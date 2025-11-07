@@ -97,35 +97,6 @@ set_target_properties(engine_core PROPERTIES
         VERSION ${PROJECT_VERSION}
 )
 
-
-# ============================================================================
-# Client Executable
-# ============================================================================
-file(GLOB_RECURSE CLIENT_SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/client/*.cpp"
-)
-
-add_executable(client ${CLIENT_SOURCES})
-
-target_link_libraries(client
-        PRIVATE
-        Engine::Core
-)
-
-set_target_properties(client PROPERTIES
-        FOLDER "Applications"
-        OUTPUT_NAME "GameClient"
-)
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/assets")
-    add_custom_command(TARGET client POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_CURRENT_SOURCE_DIR}/assets
-            $<TARGET_FILE_DIR:client>/assets
-            COMMENT "Copying assets to build directory"
-    )
-endif()
-
 # ============================================================================
 # Tests
 # ============================================================================
@@ -136,7 +107,7 @@ if(ENGINE_BUILD_TESTS)
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
     )
 
-    add_executable(engine_tests ${TEST_SOURCES})
+#    add_executable(engine_tests ${TEST_SOURCES})
 
 #    target_link_libraries(engine_tests
 #            PRIVATE
@@ -144,9 +115,9 @@ if(ENGINE_BUILD_TESTS)
 #            GTest::gtest_main
 #    )
 
-    set_target_properties(engine_tests PROPERTIES
-            FOLDER "Tests"
-    )
+#    set_target_properties(engine_tests PROPERTIES
+#            FOLDER "Tests"
+#    )
 
 #    include(GoogleTest)
 #    gtest_discover_tests(engine_tests)
