@@ -13,7 +13,7 @@ SDLImage::SDLImage()
 
 bool SDLImage::Load(const std::string &filepath)
 {
-	unLoad();
+	UnLoad();
 
 	surface = IMG_Load(filepath.c_str());
 
@@ -26,7 +26,7 @@ bool SDLImage::Load(const std::string &filepath)
 	return true;
 }
 
-bool SDLImage::unLoad()
+bool SDLImage::UnLoad()
 {
 	if (surface != nullptr)
 	{
@@ -36,4 +36,4 @@ bool SDLImage::unLoad()
 	return true;
 }
 
-bool SDLImage::isLoaded() const { return surface != nullptr; }
+bool SDLImage::IsLoaded() const { return surface != nullptr; }

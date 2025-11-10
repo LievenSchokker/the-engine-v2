@@ -10,16 +10,31 @@
 
 class AssetManager
 {
-
 public:
-	void add(const std::string& id, std::unique_ptr<Asset> asset);
-	Asset* get(const std::string& id);
-	void load(const std::string& id);
-	void unload(const std::string& id);
+	AssetManager() = default;
+	~AssetManager() = default;
+
+
+	//Don't Think we want to copy the AssetManager But I am not 100% sure about this
+	AssetManager(const AssetManager&) = delete;
+	AssetManager& operator=(const AssetManager&) = delete;
+	AssetManager(AssetManager&&) = delete;
+	AssetManager& operator=(AssetManager&&) = delete;
+
+	void Add(const std::string &fileName, std::unique_ptr<Asset> asset);
+
+	void Remove(const std::string &fileName);
+
+	bool Has(const std::string &fileName) const;
+
+	Asset *Get(const std::string &fileName);
+
+	bool Load(const std::string &fileName);
+
+	bool Unload(const std::string &fileName);
 
 private:
-	std::unordered_map<std::string, std::unique_ptr<Asset>> assets;
-
+	std::unordered_map<std::string, std::unique_ptr<Asset> > assets;
 };
 
 

@@ -15,9 +15,9 @@ class Asset
 public:
 	virtual bool Load(const std::string &filepath) = 0;
 
-	virtual bool unLoad() = 0;
+	virtual bool UnLoad() = 0;
 
-	virtual bool isLoaded() const = 0;
+	virtual bool IsLoaded() const = 0;
 
 	AssetType GetAssetType() { return m_assetType; }
 
