@@ -12,7 +12,6 @@ class ComponentManager
 {
     public:
         ComponentManager();
-
         ~ComponentManager() = default;
 
         /// Functions:
@@ -30,7 +29,7 @@ class ComponentManager
 
         void removeAllComponents();
 
-        std::vector<Behaviour &> getAllBehaviours();
+        std::vector<Behaviour*> getAllBehaviours();
 
         void activateAll();
 
