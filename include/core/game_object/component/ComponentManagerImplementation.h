@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ComponentManager.h"
+#include <algorithm>
 
 template <typename T>
 void ComponentManager::addComponent()
@@ -12,10 +13,19 @@ void ComponentManager::addComponent()
     if (owner == nullptr)
         return;
 
-    if (components.contains(typeid(T).name()))
+    auto iterator = std::find_if(components.begin(), components.end(),
+        [](const std::unique_ptr<Component>& comp) {
+            return dynamic_cast<T*>(comp.get()) != nullptr;
+        });
+
+    if (iterator != components.end())
+    {
+        /// Todo: 1) No duplicates allowed? 2) Thow warning, exception, nothing?
+        #warning "Cannot add a duplicate component to GameObject!"
         return;
+    }
 
-
+    components.push_back(std::make_unique<T>());
 }
 
 template <typename T>
@@ -24,14 +34,32 @@ T* ComponentManager::getComponent() const
     if (owner == nullptr)
         return nullptr;
 
+    auto iterator = std::find_if(components.begin(), components.end(),
+        [](const std::unique_ptr<Component>& comp) {
+            return dynamic_cast<T*>(comp.get()) != nullptr;
+        });
 
+    if (iterator != components.end())
+    {
+        return dynamic_cast<T*>(iterator->get());
+    }
+    else
+        return nullptr;
 }
 
 template <typename T>
 void ComponentManager::removeComponent()
 {
     if (owner == nullptr)
-        return nullptr;
+        return;
 
+    auto iterator = std::find_if(components.begin(), components.end(),
+        [](const std::unique_ptr<Component>& comp) {
+            return dynamic_cast<T*>(comp.get()) != nullptr;
+        });
 
+    if (iterator != components.end())
+    {
+        components.erase(iterator);
+    }
 }

@@ -13,7 +13,7 @@
 
 class ComponentManager
 {
-    ComponentManager() = default;
+    ComponentManager();
     ~ComponentManager() = default;
 
     /// Functions:
@@ -28,7 +28,7 @@ class ComponentManager
 
     void removeAllComponents();
 
-    std::Vector<Behaviour&> getAllBehaviours();
+    std::vector<Behaviour&> getAllBehaviours();
 
      void activateAll();
      void deactivateAll();
@@ -37,7 +37,7 @@ class ComponentManager
     public:
         std::vector<std::unique_ptr<Component>> components;
         GameObject* const owner;
-}
+};
 
 /// Template implementations:
 #include "ComponentManagerImplementation.h"

@@ -3,8 +3,15 @@
 //
 
 #pragma once
+#include "component/ComponentManager.h"
 
 class GameObject
 {
+    public:
+        GameObject();
+        ~GameObject();
 
-}
+
+    /// Fields:
+    std::unique_ptr<ComponentManager> componentManager = nullptr;
+};

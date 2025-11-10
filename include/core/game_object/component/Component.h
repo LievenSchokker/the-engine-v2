@@ -11,20 +11,19 @@ class Component
 {
     /// Functions:
     public:
-        Component();
+        Component() = default;
         virtual ~Component() = 0;
 
         template <typename T>
-        T* GetComponent();
+        T* getComponent();
 
         template <typename T>
-        bool TryGetComponent(T*& out);
+        bool tryGetComponent(T*& out);
 
     /// Variables:
-    public:
-        GameObject* gameObject;
-        Transform* transform;
-}
+        GameObject* owner = nullptr;
+        Transform* transform = nullptr;
+};
 
 /// Implementation of the template functions:
 #include "ComponentImplementation.h"
