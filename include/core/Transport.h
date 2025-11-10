@@ -24,15 +24,14 @@ public:
 	virtual TransportResult StartServer(uint16_t port) = 0;
 	virtual TransportResult StartClient(const char* serverAddress, uint16_t port) = 0;
 	virtual TransportResult Send(int connectionId, const std::byte data[], size_t length, bool reliable) = 0;
-	virtual TransportResult Send(int connectionId, const std::byte data[], size_t length, SendMode mode) = 0;
 	virtual TransportResult Disconnect(int connectionId) = 0;
 	virtual void Poll() = 0;
 	virtual void Shutdown() = 0;
 
-	void SetOnMessageReceived(OnMessageReceivedCallback callback) { m_onMessageReceived = callback; }
-	void SetOnConnectionChanged(OnConnectionChangedCallback callback) { m_onConnectionChanged = callback; }
+	void SetOnMessageReceived(OnMessageReceivedCallback callback) { onMessageReceived = callback; }
+	void SetOnConnectionChanged(OnConnectionChangedCallback callback) { onConnectionChanged = callback; }
 
 protected:
-	OnMessageReceivedCallback m_onMessageReceived;
-	OnConnectionChangedCallback m_onConnectionChanged;
+	OnMessageReceivedCallback onMessageReceived;
+	OnConnectionChangedCallback onConnectionChanged;
 };
