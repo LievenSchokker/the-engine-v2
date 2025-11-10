@@ -46,8 +46,8 @@ endif()
 # ============================================================================
 # Dependencies
 # ============================================================================
-#find_package(SDL3 REQUIRED)
-#find_package(GameNetworkingSockets REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
 
 #if(ENGINE_BUILD_TESTS)
 #    find_package(GTest REQUIRED)
@@ -63,6 +63,7 @@ file(GLOB_RECURSE ENGINE_SOURCES
 
 file(GLOB_RECURSE ENGINE_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h"
 )
 
 add_library(engine_core STATIC
@@ -80,11 +81,11 @@ target_include_directories(engine_core
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-#target_link_libraries(engine_core
-#       PUBLIC
-#        SDL3::SDL3
-#        GameNetworkingSockets
-#)
+target_link_libraries(engine_core
+        PUBLIC
+        SDL2::SDL2
+        SDL2_image::SDL2_image
+)
 
 if(ENGINE_ENABLE_WARNINGS)
     if(MSVC)
@@ -93,7 +94,7 @@ if(ENGINE_ENABLE_WARNINGS)
             target_compile_options(engine_core PRIVATE /WX)
         endif()
     else()
-        target_compile_options(engine_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
+        target_compile_options(engine_core PRIVATE -Wall -Wextra -Wpedantic)
         if(ENGINE_WARNINGS_AS_ERRORS)
             target_compile_options(engine_core PRIVATE -Werror)
         endif()
@@ -146,20 +147,20 @@ if(ENGINE_BUILD_TESTS)
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
     )
 
-#    add_executable(engine_tests ${TEST_SOURCES})
+    #    add_executable(engine_tests ${TEST_SOURCES})
 
-#    target_link_libraries(engine_tests
-#            PRIVATE
-#            Engine::Core
-#            GTest::gtest_main
-#    )
+    #    target_link_libraries(engine_tests
+    #            PRIVATE
+    #            Engine::Core
+    #            GTest::gtest_main
+    #    )
 
-#    set_target_properties(engine_tests PROPERTIES
-#            FOLDER "Tests"
-#    )
+    #    set_target_properties(engine_tests PROPERTIES
+    #            FOLDER "Tests"
+    #    )
 
-#    include(GoogleTest)
-#    gtest_discover_tests(engine_tests)
+    #    include(GoogleTest)
+    #    gtest_discover_tests(engine_tests)
 endif()
 
 # ============================================================================
