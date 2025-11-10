@@ -25,3 +25,6 @@ class Component
         GameObject* gameObject;
         Transform* transform;
 }
+
+/// Implementation of the template functions:
+#include "ComponentImplementation.h"
