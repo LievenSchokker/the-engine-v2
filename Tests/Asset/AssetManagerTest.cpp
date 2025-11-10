@@ -27,10 +27,10 @@ protected:
 // Test 1: Load a single image
 TEST_F(AssetManagerTest, LoadSingleImage) {
 	//Arrange
-	manager->Add(testImagePath, std::make_unique<SDLImage>());
+	manager->add(testImagePath, std::make_unique<SDLImage>());
 
 	//Act
-	bool loaded = manager->Load(testImagePath);
+	bool loaded = manager->load(testImagePath);
 
 	//Assert
 	EXPECT_TRUE(loaded) << "Failed to load image: " << SDL_GetError();
@@ -39,15 +39,28 @@ TEST_F(AssetManagerTest, LoadSingleImage) {
 // Test 2: Prevent duplicate loading
 TEST_F(AssetManagerTest, PreventDuplicateLoad) {
 	//Arrange
-	manager->Add(testImagePath, std::make_unique<SDLImage>());
-	manager->Load(testImagePath);
+	manager->add(testImagePath, std::make_unique<SDLImage>());
+	manager->load(testImagePath);
 
 	// Act
-	bool loadedAgain = manager->Load(testImagePath);
+	bool loadedAgain = manager->load(testImagePath);
 
 	// Assert
 	EXPECT_TRUE(loadedAgain) << "Duplicate load should return true";
 }
 
+// Test 3: Prevent duplicate addition of same asset
+TEST_F(AssetManagerTest, PreventDuplicateAdd) {
+	//Arrange & Act
+	manager->add(testImagePath, std::make_unique<SDLImage>());
+	Asset* firstAsset = manager->get(testImagePath);
 
+	// Try to add duplicate
+	manager->add(testImagePath, std::make_unique<SDLImage>());
+	Asset* secondAsset = manager->get(testImagePath);
+
+	// Assert - Should be the same asset (duplicate add was prevented)
+	EXPECT_EQ(firstAsset, secondAsset) << "Duplicate add should be ignored, same asset pointer expected";
+	EXPECT_TRUE(manager->has(testImagePath)) << "Asset should still exist";
+}
 
