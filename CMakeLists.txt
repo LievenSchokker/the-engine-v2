@@ -9,7 +9,7 @@ project(GameEngine
 # ============================================================================
 # Build Options
 # ============================================================================
-option(ENGINE_BUILD_TESTS "Build the test suite" OFF)
+option(ENGINE_BUILD_TESTS "Build the test suite" ON)
 option(ENGINE_BUILD_EXAMPLE "Build executable for testing" ON)
 option(ENGINE_ENABLE_WARNINGS "Enable compiler warnings" OFF)
 option(ENGINE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
@@ -49,9 +49,10 @@ endif()
 find_package(SDL2 REQUIRED)
 find_package(SDL2_image REQUIRED)
 
-#if(ENGINE_BUILD_TESTS)
-#    find_package(GTest REQUIRED)
-#endif()
+if (ENGINE_BUILD_TESTS)
+    find_package(GTest REQUIRED)
+    enable_testing()
+endif ()
 
 # ============================================================================
 # Engine Core Files
@@ -140,28 +141,34 @@ endif()
 # ============================================================================
 # Tests
 # ============================================================================
-if(ENGINE_BUILD_TESTS)
-    enable_testing()
-
-    file(GLOB_RECURSE TEST_SOURCES
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
+if (ENGINE_BUILD_TESTS)
+    add_executable(engine_tests
+            ${ENGINE_SOURCES}
+            Tests/Asset/AssetManagerTest.cpp
     )
 
-    #    add_executable(engine_tests ${TEST_SOURCES})
+    target_include_directories(engine_tests PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/include
+            ${CMAKE_CURRENT_SOURCE_DIR}/src
+    )
 
-    #    target_link_libraries(engine_tests
-    #            PRIVATE
-    #            Engine::Core
-    #            GTest::gtest_main
-    #    )
+    target_link_libraries(engine_tests
+            PRIVATE
+            GTest::gtest
+            GTest::gtest_main
+            SDL2::SDL2
+            SDL2_image::SDL2_image
+    )
 
-    #    set_target_properties(engine_tests PROPERTIES
-    #            FOLDER "Tests"
-    #    )
+    set_target_properties(engine_tests PROPERTIES
+            FOLDER "Tests"
+    )
 
-    #    include(GoogleTest)
-    #    gtest_discover_tests(engine_tests)
-endif()
+    include(GoogleTest)
+    gtest_discover_tests(engine_tests)
+
+    message(STATUS "Building tests executable")
+endif ()
 
 # ============================================================================
 # Print Configuration Summary
