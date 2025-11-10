@@ -86,16 +86,19 @@ target_include_directories(engine_core
 #        GameNetworkingSockets
 #)
 
-if(WIN32)
-    target_link_libraries(engine_core PRIVATE ws2_32)
-elseif(UNIX AND NOT APPLE)
-    target_link_libraries(engine_core PRIVATE pthread dl)
+if(ENGINE_ENABLE_WARNINGS)
+    if(MSVC)
+        target_compile_options(engine_core PRIVATE /W4)
+        if(ENGINE_WARNINGS_AS_ERRORS)
+            target_compile_options(engine_core PRIVATE /WX)
+        endif()
+    else()
+        target_compile_options(engine_core PRIVATE -Wall -Wextra -Wpedantic)
+        if(ENGINE_WARNINGS_AS_ERRORS)
+            target_compile_options(engine_core PRIVATE -Werror)
+        endif()
+    endif()
 endif()
-
-set_target_properties(engine_core PROPERTIES
-        FOLDER "Engine"
-        VERSION ${PROJECT_VERSION}
-)
 
 # ============================================================================
 # Tests
