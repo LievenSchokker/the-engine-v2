@@ -1,65 +1,79 @@
-//
-// Created by Lieven Schokker on 10/11/2025.
-//
+///
+/// Created by Lieven Schokker on 10/11/2025.
+///
+
 
 #include "AssetManager.h"
+#include "Assets/Asset.h"
 
-void AssetManager::Add(const std::string &fileName, std::unique_ptr<Asset> asset)
+
+
+void AssetManager::add(const std::string & fileName, std::unique_ptr<Asset> asset)
 {
-	if (Get(fileName) == nullptr)
+	if(get(fileName) == nullptr)
 	{
 		assets[fileName] = std::move(asset);
 	}
 }
 
-void AssetManager::Remove(const std::string& filePath)
+
+void AssetManager::remove(const std::string & filePath)
 {
 	assets.erase(filePath);
 }
 
-bool AssetManager::Has(const std::string& filePath) const
+
+bool AssetManager::has(const std::string & filePath) const
 {
 	return assets.contains(filePath);
 }
 
-Asset* AssetManager::Get(const std::string&filePath)
+
+Asset* AssetManager::get(const std::string & filePath)
 {
 	auto it = assets.find(filePath);
-	if (it != assets.end()) {
+
+	if(it != assets.end())
+	{
 		return it->second.get();
 	}
+
 	return nullptr;
 }
 
-bool AssetManager::Load(const std::string &filePath)
-{
-	Asset* asset = Get(filePath);
 
-	if (asset == nullptr)
+bool AssetManager::load(const std::string & filePath)
+{
+	Asset* asset = get(filePath);
+
+	if(asset == nullptr)
 	{
 		return false;
 	}
 
-	if(asset->IsLoaded() == false)
+	if(!asset->isLoaded())
 	{
-		return asset->Load(filePath);
+		return asset->load(filePath);
 	}
+
 	return true;
 }
 
-bool AssetManager::Unload(const std::string &filePath)
-{
-	Asset* asset = Get(filePath);
 
-	if (asset == nullptr)
+bool AssetManager::unload(const std::string & filePath)
+{
+	Asset* asset = get(filePath);
+
+	if(asset == nullptr)
 	{
 		return false;
 	}
 
-	if(asset->IsLoaded() == false)
+	if(!asset->isLoaded())
 	{
-		return asset->UnLoad();
+		return asset->unLoad();
 	}
+
 	return true;
 }
 

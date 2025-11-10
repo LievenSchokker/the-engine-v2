@@ -1,9 +1,9 @@
-//
-// Created by Lieven Schokker on 10/11/2025.
-//
+///
+/// Created by Lieven Schokker on 10/11/2025.
+///
 
-#ifndef GAMEENGINE_SDLIMAGE_H
-#define GAMEENGINE_SDLIMAGE_H
+#pragma once
+
 #include "../Asset.h"
 #include <SDL_image.h>
 #include <SDL.h>
@@ -12,6 +12,7 @@ class SDLImage : public Asset
 {
 public:
 	SDLImage();
+
 	~SDLImage();
 
 	SDLImage(const SDLImage &) = delete;
@@ -19,16 +20,12 @@ public:
 	SDLImage &operator=(const SDLImage &) = delete;
 
 
+	bool load(const std::string & filepath) override;
 
-	bool Load(const std::string &filepath) override;
+	bool unLoad() override;
 
-	bool UnLoad() override;
-
-	bool IsLoaded() const override;
+	bool isLoaded() const override;
 
 private:
 	SDL_Surface *surface;
 };
-
-
-#endif //GAMEENGINE_SDLIMAGE_H
