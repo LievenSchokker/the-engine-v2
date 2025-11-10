@@ -21,20 +21,23 @@ class ComponentManager
     void addComponent();
 
     template <typename T>
-    T* getComponent();
+    T* getComponent() const;
 
     template <typename T>
     void removeComponent();
 
     void removeAllComponents();
 
-    std::Vector<Behaviour> getAllBehaviours();
+    std::Vector<Behaviour&> getAllBehaviours();
 
-    void activateAll();
-    void deactivateAll();
+     void activateAll();
+     void deactivateAll();
 
     /// Variables:
     public:
         std::vector<std::unique_ptr<Component>> components;
-        GameObject* gameObject;
+        GameObject* const owner;
 }
+
+/// Template implementations:
+#include "ComponentManagerImplementation.h"

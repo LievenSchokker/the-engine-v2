@@ -30,3 +30,4 @@ bool TryGetComponent(T*& out)
 
     return (out != nullptr);
 }
+
