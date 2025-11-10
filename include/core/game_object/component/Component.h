@@ -15,10 +15,12 @@ class Component
         virtual ~Component() = 0;
 
         template <typename T>
-        T* getComponent();
+        T* getComponent() const;
 
         template <typename T>
-        bool tryGetComponent(T*& out);
+        bool tryGetComponent(T*& out) const;
+
+        void setOwner(GameObject* object);
 
     /// Variables:
         GameObject* owner = nullptr;

@@ -3,34 +3,29 @@
 //
 #pragma once
 #include "Component.h"
+#include "ComponentManager.h"
+
 
 template<typename T>
-T *Component::getComponent()
+T* Component::getComponent() const
 {
     if (owner == nullptr)
         return nullptr;
 
-    for (Component *comp: owner->componentManager->components)
-    {
-        if (T *casted = dynamic_cast<T *>(comp))
-            return casted;
-    }
-    return nullptr;
+    T* component = owner->componentManager->getComponent<T>();
+
+    if (component != nullptr)
+        return component;
+    else
+        throw std::runtime_error("GameObject does not have a component of type T!");
 }
 
 template<typename T>
-bool Component::tryGetComponent(T*& out)
+bool Component::tryGetComponent(T*& out) const
 {
     if (owner == nullptr)
         return false;
 
-    for (Component *comp: owner->componentManager->components)
-    {
-        if (T *casted = dynamic_cast<T *>(comp))
-        {
-            out = casted;
-            return true;
-        }
-    }
-    return false;
+    out = owner->componentManager->tryGetComponent<T>();
+    return (out != nullptr);
 }

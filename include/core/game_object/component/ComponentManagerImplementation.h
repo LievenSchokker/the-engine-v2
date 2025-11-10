@@ -29,16 +29,21 @@ void ComponentManager::addComponent()
 }
 
 template <typename T>
+std::vector<std::unique_ptr<Component>>::iterator ComponentManager::getComponentIterator()
+{
+    return std::find_if(components.begin(), components.end(),
+        [](const std::unique_ptr<Component>& comp) {
+            return dynamic_cast<T*>(comp.get()) != nullptr;
+        });
+}
+
+template <typename T>
 T* ComponentManager::getComponent() const
 {
     if (owner == nullptr)
         return nullptr;
 
-    auto iterator = std::find_if(components.begin(), components.end(),
-        [](const std::unique_ptr<Component>& comp) {
-            return dynamic_cast<T*>(comp.get()) != nullptr;
-        });
-
+    auto iterator = getComponentIterator<T>();
     if (iterator != components.end())
     {
         return dynamic_cast<T*>(iterator->get());
@@ -47,17 +52,28 @@ T* ComponentManager::getComponent() const
         return nullptr;
 }
 
+template<typename T>
+bool ComponentManager::tryGetComponent(T*& out) const
+{
+    T* component = getComponent<T>();
+
+    if (component == nullptr)
+        return false;
+    else
+    {
+        out = component;
+        return true;
+    }
+}
+
+
 template <typename T>
 void ComponentManager::removeComponent()
 {
     if (owner == nullptr)
         return;
 
-    auto iterator = std::find_if(components.begin(), components.end(),
-        [](const std::unique_ptr<Component>& comp) {
-            return dynamic_cast<T*>(comp.get()) != nullptr;
-        });
-
+    auto iterator = getComponentIterator<T>();
     if (iterator != components.end())
     {
         components.erase(iterator);
