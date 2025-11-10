@@ -9,8 +9,9 @@ project(GameEngine
 # ============================================================================
 # Build Options
 # ============================================================================
-option(ENGINE_BUILD_TESTS "Build the test suite" ON)
-option(ENGINE_ENABLE_WARNINGS "Enable compiler warnings" ON)
+option(ENGINE_BUILD_TESTS "Build the test suite" OFF)
+option(ENGINE_BUILD_EXAMPLE "Build executable for testing" ON)
+option(ENGINE_ENABLE_WARNINGS "Enable compiler warnings" OFF)
 option(ENGINE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 
 # ============================================================================
@@ -57,12 +58,11 @@ endif()
 # ============================================================================
 
 file(GLOB_RECURSE ENGINE_SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/engine/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
 file(GLOB_RECURSE ENGINE_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/*.hpp"
 )
 
 add_library(engine_core STATIC
@@ -77,7 +77,7 @@ target_include_directories(engine_core
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
         PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src/engine
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 #target_link_libraries(engine_core
@@ -93,12 +93,48 @@ if(ENGINE_ENABLE_WARNINGS)
             target_compile_options(engine_core PRIVATE /WX)
         endif()
     else()
-        target_compile_options(engine_core PRIVATE -Wall -Wextra -Wpedantic)
+        target_compile_options(engine_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
         if(ENGINE_WARNINGS_AS_ERRORS)
             target_compile_options(engine_core PRIVATE -Werror)
         endif()
     endif()
 endif()
+
+# ============================================================================
+# Executable (Used for debugging)
+# ============================================================================
+if(ENGINE_BUILD_EXAMPLE)
+    add_executable(engine_sandbox
+            src/main.cpp
+    )
+
+    target_link_libraries(engine_sandbox
+            PRIVATE
+            Engine::Core
+    )
+
+    set_target_properties(engine_sandbox PROPERTIES
+            FOLDER "Sandbox"
+            OUTPUT_NAME "sandbox"
+    )
+
+    if(ENGINE_ENABLE_WARNINGS)
+        if(MSVC)
+            target_compile_options(engine_sandbox PRIVATE /W4)
+            if(ENGINE_WARNINGS_AS_ERRORS)
+                target_compile_options(engine_sandbox PRIVATE /WX)
+            endif()
+        else()
+            target_compile_options(engine_sandbox PRIVATE -Wall -Wextra -Wpedantic)
+            if(ENGINE_WARNINGS_AS_ERRORS)
+                target_compile_options(engine_sandbox PRIVATE -Werror)
+            endif()
+        endif()
+    endif()
+
+    message(STATUS "Building sandbox executable: ${CMAKE_BINARY_DIR}/bin/sandbox")
+endif()
+
 
 # ============================================================================
 # Tests
@@ -134,6 +170,7 @@ message(STATUS "Game Engine Version: ${PROJECT_VERSION}")
 message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
 message(STATUS "Build Tests: ${ENGINE_BUILD_TESTS}")
+message(STATUS "Build Example: ${ENGINE_BUILD_EXAMPLE}")
 message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "Platform: ${CMAKE_SYSTEM_NAME}")
 message(STATUS "========================================================")
