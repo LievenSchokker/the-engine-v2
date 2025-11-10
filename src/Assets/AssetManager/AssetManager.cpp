@@ -6,31 +6,34 @@
 
 void AssetManager::Add(const std::string &fileName, std::unique_ptr<Asset> asset)
 {
-	assets[fileName] = std::move(asset);
+	if (Get(fileName) == nullptr)
+	{
+		assets[fileName] = std::move(asset);
+	}
 }
 
-void AssetManager::Remove(const std::string& fileName)
+void AssetManager::Remove(const std::string& filePath)
 {
-	assets.erase(fileName);
+	assets.erase(filePath);
 }
 
-bool AssetManager::Has(const std::string& fileName) const
+bool AssetManager::Has(const std::string& filePath) const
 {
-	return assets.contains(fileName);
+	return assets.contains(filePath);
 }
 
-Asset* AssetManager::Get(const std::string&fileName)
+Asset* AssetManager::Get(const std::string&filePath)
 {
-	auto it = assets.find(fileName);
+	auto it = assets.find(filePath);
 	if (it != assets.end()) {
 		return it->second.get();
 	}
 	return nullptr;
 }
 
-bool AssetManager::Load(const std::string &fileName)
+bool AssetManager::Load(const std::string &filePath)
 {
-	Asset* asset = Get(fileName);
+	Asset* asset = Get(filePath);
 
 	if (asset == nullptr)
 	{
@@ -39,14 +42,14 @@ bool AssetManager::Load(const std::string &fileName)
 
 	if(asset->IsLoaded() == false)
 	{
-		return asset->Load(fileName);
+		return asset->Load(filePath);
 	}
 	return true;
 }
 
-bool AssetManager::Unload(const std::string &fileName)
+bool AssetManager::Unload(const std::string &filePath)
 {
-	Asset* asset = Get(fileName);
+	Asset* asset = Get(filePath);
 
 	if (asset == nullptr)
 	{

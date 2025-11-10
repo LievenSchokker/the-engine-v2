@@ -6,7 +6,7 @@
 #define THE_ENGINE_REPO_ASSETMANAGER_H
 
 #include <unordered_set>
-#include "Assets/Asset.h"
+#include "../Asset.h"
 
 class AssetManager
 {
@@ -21,17 +21,17 @@ public:
 	AssetManager(AssetManager&&) = delete;
 	AssetManager& operator=(AssetManager&&) = delete;
 
-	void Add(const std::string &fileName, std::unique_ptr<Asset> asset);
+	void Add(const std::string &filePath, std::unique_ptr<Asset> asset);
 
-	void Remove(const std::string &fileName);
+	void Remove(const std::string &filePath);
 
-	bool Has(const std::string &fileName) const;
+	bool Has(const std::string &filePath) const;
 
-	Asset *Get(const std::string &fileName);
+	Asset *Get(const std::string &filePath);
 
-	bool Load(const std::string &fileName);
+	bool Load(const std::string &filePath);
 
-	bool Unload(const std::string &fileName);
+	bool Unload(const std::string &filePath);
 
 private:
 	std::unordered_map<std::string, std::unique_ptr<Asset> > assets;

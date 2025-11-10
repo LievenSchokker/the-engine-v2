@@ -4,7 +4,7 @@
 
 #ifndef GAMEENGINE_SDLIMAGE_H
 #define GAMEENGINE_SDLIMAGE_H
-#include "Assets/Asset.h"
+#include "../Asset.h"
 #include <SDL_image.h>
 #include <SDL.h>
 
@@ -12,18 +12,19 @@ class SDLImage : public Asset
 {
 public:
 	SDLImage();
+	~SDLImage();
 
 	SDLImage(const SDLImage &) = delete;
 
 	SDLImage &operator=(const SDLImage &) = delete;
 
-	virtual ~SDLImage() = delete;
 
-	virtual bool Load(const std::string &filepath) = 0;
 
-	virtual bool UnLoad() = 0;
+	bool Load(const std::string &filepath) override;
 
-	virtual bool IsLoaded() const = 0;
+	bool UnLoad() override;
+
+	bool IsLoaded() const override;
 
 private:
 	SDL_Surface *surface;

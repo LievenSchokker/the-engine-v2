@@ -11,6 +11,11 @@ SDLImage::SDLImage()
 	m_assetType = AssetType::Sprite;
 }
 
+SDLImage::~SDLImage()
+{
+	UnLoad();
+}
+
 bool SDLImage::Load(const std::string &filepath)
 {
 	UnLoad();

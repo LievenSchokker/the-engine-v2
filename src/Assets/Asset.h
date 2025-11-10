@@ -10,9 +10,8 @@
 
 class Asset
 {
-	~Asset() = default;
-
 public:
+	virtual ~Asset() = default;
 	virtual bool Load(const std::string &filepath) = 0;
 
 	virtual bool UnLoad() = 0;
@@ -21,7 +20,7 @@ public:
 
 	AssetType GetAssetType() { return m_assetType; }
 
-private:
+protected:
 	AssetType m_assetType = AssetType::None;
 };
 
