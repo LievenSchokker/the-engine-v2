@@ -29,7 +29,7 @@ the-engine/
 ├─ LICENSE
 │
 ├─ include/                 # Public headers for engine_core, client, and server
-│   ├─ engine/
+│   ├─ core/
 │   │   ├─ Engine.hpp
 │   │   ├─ Renderer.hpp
 │   │   └─ Network.hpp
