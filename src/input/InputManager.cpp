@@ -3,17 +3,17 @@
 
 InputManager* InputManager::instance = nullptr;
 
-InputManager* InputManager::GetInstance()
+InputManager* InputManager::getInstance()
 {
     if (!instance)
     {
         instance = new InputManager();
-        instance->_adapter = new SDLInputAdapter();
+        instance->adapter = new SDLInputAdapter();
     }
     return instance;
 }
 
-void InputManager::Shutdown()
+void InputManager::shutdown()
 {
     if (instance)
     {
@@ -24,167 +24,168 @@ void InputManager::Shutdown()
 
 InputManager::~InputManager()
 {
-    delete _adapter;
-    _adapter = nullptr;
+    delete adapter;
+    adapter = nullptr;
 }
 
 void InputManager::update()
 {
     resetPerFrameState();
-    if (_adapter)
+    if (adapter)
     {
-        _adapter->poll(*this);
+        adapter->poll(*this);
     }
     computeTransitions();
 }
 
 void InputManager::requestQuit()
 {
-    _quitRequested = true;
+    quitRequested = true;
 }
 
 bool InputManager::shouldQuit() const
 {
-    return _quitRequested;
+    return quitRequested;
 }
 
 void InputManager::resetPerFrameState()
 {
-    _keysPressed.clear();
-    _keysReleased.clear();
-    _mousePressed.clear();
-    _mouseReleased.clear();
+    keysPressed.clear();
+    keysReleased.clear();
+    mousePressed.clear();
+    mouseReleased.clear();
 
-    _prevMouseX = _mouseX;
-    _prevMouseY = _mouseY;
-    _mouseMovedThisFrame = false;
+    previousMouseX = currentMouseX;
+    previousMouseY = currentMouseY;
+    mouseMovedInFrame = false;
 
-    _wheelX = 0;
-    _wheelY = 0;
+    wheelX = 0;
+    wheelY = 0;
 }
 
 void InputManager::computeTransitions()
 {
-    _keysPressed.clear();
-    _keysReleased.clear();
-    for (const auto& k : _keysCurrent)
+    keysPressed.clear();
+    keysReleased.clear();
+    for (const auto& k : keysCurrent)
     {
-        if (_keysPrevious.find(k) == _keysPrevious.end())
-            _keysPressed.insert(k);
+        if (keysPrevious.find(k) == keysPrevious.end())
+            keysPressed.insert(k);
     }
-    for (const auto& k : _keysPrevious)
+    for (const auto& k : keysPrevious)
     {
-        if (_keysCurrent.find(k) == _keysCurrent.end())
-            _keysReleased.insert(k);
+        if (keysCurrent.find(k) == keysCurrent.end())
+            keysReleased.insert(k);
     }
-    _keysPrevious = _keysCurrent;
+    keysPrevious = keysCurrent;
 
-    _mousePressed.clear();
-    _mouseReleased.clear();
-    for (const auto& b : _mouseCurrent)
+    mousePressed.clear();
+    mouseReleased.clear();
+    for (const auto& b : mouseCurrent)
     {
-        if (_mousePrevious.find(b) == _mousePrevious.end())
-            _mousePressed.insert(b);
+        if (mousePrevious.find(b) == mousePrevious.end())
+            mousePressed.insert(b);
     }
-    for (const auto& b : _mousePrevious)
+    for (const auto& b : mousePrevious)
     {
-        if (_mouseCurrent.find(b) == _mouseCurrent.end())
-            _mouseReleased.insert(b);
+        if (mouseCurrent.find(b) == mouseCurrent.end())
+            mouseReleased.insert(b);
     }
-    _mousePrevious = _mouseCurrent;
+    mousePrevious = mouseCurrent;
 
-    _mouseMovedThisFrame = (_mouseX != _prevMouseX) || (_mouseY != _prevMouseY);
+    mouseMovedInFrame =
+        (currentMouseX != previousMouseX) || (currentMouseY != previousMouseY);
 }
 
 void InputManager::setKeyDown(KeyCode key, bool isDown)
 {
     if (isDown)
-        _keysCurrent.insert(key);
+        keysCurrent.insert(key);
     else
-        _keysCurrent.erase(key);
+        keysCurrent.erase(key);
 }
 
 void InputManager::setMouseDown(MouseButton button, bool isDown)
 {
     if (isDown)
-        _mouseCurrent.insert(button);
+        mouseCurrent.insert(button);
     else
-        _mouseCurrent.erase(button);
+        mouseCurrent.erase(button);
 }
 
 void InputManager::setMousePosition(int x, int y)
 {
-    _mouseX = x;
-    _mouseY = y;
+    currentMouseX = x;
+    currentMouseY = y;
 }
 
 void InputManager::addMouseWheelDelta(int dx, int dy)
 {
-    _wheelX += dx;
-    _wheelY += dy;
+    wheelX += dx;
+    wheelY += dy;
 }
 
 bool InputManager::isKeyDown(KeyCode key) const
 {
-    return _keysCurrent.find(key) != _keysCurrent.end();
+    return keysCurrent.find(key) != keysCurrent.end();
 }
 
 bool InputManager::wasKeyPressed(KeyCode key) const
 {
-    return _keysPressed.find(key) != _keysPressed.end();
+    return keysPressed.find(key) != keysPressed.end();
 }
 
 bool InputManager::wasKeyReleased(KeyCode key) const
 {
-    return _keysReleased.find(key) != _keysReleased.end();
+    return keysReleased.find(key) != keysReleased.end();
 }
 
 bool InputManager::isMouseDown(MouseButton button) const
 {
-    return _mouseCurrent.find(button) != _mouseCurrent.end();
+    return mouseCurrent.find(button) != mouseCurrent.end();
 }
 
 bool InputManager::wasMousePressed(MouseButton button) const
 {
-    return _mousePressed.find(button) != _mousePressed.end();
+    return mousePressed.find(button) != mousePressed.end();
 }
 
 bool InputManager::wasMouseReleased(MouseButton button) const
 {
-    return _mouseReleased.find(button) != _mouseReleased.end();
+    return mouseReleased.find(button) != mouseReleased.end();
 }
 
 int InputManager::mouseX() const
 {
-    return _mouseX;
+    return currentMouseX;
 }
 
 int InputManager::mouseY() const
 {
-    return _mouseY;
+    return currentMouseY;
 }
 
 int InputManager::mouseDeltaX() const
 {
-    return _mouseX - _prevMouseX;
+    return currentMouseX - previousMouseX;
 }
 
 int InputManager::mouseDeltaY() const
 {
-    return _mouseY - _prevMouseY;
+    return currentMouseY - previousMouseY;
 }
 
 bool InputManager::mouseMovedThisFrame() const
 {
-    return _mouseMovedThisFrame;
+    return mouseMovedInFrame;
 }
 
 int InputManager::wheelDeltaX() const
 {
-    return _wheelX;
+    return wheelX;
 }
 
 int InputManager::wheelDeltaY() const
 {
-    return _wheelY;
+    return wheelY;
 }

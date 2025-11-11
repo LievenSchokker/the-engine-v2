@@ -12,8 +12,8 @@ class IInputAdapter;
 class InputManager
 {
   public:
-    static InputManager* GetInstance();
-    static void Shutdown();
+    static InputManager* getInstance();
+    static void shutdown();
 
     /// Polling entry point (owned adapter will feed events)
     void update();
@@ -57,7 +57,7 @@ class InputManager
     InputManager(InputManager&&) = delete;
     InputManager& operator=(InputManager&&) = delete;
     ~InputManager();
-    IInputAdapter* _adapter = nullptr;
+    IInputAdapter* adapter = nullptr;
     static InputManager* instance;
 
     /// Frame lifecycle internals
@@ -65,31 +65,30 @@ class InputManager
     void computeTransitions();
 
     // Keyboard state
-    std::unordered_set<KeyCode> _keysCurrent;
-    std::unordered_set<KeyCode> _keysPrevious;
-    std::unordered_set<KeyCode> _keysPressed; /// computed in computeTransitions
-    std::unordered_set<KeyCode>
-        _keysReleased; /// computed in computeTransitions
+    std::unordered_set<KeyCode> keysCurrent;
+    std::unordered_set<KeyCode> keysPrevious;
+    std::unordered_set<KeyCode> keysPressed;  /// computed in computeTransitions
+    std::unordered_set<KeyCode> keysReleased; /// computed in computeTransitions
 
     // Mouse button state
-    std::unordered_set<MouseButton> _mouseCurrent;
-    std::unordered_set<MouseButton> _mousePrevious;
+    std::unordered_set<MouseButton> mouseCurrent;
+    std::unordered_set<MouseButton> mousePrevious;
     std::unordered_set<MouseButton>
-        _mousePressed; // computed in computeTransitions
+        mousePressed; // computed in computeTransitions
     std::unordered_set<MouseButton>
-        _mouseReleased; // computed in computeTransitions
+        mouseReleased; // computed in computeTransitions
 
     // Mouse position
-    int _mouseX = 0;
-    int _mouseY = 0;
-    int _prevMouseX = 0;
-    int _prevMouseY = 0;
-    bool _mouseMovedThisFrame = false;
+    int currentMouseX = 0;
+    int currentMouseY = 0;
+    int previousMouseX = 0;
+    int previousMouseY = 0;
+    bool mouseMovedInFrame = false;
 
     // Mouse wheel (per frame)
-    int _wheelX = 0;
-    int _wheelY = 0;
-    bool _quitRequested = false;
+    int wheelX = 0;
+    int wheelY = 0;
+    bool quitRequested = false;
 };
 
 #endif // INPUT_MANAGER_H
