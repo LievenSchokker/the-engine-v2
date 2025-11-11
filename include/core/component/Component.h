@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Transform.h"
-#include "../GameObject.h"
+#include "../game_object/GameObject.h"
 
 class Component
 {

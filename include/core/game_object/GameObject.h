@@ -1,74 +1,72 @@
 //
 // Created by samle on 10/11/2025.
 //
+
+
 #pragma once
 
 
-#include "component/ComponentManager.h"
-#include "behaviour/Behaviour.h"
+#include "../component/ComponentManager.h"
+#include "../behaviour/Behaviour.h"
 
 
 class GameObject
 {
-public:
-    GameObject();
+    public:
+        GameObject();
 
-    ~GameObject();
+        ~GameObject();
 
-    bool compareTag(std::string other);
+        bool compareTag(std::string other);
 
-    std::vector<Behaviour> getActiveBehaviours() const;
+        std::vector<Behaviour> getActiveBehaviours() const;
 
-    /// Template functions:
-    template <typename T>
-    void addComponent();
+        /// Template functions:
+        template<typename T>
+        void addComponent();
 
-    template <typename T>
-    T* getComponent();
+        template<typename T>
+        T* getComponent();
 
-    template <typename T>
-    bool tryGetComponent();
+        template<typename T>
+        bool tryGetComponent();
 
-    template <typename T>
-    T* getOrAddComponent();
+        template<typename T>
+        T* getOrAddComponent();
 
+        /// Getters:
+        ComponentManager* getComponentManager() const;
 
-    /// Getters:
-    ComponentManager* getComponentManager() const;
+        Transform* getTransform() const;
 
-    Transform* getTransform() const;
+        std::string getName() const;
 
-    std::string getName() const;
+        int getLayer() const;
 
-    int getLayer() const;
+        std::string getTag() const;
 
-    std::string getTag() const;
+        bool getIsActive() const;
 
-    bool getIsActive() const;
+        bool getIsStatic() const;
 
-    bool getIsStatic() const;
+        /// Setters:
+        void setName(std::string newName);
 
+        void setLayer(int newLayer);
 
-    /// Setters:
-    void setName(std::string newName);
+        void setTag(std::string newTag);
 
-    void setLayer(int newLayer);
+        void setIsActive(bool value);
 
-    void setTag(std::string newTag);
+        void setIsStatic(bool value);
 
-    void setIsActive(bool value);
-
-    void setIsStatic(bool value);
-
-private:
-    /// Fields:
-    const std::unique_ptr<ComponentManager> componentManager = nullptr;
-    std::unique_ptr<Transform> const transform = nullptr;
-
-    std::string name;
-    int layer;
-    std::string tag;
-
-    bool isActive;
-    bool isStatic;
+    private:
+        /// Fields:
+        const std::unique_ptr<ComponentManager> componentManager = nullptr;
+        std::unique_ptr<Transform> const transform = nullptr;
+        std::string name;
+        int layer;
+        std::string tag;
+        bool isActive;
+        bool isStatic;
 };
