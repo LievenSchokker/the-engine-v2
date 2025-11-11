@@ -27,7 +27,7 @@ public:
 
 	bool load(const std::string & filePath);
 
-	bool unload(const std::string & filePath);
+	bool unLoad(const std::string & filePath);
 
 private:
 	std::unordered_map<std::string, std::unique_ptr<Asset> > assets;

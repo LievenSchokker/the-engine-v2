@@ -60,7 +60,7 @@ bool AssetManager::load(const std::string & filePath)
 }
 
 
-bool AssetManager::unload(const std::string & filePath)
+bool AssetManager::unLoad(const std::string & filePath)
 {
 	Asset* asset = get(filePath);
 

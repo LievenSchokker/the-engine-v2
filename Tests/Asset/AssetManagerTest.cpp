@@ -1,3 +1,4 @@
+#include <iostream>
 #include <gtest/gtest.h>
 #include <SDL.h>
 #include <SDL_image.h>
@@ -10,11 +11,12 @@ class AssetManagerTest : public ::testing::Test {
 protected:
 	AssetManager* manager{};
 	const char* testImagePath{};
+
 	void SetUp() override {
 		std::cout << "SDL_image initialized successfully" << std::endl;
 
 		manager = new AssetManager();
-		testImagePath = "/Users/sirbarry/Documents/GitHub/the-engine-repo/tests/Asset/Sprite/MissingTexture.jpg";
+		testImagePath = "Sprite/MissingTexture.jpg";
 
 		std::cout << "SetUp complete!" << std::endl;
 	}
