@@ -13,6 +13,15 @@ InputManager* InputManager::GetInstance()
     return instance;
 }
 
+void InputManager::Shutdown()
+{
+    if (instance)
+    {
+        delete instance;
+        instance = nullptr;
+    }
+}
+
 InputManager::~InputManager()
 {
     delete _adapter;

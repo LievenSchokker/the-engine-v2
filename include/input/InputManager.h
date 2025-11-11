@@ -13,6 +13,7 @@ class InputManager
 {
   public:
     static InputManager* GetInstance();
+    static void Shutdown();
 
     /// Polling entry point (owned adapter will feed events)
     void update();
@@ -51,6 +52,10 @@ class InputManager
 
   private:
     InputManager() = default;
+    InputManager(const InputManager&) = delete;
+    InputManager& operator=(const InputManager&) = delete;
+    InputManager(InputManager&&) = delete;
+    InputManager& operator=(InputManager&&) = delete;
     ~InputManager();
     IInputAdapter* _adapter = nullptr;
     static InputManager* instance;
