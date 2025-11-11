@@ -7,29 +7,30 @@
 
 
 #include "ComponentManager.h"
+#include "Component.h"
 #include <algorithm>
 
 
+
 template<typename T>
-void ComponentManager::addComponent()
+T* ComponentManager::addComponent()
 {
     static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
 
     if (owner == nullptr)
-        return;
+        return nullptr;
 
     auto iterator = getComponentIterator<T>();
     if (iterator != components.end())
     {
         /// Todo: 1) Implement ways to allow certain components to be duplicates, 2) Thow warning, exception, nothing here?
-        return;
+        return dynamic_cast<T*>(iterator->get());
     }
-    else
-    {
-        std::unique_ptr<Component> component = std::make_unique<T>();
-        component->setOwner(owner);
-        components.push_back(std::move(component));
-    }
+
+    auto& component = components.emplace_back(std::make_unique<T>());
+    component->setOwner(owner);
+
+    return dynamic_cast<T*>(component.get());
 }
 
 
@@ -75,11 +76,21 @@ void ComponentManager::removeComponent()
 }
 
 template<typename T>
-std::vector<std::unique_ptr<Component> >::iterator ComponentManager::getComponentIterator()
+auto ComponentManager::getComponentIterator() -> std::vector<std::unique_ptr<Component> >::iterator
 {
     return std::find_if(components.begin(), components.end(),
                         [](const std::unique_ptr<Component> &comp)
                         {
                             return dynamic_cast<T *>(comp.get()) != nullptr;
+                        });
+}
+
+template<typename T>
+auto ComponentManager::getComponentIterator() const -> std::vector<std::unique_ptr<Component>>::const_iterator
+{
+    return std::find_if(components.cbegin(), components.cend(),
+                        [](const std::unique_ptr<Component>& comp)
+                        {
+                            return dynamic_cast<T*>(comp.get()) != nullptr;
                         });
 }

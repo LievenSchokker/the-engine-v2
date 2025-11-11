@@ -8,6 +8,7 @@
 
 #include "../component/ComponentManager.h"
 #include "../behaviour/Behaviour.h"
+#include "../component/Transform.h"
 
 
 class GameObject
@@ -62,8 +63,8 @@ class GameObject
 
     private:
         /// Fields:
-        const std::unique_ptr<ComponentManager> componentManager = nullptr;
-        std::unique_ptr<Transform> const transform = nullptr;
+        std::unique_ptr<ComponentManager> componentManager = nullptr;
+        Transform* transform = nullptr;
         std::string name;
         int layer;
         std::string tag;

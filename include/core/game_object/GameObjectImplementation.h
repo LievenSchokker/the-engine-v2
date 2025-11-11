@@ -24,11 +24,12 @@ T* GameObject::getComponent()
 template<typename T> T* GameObject::getOrAddComponent()
 {
     T *component = componentManager->getComponent<T>();
+
     if (component == nullptr)
     {
-        componentManager->addComponent<T>();
-        component = componentManager->getComponent<T>();
+       component = componentManager->addComponent<T>();
     }
+
     return component;
 }
 

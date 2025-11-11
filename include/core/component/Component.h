@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include "Transform.h"
-#include "../game_object/GameObject.h"
+
+class GameObject;
+class Transform;
+
 
 class Component
 {

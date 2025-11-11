@@ -2,7 +2,7 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "../../../../include/core/game_object/component/Component.h"
+#include "../../../include/core/component/Component.h"
 
 Component::~Component()
 {

@@ -2,13 +2,18 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "../../../../include/core/game_object/component/ComponentManager.h"
+#include "../../../include/core/component/ComponentManager.h"
 
 /// TODO: Implement functions once behaviour class is implemented.
 
 ComponentManager::ComponentManager()
 {
 
+}
+
+ComponentManager::~ComponentManager()
+{
+    removeAllComponents();
 }
 
 

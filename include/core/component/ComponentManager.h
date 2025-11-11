@@ -8,20 +8,20 @@
 
 #include <vector>
 #include <memory>
-#include "Component.h"
-#include "../behaviour/Behaviour.h"
-#include "../game_object/GameObject.h"
 
+class Component;
+class GameObject;
+class Behaviour;
 
 class ComponentManager
 {
 public:
     ComponentManager();
-    ~ComponentManager() = default;
+    ~ComponentManager();
 
     /// Functions:
     template <typename T>
-    void addComponent();
+    T* addComponent();
 
     template <typename T>
     T* getComponent() const;
@@ -43,6 +43,9 @@ public:
 private:
     template <typename T>
     std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
+
+    template <typename T>
+    std::vector<std::unique_ptr<Component>>::const_iterator getComponentIterator() const;
 
     /// Variables:
 public:
