@@ -1,9 +1,9 @@
 #include "../../include/input/InputManager.h"
 #include "../../include/input/SDLInputAdapter.h"
 
-InputManager *InputManager::instance = nullptr;
+InputManager* InputManager::instance = nullptr;
 
-InputManager *InputManager::GetInstance()
+InputManager* InputManager::GetInstance()
 {
     if (!instance)
     {
@@ -58,12 +58,12 @@ void InputManager::computeTransitions()
 {
     _keysPressed.clear();
     _keysReleased.clear();
-    for (const auto &k : _keysCurrent)
+    for (const auto& k : _keysCurrent)
     {
         if (_keysPrevious.find(k) == _keysPrevious.end())
             _keysPressed.insert(k);
     }
-    for (const auto &k : _keysPrevious)
+    for (const auto& k : _keysPrevious)
     {
         if (_keysCurrent.find(k) == _keysCurrent.end())
             _keysReleased.insert(k);
@@ -72,12 +72,12 @@ void InputManager::computeTransitions()
 
     _mousePressed.clear();
     _mouseReleased.clear();
-    for (const auto &b : _mouseCurrent)
+    for (const auto& b : _mouseCurrent)
     {
         if (_mousePrevious.find(b) == _mousePrevious.end())
             _mousePressed.insert(b);
     }
-    for (const auto &b : _mousePrevious)
+    for (const auto& b : _mousePrevious)
     {
         if (_mouseCurrent.find(b) == _mouseCurrent.end())
             _mouseReleased.insert(b);
@@ -143,4 +143,39 @@ bool InputManager::wasMousePressed(MouseButton button) const
 bool InputManager::wasMouseReleased(MouseButton button) const
 {
     return _mouseReleased.find(button) != _mouseReleased.end();
+}
+
+int InputManager::mouseX() const
+{
+    return _mouseX;
+}
+
+int InputManager::mouseY() const
+{
+    return _mouseY;
+}
+
+int InputManager::mouseDeltaX() const
+{
+    return _mouseX - _prevMouseX;
+}
+
+int InputManager::mouseDeltaY() const
+{
+    return _mouseY - _prevMouseY;
+}
+
+bool InputManager::mouseMovedThisFrame() const
+{
+    return _mouseMovedThisFrame;
+}
+
+int InputManager::wheelDeltaX() const
+{
+    return _wheelX;
+}
+
+int InputManager::wheelDeltaY() const
+{
+    return _wheelY;
 }

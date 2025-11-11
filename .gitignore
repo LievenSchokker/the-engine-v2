@@ -1,5 +1,6 @@
 .idea
 cmake-build-*/
-.clangd
 .vscode/
 build/
+.clangd
+.clang-format
