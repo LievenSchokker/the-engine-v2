@@ -12,7 +12,7 @@
 class SDLInputAdapter : public IInputAdapter
 {
   public:
-    void poll(InputManager &input) override;
+    void poll(InputManager& input) override;
 };
 
 #endif // SDL_INPUT_ADAPTER_H
