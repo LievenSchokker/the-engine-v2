@@ -1,5 +1,6 @@
 #include "../../include/input/InputManager.h"
 #include "../../include/input/SDLInputAdapter.h"
+#include <utility>
 
 InputManager* InputManager::instance = nullptr;
 
@@ -8,7 +9,6 @@ InputManager* InputManager::getInstance()
     if (!instance)
     {
         instance = new InputManager();
-        instance->adapter = new SDLInputAdapter();
     }
     return instance;
 }
@@ -24,13 +24,20 @@ void InputManager::shutdown()
 
 InputManager::~InputManager()
 {
-    delete adapter;
-    adapter = nullptr;
+}
+
+void InputManager::setAdapter(std::unique_ptr<IInputAdapter> newAdapter)
+{
+    adapter = std::move(newAdapter);
 }
 
 void InputManager::update()
 {
     resetPerFrameState();
+    if (!adapter)
+    {
+        adapter = std::make_unique<SDLInputAdapter>();
+    }
     if (adapter)
     {
         adapter->poll(*this);

@@ -4,6 +4,7 @@
 
 #include "../enums/KeyCode.h"
 #include "../enums/MouseButton.h"
+#include <memory>
 #include <unordered_set>
 
 
@@ -14,6 +15,9 @@ class InputManager
   public:
     static InputManager* getInstance();
     static void shutdown();
+
+    /// Configure the adapter used to gather input events.
+    void setAdapter(std::unique_ptr<IInputAdapter> newAdapter);
 
     /// Polling entry point (owned adapter will feed events)
     void update();
@@ -57,7 +61,7 @@ class InputManager
     InputManager(InputManager&&) = delete;
     InputManager& operator=(InputManager&&) = delete;
     ~InputManager();
-    IInputAdapter* adapter = nullptr;
+    std::unique_ptr<IInputAdapter> adapter;
     static InputManager* instance;
 
     /// Frame lifecycle internals
