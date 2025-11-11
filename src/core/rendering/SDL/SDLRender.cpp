@@ -3,23 +3,28 @@
 ///
 
 
-#include "core/rendering/window/sdl/SDLRender.h"
+#include "core/rendering/SDL/SDLRender.h"
 #include <iostream>
 #include <algorithm>
 #include <cassert>
 
+#include "external/SdlContext.h"
 
-SdlWindow::SdlWindow(SdlContext& ctx)
-    : windowWidth(0), windowHeight(0) {
-    assert(ctx.WasInit(SDL_INIT_VIDEO) && "SDL video subsystem not initialized");
+
+SDLRender::SDLRender(SdlContext& ctx)
+    : windowWidth(0),
+    windowHeight(0)
+{
+    assert(ctx.wasInit(SDL_INIT_VIDEO) && "SDL video subsystem not initialized");
 }
 
-SdlWindow::~SdlWindow() {
+SDLRender::~SDLRender() {
     close();
 }
 
-void SdlWindow::open(const WindowOptions& opts) {
-    Uint32 flags = opts.resizable ? SDL_WINDOW_RESIZABLE : SDL_WINDOW_SHOWN;
+void SDLRender::open(const WindowOptions& opts)
+{
+    Uint32 flags = SDL_WINDOW_SHOWN;
 
     window = SDL_CreateWindow(
         opts.title.c_str(),
@@ -32,13 +37,16 @@ void SdlWindow::open(const WindowOptions& opts) {
     windowWidth = opts.width;
     windowHeight = opts.height;
 
-    if (window == nullptr) {
+    if (window == nullptr)
+    {
         std::cerr << "Window could not be created! SDL_Error: " << SDL_GetError() << "\n";
         return;
     }
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-    if (!renderer) {
+
+    if (!renderer)
+    {
         std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << "\n";
         SDL_DestroyWindow(window);
         window = nullptr;
@@ -46,21 +54,31 @@ void SdlWindow::open(const WindowOptions& opts) {
     }
 }
 
-bool SdlWindow::isOpen() {
+bool SDLRender::isOpen()
+{
     return window != nullptr;
 }
 
-void SdlWindow::close() {
-    if (renderer) { SDL_DestroyRenderer(renderer); renderer = nullptr; }
-    if (window)   { SDL_DestroyWindow(window);     window   = nullptr; }
+void SDLRender::close()
+{
+    if (renderer)
+    {
+        SDL_DestroyRenderer(renderer); renderer = nullptr;
+    }
+    if (window)
+    {
+        SDL_DestroyWindow(window);     window   = nullptr;
+    }
 }
 
-void SdlWindow::setTitle(const std::string& title) {
+void SDLRender::setTitle(const std::string& title)
+{
     if (window) SDL_SetWindowTitle(window, title.c_str());
 }
 
 
-void SdlWindow::presentFrame() {
+void SDLRender::presentFrame()
+{
     if (!renderer) return;
 
     SDL_PumpEvents();
@@ -68,13 +86,6 @@ void SdlWindow::presentFrame() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    gridRenderCommands.clear();
-    uiRenderCommands.clear();
-
     SDL_RenderPresent(renderer);
-}
-
-void SdlWindow::AddRenderCommand(RenderPackage command) {
-    gridRenderCommands.push_back(command);
 }
 

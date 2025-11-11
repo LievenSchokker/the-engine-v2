@@ -1,11 +1,6 @@
-///
-/// Created by Lieven Schokker on 11/11/2025.
-///
-
-
 #pragma once
 #include <string>
-#include "WindowOptions.h"
+#include "window/WindowOptions.h"
 
 
 class IRender

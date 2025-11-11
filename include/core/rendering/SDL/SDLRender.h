@@ -1,17 +1,14 @@
-///
-/// Created by Lieven Schokker on 11/11/2025.
-///
-
 #pragma once
 #include <map>
 #include <SDL.h>
+#include "../IRender.h"
+#include "external/SdlContext.h"
 
-#include "core/rendering/window/IRender.h"
-
-class SdlWindow : public IRender {
+class SDLRender : public IRender {
 public:
-	SdlWindow();
-	~SdlWindow();
+
+	explicit SDLRender(SdlContext &ctx);
+	~SDLRender() override;
 
 	void open(const WindowOptions& opts) override;
 	bool isOpen() override;
