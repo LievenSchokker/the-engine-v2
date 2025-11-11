@@ -1,2 +1,5 @@
 .idea
 cmake-build-*/
+.clangd
+.vscode/
+build/
