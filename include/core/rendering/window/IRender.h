@@ -1,0 +1,25 @@
+///
+/// Created by Lieven Schokker on 11/11/2025.
+///
+
+
+#pragma once
+#include <string>
+#include "WindowOptions.h"
+
+
+class IRender
+{
+public:
+	virtual ~IRender() = default;
+
+	virtual void open(const WindowOptions &opts) = 0;
+
+	virtual void presentFrame() = 0;
+
+	virtual void close() = 0;
+
+	virtual bool isOpen() = 0;
+
+	virtual void setTitle(const std::string &title) = 0;
+};
