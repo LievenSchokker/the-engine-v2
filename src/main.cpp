@@ -14,6 +14,14 @@ int main()
         return 1;
     }
 
+#if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
+    // Disable compositor bypass
+    if (!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0"))
+    {
+        std::cout << "SDL can not disable compositor bypass!" << std::endl;
+        return 0;
+    }
+#endif
     SDL_Window* window = SDL_CreateWindow(
         "Basic C++ SDL project", SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
