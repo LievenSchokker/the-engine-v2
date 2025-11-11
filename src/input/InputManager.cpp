@@ -72,8 +72,6 @@ void InputManager::resetPerFrameState()
 
 void InputManager::computeTransitions()
 {
-    keysPressed.clear();
-    keysReleased.clear();
     for (const auto& k : keysCurrent)
     {
         if (keysPrevious.find(k) == keysPrevious.end())
@@ -86,8 +84,6 @@ void InputManager::computeTransitions()
     }
     keysPrevious = keysCurrent;
 
-    mousePressed.clear();
-    mouseReleased.clear();
     for (const auto& b : mouseCurrent)
     {
         if (mousePrevious.find(b) == mousePrevious.end())
