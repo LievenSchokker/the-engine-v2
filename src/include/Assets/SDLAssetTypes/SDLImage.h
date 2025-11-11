@@ -4,9 +4,11 @@
 
 #pragma once
 
+
 #include "../Asset.h"
 #include <SDL_image.h>
 #include <SDL.h>
+
 
 class SDLImage : public Asset
 {

@@ -4,7 +4,10 @@
 
 #pragma once
 
+
+#include <unordered_map>
 #include <unordered_set>
+
 
 class Asset;
 class AssetManager
@@ -20,7 +23,7 @@ public:
 
 	bool has(const std::string & filePath) const;
 
-	Asset *get(const std::string & filePath);
+	Asset* get(const std::string & filePath);
 
 	bool load(const std::string & filePath);
 

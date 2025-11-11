@@ -2,8 +2,10 @@
 /// Created by Lieven Schokker on 10/11/2025.
 ///
 
+
 #include "../../include/Assets/SDLAssetTypes/SDLImage.h"
 #include <iostream>
+
 
 SDLImage::SDLImage()
 {

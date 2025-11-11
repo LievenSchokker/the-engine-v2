@@ -4,15 +4,17 @@
 
 #pragma once
 
+
 #include <string>
 #include "FileTypes/AssetTypes.h"
+
 
 class Asset
 {
 public:
 	virtual ~Asset() = default;
 
-	virtual bool load(const std::string &filepath) = 0;
+	virtual bool load(const std::string & filepath) = 0;
 
 	virtual bool unLoad() = 0;
 
