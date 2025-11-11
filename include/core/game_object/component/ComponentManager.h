@@ -10,39 +10,39 @@
 
 class ComponentManager
 {
-    public:
-        ComponentManager();
-        ~ComponentManager() = default;
+public:
+    ComponentManager();
+    ~ComponentManager() = default;
 
-        /// Functions:
-        template<typename T>
-        void addComponent();
+    /// Functions:
+    template <typename T>
+    void addComponent();
 
-        template<typename T>
-        T *getComponent() const;
+    template <typename T>
+    T* getComponent() const;
 
-        template<typename T>
-        bool tryGetComponent(T *&out) const;
+    template <typename T>
+    bool tryGetComponent(T*& out) const;
 
-        template<typename T>
-        void removeComponent();
+    template <typename T>
+    void removeComponent();
 
-        void removeAllComponents();
+    void removeAllComponents();
 
-        std::vector<Behaviour*> getAllBehaviours();
+    std::vector<Behaviour*> getAllBehaviours();
 
-        void activateAll();
+    void activateAll();
 
-        void deactivateAll();
+    void deactivateAll();
 
-    private:
-        template<typename T>
-        std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
+private:
+    template <typename T>
+    std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
 
-        /// Variables:
-    public:
-        std::vector<std::unique_ptr<Component> > components;
-        GameObject *const owner;
+    /// Variables:
+public:
+    std::vector<std::unique_ptr<Component>> components;
+    GameObject* const owner;
 };
 
 /// Template implementations:
