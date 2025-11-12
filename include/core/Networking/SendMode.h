@@ -1,6 +1,7 @@
 #pragma once
 
-struct TransportResult {
-    bool success;
-    int errorCode;
+enum class SendMode {
+    ReliableOrdered,
+    ReliableUnordered,
+    Unreliable
 };
