@@ -1,6 +1,14 @@
+#include <SDL.h>
 #include <gtest/gtest.h>
+
+
 #include "core/rendering/SDL/SDLRender.h"
 #include "external/SdlContext.h"
+
+
+TEST(BasicSanityTest, AlwaysTrue) {
+    EXPECT_TRUE(true);
+}
 
 class SDLRenderTest : public ::testing::Test {
 protected:
@@ -21,15 +29,13 @@ protected:
 TEST_F(SDLRenderTest, OpenCloseTest)
 {
     SDLRender render(*ctx);
-
-    // Initially, window should not be open
     EXPECT_FALSE(render.isOpen()) << "Window should not be open initially";
 
     WindowOptions opts{"Test Window", 640, 480};
+
     render.open(opts);
+    EXPECT_TRUE(render.isOpen()) << "Window should open after calling open()";
 
-    EXPECT_TRUE(true);
-
-    // Window should now be closed
+    render.close();
     EXPECT_FALSE(render.isOpen()) << "Window should be closed after calling close()";
 }

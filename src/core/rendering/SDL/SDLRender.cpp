@@ -63,23 +63,32 @@ void SDLRender::close()
 {
     if (renderer)
     {
-        SDL_DestroyRenderer(renderer); renderer = nullptr;
+        SDL_DestroyRenderer(renderer);
+        renderer = nullptr;
     }
+
     if (window)
     {
-        SDL_DestroyWindow(window);     window   = nullptr;
+        SDL_DestroyWindow(window);
+        window = nullptr;
     }
 }
 
 void SDLRender::setTitle(const std::string& title)
 {
-    if (window) SDL_SetWindowTitle(window, title.c_str());
+    if (window)
+    {
+        SDL_SetWindowTitle(window, title.c_str());
+    }
 }
 
 
 void SDLRender::presentFrame()
 {
-    if (!renderer) return;
+    if (!renderer)
+    {
+        return;
+    }
 
     SDL_PumpEvents();
 

@@ -1,176 +1,71 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
+project(program)
 
-project(GameEngine
-        VERSION 0.1.0
-        DESCRIPTION "Cross-platform SpelMotor"
-        LANGUAGES CXX
-)
 
-# ============================================================================
-# Build Options
-# ============================================================================
-option(ENGINE_BUILD_TESTS "Build the test suite" OFF)
-option(ENGINE_BUILD_EXAMPLE "Build executable for testing" ON)
-option(ENGINE_ENABLE_WARNINGS "Enable compiler warnings" OFF)
-option(ENGINE_WARNINGS_AS_ERRORS "Treat warnings as errors" OFF)
 
-# ============================================================================
-# C++ Standard
-# ============================================================================
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
-# ============================================================================
-# Global Settings
-# ============================================================================
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+find_package(SDL2 REQUIRED)
+find_package(CURL REQUIRED)
+find_package(PkgConfig REQUIRED)
+find_package(GTest REQUIRED)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+enable_testing()
 
-# ============================================================================
-# Platform Detection & Configuration
-# ============================================================================
-if(WIN32)
-    add_compile_definitions(ENGINE_PLATFORM_WINDOWS)
-    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN)
-elseif(APPLE)
-    add_compile_definitions(ENGINE_PLATFORM_MACOS)
-elseif(UNIX)
-    add_compile_definitions(ENGINE_PLATFORM_LINUX)
-endif()
+pkg_check_modules(SDL2_TTF REQUIRED SDL2_ttf)
 
-# ============================================================================
-# Dependencies
-# ============================================================================
-#find_package(SDL3 REQUIRED)
-#find_package(GameNetworkingSockets REQUIRED)
+include_directories(${SDL2_INCLUDE_DIRS})
+include_directories(${SDL2_TTF_INCLUDE_DIRS})
 
-#if(ENGINE_BUILD_TESTS)
-#    find_package(GTest REQUIRED)
-#endif()
-
-# ============================================================================
-# Engine Core Files
-# ============================================================================
-
-file(GLOB_RECURSE ENGINE_SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
+file(GLOB_RECURSE SOURCES
+        "${CMAKE_SOURCE_DIR}/src/*.cpp"
 )
 
-file(GLOB_RECURSE ENGINE_HEADERS
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+list(REMOVE_ITEM SOURCES "${CMAKE_SOURCE_DIR}/src/main.cpp")
+
+add_executable(program
+        ${SOURCES}
+        ${CMAKE_SOURCE_DIR}/src/main.cpp
 )
 
-add_library(engine_core STATIC
-        ${ENGINE_SOURCES}
-        ${ENGINE_HEADERS}
+target_include_directories(program PRIVATE
+        ${SDL2_INCLUDE_DIRS}
+        ${SDL2_TTF_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
 )
 
-add_library(Engine::Core ALIAS engine_core)
-
-target_include_directories(engine_core
-        PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:include>
-        PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+target_link_directories(program PRIVATE
+        ${SDL2_TTF_LIBRARY_DIRS}
 )
 
-#target_link_libraries(engine_core
-#       PUBLIC
-#        SDL3::SDL3
-#        GameNetworkingSockets
-#)
+target_link_libraries(program
+        ${SDL2_LIBRARIES}
+        ${SDL2_TTF_LIBRARIES}
+        CURL::libcurl
+)
 
-if(ENGINE_ENABLE_WARNINGS)
-    if(MSVC)
-        target_compile_options(engine_core PRIVATE /W4)
-        if(ENGINE_WARNINGS_AS_ERRORS)
-            target_compile_options(engine_core PRIVATE /WX)
-        endif()
-    else()
-        target_compile_options(engine_core PRIVATE -Wall -Wextra -Wpedantic -Werror)
-        if(ENGINE_WARNINGS_AS_ERRORS)
-            target_compile_options(engine_core PRIVATE -Werror)
-        endif()
-    endif()
-endif()
+add_executable(unit_tests
+        ${SOURCES}
+        Tests/core/rendering/SDL/SDLRenderTest.cpp
+)
 
-# ============================================================================
-# Executable (Used for debugging)
-# ============================================================================
-if(ENGINE_BUILD_EXAMPLE)
-    add_executable(engine_sandbox
-            src/main.cpp
-    )
+target_include_directories(unit_tests PRIVATE
+        ${CMAKE_SOURCE_DIR}/include
+        ${SDL2_INCLUDE_DIRS}
+        ${SDL2_TTF_INCLUDE_DIRS}
+        ${CURL_INCLUDE_DIRS}
+)
 
-    target_link_libraries(engine_sandbox
-            PRIVATE
-            Engine::Core
-    )
+target_link_directories(unit_tests PRIVATE
+        ${SDL2_TTF_LIBRARY_DIRS}
+)
 
-    set_target_properties(engine_sandbox PROPERTIES
-            FOLDER "Sandbox"
-            OUTPUT_NAME "sandbox"
-    )
+target_link_libraries(unit_tests
+        GTest::gtest
+        GTest::gtest_main
+        ${SDL2_LIBRARIES}
+        CURL::libcurl
+)
 
-    if(ENGINE_ENABLE_WARNINGS)
-        if(MSVC)
-            target_compile_options(engine_sandbox PRIVATE /W4)
-            if(ENGINE_WARNINGS_AS_ERRORS)
-                target_compile_options(engine_sandbox PRIVATE /WX)
-            endif()
-        else()
-            target_compile_options(engine_sandbox PRIVATE -Wall -Wextra -Wpedantic)
-            if(ENGINE_WARNINGS_AS_ERRORS)
-                target_compile_options(engine_sandbox PRIVATE -Werror)
-            endif()
-        endif()
-    endif()
-
-    message(STATUS "Building sandbox executable: ${CMAKE_BINARY_DIR}/bin/sandbox")
-endif()
-
-
-# ============================================================================
-# Tests
-# ============================================================================
-if(ENGINE_BUILD_TESTS)
-    enable_testing()
-
-    file(GLOB_RECURSE TEST_SOURCES
-            "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
-    )
-
-#    add_executable(engine_tests ${TEST_SOURCES})
-
-#    target_link_libraries(engine_tests
-#            PRIVATE
-#            Engine::Core
-#            GTest::gtest_main
-#    )
-
-#    set_target_properties(engine_tests PROPERTIES
-#            FOLDER "Tests"
-#    )
-
-#    include(GoogleTest)
-#    gtest_discover_tests(engine_tests)
-endif()
-
-# ============================================================================
-# Print Configuration Summary
-# ============================================================================
-message(STATUS "==================== Configuration ====================")
-message(STATUS "Game Engine Version: ${PROJECT_VERSION}")
-message(STATUS "Build Type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "C++ Standard: ${CMAKE_CXX_STANDARD}")
-message(STATUS "Build Tests: ${ENGINE_BUILD_TESTS}")
-message(STATUS "Build Example: ${ENGINE_BUILD_EXAMPLE}")
-message(STATUS "Compiler: ${CMAKE_CXX_COMPILER_ID}")
-message(STATUS "Platform: ${CMAKE_SYSTEM_NAME}")
-message(STATUS "========================================================")
+include(GoogleTest)
+gtest_discover_tests(unit_tests)
