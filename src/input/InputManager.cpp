@@ -45,14 +45,14 @@ void InputManager::update()
     computeTransitions();
 }
 
-void InputManager::requestQuit()
+void InputManager::signalQuit()
 {
-    quitRequested = true;
+    quitSignaled = true;
 }
 
-bool InputManager::shouldQuit() const
+bool InputManager::quitRequested() const
 {
-    return quitRequested;
+    return quitSignaled;
 }
 
 void InputManager::resetPerFrameState()

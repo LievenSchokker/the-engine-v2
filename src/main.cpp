@@ -96,7 +96,7 @@ int main()
         }
 
         // OS quit button was pressed
-        if (input->shouldQuit())
+        if (input->quitRequested())
         {
             running = false;
         }

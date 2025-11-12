@@ -86,18 +86,19 @@ class InputManager
     void addMouseWheelDelta(int dx, int dy);
 
     /**
-     * @brief Signal that the application should quit.
+     * @brief Latch a quit request coming from the platform layer.
      *
-     * Used by adapters to propagate window close or OS quit events.
+     * Used by adapters to propagate window close or OS quit events; once
+     * signaled, the request remains active until shutdown.
      */
-    void requestQuit();
+    void signalQuit();
 
     /**
-     * @brief Query whether a quit request has been raised.
+     * @brief Check whether a quit request is currently latched.
      *
-     * @return True if a quit has been requested; remains true once set.
+     * @return True if any previous call to `signalQuit()` has occurred.
      */
-    bool shouldQuit() const;
+    bool quitRequested() const;
 
     /**
      * @brief Test if a key is currently held down.
@@ -234,7 +235,7 @@ class InputManager
     // Mouse wheel (per frame)
     int wheelX = 0;
     int wheelY = 0;
-    bool quitRequested = false;
+    bool quitSignaled = false;
 };
 
 #endif // INPUT_MANAGER_H
