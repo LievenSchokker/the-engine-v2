@@ -2,7 +2,7 @@
 /// Created by thijs on 12-11-2025.
 ///
 
-#include "../../../include/core/Networking/TransportGNS.h"
+#include "core/Networking/TransportGNS.h"
 #include <iostream>
 #include <steam/steamnetworkingsockets.h>
 #include <steam/isteamnetworkingutils.h>
@@ -47,10 +47,12 @@ TransportResult TransportGNS::startServer(uint16_t port) {
     serverAddr.Clear();
     serverAddr.m_port = port;
 
+    // Register connection status callback
     SteamNetworkingConfigValue_t opt;
     opt.SetPtr(k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged,
                (void *) steamNetConnectionStatusChangedCallback);
 
+    // Create a listening socket
     hListenSock = pInterface->CreateListenSocketIP(serverAddr, 1, &opt);
     if (hListenSock == k_HSteamListenSocket_Invalid) {
         std::cerr << "Failed to listen on port " << port << std::endl;
@@ -58,6 +60,7 @@ TransportResult TransportGNS::startServer(uint16_t port) {
         return result;
     }
 
+    // Create a poll group for managing multiple connections
     hPollGroup = pInterface->CreatePollGroup();
     if (hPollGroup == k_HSteamNetPollGroup_Invalid) {
         std::cerr << "Failed to create poll group" << std::endl;
@@ -82,6 +85,7 @@ TransportResult TransportGNS::startClient(const char *serverAddress, uint16_t po
     }
     serverAddr.m_port = port;
 
+    // Print resolved address
     char szAddr[SteamNetworkingIPAddr::k_cchMaxString];
     serverAddr.ToString(szAddr, sizeof(szAddr), true);
     std::cout << "Connecting to " << szAddr << std::endl;
@@ -90,6 +94,7 @@ TransportResult TransportGNS::startClient(const char *serverAddress, uint16_t po
     opt.SetPtr(k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged,
                (void *) steamNetConnectionStatusChangedCallback);
 
+    // Attempt connection
     hConnection = pInterface->ConnectByIPAddress(serverAddr, 1, &opt);
     if (hConnection == k_HSteamNetConnection_Invalid) {
         std::cerr << "Failed to create connection" << std::endl;
@@ -101,11 +106,29 @@ TransportResult TransportGNS::startClient(const char *serverAddress, uint16_t po
     return result;
 }
 
-TransportResult TransportGNS::send(int connectionId, const std::byte data[], size_t length, bool reliable) {
+TransportResult TransportGNS::send(int connectionId, const std::byte data[], size_t length, SendMode send_mode) {
     EResult result;
     TransportResult transport_result;
 
+    // Choose message reliability/ordering mode
+    int sendFlags = 0;
+    switch (send_mode) {
+        case SendMode::ReliableOrdered:
+            sendFlags = k_nSteamNetworkingSend_Reliable;
+            break;
+
+        case SendMode::ReliableUnordered:
+            // Slightly less delayed reliable send; still ordered per connection
+            sendFlags = k_nSteamNetworkingSend_Reliable | k_nSteamNetworkingSend_UnreliableNoDelay;
+            break;
+
+        case SendMode::Unreliable:
+            sendFlags = k_nSteamNetworkingSend_Unreliable;
+            break;
+    }
+
     if (bIsServer) {
+        // Resolve connection handle
         HSteamNetConnection hConn = getSteamConnection(connectionId);
         if (hConn == k_HSteamNetConnection_Invalid) {
             transport_result.success = false;
@@ -115,31 +138,26 @@ TransportResult TransportGNS::send(int connectionId, const std::byte data[], siz
         result = pInterface->SendMessageToConnection(
             hConn,
             data,
-            (uint32) length,
-            reliable ? k_nSteamNetworkingSend_Reliable : k_nSteamNetworkingSend_Unreliable,
+            static_cast<uint32>(length),
+            sendFlags,
             nullptr
         );
     } else {
         result = pInterface->SendMessageToConnection(
             hConnection,
             data,
-            (uint32) length,
-            reliable ? k_nSteamNetworkingSend_Reliable : k_nSteamNetworkingSend_Unreliable,
+            static_cast<uint32>(length),
+            sendFlags,
             nullptr
         );
     }
 
-    if (result == k_EResultOK) {
-        transport_result.success = true;
-        return transport_result;
-    }
-    else {
-        transport_result.success = false;
-        return transport_result;
-    }
+    transport_result.success = (result == k_EResultOK);
+    return transport_result;
 }
 
 bool TransportGNS::disconnect(int connectionId) {
+    // Close the given connection (server) or client link
     if (bIsServer) {
         HSteamNetConnection hConn = getSteamConnection(connectionId);
         if (hConn == k_HSteamNetConnection_Invalid) {
@@ -159,11 +177,13 @@ bool TransportGNS::disconnect(int connectionId) {
 }
 
 void TransportGNS::poll() {
+    // Handle both connection state changes and queued messages
     pollConnectionStateChanges();
     pollIncomingMessages();
 }
 
 void TransportGNS::shutdown() {
+    // Gracefully close all active sockets and connections
     if (bIsServer) {
         // Close all connections
         for (auto &pair: mapConnections) {
@@ -189,6 +209,7 @@ void TransportGNS::shutdown() {
 }
 
 void TransportGNS::pollIncomingMessages() {
+    // Receive all queued messages for server or client
     if (bIsServer) {
         while (true) {
             ISteamNetworkingMessage *pMsg = nullptr;
@@ -240,12 +261,14 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
             if (bIsServer) {
                 std::cout << "Connection request from " << pInfo->m_info.m_szConnectionDescription << std::endl;
 
+                // Accept or reject new incoming connection
                 if (pInterface->AcceptConnection(pInfo->m_hConn) != k_EResultOK) {
                     pInterface->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
                     std::cerr << "Failed to accept connection" << std::endl;
                     break;
                 }
 
+                // Add new connection to poll group
                 if (!pInterface->SetConnectionPollGroup(pInfo->m_hConn, hPollGroup)) {
                     pInterface->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
                     std::cerr << "Failed to set poll group" << std::endl;
@@ -272,6 +295,7 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
 
         case k_ESteamNetworkingConnectionState_ClosedByPeer:
         case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
+            // Handle disconnection
             if (pInfo->m_eOldState == k_ESteamNetworkingConnectionState_Connected) {
                 std::cout << "Connection closed: " << pInfo->m_info.m_szEndDebug << std::endl;
 
