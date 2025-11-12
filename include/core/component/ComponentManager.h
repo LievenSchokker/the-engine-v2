@@ -8,14 +8,16 @@
 #include <vector>
 #include <memory>
 
-class Component;
-class Behaviour;
+#include "Component.h"
 class GameObject;
+class Behaviour;
 
 class ComponentManager
 {
 public:
-    ComponentManager();
+    ComponentManager(GameObject* parent_)
+        : parent(parent_){}
+
     ~ComponentManager();
 
     /// Functions:
@@ -49,7 +51,7 @@ private:
     /// Variables:
 public:
     std::vector<std::unique_ptr<Component>> components;
-    GameObject* const owner = nullptr;
+    GameObject* const parent = nullptr;
 };
 
 /// Template implementations:

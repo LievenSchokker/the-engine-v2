@@ -4,11 +4,12 @@
 
 
 #include "../../../include/core/game_object/GameObject.h"
+#include "../../../include/core/component/ComponentManager.h"
 #include "../../../include/core/component/Transform.h"
 
 GameObject::GameObject()
 {
-    componentManager = std::make_unique<ComponentManager>();
+    componentManager = std::make_unique<ComponentManager>(this);
     transform = std::make_unique<Transform>();
 
     name = "GameObject";

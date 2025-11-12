@@ -5,16 +5,16 @@
 
 #pragma once
 
-#include "Component.h"
+// #include "Component.h"
 #include <algorithm>
+#include <type_traits>
 
 template<typename T>
 T* ComponentManager::addComponent()
 {
-    static_assert(std::is_base_of_v<Component, T>, "T must derive from Component!");
-    static_assert(std::is_same_v<Transform, T>, "Cannot add a Transform component!");
+    static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
 
-    if (owner == nullptr)
+    if (parent == nullptr)
         return nullptr;
 
     auto iterator = getComponentIterator<T>();
@@ -25,7 +25,7 @@ T* ComponentManager::addComponent()
     }
 
     auto& component = components.emplace_back(std::make_unique<T>());
-    component->setOwner(owner);
+    component->setGameObject(parent);
 
     return dynamic_cast<T*>(component.get());
 }
@@ -34,7 +34,7 @@ T* ComponentManager::addComponent()
 template<typename T>
 T *ComponentManager::getComponent() const
 {
-    if (owner == nullptr)
+    if (parent == nullptr)
         return nullptr;
     auto iterator = getComponentIterator<T>();
     if (iterator != components.end())
@@ -63,7 +63,7 @@ bool ComponentManager::tryGetComponent(T *&out) const
 template<typename T>
 void ComponentManager::removeComponent()
 {
-    if (ComponentManager::owner == nullptr)
+    if (parent == nullptr)
         return;
     auto iterator = getComponentIterator<T>();
     if (iterator != components.end())

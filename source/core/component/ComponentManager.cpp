@@ -3,13 +3,9 @@
 //
 
 #include "../../../include/core/component/ComponentManager.h"
+#include "../../../include/core/game_object/GameObject.h"
+#include "../../../include/core/component/Component.h"
 
-/// TODO: Implement functions once behaviour class is implemented.
-
-ComponentManager::ComponentManager()
-{
-
-}
 
 ComponentManager::~ComponentManager()
 {

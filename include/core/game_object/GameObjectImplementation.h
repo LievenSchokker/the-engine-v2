@@ -6,26 +6,27 @@
 
 #include "../component/ComponentManager.h"
 
+
 template<typename T>
 void GameObject::addComponent()
 {
-    componentManager->addComponent<T>();
+    componentManager->template addComponent<T>();
 }
 
 template<typename T>
 T* GameObject::getComponent()
 {
-   return  componentManager->getComponent<T>();
+   return  componentManager->template getComponent<T>();
 }
 
 template<typename T>
 T* GameObject::getOrAddComponent()
 {
-    T *component = componentManager->getComponent<T>();
+    T *component = componentManager->template getComponent<T>();
 
     if (component == nullptr)
     {
-       component = componentManager->addComponent<T>();
+       component = componentManager->template addComponent<T>();
     }
 
     return component;
@@ -34,12 +35,12 @@ T* GameObject::getOrAddComponent()
 template<typename T>
 bool GameObject::tryGetComponent()
 {
-    return componentManager->tryGetComponent<T>();
+    return componentManager->template tryGetComponent<T>();
 }
 
 template <typename T>
 void GameObject::removeComponent()
 {
-    componentManager->removeComponent<T>();
+    componentManager->template removeComponent<T>();
 }
 

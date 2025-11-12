@@ -8,9 +8,10 @@
 #include <string>
 #include <vector>
 
-class Transform;
+#include "../component/Transform.h"
 class Behaviour;
 class ComponentManager;
+
 
 class GameObject
 {

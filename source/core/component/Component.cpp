@@ -3,7 +3,9 @@
 //
 
 #include "../../../include/core/component/Component.h"
+#include "../../../include/core/component/Transform.h"
 #include "../../../include/core/game_object/GameObject.h"
+
 
 Component::~Component()
 {

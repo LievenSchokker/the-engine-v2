@@ -7,8 +7,8 @@
 #include <stdexcept>
 #include <memory>
 
-#include "../game_object/GameObject.h"
 class Transform;
+class GameObject;
 
 class Component
 {
