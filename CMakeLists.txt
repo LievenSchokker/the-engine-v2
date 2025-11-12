@@ -47,7 +47,7 @@ endif()
 # Dependencies
 # ============================================================================
 #find_package(SDL3 REQUIRED)
-#find_package(GameNetworkingSockets REQUIRED)
+find_package(GameNetworkingSockets REQUIRED)
 
 #if(ENGINE_BUILD_TESTS)
 #    find_package(GTest REQUIRED)
@@ -80,11 +80,11 @@ target_include_directories(engine_core
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-#target_link_libraries(engine_core
-#       PUBLIC
+target_link_libraries(engine_core
+       PUBLIC
 #        SDL3::SDL3
-#        GameNetworkingSockets
-#)
+        GameNetworkingSockets
+)
 
 if(ENGINE_ENABLE_WARNINGS)
     if(MSVC)
