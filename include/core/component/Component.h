@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <memory>
 
-class GameObject;
+#include "../game_object/GameObject.h"
 class Transform;
 
 class Component
@@ -17,14 +17,13 @@ class Component
         Component() = default;
         virtual ~Component() = 0;
 
-        void setOwner(GameObject* object);
+        void setGameObject(GameObject* object);
 
         template <typename T>
         T* getComponent() const;
 
         template <typename T>
         bool tryGetComponent(T*& out) const;
-
 
 
     /// Variables:
