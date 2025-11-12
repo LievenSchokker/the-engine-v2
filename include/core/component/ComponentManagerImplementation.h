@@ -5,12 +5,8 @@
 
 #pragma once
 
-
-#include "ComponentManager.h"
 #include "Component.h"
 #include <algorithm>
-
-
 
 template<typename T>
 T* ComponentManager::addComponent()
@@ -66,7 +62,7 @@ bool ComponentManager::tryGetComponent(T *&out) const
 template<typename T>
 void ComponentManager::removeComponent()
 {
-    if (owner == nullptr)
+    if (ComponentManager::owner == nullptr)
         return;
     auto iterator = getComponentIterator<T>();
     if (iterator != components.end())

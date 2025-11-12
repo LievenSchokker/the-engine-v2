@@ -4,10 +4,11 @@
 
 #pragma once
 
+#include <stdexcept>
+#include <memory>
 
 class GameObject;
 class Transform;
-
 
 class Component
 {

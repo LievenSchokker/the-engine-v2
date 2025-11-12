@@ -4,7 +4,7 @@
 
 
 #include "../../../include/core/game_object/GameObject.h"
-
+#include "../../../include/core/component/Transform.h"
 
 GameObject::GameObject()
 {
@@ -29,9 +29,9 @@ bool GameObject::compareTag(std::string other)
     return tag == other;
 }
 
-std::vector<Behaviour> GameObject::getActiveBehaviours() const
+std::vector<Behaviour*> GameObject::getActiveBehaviours() const
 {
-    // Implement when Behaviour is implemented.
+    return std::vector<Behaviour*>{};
 }
 
 ComponentManager* GameObject::getComponentManager() const

@@ -19,7 +19,7 @@ ComponentManager::~ComponentManager()
 
 std::vector<Behaviour*> ComponentManager::getAllBehaviours()
 {
-
+    return {};
 }
 
 void ComponentManager::activateAll()

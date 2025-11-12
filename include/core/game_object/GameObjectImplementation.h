@@ -2,12 +2,9 @@
 // Created by samle on 11/11/2025.
 //
 
-
 #pragma once
 
-
-#include "GameObject.h"
-
+#include "../component/ComponentManager.h"
 
 template<typename T>
 void GameObject::addComponent()

@@ -9,3 +9,8 @@ Transform::Transform()
 {
 
 }
+
+Transform::~Transform()
+{
+
+}

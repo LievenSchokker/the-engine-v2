@@ -6,5 +6,7 @@
 
 class Behaviour
 {
-
+    public:
+        Behaviour();
+        ~Behaviour();
 };

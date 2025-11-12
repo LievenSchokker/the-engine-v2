@@ -2,14 +2,15 @@
 // Created by samle on 10/11/2025.
 //
 
-
 #pragma once
 
+#include <memory>
+#include <string>
+#include <vector>
 
-#include "../component/ComponentManager.h"
-#include "../behaviour/Behaviour.h"
-#include "../component/Transform.h"
-
+class Transform;
+class Behaviour;
+class ComponentManager;
 
 class GameObject
 {
@@ -20,7 +21,7 @@ class GameObject
 
         bool compareTag(std::string other);
 
-        std::vector<Behaviour> getActiveBehaviours() const;
+        std::vector<Behaviour*> getActiveBehaviours() const;
 
         /// Template functions:
         template<typename T>
@@ -71,3 +72,5 @@ class GameObject
         bool isActive;
         bool isStatic;
 };
+
+#include "GameObjectImplementation.h"

@@ -5,13 +5,12 @@
 
 #pragma once
 
-
 #include <vector>
 #include <memory>
 
 class Component;
-class GameObject;
 class Behaviour;
+class GameObject;
 
 class ComponentManager
 {
@@ -50,7 +49,7 @@ private:
     /// Variables:
 public:
     std::vector<std::unique_ptr<Component>> components;
-    GameObject* const owner;
+    GameObject* const owner = nullptr;
 };
 
 /// Template implementations:
