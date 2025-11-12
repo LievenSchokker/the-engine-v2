@@ -28,11 +28,18 @@ the-engine/
 ├─ README.md
 ├─ LICENSE
 │
-├─ include/                 # Public headers for engine_core, client, and server
-│   ├─ core/
-│   │   ├─ Engine.hpp
-│   │   ├─ Renderer.hpp
-│   │   └─ Network.hpp
+├─ include/                 # Public header files
+│   ├─ Engine/
+│   │   ├─ Core/
+│   │   ├─ Debug/
+│   │   ├─ Input/
+│   │   ├─ Window/
+│   │   ├─ Physics/
+│   │   ├─ Renderer/
+│   │   ├─ Scene/
+│   │   ├─ Utils/
+│   │   ├─ GameObject/
+│   │   ├─ Network/
 │   │
 │   ├─ client/
 │   │   └─ Client.hpp
@@ -41,20 +48,42 @@ the-engine/
 │       └─ Server.hpp
 │
 ├─ src/                     # Source files
-│   ├─ core/                # Core engine implementation
-│   │   ├─ Engine.cpp
-│   │   ├─ Renderer.cpp
-│   │   └─ Network.cpp
+│   ├─ Engine/
+│   │   ├─ Core/
+│   │   ├─ Debug/
+│   │   ├─ Input/
+│   │   ├─ Window/
+│   │   ├─ Physics/
+│   │   ├─ Renderer/
+│   │   ├─ Scene/
+│   │   ├─ Utils/
+│   │   ├─ GameObject/
+│   │   ├─ Network/
 │   │
-│   ├─ client/              # Client application
+│   ├─ client/
 │   │   └─ main.cpp
 │   │
-│   └─ server/              # Server application
+│   └─ server/
 │       └─ main.cpp
 │
 ├─ tests/                   # Unit tests
-│   ├─ test_main.cpp
-│   └─ test_engine.cpp
+│   ├─ Engine/
+│   │   ├─ Core/
+│   │   ├─ Debug/
+│   │   ├─ Input/
+│   │   ├─ Window/
+│   │   ├─ Physics/
+│   │   ├─ Renderer/
+│   │   ├─ Scene/
+│   │   ├─ Utils/
+│   │   ├─ GameObject/
+│   │   ├─ Network/
+│   │
+│   ├─ client/
+│   │   └─ main.cpp
+│   │
+│   └─ server/
+│       └─ main.cpp
 │
 ├─ external/                # Dependencies (SDL3, GoogleTests, ValveNetworkingSockets etc)
 │
@@ -62,3 +91,6 @@ the-engine/
 │
 └─ .gitignore
 ```
+
+
+
