@@ -51,7 +51,7 @@ private:
     /// Variables:
 public:
     std::vector<std::unique_ptr<Component>> components;
-    GameObject* const parent = nullptr;
+    GameObject* const parent;
 };
 
 /// Template implementations:

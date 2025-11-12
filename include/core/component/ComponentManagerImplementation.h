@@ -12,10 +12,15 @@
 template<typename T>
 T* ComponentManager::addComponent()
 {
-    static_assert(std::is_base_of<Component, T>::value, "T must derive from Component");
+    static_assert(std::is_base_of_v<Component, T>, "T must derive from Component!");
 
     if (parent == nullptr)
         return nullptr;
+
+    if constexpr (std::is_same_v<Transform, T>) {
+        return nullptr;
+    }
+
 
     auto iterator = getComponentIterator<T>();
     if (iterator != components.end())
