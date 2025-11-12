@@ -12,7 +12,7 @@ T* Component::getComponent() const
     if (owner == nullptr)
         return nullptr;
 
-    T* component = owner->componentManager->getComponent<T>();
+    T* component = owner->getComponentManager()->getComponent<T>();
 
     if (component != nullptr)
         return component;
@@ -26,6 +26,6 @@ bool Component::tryGetComponent(T*& out) const
     if (owner == nullptr)
         return false;
 
-    out = owner->componentManager->tryGetComponent<T>();
+    out = owner->getComponentManager()->tryGetComponent<T>();
     return (out != nullptr);
 }

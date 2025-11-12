@@ -9,7 +9,7 @@
 GameObject::GameObject()
 {
     componentManager = std::make_unique<ComponentManager>();
-    transform = componentManager->addComponent<Transform>();
+    transform = std::make_unique<Transform>();
 
     name = "GameObject";
     layer = 0;
@@ -41,7 +41,7 @@ ComponentManager* GameObject::getComponentManager() const
 
 Transform* GameObject::getTransform() const
 {
-    return componentManager->getComponent<Transform>();
+    return transform.get();
 }
 
 std::string GameObject::getName() const

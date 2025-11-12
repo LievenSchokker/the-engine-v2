@@ -35,6 +35,9 @@ class GameObject
         template<typename T>
         T* getOrAddComponent();
 
+        template<typename  T>
+        void removeComponent();
+
         /// Getters:
         ComponentManager* getComponentManager() const;
 
@@ -64,7 +67,7 @@ class GameObject
     private:
         /// Fields:
         std::unique_ptr<ComponentManager> componentManager = nullptr;
-        Transform* transform = nullptr;
+        std::unique_ptr<Transform> transform = nullptr;
         std::string name;
         int layer;
         std::string tag;

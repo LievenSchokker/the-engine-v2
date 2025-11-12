@@ -10,8 +10,8 @@ Component::~Component()
     transform = nullptr;
 }
 
-void Component::setOwner(GameObject* object)
+void Component::setGameObject(GameObject* object)
 {
     owner = object;
-    transform = object->getTransform();
+    transform = owner->getTransform();
 }
