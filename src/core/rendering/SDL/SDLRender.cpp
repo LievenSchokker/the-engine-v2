@@ -3,12 +3,13 @@
 ///
 
 
-#include "core/rendering/SDL/SDLRender.h"
+
 #include <iostream>
 #include <algorithm>
 #include <cassert>
 
-#include "external/SdlContext.h"
+
+#include "core/rendering/SDL/SDLRender.h"
 
 
 SDLRender::SDLRender(SdlContext& ctx)

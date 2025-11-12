@@ -3,8 +3,12 @@
 //
 
 
-#include "../../include/external/SdlContext.h"
+
+
 #include <string>
+
+
+#include "external/SdlContext.h"
 
 
 int SdlContext::referenceCount = 0;

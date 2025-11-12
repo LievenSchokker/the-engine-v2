@@ -5,11 +5,6 @@
 #include "core/rendering/SDL/SDLRender.h"
 #include "external/SdlContext.h"
 
-
-TEST(BasicSanityTest, AlwaysTrue) {
-    EXPECT_TRUE(true);
-}
-
 class SDLRenderTest : public ::testing::Test {
 protected:
     SdlContext* ctx;
