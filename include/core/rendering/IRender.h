@@ -16,10 +16,13 @@
  *
  */
 
+
 #pragma once
+
 
 class string;
 struct WindowOptions;
+
 
 class IRender
 {

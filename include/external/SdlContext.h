@@ -25,7 +25,6 @@
 
 
 class SdlContext {
-
 public:
     /**
      * @brief Constructs an SdlContext and initializes requested SDL subsystems
