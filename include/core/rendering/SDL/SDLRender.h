@@ -26,8 +26,10 @@
 #include <SDL.h>
 
 
-#include "../IRender.h"
-#include "external/SdlContext.h"
+#include "core/rendering/IRender.h"
+
+
+class SdlContext;
 
 
 class SDLRender : public IRender
@@ -40,11 +42,11 @@ public:
      * for the lifetime of this renderer. The assertion prevents runtime errors from
      * attempting to create windows without proper SDL initialization.
      *
-     * @param ctx SDL context that must have video subsystem initialized
-     * @pre ctx must have SDL_INIT_VIDEO initialized
+     * @param context SDL context that must have video subsystem initialized
+     * @pre context must have SDL_INIT_VIDEO initialized
      * @throws assertion failure if video subsystem not initialized (debug builds)
      */
-    explicit SDLRender(SdlContext &ctx);
+    explicit SDLRender(SdlContext & context);
 
     /**
      * @brief Ensures proper cleanup of SDL resources in correct order
@@ -60,10 +62,10 @@ public:
      * The renderer is tightly coupled to the window to ensure they're destroyed
      * in the correct order (renderer first, then window) to avoid SDL errors.
      *
-     * @param opts Window configuration options
+     * @param options Window configuration options
      * @note Errors are logged to stderr rather than throwing to allow graceful degradation
      */
-    void open(const WindowOptions& opts) override;
+    void open(const WindowOptions & options) override;
 
     /**
      * @brief Checks window existence as indicator of render system state
@@ -93,7 +95,7 @@ public:
      *
      * @param title New window title text
      */
-    void setTitle(const std::string& title) override;
+    void setTitle(const std::string & title) override;
 
     /**
      * @brief Presents the rendered frame with event processing and screen clearing

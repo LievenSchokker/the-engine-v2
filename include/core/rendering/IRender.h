@@ -18,10 +18,8 @@
 
 #pragma once
 
-#include <string>
-
-#include "window/WindowOptions.h"
-
+class string;
+struct WindowOptions;
 
 class IRender
 {

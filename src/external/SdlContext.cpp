@@ -53,7 +53,7 @@ void SdlContext::acquire(Uint32 requestedFlags)
 	}
 
 	++referenceCount;
-	this->flags = requestedFlags;
+	flags = requestedFlags;
 }
 
 void SdlContext::release()
@@ -66,7 +66,6 @@ void SdlContext::release()
 		globalFlags = 0;
 	}
 
-	isOwner = false;
 	flags = 0;
 }
 

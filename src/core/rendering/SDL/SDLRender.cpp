@@ -46,12 +46,11 @@ void SDLRender::open(const WindowOptions& opts)
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    if (!renderer)
+    if (renderer != nullptr)
     {
         std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << "\n";
         SDL_DestroyWindow(window);
         window = nullptr;
-        return;
     }
 }
 
@@ -62,13 +61,13 @@ bool SDLRender::isOpen()
 
 void SDLRender::close()
 {
-    if (renderer)
+    if (renderer != nullptr)
     {
         SDL_DestroyRenderer(renderer);
         renderer = nullptr;
     }
 
-    if (window)
+    if (window != nullptr)
     {
         SDL_DestroyWindow(window);
         window = nullptr;
@@ -77,7 +76,7 @@ void SDLRender::close()
 
 void SDLRender::setTitle(const std::string& title)
 {
-    if (window)
+    if (window != nullptr)
     {
         SDL_SetWindowTitle(window, title.c_str());
     }
@@ -86,7 +85,7 @@ void SDLRender::setTitle(const std::string& title)
 
 void SDLRender::presentFrame()
 {
-    if (!renderer)
+    if (renderer == nullptr)
     {
         return;
     }
