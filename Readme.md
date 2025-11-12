@@ -19,6 +19,7 @@ The project uses the following external libraries:
 - SDL3 - Simple DirectMedia Layer
 - GameNetworkingSockets - Valve's networking library
 - GoogleTest - For unit testing
+These dependencies are loaded with vcpkg on windows
 
 ## Project Structure
 ```
@@ -83,9 +84,7 @@ the-engine/
 │   │   └─ main.cpp
 │   │
 │   └─ server/
-│       └─ main.cpp
-│
-├─ external/                # Dependencies (SDL3, GoogleTests, ValveNetworkingSockets etc)
+│       └─ main.cpp 
 │
 ├─ cmake-build-debug/       # CMake build output folder (ignored by git)
 │
