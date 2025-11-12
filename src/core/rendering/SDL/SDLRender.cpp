@@ -3,20 +3,21 @@
 ///
 
 
-
-#include <iostream>
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 
 
 #include "core/rendering/SDL/SDLRender.h"
+#include "core/rendering/window/WindowOptions.h"
+#include "external/SdlContext.h"
 
 
-SDLRender::SDLRender(SdlContext& ctx)
+SDLRender::SDLRender(SdlContext & context)
     : windowWidth(0),
     windowHeight(0)
 {
-    assert(ctx.wasInit(SDL_INIT_VIDEO) && "SDL video subsystem not initialized");
+    assert(context.wasInit(SDL_INIT_VIDEO) && "SDL video subsystem not initialized");
 }
 
 SDLRender::~SDLRender() {
