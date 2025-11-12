@@ -2,6 +2,7 @@
 #include "../../include/input/SDLInputAdapter.h"
 #include <utility>
 
+
 InputManager* InputManager::instance = nullptr;
 
 InputManager* InputManager::getInstance()
