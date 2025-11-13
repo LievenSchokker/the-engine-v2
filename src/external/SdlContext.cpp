@@ -7,7 +7,7 @@
 
 #include <string>
 #include <stdexcept>
-
+#include <iostream>
 
 #include "external/SdlContext.h"
 
@@ -33,10 +33,10 @@ void SdlContext::acquire(Uint32 requestedFlags)
 	if(!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0"))
 	{
 		std::cout << "SDL can not disable compositor bypass!" << std::endl;
-		return 0;
+		return;
 	}
 	#endif
-	
+
 	if (referenceCount == 0)
 	{
 		if (SDL_Init(requestedFlags) != 0)
