@@ -111,8 +111,16 @@ endif()
 if(ENGINE_BUILD_TESTS)
     enable_testing()
 
-    # Build GTest from source (no vcpkg/MSVC required)
-    add_subdirectory(external/googletest)
+    include(FetchContent)
+    FetchContent_Declare(
+            googletest
+            URL https://github.com/google/googletest/archive/refs/heads/main.zip
+    )
+
+    # Prevent GTest from overriding compiler/linker flags on Windows
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+    FetchContent_MakeAvailable(googletest)
 
     file(GLOB_RECURSE TEST_SOURCES
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
@@ -123,7 +131,7 @@ if(ENGINE_BUILD_TESTS)
     target_link_libraries(engine_tests
             PRIVATE
             Engine::Core
-            gtest_main
+            GTest::gtest_main
     )
 
     include(GoogleTest)

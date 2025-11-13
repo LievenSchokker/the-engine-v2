@@ -3,59 +3,97 @@
 //
 
 
-
 #include <gtest/gtest.h>
 #include "../include/core/game_object/GameObject.h"
 
 namespace engine_tests
 {
-
-}
-class TestComponent : public Component
-{
+    class TestComponentOne : public Component
+    {
     public:
-        TestComponent() = default;
-        ~TestComponent() override = default;
-};
+        TestComponentOne() = default;
+        ~TestComponentOne() override = default;
+    };
 
-TEST(GameObjectTests, HasTransformAfterConstruction)
-{
-    GameObject go;
-    EXPECT_NE(go.getTransform(), nullptr);
-}
+    class TestComponentTwo : public Component
+    {
+    public:
+        TestComponentTwo() = default;
+        ~TestComponentTwo() override = default;
+    };
 
-TEST(GameObjectTests, HasComponentManagerAfterConstruction)
-{
-    GameObject go;
-    EXPECT_NE(go.getComponentManager(), nullptr);
-}
+    class TestComponentThree : public Component
+    {
+    public:
+        TestComponentThree() = default;
+        ~TestComponentThree() override = default;
+    };
 
-TEST(GameObjectTests, AddComponentAddsToComponentManager)
-{
-    GameObject go;
-    go.addComponent<TestComponent>();
-    TestComponent* comp = go.getComponent<TestComponent>();
+    TEST(GameObjectTests, HasTransformAfterConstruction)
+    {
+        GameObject go;
+        EXPECT_NE(go.getTransform(), nullptr);
+    }
 
-    EXPECT_NE(comp, nullptr);
-    EXPECT_EQ(comp, go.getComponentManager()->getComponent<TestComponent>());
-}
+    TEST(GameObjectTests, HasComponentManagerAfterConstruction)
+    {
+        GameObject go;
+        EXPECT_NE(go.getComponentManager(), nullptr);
+    }
 
-TEST(GameObjectTests, AddTransformDirectlyIsNotAllowed)
-{
-    GameObject go;
-    go.addComponent<Transform>();
+    TEST(GameObjectTests, AddComponentAddsToComponentManager)
+    {
+        GameObject go;
+        TestComponentOne* empty = go.getComponentManager()->getComponent<TestComponentOne>();
+        EXPECT_EQ(empty, nullptr);
 
-    EXPECT_NE(go.getTransform(), nullptr);
-    EXPECT_EQ(go.getComponentManager()->getComponent<Transform>(), nullptr);
-}
+        go.addComponent<TestComponentOne>();
+        TestComponentOne* goComp = go.getComponent<TestComponentOne>();
+        TestComponentOne* managerComp = go.getComponentManager()->getComponent<TestComponentOne>();
+
+        EXPECT_EQ(goComp, managerComp);
+    }
+
+    TEST(GameObjectTests, AddTransformDirectlyIsNotAllowed)
+    {
+        GameObject go;
+        go.addComponent<Transform>();
+        EXPECT_NE(go.getTransform(), nullptr);
+        EXPECT_EQ(go.getComponentManager()->getComponent<Transform>(), nullptr);
+    }
 
 
-TEST(GameObjectTests, GameObjectRemoveComponentFunctionRemovesViaComponentManager)
-{
-    GameObject go;
-    go.addComponent<TestComponent>();
+    TEST(GameObjectTests, GameObjectRemoveComponentFunctionRemovesViaComponentManager)
+    {
+        GameObject go;
+        go.addComponent<TestComponentOne>();
+        EXPECT_NE(go.getComponent<TestComponentOne>(), nullptr);
+        go.removeComponent<TestComponentOne>();
+        EXPECT_EQ(go.getComponentManager()->getComponent<TestComponentOne>(), nullptr);
+    }
 
-    EXPECT_NE(go.getComponent<TestComponent>(), nullptr);
-    go.removeComponent<TestComponent>();
-    EXPECT_EQ(go.getComponentManager()->getComponent<TestComponent>(), nullptr);
+    TEST(GameObjectTests, ComponentManagerRemovesAllComponents)
+    {
+        GameObject go;
+        go.addComponent<TestComponentOne>();
+        go.addComponent<TestComponentTwo>();
+        go.addComponent<TestComponentThree>();
+
+        bool componentCountBiggerThanZero1 = go.getComponentManager()->components.size() > 0;
+        EXPECT_EQ(componentCountBiggerThanZero1, true);
+        go.getComponentManager()->removeAllComponents();
+        bool componentCountBiggerThanZero2 = go.getComponentManager()->components.size() > 0;
+
+        EXPECT_EQ(componentCountBiggerThanZero2, false);
+    }
+
+    TEST(GameObjectTests, GetComponentCount)
+    {
+        GameObject go;
+        go.addComponent<TestComponentOne>();
+        go.addComponent<TestComponentTwo>();
+        go.addComponent<TestComponentThree>();
+
+        EXPECT_EQ(go.getComponentCount(), 3);
+    }
 }

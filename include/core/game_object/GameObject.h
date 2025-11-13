@@ -55,6 +55,8 @@ class GameObject
 
         bool getIsStatic() const;
 
+        int getComponentCount() const;
+
         /// Setters:
         void setName(std::string newName);
 

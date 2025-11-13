@@ -70,6 +70,11 @@ bool GameObject::getIsStatic() const
     return isStatic;
 }
 
+int GameObject::getComponentCount() const
+{
+    return componentManager->components.size();
+}
+
 void GameObject::setName(std::string newName)
 {
     name = newName;
