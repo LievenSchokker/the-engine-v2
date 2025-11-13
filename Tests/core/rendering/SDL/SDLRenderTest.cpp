@@ -4,6 +4,7 @@
 
 #include "core/rendering/SDL/SDLRender.h"
 #include "external/SdlContext.h"
+#include "core/rendering/window/WindowOptions.h"
 
 class SDLRenderTest : public ::testing::Test {
 protected:
@@ -29,6 +30,7 @@ TEST_F(SDLRenderTest, OpenCloseTest)
     WindowOptions opts{"Test Window", 640, 480};
 
     render.open(opts);
+
     EXPECT_TRUE(render.isOpen()) << "Window should open after calling open()";
 
     render.close();

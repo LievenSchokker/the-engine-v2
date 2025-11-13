@@ -47,7 +47,7 @@ void SDLRender::open(const WindowOptions& opts)
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    if (renderer != nullptr)
+    if (renderer == nullptr)
     {
         std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << "\n";
         SDL_DestroyWindow(window);

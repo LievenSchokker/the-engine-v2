@@ -107,6 +107,8 @@ public:
      */
     void presentFrame() override;
 
+	void open();
+
 private:
     SDL_Window* window = nullptr;      ///< Null indicates closed state; must outlive renderer
     SDL_Renderer* renderer = nullptr;  ///< Must be destroyed before window; null-checked for safety
