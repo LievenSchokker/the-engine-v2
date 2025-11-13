@@ -6,6 +6,7 @@
 
 
 #include <string>
+#include <stdexcept>
 
 
 #include "external/SdlContext.h"
@@ -26,6 +27,16 @@ SdlContext::~SdlContext()
 
 void SdlContext::acquire(Uint32 requestedFlags)
 {
+
+	#if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
+	// Disable compositor bypass
+	if(!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0"))
+	{
+		std::cout << "SDL can not disable compositor bypass!" << std::endl;
+		return 0;
+	}
+	#endif
+	
 	if (referenceCount == 0)
 	{
 		if (SDL_Init(requestedFlags) != 0)
@@ -34,6 +45,7 @@ void SdlContext::acquire(Uint32 requestedFlags)
 				std::string("SDL_Init failed: ") + SDL_GetError()
 			);
 		}
+
 		globalFlags = SDL_WasInit(0);
 	} else
 	{
