@@ -2,8 +2,8 @@
 #ifndef INPUT_MANAGER_H
 #define INPUT_MANAGER_H
 
-#include "../enums/KeyCode.h"
-#include "../enums/MouseButton.h"
+#include "KeyCode.h"
+#include "MouseButton.h"
 #include <memory>
 #include <unordered_set>
 
