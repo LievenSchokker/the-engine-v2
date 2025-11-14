@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch (CodeLLDB)",
+            "type": "lldb",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/build/engine",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "Launch (CodeLLDB) - Tests",
+            "type": "lldb",
+            "request": "launch",
+            "preLaunchTask": "build-and-run-tests",
+            "program": "${workspaceFolder}/build/engine_tests",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}
