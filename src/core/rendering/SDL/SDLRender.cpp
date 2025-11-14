@@ -28,6 +28,16 @@ void SDLRender::open(const WindowOptions& opts)
 {
     Uint32 flags = SDL_WINDOW_SHOWN;
 
+    #if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
+    // Disable compositor bypass
+    if(!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0"))
+    {
+        std::cout << "SDL can not disable compositor bypass!" << std::endl;
+        return;
+    }
+    #endif
+
+
     window = SDL_CreateWindow(
         opts.title.c_str(),
         SDL_WINDOWPOS_UNDEFINED,
