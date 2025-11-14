@@ -1,24 +1,26 @@
+#include <filesystem>
 #include <iostream>
 #include <gtest/gtest.h>
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "../../src/include/Assets/AssetManager/AssetManager.h"
-#include "../../src/include/Assets/SDLAssetTypes/SDLImage.h"
+#include "Assets/SDLAssetTypes/SDLImage.h"
+#include "Assets/AssetManager.h"
 
 
 class AssetManagerTest : public ::testing::Test {
 protected:
 	AssetManager* manager{};
-	const char* testImagePath{};
+	std::string testImagePath{};  
 
 	void SetUp() override {
 		std::cout << "SDL_image initialized successfully" << std::endl;
 
 		manager = new AssetManager();
-		testImagePath = "Sprite/MissingTexture.jpg";
 
-		std::cout << "SetUp complete!" << std::endl;
+		std::filesystem::path testFilePath = __FILE__;
+		std::filesystem::path testDir = testFilePath.parent_path();
+		testImagePath = (testDir / "Sprite" / "MissingTexture.jpg").string();
 	}
 
 	void TearDown() override {

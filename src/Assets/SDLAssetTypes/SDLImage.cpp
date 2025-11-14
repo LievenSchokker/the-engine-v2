@@ -3,8 +3,13 @@
 ///
 
 
-#include "../../include/Assets/SDLAssetTypes/SDLImage.h"
+#include "Assets/SDLAssetTypes/SDLImage.h"
+#include "Assets/AssetTypes.h"
+
+
 #include <iostream>
+
+
 
 
 SDLImage::SDLImage()
@@ -47,4 +52,7 @@ bool SDLImage::unLoad()
 }
 
 
-bool SDLImage::isLoaded() const { return surface != nullptr; }
+bool SDLImage::isLoaded() const
+{
+	return surface	!= nullptr;
+}

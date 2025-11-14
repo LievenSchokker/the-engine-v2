@@ -3,8 +3,8 @@
 ///
 
 
-#include "../../include/Assets/AssetManager/AssetManager.h"
-#include "../../include/Assets/Asset.h"
+#include "Assets/AssetManager.h"
+#include "Assets/Asset.h"
 
 
 
