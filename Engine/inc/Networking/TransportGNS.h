@@ -15,8 +15,8 @@
  * @class TransportGNS
  * @brief Implements a transport layer using Valve's GameNetworkingSockets (GNS).
  *
- * This class provides both server and client functionality for networking using
- * the SteamNetworkingSockets API.
+ * This class provides both opening socket and sending data to sockets functionality.
+ * Using the SteamNetworkingSockets API.
  *
  * @note Both reliable and unreliable send modes are supported. ReliableUnordered
  * mode behaves similarly to reliable ordered, but with reduced latency due to
@@ -37,20 +37,20 @@ public:
 
 
     /**
-     * @brief Starts a GNS server listening on the given port.
+     * @brief Starts a GNS socket listening on the given port.
      * @param port The port to listen on.
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult startServer(uint16_t port) override;
+    TransportResult setUpListenSocket(uint16_t port) override;
 
 
     /**
-     * @brief Connects to a remote GNS server.
-     * @param serverAddress The server's IP address (IPv4 or IPv6).
-     * @param port The server's port.
+     * @brief Connects to a remote GNS socket.
+     * @param socketAddress The socket's IP address (IPv4 or IPv6).
+     * @param port The socket's port.
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult startClient(const char *serverAddress, uint16_t port) override;
+    TransportResult connectByIPAdress(const char *socketAddress, uint16_t port) override;
 
 
     /**
@@ -69,6 +69,7 @@ public:
      */
     TransportResult send(const RawMessage& raw_message) override;
 
+
     /**
      * @brief Sends a message over the network to all connected nodes
      *
@@ -86,11 +87,11 @@ public:
 
 
     /**
-     * @brief Disconnects a client or closes the client connection.
+     * @brief Closes connection to a remote socket.
      * @param connectionId The ID of the connection to close.
      * @return True if successfully disconnected, false otherwise.
      */
-    bool disconnect(int connectionId) override;
+    bool TransportGNS::disconnectFromSocket(int connectionId) override;
 
 
     /**
@@ -100,33 +101,23 @@ public:
 
 
     /**
-     * @brief Shuts down the transport and closes all active connections.
+     * @brief Shuts down the socket and closes all active connections.
     */
-    void shutdown() override;
-
+    bool TransportGNS::closeOpenSocket() override;
 private:
     /// @name Server Members
     /// @{
-    HSteamListenSocket hListenSock;                    /// Listening socket for server mode.
-    HSteamNetPollGroup hPollGroup;                     /// Poll group for managing multiple connections.
+    HSteamListenSocket listenSocket;                   /// Listening socket for server mode.
+    HSteamNetPollGroup pollGroup;                      /// Poll group for managing multiple connections.
     std::map<HSteamNetConnection, int> mapConnections; /// Maps Steam connections to internal connection IDs.
     std::mutex mapMutex;                               /// Thread-safe access to mapConnections
     std::vector<int> getActiveConnectionIds();         /// Get all connection ids which are active
     /// @}
 
-
-    /// @name Client Members
-    /// @{
-    HSteamNetConnection hConnection;             /// Active client connection handle.
-    /// @}
-    ///
-
-
     /// @name Common
     /// @{
-    ISteamNetworkingSockets *pInterface;         /// Pointer to the main GNS interface.
-    bool bIsServer;                              /// Indicates whether this instance acts as a server.
-    int nextConnectionId;                        /// Incremental ID for new incoming connections.
+    ISteamNetworkingSockets *steamNetworkingSockets;    /// Pointer to the main GNS interface.
+    int nextConnectionId;                               /// Incremental ID for new incoming connections.
     /// @}
 
 

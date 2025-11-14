@@ -40,7 +40,7 @@ public:
      * @param port The port to bind and listen on.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult startServer(uint16_t port) = 0;
+    virtual TransportResult setUpListenSocket(uint16_t port) = 0;
 
 
     /**
@@ -49,7 +49,7 @@ public:
      * @param port Server port.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult startClient(const char *serverAddress, uint16_t port) = 0;
+    virtual TransportResult connectByIPAdress(const char *serverAddress, uint16_t port) = 0;
 
 
     /**
@@ -60,7 +60,7 @@ public:
      * @param send_mode The desired reliability and ordering (SendMode).
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult send(const RawMessage& msg) = 0;
+    virtual TransportResult send(const RawMessage &msg) = 0;
 
 
     /**
@@ -70,7 +70,7 @@ public:
      * @param send_mode The desired reliability and ordering (SendMode).
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult sendToAll(const RawMessage& msg) = 0;
+    virtual TransportResult sendToAll(const RawMessage &msg) = 0;
 
 
     /**
@@ -78,7 +78,7 @@ public:
      * @param connectionId The connection ID to disconnect.
      * @return True if successful, false otherwise.
      */
-    virtual bool disconnect(int connectionId) = 0;
+    virtual bool disconnectFromSocket(int connectionId) = 0;
 
 
     /**
@@ -90,7 +90,7 @@ public:
     /**
      * @brief Shuts down the transport, closing all connections and cleaning up resources.
      */
-    virtual void shutdown() = 0;
+    virtual bool closeOpenSocket() = 0;
 
 
     /**
