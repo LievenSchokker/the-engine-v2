@@ -5,12 +5,14 @@
 
 #pragma once
 
-#include <vector>
-#include <memory>
 
 class GameObject;
 class Behaviour;
 class Component;
+
+#include <vector>
+#include <memory>
+
 
 class ComponentManager
 {
@@ -51,7 +53,6 @@ private:
     template <typename T>
     std::vector<std::unique_ptr<Component>>::const_iterator getComponentIterator() const;
 
-    /// Variables:
 public:
     std::vector<std::unique_ptr<Component>> components;
     GameObject* const parent;

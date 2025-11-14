@@ -15,18 +15,23 @@ ComponentManager::~ComponentManager()
 
 std::vector<Behaviour*> ComponentManager::getAllBehaviours()
 {
+    // implement with behaviour.
     return {};
 }
 
+
 void ComponentManager::activateAll()
 {
-
+    // implement with behaviour.
 }
+
 
 void ComponentManager::deactivateAll()
 {
+    // implement with behaviour.
 
 }
+
 
 bool ComponentManager::hasComponent(Component* comp) const
 {
@@ -41,6 +46,7 @@ bool ComponentManager::hasComponent(Component* comp) const
     return it != components.end();
 }
 
+
 void ComponentManager::addComponent(Component* comp)
 {
     if (comp && !hasComponent(comp))
@@ -48,6 +54,7 @@ void ComponentManager::addComponent(Component* comp)
         components.push_back(std::unique_ptr<Component>(comp));
     }
 }
+
 
 void ComponentManager::removeComponent(Component* comp)
 {
@@ -62,6 +69,7 @@ void ComponentManager::removeComponent(Component* comp)
         components.erase(it);
     }
 }
+
 
 void ComponentManager::removeAllComponents()
 {

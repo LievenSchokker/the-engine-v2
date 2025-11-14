@@ -2,13 +2,14 @@
 // Created by samle on 10/11/2025.
 //
 
-
 #pragma once
+
+
+class Transform;
 
 #include <algorithm>
 #include <type_traits>
 
-class Transform;
 
 template<typename T>
 T* ComponentManager::addComponent()
@@ -78,6 +79,7 @@ void ComponentManager::removeComponent()
     }
 }
 
+
 template<typename T>
 auto ComponentManager::getComponentIterator() -> std::vector<std::unique_ptr<Component> >::iterator
 {
@@ -87,6 +89,7 @@ auto ComponentManager::getComponentIterator() -> std::vector<std::unique_ptr<Com
                             return dynamic_cast<T *>(comp.get()) != nullptr;
                         });
 }
+
 
 template<typename T>
 auto ComponentManager::getComponentIterator() const -> std::vector<std::unique_ptr<Component>>::const_iterator

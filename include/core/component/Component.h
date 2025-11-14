@@ -9,7 +9,6 @@ class GameObject;
 
 class Component
 {
-    /// Functions:
     public:
         Component() = default;
         virtual ~Component() = 0;
@@ -23,7 +22,6 @@ class Component
         bool tryGetComponent(T*& out) const;
 
 
-    /// Variables:
         GameObject* owner = nullptr;
         Transform* transform = nullptr;
 };

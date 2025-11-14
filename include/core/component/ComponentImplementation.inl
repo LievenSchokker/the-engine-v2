@@ -6,6 +6,7 @@
 
 #include "../game_object/GameObject.h"
 
+
 template<typename T>
 T* Component::getComponent() const
 {
@@ -19,6 +20,7 @@ T* Component::getComponent() const
     else
         throw std::runtime_error("GameObject does not have a component of type T!");
 }
+
 
 template<typename T>
 bool Component::tryGetComponent(T*& out) const

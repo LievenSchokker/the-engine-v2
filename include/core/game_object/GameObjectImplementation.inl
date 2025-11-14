@@ -13,11 +13,13 @@ T* GameObject::addComponent()
     return componentManager->template addComponent<T>();
 }
 
+
 template<typename T>
 T* GameObject::getComponent()
 {
    return  componentManager->template getComponent<T>();
 }
+
 
 template<typename T>
 T* GameObject::getOrAddComponent()
@@ -32,11 +34,13 @@ T* GameObject::getOrAddComponent()
     return component;
 }
 
+
 template<typename T>
 bool GameObject::tryGetComponent(T*& out)
 {
     return componentManager->template tryGetComponent<T>(out);
 }
+
 
 template <typename T>
 void GameObject::removeComponent()

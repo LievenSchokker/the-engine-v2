@@ -13,6 +13,7 @@ Component::~Component()
     transform = nullptr;
 }
 
+
 void Component::setGameObject(GameObject* object)
 {
     owner = object;
