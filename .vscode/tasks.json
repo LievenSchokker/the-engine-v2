@@ -1,0 +1,30 @@
+// Used by Pablo
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "-lc",
+                "mkdir -p \"${workspaceFolder}/build\" && cmake -S . -B \"${workspaceFolder}/build\" && cmake --build \"${workspaceFolder}/build\""
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "build-and-run",
+            "type": "shell",
+            "command": "\"${workspaceFolder}/build/engine\"",
+            "dependsOn": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "build-and-run-tests",
+            "type": "shell",
+            "command": "\"${workspaceFolder}/build/engine_tests\"",
+            "dependsOn": "build",
+            "problemMatcher": []
+        }
+    ]
+}

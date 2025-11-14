@@ -2,34 +2,25 @@
 
 #include <string>
 
-
-class GameObject
-{
-  public:
+class GameObject {
+   public:
     explicit GameObject(std::string name);
     virtual ~GameObject() = default;
 
-    const std::string& getName() const
-    {
-        return name;
-    }
+    const std::string& getName() const;
 
-    virtual void onStart()
-    {
-    }
+    virtual void onStart() = 0;
 
-    virtual void onStop()
-    {
-    }
+    virtual void onStop() = 0;
 
-    virtual void update(float /*deltaTime*/)
-    {
-    }
+    virtual void onPause() = 0;
 
-    virtual void render()
-    {
-    }
+    virtual void onResume() = 0;
 
-  private:
+    virtual void update(float /*deltaTime*/) = 0;
+
+    virtual void render() = 0;
+
+   private:
     std::string name;
 };

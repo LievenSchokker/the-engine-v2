@@ -1,32 +1,30 @@
 #pragma once
 
-#include "Scene.h"
-
 #include <memory>
 #include <string>
 #include <unordered_map>
 
+#include "Scene.h"
 
 /**
  * @brief Coordinates ownership and activation of scenes.
- *s
+ *
  * Stores scenes by name, forwards lifecycle calls, and keeps track of the
  * active scene along with a simple paused state.
  */
-class SceneManager
-{
-  public:
+class SceneManager {
+   public:
     SceneManager() = default;
 
     /**
      * @brief Register a scene owned by the manager.
      *
-     * If a scene with the same name already exists the existing instance is
-     * returned and nothing is replaced.
+     * If a scene with the same name already exists, nullptr is returned to
+     * indicate an error and the scene is not added.
      *
      * @param scene Scene instance that transfers ownership to the manager.
      * @return Pointer to the stored scene, or nullptr when the argument is
-     * null.
+     * null or a scene with the same name already exists.
      */
     Scene* addScene(std::unique_ptr<Scene> scene);
 
@@ -54,8 +52,7 @@ class SceneManager
      *
      * @return Pointer to the active scene, or nullptr when none is active.
      */
-    Scene* getActiveScene() const
-    {
+    Scene* getActiveScene() const {
         return activeScene;
     }
 
@@ -81,7 +78,7 @@ class SceneManager
     /**
      * @brief Pause the active scene.
      *
-     * Invokes @ref Scene::onStop and suppresses update/render calls until
+     * Invokes @ref Scene::onPause and suppresses update/render calls until
      * @ref resume is invoked.
      */
     void pause();
@@ -89,7 +86,7 @@ class SceneManager
     /**
      * @brief Resume a paused scene.
      *
-     * Invokes @ref Scene::onStart and re-enables update/render calls.
+     * Invokes @ref Scene::onResume and re-enables update/render calls.
      */
     void resume();
 
@@ -98,8 +95,7 @@ class SceneManager
      *
      * @return true when the active scene is paused.
      */
-    bool isPaused() const
-    {
+    bool isPaused() const {
         return paused;
     }
 
@@ -115,7 +111,7 @@ class SceneManager
      */
     void render();
 
-  private:
+   private:
     std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
     Scene* activeScene = nullptr;
     bool paused = false;

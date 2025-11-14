@@ -2,17 +2,17 @@
 
 #include "GameObject.h"
 
-
-class PlaceholderGameObject : public GameObject
-{
-  public:
+class PlaceholderGameObject : public GameObject {
+   public:
     explicit PlaceholderGameObject(std::string name);
 
     void onStart() override;
     void onStop() override;
+    void onPause() override;
+    void onResume() override;
     void update(float deltaTime) override;
     void render() override;
 
-  private:
+   private:
     float accumulatedTime = 0.0f;
 };

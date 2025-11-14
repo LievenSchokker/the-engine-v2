@@ -1,11 +1,10 @@
 #pragma once
 
-#include "GameObject.h"
-
 #include <memory>
 #include <string>
 #include <vector>
 
+#include "GameObject.h"
 
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.
@@ -13,9 +12,8 @@
  * Maintains lifecycle state and propagates core calls to its game objects when
  * active.
  */
-class Scene
-{
-  public:
+class Scene {
+   public:
     /**
      * @brief Create a scene with the given identifier.
      *
@@ -28,10 +26,7 @@ class Scene
      *
      * @return Reference to the stored scene name.
      */
-    const std::string& getName() const
-    {
-        return name;
-    }
+    const std::string& getName() const;
 
     /**
      * @brief Add a game object to the scene.
@@ -79,6 +74,20 @@ class Scene
     void onStop();
 
     /**
+     * @brief Pause the scene if it is active.
+     *
+     * Triggers @ref GameObject::onPause for every stored object.
+     */
+    void onPause();
+
+    /**
+     * @brief Resume the scene if it is active.
+     *
+     * Triggers @ref GameObject::onResume for every stored object.
+     */
+    void onResume();
+
+    /**
      * @brief Update all game objects when the scene is active.
      *
      * @param deltaTime Seconds elapsed since the previous update.
@@ -90,7 +99,7 @@ class Scene
      */
     void render();
 
-  private:
+   private:
     std::string name;
     std::vector<std::unique_ptr<GameObject>> gameObjects;
     bool active = false;

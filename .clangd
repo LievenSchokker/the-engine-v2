@@ -1,0 +1,12 @@
+# Used by Pablo
+
+CompileFlags:
+  Add:
+    - -std=c++20
+    - -I/opt/homebrew/include
+    - -I/usr/local/include
+    - -I/opt/homebrew/include/SDL2
+    - -I/usr/local/include/SDL2
+    - -I/opt/homebrew/include/SDL2_image
+    - -I/usr/local/include/SDL2_image
+    
