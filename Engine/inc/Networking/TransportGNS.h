@@ -67,7 +67,7 @@ public:
      * @param send_mode The desired transmission mode.
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult send(int connectionId, const std::byte data[], size_t length, SendMode send_mode) override;
+    TransportResult send(const RawMessage& raw_message) override;
 
     /**
      * @brief Sends a message over the network to all connected nodes
@@ -82,7 +82,7 @@ public:
      * @param send_mode The desired transmission mode.
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult sendToAll(const std::byte data[], size_t length, SendMode send_mode) override;
+    TransportResult sendToAll(const RawMessage& raw_message) override;
 
 
     /**
@@ -107,32 +107,32 @@ public:
 private:
     /// @name Server Members
     /// @{
-    HSteamListenSocket hListenSock;                    ///< Listening socket for server mode.
-    HSteamNetPollGroup hPollGroup;                     ///< Poll group for managing multiple connections.
-    std::map<HSteamNetConnection, int> mapConnections; ///< Maps Steam connections to internal connection IDs.
-    std::mutex mapMutex; // new: thread-safe access to mapConnections
-    std::vector<int> getActiveConnectionIds();         ///< Get all connection ids which are active
+    HSteamListenSocket hListenSock;                    /// Listening socket for server mode.
+    HSteamNetPollGroup hPollGroup;                     /// Poll group for managing multiple connections.
+    std::map<HSteamNetConnection, int> mapConnections; /// Maps Steam connections to internal connection IDs.
+    std::mutex mapMutex;                               /// Thread-safe access to mapConnections
+    std::vector<int> getActiveConnectionIds();         /// Get all connection ids which are active
     /// @}
 
 
     /// @name Client Members
     /// @{
-    HSteamNetConnection hConnection;             ///< Active client connection handle.
+    HSteamNetConnection hConnection;             /// Active client connection handle.
     /// @}
     ///
 
 
     /// @name Common
     /// @{
-    ISteamNetworkingSockets *pInterface;         ///< Pointer to the main GNS interface.
-    bool bIsServer;                              ///< Indicates whether this instance acts as a server.
-    int nextConnectionId;                        ///< Incremental ID for new incoming connections.
+    ISteamNetworkingSockets *pInterface;         /// Pointer to the main GNS interface.
+    bool bIsServer;                              /// Indicates whether this instance acts as a server.
+    int nextConnectionId;                        /// Incremental ID for new incoming connections.
     /// @}
 
 
     /// @name Callbacks
     /// @{
-    static TransportGNS *pCallbackInstance;      ///< Static instance pointer for static callbacks.
+    static TransportGNS *pCallbackInstance;      /// Static instance pointer for static callbacks.
     static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t *pInfo);
     void onSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t *pInfo);
     /// @}
@@ -140,9 +140,9 @@ private:
 
     /// @name Helper Methods
     /// @{
-    void pollIncomingMessages();                 ///< Processes all queued incoming messages.
-    void pollConnectionStateChanges();           ///< Handles connection state change events.
-    int getConnectionId(HSteamNetConnection hConn); ///< Retrieves internal ID for a connection handle.
-    HSteamNetConnection getSteamConnection(int connectionId); ///< Retrieves connection handle from ID.
+    void pollIncomingMessages();                 /// Processes all queued incoming messages.
+    void pollConnectionStateChanges();           /// Handles connection state change events.
+    int getConnectionId(HSteamNetConnection hConn); /// Retrieves internal ID for a connection handle.
+    HSteamNetConnection getSteamConnection(int connectionId); /// Retrieves connection handle from ID.
     /// @}
 };
