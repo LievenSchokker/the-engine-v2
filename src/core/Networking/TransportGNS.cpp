@@ -6,6 +6,9 @@
 #include <iostream>
 #include <steam/steamnetworkingsockets.h>
 #include <steam/isteamnetworkingutils.h>
+#include <mutex>
+#include <string>
+
 
 TransportGNS *TransportGNS::pCallbackInstance = nullptr;
 
@@ -156,6 +159,22 @@ TransportResult TransportGNS::send(int connectionId, const std::byte data[], siz
     return transport_result;
 }
 
+TransportResult TransportGNS::sendToAll(const std::byte data[], size_t length, SendMode send_mode) {
+    TransportResult transport_result;
+
+    auto clients = getActiveConnectionIds();
+    for (int id: clients) {
+        TransportResult singe_transport_result = send(id, data, length, SendMode::ReliableOrdered);
+
+        if (!singe_transport_result.success) {
+            transport_result.success = false;
+            transport_result.success = singe_transport_result.errorCode;
+        }
+    }
+
+    return transport_result;
+}
+
 bool TransportGNS::disconnect(int connectionId) {
     // Close the given connection (server) or client link
     if (bIsServer) {
@@ -215,12 +234,13 @@ void TransportGNS::pollIncomingMessages() {
             ISteamNetworkingMessage *pMsg = nullptr;
             int numMsgs = pInterface->ReceiveMessagesOnPollGroup(hPollGroup, &pMsg, 1);
             if (numMsgs == 0) break;
-            if (numMsgs < 0) {
-                std::cerr << "Error receiving messages" << std::endl;
-                break;
+
+            int connId;
+            {
+                std::lock_guard<std::mutex> lock(mapMutex);
+                connId = getConnectionId(pMsg->m_conn);
             }
 
-            int connId = getConnectionId(pMsg->m_conn);
             if (connId != -1 && onMessageReceived) {
                 onMessageReceived(connId, (const std::byte *) pMsg->m_pData, pMsg->m_cbSize);
             }
@@ -259,28 +279,33 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
     switch (pInfo->m_info.m_eState) {
         case k_ESteamNetworkingConnectionState_Connecting:
             if (bIsServer) {
-                std::cout << "Connection request from " << pInfo->m_info.m_szConnectionDescription << std::endl;
+                std::cout << "[Server] Connection request from " << pInfo->m_info.m_szConnectionDescription << std::endl;
 
-                // Accept or reject new incoming connection
                 if (pInterface->AcceptConnection(pInfo->m_hConn) != k_EResultOK) {
                     pInterface->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
-                    std::cerr << "Failed to accept connection" << std::endl;
+                    std::cerr << "[Server] Failed to accept connection" << std::endl;
                     break;
                 }
 
-                // Add new connection to poll group
                 if (!pInterface->SetConnectionPollGroup(pInfo->m_hConn, hPollGroup)) {
                     pInterface->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
-                    std::cerr << "Failed to set poll group" << std::endl;
+                    std::cerr << "[Server] Failed to set poll group" << std::endl;
                     break;
                 }
 
-                int connId = nextConnectionId++;
-                mapConnections[pInfo->m_hConn] = connId;
+                int connId;
+                {
+                    std::lock_guard<std::mutex> lock(mapMutex);
+                    connId = nextConnectionId++;
+                    mapConnections[pInfo->m_hConn] = connId;
+                }
 
+                // signal connection event 
                 if (onConnectionChanged) {
                     onConnectionChanged(connId, true);
                 }
+
+                std::cout << "[Server] Client assigned ID " << connId << std::endl;
             }
             break;
 
@@ -335,4 +360,12 @@ HSteamNetConnection TransportGNS::getSteamConnection(int connectionId) {
         }
     }
     return k_HSteamNetConnection_Invalid;
+}
+
+
+std::vector<int> TransportGNS::getActiveConnectionIds() {
+    std::lock_guard<std::mutex> lock(mapMutex);
+    std::vector<int> ids;
+    for (auto &pair: mapConnections) ids.push_back(pair.second);
+    return ids;
 }

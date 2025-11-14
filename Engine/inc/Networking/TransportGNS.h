@@ -2,8 +2,11 @@
 /// Created by thijs on 12-11-2025.
 ///
 
-
+#pragma once
 #include "Transport.h"
+#include <cstddef>
+#include <functional>
+#include <mutex>
 #include <map>
 #include <steam/steamnetworkingsockets.h>
 #include <steam/isteamnetworkingutils.h>
@@ -66,6 +69,21 @@ public:
      */
     TransportResult send(int connectionId, const std::byte data[], size_t length, SendMode send_mode) override;
 
+    /**
+     * @brief Sends a message over the network to all connected nodes
+     *
+     * The message is sent using the specified SendMode:
+     * - ReliableOrdered: Guarantees in-order delivery.
+     * - ReliableUnordered: Reliable but sent with minimal delay (order not guaranteed).
+     * - Unreliable: May be dropped or arrive out of order.
+     *
+     * @param data Pointer to the message buffer.
+     * @param length Length of the message buffer in bytes.
+     * @param send_mode The desired transmission mode.
+     * @return A TransportResult indicating success or failure.
+     */
+    TransportResult sendToAll(const std::byte data[], size_t length, SendMode send_mode) override;
+
 
     /**
      * @brief Disconnects a client or closes the client connection.
@@ -89,9 +107,11 @@ public:
 private:
     /// @name Server Members
     /// @{
-    HSteamListenSocket hListenSock;              ///< Listening socket for server mode.
-    HSteamNetPollGroup hPollGroup;               ///< Poll group for managing multiple connections.
+    HSteamListenSocket hListenSock;                    ///< Listening socket for server mode.
+    HSteamNetPollGroup hPollGroup;                     ///< Poll group for managing multiple connections.
     std::map<HSteamNetConnection, int> mapConnections; ///< Maps Steam connections to internal connection IDs.
+    std::mutex mapMutex; // new: thread-safe access to mapConnections
+    std::vector<int> getActiveConnectionIds();         ///< Get all connection ids which are active
     /// @}
 
 

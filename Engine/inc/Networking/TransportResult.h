@@ -1,6 +1,6 @@
 #pragma once
 
 struct TransportResult {
-    bool success;
-    int errorCode;
+    bool success = false;
+    int errorCode = 0;
 };
