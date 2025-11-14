@@ -13,11 +13,9 @@
 TransportGNS *TransportGNS::pCallbackInstance = nullptr;
 
 TransportGNS::TransportGNS()
-    : hListenSock(k_HSteamListenSocket_Invalid)
-      , hPollGroup(k_HSteamNetPollGroup_Invalid)
-      , hConnection(k_HSteamNetConnection_Invalid)
-      , pInterface(nullptr)
-      , bIsServer(false)
+    : listenSocket(k_HSteamListenSocket_Invalid)
+      , pollGroup(k_HSteamNetPollGroup_Invalid)
+      , steamNetworkingSockets(nullptr)
       , nextConnectionId(1) {
     // Initialize GameNetworkingSockets
     SteamDatagramErrMsg errMsg;
@@ -26,7 +24,7 @@ TransportGNS::TransportGNS()
         return;
     }
 
-    pInterface = SteamNetworkingSockets();
+    steamNetworkingSockets = SteamNetworkingSockets();
 
     // Set debug output
     SteamNetworkingUtils()->SetDebugOutputFunction(
@@ -35,73 +33,65 @@ TransportGNS::TransportGNS()
             std::cout << pszMsg << std::endl;
         }
     );
+
+    // Global connection state callback
+    SteamNetworkingUtils()->SetGlobalCallback_SteamNetConnectionStatusChanged(
+        steamNetConnectionStatusChangedCallback
+    );
+
 }
 
 TransportGNS::~TransportGNS() {
-    shutdown();
+    closeOpenSocket();
     GameNetworkingSockets_Kill();
 }
 
-TransportResult TransportGNS::startServer(uint16_t port) {
-    bIsServer = true;
+
+TransportResult TransportGNS::setUpListenSocket(uint16_t port) {
     TransportResult result;
 
-    SteamNetworkingIPAddr serverAddr;
-    serverAddr.Clear();
-    serverAddr.m_port = port;
+    SteamNetworkingIPAddr addr;
+    addr.Clear();
+    addr.m_port = port;
 
-    // Register connection status callback
-    SteamNetworkingConfigValue_t opt;
-    opt.SetPtr(k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged,
-               (void *) steamNetConnectionStatusChangedCallback);
 
     // Create a listening socket
-    hListenSock = pInterface->CreateListenSocketIP(serverAddr, 1, &opt);
-    if (hListenSock == k_HSteamListenSocket_Invalid) {
-        std::cerr << "Failed to listen on port " << port << std::endl;
+    listenSocket = steamNetworkingSockets->CreateListenSocketIP(addr, 0, nullptr);
+    if (listenSocket == k_HSteamListenSocket_Invalid) {
+        std::cerr << "[GNS] Failed to listen on port " << port << std::endl;
         result.success = false;
         return result;
     }
 
     // Create a poll group for managing multiple connections
-    hPollGroup = pInterface->CreatePollGroup();
-    if (hPollGroup == k_HSteamNetPollGroup_Invalid) {
-        std::cerr << "Failed to create poll group" << std::endl;
+    pollGroup = steamNetworkingSockets->CreatePollGroup();
+    if (pollGroup == k_HSteamNetPollGroup_Invalid) {
+        std::cerr << "[GNS] Failed to create poll group\n";
         result.success = false;
         return result;
     }
 
-    std::cout << "Server listening on port " << port << std::endl;
+    std::cout << "[GNS] Listening on port " << port << "\n";
     result.success = true;
     return result;
 }
 
 
-TransportResult TransportGNS::startClient(const char *serverAddress, uint16_t port) {
-    bIsServer = false;
+TransportResult TransportGNS::connectByIPAdress(const char *socketAddress, uint16_t port) {
     TransportResult result;
 
-    SteamNetworkingIPAddr serverAddr;
-    if (!serverAddr.ParseString(serverAddress)) {
-        std::cerr << "Invalid server address: " << serverAddress << std::endl;
+    SteamNetworkingIPAddr addr;
+    if (!addr.ParseString(socketAddress)) {
+        std::cerr << "[GNS] Invalid address: " << socketAddress << '\n';
         result.success = false;
         return result;
     }
-    serverAddr.m_port = port;
+    addr.m_port = port;
 
-    // Print resolved address
-    char szAddr[SteamNetworkingIPAddr::k_cchMaxString];
-    serverAddr.ToString(szAddr, sizeof(szAddr), true);
-    std::cout << "Connecting to " << szAddr << std::endl;
+    HSteamNetConnection hConn = steamNetworkingSockets->ConnectByIPAddress(addr, 0, nullptr);
 
-    SteamNetworkingConfigValue_t opt;
-    opt.SetPtr(k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged,
-               (void *) steamNetConnectionStatusChangedCallback);
-
-    // Attempt connection
-    hConnection = pInterface->ConnectByIPAddress(serverAddr, 1, &opt);
-    if (hConnection == k_HSteamNetConnection_Invalid) {
-        std::cerr << "Failed to create connection" << std::endl;
+    if (hConn == k_HSteamNetConnection_Invalid) {
+        std::cerr << "[GNS] ConnectByIPAddress failed\n";
         result.success = false;
         return result;
     }
@@ -111,94 +101,90 @@ TransportResult TransportGNS::startClient(const char *serverAddress, uint16_t po
 }
 
 
-TransportResult TransportGNS::send(const RawMessage& msg) {
-    EResult result;
-    TransportResult transport_result;
+TransportResult TransportGNS::send(const RawMessage &msg) {
+    TransportResult result;
 
-    // Choose message reliability/ordering mode
     int sendFlags = 0;
     switch (msg.mode) {
         case SendMode::ReliableOrdered:
             sendFlags = k_nSteamNetworkingSend_Reliable;
             break;
-
         case SendMode::ReliableUnordered:
-            // Slightly less delayed reliable send; still ordered per connection
             sendFlags = k_nSteamNetworkingSend_Reliable | k_nSteamNetworkingSend_UnreliableNoDelay;
             break;
-
         case SendMode::Unreliable:
             sendFlags = k_nSteamNetworkingSend_Unreliable;
             break;
     }
 
-    if (bIsServer) {
-        // Resolve connection handle
-        HSteamNetConnection hConn = getSteamConnection(msg.connectionId);
-        if (hConn == k_HSteamNetConnection_Invalid) {
-            transport_result.success = false;
-            return transport_result;
-        }
-
-        result = pInterface->SendMessageToConnection(
-            hConn,
-            msg.payload.data(),
-            static_cast<uint32>(msg.payload.size()),
-            sendFlags,
-            nullptr
-        );
-    } else {
-        result = pInterface->SendMessageToConnection(
-            hConnection,
-            msg.payload.data(),
-            static_cast<uint32>(msg.payload.size()),
-            sendFlags,
-            nullptr
-        );
+    HSteamNetConnection hConn = getSteamConnection(msg.connectionId);
+    if (hConn == k_HSteamNetConnection_Invalid) {
+        result.success = false;
+        return result;
     }
 
-    transport_result.success = (result == k_EResultOK);
-    return transport_result;
+    EResult r = steamNetworkingSockets->SendMessageToConnection(
+        hConn,
+        msg.payload.data(),
+        (uint32)msg.payload.size(),
+        sendFlags,
+        nullptr
+    );
+
+    result.success = (r == k_EResultOK);
+    return result;
 }
 
 
-TransportResult TransportGNS::sendToAll(const RawMessage& msg) {
-    TransportResult transport_result;
+TransportResult TransportGNS::sendToAll(const RawMessage &msg) {
+    TransportResult result;
+    result.success = true;
 
-    auto clients = getActiveConnectionIds();
-    for (int id: clients) {
-        RawMessage rm = msg;
-        rm.connectionId = id;
-        TransportResult single_result = send(rm);
-        if (!single_result.success) {
-            transport_result.success = false;
-            transport_result.errorCode = single_result.errorCode;
+    for (int cid : getActiveConnectionIds()) {
+        RawMessage clone = msg;
+        clone.connectionId = cid;
+
+        TransportResult r = send(clone);
+        if (!r.success) {
+            result.success = false;
         }
     }
-
-    return transport_result;
+    return result;
 }
 
 
-bool TransportGNS::disconnect(int connectionId) {
-    // Close the given connection (server) or client link
-    if (bIsServer) {
-        HSteamNetConnection hConn = getSteamConnection(connectionId);
-        if (hConn == k_HSteamNetConnection_Invalid) {
-            return false;
-        }
+bool TransportGNS::closeOpenSocket() {
+    for (auto &pair : mapConnections) {
+        steamNetworkingSockets->CloseConnection(pair.first, 0, "Close open socket", true);
+    }
+    mapConnections.clear();
 
-        pInterface->CloseConnection(hConn, 0, "Disconnected", true);
-        mapConnections.erase(hConn);
-    } else {
-        if (hConnection != k_HSteamNetConnection_Invalid) {
-            pInterface->CloseConnection(hConnection, 0, "Disconnected", true);
-            hConnection = k_HSteamNetConnection_Invalid;
-        }
+    if (listenSocket != k_HSteamListenSocket_Invalid) {
+        steamNetworkingSockets->CloseListenSocket(listenSocket);
+        listenSocket = k_HSteamListenSocket_Invalid;
+    }
+
+    if (pollGroup != k_HSteamNetPollGroup_Invalid) {
+        steamNetworkingSockets->DestroyPollGroup(pollGroup);
+        pollGroup = k_HSteamNetPollGroup_Invalid;
     }
 
     return true;
 }
+
+bool TransportGNS::disconnectFromSocket(int connectionId) {
+    HSteamNetConnection hConn = getSteamConnection(connectionId);
+
+    if (hConn == k_HSteamNetConnection_Invalid)
+        return false;
+
+    steamNetworkingSockets->CloseConnection(hConn, 0, "Disconnected", true);
+
+    std::lock_guard<std::mutex> lock(mapMutex);
+    mapConnections.erase(hConn);
+    return true;
+}
+
 
 void TransportGNS::poll() {
     // Handle both connection state changes and queued messages
@@ -206,104 +192,64 @@ void TransportGNS::poll() {
     pollIncomingMessages();
 }
 
-void TransportGNS::shutdown() {
-    // Gracefully close all active sockets and connections
-    if (bIsServer) {
-        // Close all connections
-        for (auto &pair: mapConnections) {
-            pInterface->CloseConnection(pair.first, 0, "Server Shutdown", true);
-        }
-        mapConnections.clear();
-
-        if (hListenSock != k_HSteamListenSocket_Invalid) {
-            pInterface->CloseListenSocket(hListenSock);
-            hListenSock = k_HSteamListenSocket_Invalid;
-        }
-
-        if (hPollGroup != k_HSteamNetPollGroup_Invalid) {
-            pInterface->DestroyPollGroup(hPollGroup);
-            hPollGroup = k_HSteamNetPollGroup_Invalid;
-        }
-    } else {
-        if (hConnection != k_HSteamNetConnection_Invalid) {
-            pInterface->CloseConnection(hConnection, 0, "Client Shutdown", true);
-            hConnection = k_HSteamNetConnection_Invalid;
-        }
-    }
-}
-
-void TransportGNS::pollIncomingMessages() {
-    if (bIsServer) {
-        while (true) {
-            ISteamNetworkingMessage *pMsg = nullptr;
-            int numMsgs = pInterface->ReceiveMessagesOnPollGroup(hPollGroup, &pMsg, 1);
-            if (numMsgs == 0) break;
-
-            int connId;
-            {
-                std::lock_guard<std::mutex> lock(mapMutex);
-                connId = getConnectionId(pMsg->m_conn);
-            }
-
-            if (connId != -1 && onMessageReceived) {
-                RawMessage rm(connId,
-                              reinterpret_cast<const std::byte*>(pMsg->m_pData),
-                              pMsg->m_cbSize);
-                onMessageReceived(rm);
-            }
-
-            pMsg->Release();
-        }
-    } else {
-        while (true) {
-            ISteamNetworkingMessage *pMsg = nullptr;
-            int numMsgs = pInterface->ReceiveMessagesOnConnection(hConnection, &pMsg, 1);
-            if (numMsgs == 0) break;
-            if (numMsgs < 0) {
-                std::cerr << "Error receiving messages" << std::endl;
-                break;
-            }
-
-            if (onMessageReceived) {
-                RawMessage rm(0,
-                              reinterpret_cast<const std::byte*>(pMsg->m_pData),
-                              static_cast<size_t>(pMsg->m_cbSize));
-                onMessageReceived(rm);
-            }
-
-            pMsg->Release();
-        }
-    }
-}
-
 
 void TransportGNS::pollConnectionStateChanges() {
     pCallbackInstance = this;
-    pInterface->RunCallbacks();
+    steamNetworkingSockets->RunCallbacks();
 }
+
+
+void TransportGNS::pollIncomingMessages() {
+    // 1. Poll group (incoming accepted connections)
+    if (pollGroup != k_HSteamNetPollGroup_Invalid) {
+        while (true) {
+            ISteamNetworkingMessage *msg = nullptr;
+            int num = steamNetworkingSockets->ReceiveMessagesOnPollGroup(pollGroup, &msg, 1);
+            if (num != 1) break;
+
+            int cid = getConnectionId(msg->m_conn);
+            if (cid != -1 && onMessageReceived) {
+                RawMessage rm(cid,
+                    (const std::byte*)msg->m_pData,
+                    msg->m_cbSize);
+                onMessageReceived(rm);
+            }
+            msg->Release();
+        }
+    }
+
+    // 2. Poll outbound or P2P connections
+    for (auto &[hConn, cid] : mapConnections) {
+        ISteamNetworkingMessage *msg = nullptr;
+        while (steamNetworkingSockets->ReceiveMessagesOnConnection(hConn, &msg, 1) == 1) {
+            RawMessage rm(cid,
+                (const std::byte*)msg->m_pData,
+                msg->m_cbSize);
+
+            if (onMessageReceived)
+                onMessageReceived(rm);
+
+            msg->Release();
+        }
+    }
+}
+
 
 void TransportGNS::steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t *pInfo) {
     pCallbackInstance->onSteamNetConnectionStatusChanged(pInfo);
 }
 
-void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t *pInfo) {
-    switch (pInfo->m_info.m_eState) {
+void TransportGNS::onSteamNetConnectionStatusChanged(
+        SteamNetConnectionStatusChangedCallback_t *pInfo)
+{
+    switch (pInfo->m_info.m_eState)
+    {
         case k_ESteamNetworkingConnectionState_Connecting:
-            if (bIsServer) {
-                std::cout << "[Server] Connection request from " << pInfo->m_info.m_szConnectionDescription << std::endl;
-
-                if (pInterface->AcceptConnection(pInfo->m_hConn) != k_EResultOK) {
-                    pInterface->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
-                    std::cerr << "[Server] Failed to accept connection" << std::endl;
-                    break;
-                }
-
-                if (!pInterface->SetConnectionPollGroup(pInfo->m_hConn, hPollGroup)) {
-                    pInterface->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
-                    std::cerr << "[Server] Failed to set poll group" << std::endl;
-                    break;
-                }
-
+        {
+            // Incoming connection?
+            if (pInfo->m_info.m_hListenSocket == listenSocket &&
+                listenSocket != k_HSteamListenSocket_Invalid)
+            {
                 int connId;
                 {
                     std::lock_guard<std::mutex> lock(mapMutex);
@@ -311,72 +257,78 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
                     mapConnections[pInfo->m_hConn] = connId;
                 }
 
-                // signal connection event 
-                if (onConnectionChanged) {
-                    onConnectionChanged(connId, true);
+                if (steamNetworkingSockets->AcceptConnection(pInfo->m_hConn) != k_EResultOK) {
+                    steamNetworkingSockets->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
+                    return;
                 }
 
-                std::cout << "[Server] Client assigned ID " << connId << std::endl;
+                if (!steamNetworkingSockets->SetConnectionPollGroup(pInfo->m_hConn, pollGroup)) {
+                    steamNetworkingSockets->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
+                    return;
+                }
             }
             break;
+        }
 
         case k_ESteamNetworkingConnectionState_Connected:
-            if (!bIsServer) {
-                std::cout << "Connected to server" << std::endl;
-                if (onConnectionChanged) {
-                    onConnectionChanged(0, true);
-                }
+        {
+            int cid;
+            {
+                std::lock_guard<std::mutex> lock(mapMutex);
+                cid = nextConnectionId++;
+                mapConnections[pInfo->m_hConn] = cid;
             }
+
+            if (onConnectionChanged)
+                onConnectionChanged(cid, true);
+
             break;
+        }
 
         case k_ESteamNetworkingConnectionState_ClosedByPeer:
         case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
-            // Handle disconnection
-            if (pInfo->m_eOldState == k_ESteamNetworkingConnectionState_Connected) {
-                std::cout << "Connection closed: " << pInfo->m_info.m_szEndDebug << std::endl;
-
-                if (bIsServer) {
-                    int connId = getConnectionId(pInfo->m_hConn);
-                    if (connId != -1) {
-                        mapConnections.erase(pInfo->m_hConn);
-                        if (onConnectionChanged) {
-                            onConnectionChanged(connId, false);
-                        }
-                    }
-                } else {
-                    hConnection = k_HSteamNetConnection_Invalid;
-                    if (onConnectionChanged) {
-                        onConnectionChanged(0, false);
-                    }
-                }
+        {
+            int cid;
+            {
+                std::lock_guard<std::mutex> lock(mapMutex);
+                cid = getConnectionId(pInfo->m_hConn);
+                if (cid != -1)
+                    mapConnections.erase(pInfo->m_hConn);
             }
 
-            pInterface->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
+            if (cid != -1 && onConnectionChanged)
+                onConnectionChanged(cid, false);
+
+            steamNetworkingSockets->CloseConnection(pInfo->m_hConn, 0, nullptr, false);
+
             break;
+        }
 
         default:
             break;
     }
 }
 
+
 int TransportGNS::getConnectionId(HSteamNetConnection hConn) {
     auto it = mapConnections.find(hConn);
-    return (it != mapConnections.end()) ? it->second : -1;
+    if (it != mapConnections.end())
+        return it->second;
+    return -1;
 }
 
 HSteamNetConnection TransportGNS::getSteamConnection(int connectionId) {
-    for (const auto &pair: mapConnections) {
-        if (pair.second == connectionId) {
+    for (const auto &pair : mapConnections) {
+        if (pair.second == connectionId)
             return pair.first;
-        }
     }
     return k_HSteamNetConnection_Invalid;
 }
 
-
 std::vector<int> TransportGNS::getActiveConnectionIds() {
     std::lock_guard<std::mutex> lock(mapMutex);
     std::vector<int> ids;
-    for (auto &pair: mapConnections) ids.push_back(pair.second);
+    for (auto &pair : mapConnections)
+        ids.push_back(pair.second);
     return ids;
 }

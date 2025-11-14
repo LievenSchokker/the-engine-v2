@@ -19,7 +19,7 @@ struct RawMessage {
     RawMessage() = default;
 
     // Construct from raw bytes
-    RawMessage(int cid, const std::byte* data, size_t len, SendMode m = SendMode::ReliableOrdered)
+    RawMessage(int cid, const std::byte* data, size_t len, SendMode m = SendMode::Unreliable)
         : connectionId(cid), payload(data, data + len), mode(m), length(len) {}
 
     // Construct from std::string
