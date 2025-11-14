@@ -76,6 +76,7 @@ TransportResult TransportGNS::startServer(uint16_t port) {
     return result;
 }
 
+
 TransportResult TransportGNS::startClient(const char *serverAddress, uint16_t port) {
     bIsServer = false;
     TransportResult result;
@@ -109,13 +110,14 @@ TransportResult TransportGNS::startClient(const char *serverAddress, uint16_t po
     return result;
 }
 
-TransportResult TransportGNS::send(int connectionId, const std::byte data[], size_t length, SendMode send_mode) {
+
+TransportResult TransportGNS::send(const RawMessage& msg) {
     EResult result;
     TransportResult transport_result;
 
     // Choose message reliability/ordering mode
     int sendFlags = 0;
-    switch (send_mode) {
+    switch (msg.mode) {
         case SendMode::ReliableOrdered:
             sendFlags = k_nSteamNetworkingSend_Reliable;
             break;
@@ -132,7 +134,7 @@ TransportResult TransportGNS::send(int connectionId, const std::byte data[], siz
 
     if (bIsServer) {
         // Resolve connection handle
-        HSteamNetConnection hConn = getSteamConnection(connectionId);
+        HSteamNetConnection hConn = getSteamConnection(msg.connectionId);
         if (hConn == k_HSteamNetConnection_Invalid) {
             transport_result.success = false;
             return transport_result;
@@ -140,16 +142,16 @@ TransportResult TransportGNS::send(int connectionId, const std::byte data[], siz
 
         result = pInterface->SendMessageToConnection(
             hConn,
-            data,
-            static_cast<uint32>(length),
+            msg.payload.data(),
+            static_cast<uint32>(msg.payload.size()),
             sendFlags,
             nullptr
         );
     } else {
         result = pInterface->SendMessageToConnection(
             hConnection,
-            data,
-            static_cast<uint32>(length),
+            msg.payload.data(),
+            static_cast<uint32>(msg.payload.size()),
             sendFlags,
             nullptr
         );
@@ -159,21 +161,24 @@ TransportResult TransportGNS::send(int connectionId, const std::byte data[], siz
     return transport_result;
 }
 
-TransportResult TransportGNS::sendToAll(const std::byte data[], size_t length, SendMode send_mode) {
+
+TransportResult TransportGNS::sendToAll(const RawMessage& msg) {
     TransportResult transport_result;
 
     auto clients = getActiveConnectionIds();
     for (int id: clients) {
-        TransportResult singe_transport_result = send(id, data, length, SendMode::ReliableOrdered);
-
-        if (!singe_transport_result.success) {
+        RawMessage rm = msg;
+        rm.connectionId = id;
+        TransportResult single_result = send(rm);
+        if (!single_result.success) {
             transport_result.success = false;
-            transport_result.success = singe_transport_result.errorCode;
+            transport_result.errorCode = single_result.errorCode;
         }
     }
 
     return transport_result;
 }
+
 
 bool TransportGNS::disconnect(int connectionId) {
     // Close the given connection (server) or client link
@@ -228,7 +233,6 @@ void TransportGNS::shutdown() {
 }
 
 void TransportGNS::pollIncomingMessages() {
-    // Receive all queued messages for server or client
     if (bIsServer) {
         while (true) {
             ISteamNetworkingMessage *pMsg = nullptr;
@@ -242,7 +246,10 @@ void TransportGNS::pollIncomingMessages() {
             }
 
             if (connId != -1 && onMessageReceived) {
-                onMessageReceived(connId, (const std::byte *) pMsg->m_pData, pMsg->m_cbSize);
+                RawMessage rm(connId,
+                              reinterpret_cast<const std::byte*>(pMsg->m_pData),
+                              pMsg->m_cbSize);
+                onMessageReceived(rm);
             }
 
             pMsg->Release();
@@ -258,13 +265,17 @@ void TransportGNS::pollIncomingMessages() {
             }
 
             if (onMessageReceived) {
-                onMessageReceived(0, (const std::byte *) pMsg->m_pData, pMsg->m_cbSize);
+                RawMessage rm(0,
+                              reinterpret_cast<const std::byte*>(pMsg->m_pData),
+                              static_cast<size_t>(pMsg->m_cbSize));
+                onMessageReceived(rm);
             }
 
             pMsg->Release();
         }
     }
 }
+
 
 void TransportGNS::pollConnectionStateChanges() {
     pCallbackInstance = this;

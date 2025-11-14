@@ -1,6 +1,7 @@
 #pragma once
 #include <cstddef>
 #include <functional>
+#include "RawMessage.h"
 #include "TransportResult.h"
 #include "SendMode.h"
 
@@ -11,7 +12,7 @@
  * @param data Pointer to the received message data.
  * @param length Length of the received message in bytes.
  */
-using OnMessageReceivedCallback = std::function<void(int connectionId, const std::byte *data, size_t length)>;
+using OnMessageReceivedCallback = std::function<void(const RawMessage)>;
 
 /**
  * @typedef OnConnectionChangedCallback
@@ -59,7 +60,8 @@ public:
      * @param send_mode The desired reliability and ordering (SendMode).
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult send(int connectionId, const std::byte data[], size_t length, SendMode send_mode) = 0;
+    virtual TransportResult send(const RawMessage& msg) = 0;
+
 
     /**
      * @brief Sends a message over the network to all active nodes
@@ -68,7 +70,7 @@ public:
      * @param send_mode The desired reliability and ordering (SendMode).
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult sendToAll(const std::byte data[], size_t length, SendMode send_mode) = 0;
+    virtual TransportResult sendToAll(const RawMessage& msg) = 0;
 
 
     /**
