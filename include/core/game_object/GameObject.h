@@ -26,13 +26,13 @@ class GameObject
 
         /// Template functions:
         template<typename T>
-        void addComponent();
+        T* addComponent();
 
         template<typename T>
         T* getComponent();
 
         template<typename T>
-        bool tryGetComponent();
+        bool tryGetComponent(T*& out);
 
         template<typename T>
         T* getOrAddComponent();
@@ -40,7 +40,10 @@ class GameObject
         template<typename  T>
         void removeComponent();
 
-        /// Getters:
+        bool hasComponent(Component* comp) const;
+        void addComponent(Component* comp);
+        void removeComponent(Component* comp);
+
         ComponentManager* getComponentManager() const;
 
         Transform* getTransform() const;

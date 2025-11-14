@@ -8,9 +8,9 @@
 
 
 template<typename T>
-void GameObject::addComponent()
+T* GameObject::addComponent()
 {
-    componentManager->template addComponent<T>();
+    return componentManager->template addComponent<T>();
 }
 
 template<typename T>
@@ -33,9 +33,9 @@ T* GameObject::getOrAddComponent()
 }
 
 template<typename T>
-bool GameObject::tryGetComponent()
+bool GameObject::tryGetComponent(T*& out)
 {
-    return componentManager->template tryGetComponent<T>();
+    return componentManager->template tryGetComponent<T>(out);
 }
 
 template <typename T>

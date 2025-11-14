@@ -20,7 +20,6 @@ public:
 
     ~ComponentManager();
 
-    /// Functions:
     template <typename T>
     T* addComponent();
 
@@ -32,6 +31,10 @@ public:
 
     template <typename T>
     void removeComponent();
+
+    bool hasComponent(Component* comp) const;
+    void addComponent(Component* component);
+    void removeComponent(Component* component);
 
     void removeAllComponents();
 

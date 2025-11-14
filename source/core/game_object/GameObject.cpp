@@ -30,6 +30,21 @@ bool GameObject::compareTag(std::string other)
     return tag == other;
 }
 
+bool GameObject::hasComponent(Component* comp) const
+{
+    return componentManager->hasComponent(comp);
+}
+
+void GameObject::addComponent(Component* comp)
+{
+    componentManager->addComponent(comp);
+}
+
+void GameObject::removeComponent(Component* comp)
+{
+    componentManager->removeComponent(comp);
+}
+
 std::vector<Behaviour*> GameObject::getActiveBehaviours() const
 {
     return std::vector<Behaviour*>{};
