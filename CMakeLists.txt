@@ -62,6 +62,11 @@ file(GLOB_RECURSE ENGINE_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
+# Exclude application entry points from the reusable engine library/test sources
+list(REMOVE_ITEM ENGINE_SOURCES
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp"
+)
+
 file(GLOB_RECURSE ENGINE_HEADERS
         "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/src/**/*.h"
