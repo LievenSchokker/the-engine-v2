@@ -47,7 +47,7 @@ endif()
 # Dependencies
 # ============================================================================
 #find_package(SDL3 REQUIRED)
-find_package(GameNetworkingSockets REQUIRED)
+#find_package(GameNetworkingSockets REQUIRED)
 
 #if(ENGINE_BUILD_TESTS)
 #    find_package(GTest REQUIRED)
@@ -80,11 +80,11 @@ target_include_directories(engine_core
         ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(engine_core
-       PUBLIC
+#target_link_libraries(engine_core
+#       PUBLIC
 #        SDL3::SDL3
-        GameNetworkingSockets
-)
+#        GameNetworkingSockets
+#)
 
 if(ENGINE_ENABLE_WARNINGS)
     if(MSVC)
@@ -146,20 +146,20 @@ if(ENGINE_BUILD_TESTS)
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp"
     )
 
-#    add_executable(engine_tests ${TEST_SOURCES})
+    #    add_executable(engine_tests ${TEST_SOURCES})
 
-#    target_link_libraries(engine_tests
-#            PRIVATE
-#            Engine::Core
-#            GTest::gtest_main
-#    )
+    #    target_link_libraries(engine_tests
+    #            PRIVATE
+    #            Engine::Core
+    #            GTest::gtest_main
+    #    )
 
-#    set_target_properties(engine_tests PROPERTIES
-#            FOLDER "Tests"
-#    )
+    #    set_target_properties(engine_tests PROPERTIES
+    #            FOLDER "Tests"
+    #    )
 
-#    include(GoogleTest)
-#    gtest_discover_tests(engine_tests)
+    #    include(GoogleTest)
+    #    gtest_discover_tests(engine_tests)
 endif()
 
 # ============================================================================
