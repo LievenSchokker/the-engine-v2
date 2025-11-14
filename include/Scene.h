@@ -35,16 +35,20 @@ class Scene {
      * GameObject::onStart.
      *
      * @param gameObject Game object instance to own.
-     * @return Pointer to the stored game object, or nullptr if the argument is
-     * null.
+     * @return true if the object was successfully added, false if gameObject was null.
      */
-    GameObject* addGameObject(std::unique_ptr<GameObject> gameObject);
+    bool addGameObject(std::unique_ptr<GameObject> gameObject);
 
     /**
      * @brief Remove a game object by name.
      *
      * When the scene is active the object receives @ref GameObject::onStop
      * before removal.
+     *
+     * @warning This call destroys the game object since the scene owns it via
+     * std::unique_ptr. If you need to keep the object alive and move it
+     * elsewhere, use @ref extractGameObject instead and add it to another
+     * scene.
      *
      * @param name Name of the game object to remove.
      * @return true when an object was removed, false otherwise.
@@ -58,6 +62,18 @@ class Scene {
      * @return Pointer to the object, or nullptr when not found.
      */
     GameObject* getGameObject(const std::string& name) const;
+
+    /**
+     * @brief Extract a game object from the scene without destroying it.
+     *
+     * Removes the game object from the scene and transfers ownership to the
+     * caller. When the scene is currently active, the object receives @ref
+     * GameObject::onStop before extraction.
+     *
+     * @param name Name of the game object to extract.
+     * @return unique_ptr to the extracted game object, or nullptr if not found.
+     */
+    std::unique_ptr<GameObject> extractGameObject(const std::string& name);
 
     /**
      * @brief Start the scene if it is not already active.

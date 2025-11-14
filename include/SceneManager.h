@@ -34,6 +34,12 @@ class SceneManager {
      * When the removed scene is the active one it receives @ref Scene::onStop
      * and the active pointer is cleared.
      *
+     * @warning Removing a scene destroys all of its owned game objects.
+     * Scenes own their game objects via std::unique_ptr; erasing the scene
+     * will delete those objects. If you need to preserve objects, extract or
+     * transfer them before removal using @ref Scene::extractGameObject or
+     * @ref transferGameObject.
+     *
      * @param name Name of the scene to remove.
      * @return true when the scene existed and was removed, false otherwise.
      */
@@ -46,6 +52,22 @@ class SceneManager {
      * @return Pointer to the scene, or nullptr when not found.
      */
     Scene* getScene(const std::string& name) const;
+
+    /**
+     * @brief Transfer a game object from one scene to another.
+     *
+     * Extracts the game object from the source scene and adds it to the target
+     * scene. The object's lifecycle methods (onStop/onStart) are called
+     * appropriately based on the active state of both scenes.
+     *
+     * @param fromSceneName Name of the source scene.
+     * @param toSceneName Name of the target scene.
+     * @param objectName Name of the game object to transfer.
+     * @return true when the transfer succeeds, false otherwise (scene not found,
+     * object not found, or object already exists in target scene).
+     */
+    bool transferGameObject(const std::string& fromSceneName, const std::string& toSceneName,
+                            const std::string& objectName);
 
     /**
      * @brief Get the currently active scene.

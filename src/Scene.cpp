@@ -10,9 +10,9 @@ const std::string& Scene::getName() const {
     return name;
 }
 
-GameObject* Scene::addGameObject(std::unique_ptr<GameObject> gameObject) {
+bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject) {
     if (!gameObject) {
-        return nullptr;
+        return false;
     }
 
     auto* rawPtr = gameObject.get();
@@ -22,7 +22,7 @@ GameObject* Scene::addGameObject(std::unique_ptr<GameObject> gameObject) {
         rawPtr->onStart();
     }
 
-    return rawPtr;
+    return true;
 }
 
 bool Scene::removeGameObject(const std::string& name) {
@@ -56,6 +56,27 @@ GameObject* Scene::getGameObject(const std::string& name) const {
     }
 
     return nullptr;
+}
+
+std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name) {
+    auto it = std::find_if(gameObjects.begin(), gameObjects.end(),
+                           [&](const std::unique_ptr<GameObject>& gameObject) {
+                               return gameObject->getName() == name;
+                           });
+
+    if (it == gameObjects.end()) {
+        return nullptr;
+    }
+
+    // Call onStop if scene is active
+    if (active) {
+        (*it)->onStop();
+    }
+
+    // Move ownership and remove from vector
+    auto result = std::move(*it);
+    gameObjects.erase(it);
+    return result;
 }
 
 void Scene::onStart() {

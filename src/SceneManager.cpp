@@ -30,6 +30,8 @@ bool SceneManager::removeScene(const std::string& name) {
         activeScene->onStop();
         activeScene = nullptr;
         paused = false;
+    } else {
+        it->second->onStop();
     }
 
     scenes.erase(it);
@@ -43,6 +45,41 @@ Scene* SceneManager::getScene(const std::string& name) const {
     }
 
     return nullptr;
+}
+
+bool SceneManager::transferGameObject(const std::string& fromSceneName,
+                                      const std::string& toSceneName,
+                                      const std::string& objectName) {
+    Scene* fromScene = getScene(fromSceneName);
+    Scene* toScene = getScene(toSceneName);
+
+    if (!fromScene || !toScene) {
+        std::cerr << "[SceneManager] Error: Scene not found\n";
+        return false;
+    }
+
+    // Check if object exists in source scene
+    if (!fromScene->getGameObject(objectName)) {
+        std::cerr << "[SceneManager] Error: GameObject '" << objectName << "' not found in scene '"
+                  << fromSceneName << "'\n";
+        return false;
+    }
+
+    // Check if object already exists in target scene
+    if (toScene->getGameObject(objectName)) {
+        std::cerr << "[SceneManager] Error: GameObject '" << objectName
+                  << "' already exists in scene '" << toSceneName << "'\n";
+        return false;
+    }
+
+    // Extract and transfer
+    auto gameObject = fromScene->extractGameObject(objectName);
+    if (!gameObject) {
+        return false;
+    }
+
+    toScene->addGameObject(std::move(gameObject));
+    return true;
 }
 
 bool SceneManager::setActiveScene(const std::string& name) {
