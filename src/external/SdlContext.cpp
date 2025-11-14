@@ -9,11 +9,11 @@
 #include <stdexcept>
 #include <iostream>
 
+
 #include "external/SdlContext.h"
 
 
 int SdlContext::referenceCount = 0;
-Uint32 SdlContext::globalFlags = 0;
 
 SdlContext::SdlContext(Uint32 flags)
 {
@@ -35,8 +35,6 @@ void SdlContext::acquire(Uint32 requestedFlags)
 				std::string("SDL_Init failed: ") + SDL_GetError()
 			);
 		}
-
-		globalFlags = SDL_WasInit(0);
 	} else
 	{
 		Uint32 alreadyInitialized = SDL_WasInit(0);
@@ -50,7 +48,6 @@ void SdlContext::acquire(Uint32 requestedFlags)
 					std::string("SDL_InitSubSystem failed: ") + SDL_GetError()
 				);
 			}
-			globalFlags = SDL_WasInit(0);
 		}
 	}
 
@@ -65,7 +62,6 @@ void SdlContext::release()
 	if (referenceCount == 0)
 	{
 		SDL_Quit();
-		globalFlags = 0;
 	}
 
 	flags = 0;
