@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include "../../../include/core/game_object/GameObject.h"
+#include "../../../include/core/component/Component.h"
 
 namespace engine_tests
 {

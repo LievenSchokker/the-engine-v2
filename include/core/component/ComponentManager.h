@@ -8,9 +8,9 @@
 #include <vector>
 #include <memory>
 
-#include "Component.h"
 class GameObject;
 class Behaviour;
+class Component;
 
 class ComponentManager
 {
@@ -58,4 +58,4 @@ public:
 };
 
 /// Template implementations:
-#include "ComponentManagerImplementation.h"
+#include "ComponentManagerImplementation.inl"

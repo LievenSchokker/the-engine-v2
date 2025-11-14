@@ -8,7 +8,8 @@
 #include <string>
 #include <vector>
 
-#include "../component/Transform.h"
+class Transform;
+class Component;
 class Behaviour;
 class ComponentManager;
 
@@ -73,8 +74,8 @@ class GameObject
 
     private:
         /// Fields:
-        std::unique_ptr<ComponentManager> componentManager = nullptr;
-        std::unique_ptr<Transform> transform = nullptr;
+        std::unique_ptr<ComponentManager> componentManager;
+        std::unique_ptr<Transform> transform;
         std::string name;
         int layer;
         std::string tag;
@@ -82,4 +83,4 @@ class GameObject
         bool isStatic;
 };
 
-#include "GameObjectImplementation.h"
+#include "GameObjectImplementation.inl"

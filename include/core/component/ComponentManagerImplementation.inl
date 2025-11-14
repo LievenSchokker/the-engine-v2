@@ -5,9 +5,10 @@
 
 #pragma once
 
-// #include "Component.h"
 #include <algorithm>
 #include <type_traits>
+
+class Transform;
 
 template<typename T>
 T* ComponentManager::addComponent()

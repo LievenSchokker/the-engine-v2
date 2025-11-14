@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <stdexcept>
-#include <memory>
-
 class Transform;
 class GameObject;
 
@@ -32,4 +29,4 @@ class Component
 };
 
 /// Implementation of the template functions:
-#include "ComponentImplementation.h"
+#include "ComponentImplementation.inl"
