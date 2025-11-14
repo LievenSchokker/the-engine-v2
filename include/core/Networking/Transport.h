@@ -61,6 +61,15 @@ public:
      */
     virtual TransportResult send(int connectionId, const std::byte data[], size_t length, SendMode send_mode) = 0;
 
+    /**
+     * @brief Sends a message over the network to all active nodes
+     * @param data Pointer to the message buffer.
+     * @param length Length of the message in bytes.
+     * @param send_mode The desired reliability and ordering (SendMode).
+     * @return A TransportResult indicating success or failure.
+     */
+    virtual TransportResult sendToAll(const std::byte data[], size_t length, SendMode send_mode) = 0;
+
 
     /**
      * @brief Disconnects a connection.
