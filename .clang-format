@@ -1,0 +1,28 @@
+BasedOnStyle: Google
+IndentWidth: 4
+TabWidth: 4
+UseTab: Always
+BreakBeforeBraces: Linux
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: true
+
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^"[^"]*"$'
+    Priority: 1
+  - Regex: '^<.*>$'
+    Priority: 2
+
+SortIncludes: true
+
+SpacesInParens: Custom
+SpacesInParensOptions:
+  InConditionalStatements: true
+  Other: false
+SpaceBeforeInheritanceColon: false
+
+SeparateDefinitionBlocks: Always
