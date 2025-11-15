@@ -14,27 +14,6 @@
 
 namespace engine_tests
 {
-    class TestComponentOne : public Component
-    {
-    public:
-        TestComponentOne() = default;
-        ~TestComponentOne() override = default;
-    };
-
-    class TestComponentTwo : public Component
-    {
-    public:
-        TestComponentTwo() = default;
-        ~TestComponentTwo() override = default;
-    };
-
-    class TestComponentThree : public Component
-    {
-    public:
-        TestComponentThree() = default;
-        ~TestComponentThree() override = default;
-    };
-
     TEST(GameObjectTests, HasTransformAfterConstruction)
     {
         GameObject go;
