@@ -18,7 +18,7 @@ class ComponentManager
 {
 public:
     ComponentManager(GameObject* parent_)
-        : parent(parent_){}
+        : gameObject(parent_){}
 
     ~ComponentManager();
 
@@ -26,7 +26,7 @@ public:
     T* addComponent();
 
     template <typename T>
-    T* getComponent();
+    T* getComponent() const;
 
     template <typename T>
     bool tryGetComponent(T*& out) const;
@@ -34,9 +34,9 @@ public:
     template <typename T>
     void removeComponent();
 
-    template <typename T> bool hasComponent();
+    template <typename T> bool hasComponent() const;
 
-    bool hasComponent(Component* comp);
+    bool hasComponent(Component* comp) const;
     void removeComponent(Component* component);
 
     void removeAllComponents();
@@ -52,14 +52,11 @@ public:
 private:
     template <typename T>
     std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
-
     template <typename T>
     std::vector<std::unique_ptr<Component>>::const_iterator getComponentIterator() const;
 
-public:
-    GameObject* const parent;
-
 private:
+    GameObject* const gameObject;
     std::vector<std::unique_ptr<Component>> components;
 };
 

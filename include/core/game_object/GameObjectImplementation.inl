@@ -15,7 +15,7 @@ T* GameObject::addComponent()
 
 
 template<typename T>
-T* GameObject::getComponent()
+T* GameObject::getComponent() const
 {
    return  componentManager->template getComponent<T>();
 }
@@ -36,7 +36,7 @@ T* GameObject::getOrAddComponent()
 
 
 template<typename T>
-bool GameObject::tryGetComponent(T*& out)
+bool GameObject::tryGetComponent(T*& out) const
 {
     return componentManager->template tryGetComponent<T>(out);
 }

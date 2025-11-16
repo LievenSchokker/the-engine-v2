@@ -27,7 +27,7 @@ GameObject* Component::getGameObject() const
 }
 
 
-Transform* Component::getTransform() const
+const Transform* Component::getTransform() const
 {
     return transform;
 }

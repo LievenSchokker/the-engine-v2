@@ -11,7 +11,7 @@ class Component
 {
     public:
         Component() = default;
-        virtual ~Component() = 0;
+        virtual ~Component();
 
         void setGameObject(GameObject* object);
 
@@ -19,18 +19,18 @@ class Component
         T* addComponent();
 
         template <typename T>
-        T* getComponent();
+        T* getComponent() const;
 
         template <typename T>
         bool tryGetComponent(T*& out) const;
 
     public:
         GameObject* getGameObject() const;
-        Transform* getTransform() const;
+        const Transform* getTransform() const;
 
     private:
         GameObject* gameObject = nullptr;
-        Transform* transform = nullptr;
+        const Transform* transform = nullptr;
 };
 
 /// Implementation of the template functions:

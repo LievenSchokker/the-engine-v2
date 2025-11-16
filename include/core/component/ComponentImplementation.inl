@@ -15,7 +15,7 @@ T* Component::addComponent()
 
 
 template<typename T>
-T* Component::getComponent()
+T* Component::getComponent() const
 {
     if (gameObject == nullptr)
         return nullptr;

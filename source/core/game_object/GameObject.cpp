@@ -27,7 +27,7 @@ GameObject::~GameObject()
 }
 
 
-bool GameObject::compareTag(std::string other)
+bool GameObject::compareTag(const std::string& other)
 {
     return tag == other;
 }
@@ -99,9 +99,9 @@ int GameObject::getComponentCount() const
 }
 
 
-void GameObject::setName(std::string newName)
+void GameObject::setName(const std::string& newName)
 {
-    name = newName;
+    name = std::move(newName);
 }
 
 
@@ -111,9 +111,9 @@ void GameObject::setLayer(int newLayer)
 }
 
 
-void GameObject::setTag(std::string newTag)
+void GameObject::setTag(const std::string& newTag)
 {
-    tag = newTag;
+    tag = std::move(newTag);
 }
 
 

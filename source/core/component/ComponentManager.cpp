@@ -33,7 +33,7 @@ void ComponentManager::deactivateAll()
 }
 
 
-bool ComponentManager::hasComponent(Component* comp)
+bool ComponentManager::hasComponent(Component* comp) const
 {
     if (comp == nullptr)
         return false;
@@ -45,6 +45,7 @@ bool ComponentManager::hasComponent(Component* comp)
 
     return it != components.end();
 }
+
 
 void ComponentManager::removeComponent(Component* comp)
 {
@@ -65,6 +66,7 @@ void ComponentManager::removeAllComponents()
 {
     components.clear();
 }
+
 
 int ComponentManager::getComponentCount() const
 {

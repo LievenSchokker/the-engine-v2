@@ -24,7 +24,7 @@ class GameObject
         template<typename T>
         T* addComponent();
         template<typename T>
-        T* getComponent();
+        T* getComponent() const;
         template<typename T>
         bool tryGetComponent(T*& out) const;
         template<typename T>
@@ -34,7 +34,7 @@ class GameObject
 
         bool hasComponent(Component* comp);
         void removeComponent(Component* comp);
-        bool compareTag(std::string other);
+        bool compareTag(const std::string& other);
 
         ComponentManager* getComponentManager() const;
         std::vector<Behaviour*> getActiveBehaviours() const;
@@ -46,9 +46,9 @@ class GameObject
         bool getIsStatic() const;
         int getComponentCount() const;
 
-        void setName(const std::string newName);
+        void setName(const std::string& newName);
         void setLayer(int newLayer);
-        void setTag(const std::string newTag);
+        void setTag(const std::string& newTag);
         void setIsActive(bool value);
         void setIsStatic(bool value);
 

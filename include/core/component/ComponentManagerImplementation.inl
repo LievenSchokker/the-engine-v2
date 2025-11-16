@@ -4,6 +4,7 @@
 
 #pragma once
 
+
 #include <algorithm>
 #include <type_traits>
 
@@ -13,7 +14,7 @@ T* ComponentManager::addComponent()
 {
     static_assert(std::is_base_of_v<Component, T>, "T must derive from Component!");
 
-    if (parent == nullptr)
+    if (gameObject == nullptr)
         return nullptr;
 
     if constexpr (std::is_same_v<Transform, T>) {
@@ -29,20 +30,20 @@ T* ComponentManager::addComponent()
     }
 
     auto& component = components.emplace_back(std::make_unique<T>());
-    component->setGameObject(parent);
+    component->setGameObject(gameObject);
 
     return dynamic_cast<T*>(component.get());
 }
 
 
 template<typename T>
-T *ComponentManager::getComponent()
+T* ComponentManager::getComponent() const
 {
-    if (parent == nullptr)
+    if (gameObject == nullptr)
         return nullptr;
 
     if constexpr (std::is_same_v<Transform, T>) {
-        return parent->getTransform();
+        return gameObject->getTransform();
     }
 
     auto iterator = getComponentIterator<T>();
@@ -56,7 +57,7 @@ T *ComponentManager::getComponent()
 
 
 template<typename T>
-bool ComponentManager::tryGetComponent(T *&out)
+bool ComponentManager::tryGetComponent(T *&out) const
 {
     T *component = getComponent<T>();
     if (component == nullptr)
@@ -72,7 +73,7 @@ bool ComponentManager::tryGetComponent(T *&out)
 template<typename T>
 void ComponentManager::removeComponent()
 {
-    if (parent == nullptr)
+    if (gameObject == nullptr)
         return;
     auto iterator = getComponentIterator<T>();
     if (iterator != components.end())
@@ -82,7 +83,7 @@ void ComponentManager::removeComponent()
 }
 
 template<typename T>
-bool ComponentManager::hasComponent()
+bool ComponentManager::hasComponent() const
 {
     for (const auto& c : components)
     {
