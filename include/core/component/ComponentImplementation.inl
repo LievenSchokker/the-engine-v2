@@ -4,29 +4,31 @@
 #pragma once
 
 
-#include "../game_object/GameObject.h"
+template<typename T>
+T* Component::addComponent()
+{
+    if (gameObject == nullptr)
+        return nullptr;
+
+    return gameObject->template addComponent<T>();
+}
 
 
 template<typename T>
-T* Component::getComponent() const
+T* Component::getComponent()
 {
-    if (owner == nullptr)
+    if (gameObject == nullptr)
         return nullptr;
 
-    T* component = owner->template getComponent<T>();
-
-    if (component != nullptr)
-        return component;
-    else
-        throw std::runtime_error("GameObject does not have a component of type T!");
+    return gameObject->template getComponent<T>();
 }
 
 
 template<typename T>
 bool Component::tryGetComponent(T*& out) const
 {
-    if (owner == nullptr)
+    if (gameObject == nullptr)
         return false;
 
-    return owner->template tryGetComponent<T>(out);
+    return gameObject->template tryGetComponent<T>(out);
 }

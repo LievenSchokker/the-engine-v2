@@ -33,7 +33,7 @@ void ComponentManager::deactivateAll()
 }
 
 
-bool ComponentManager::hasComponent(Component* comp) const
+bool ComponentManager::hasComponent(Component* comp)
 {
     if (comp == nullptr)
         return false;

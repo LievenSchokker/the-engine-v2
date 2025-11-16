@@ -4,9 +4,6 @@
 
 #pragma once
 
-
-class Transform;
-
 #include <algorithm>
 #include <type_traits>
 
@@ -39,10 +36,15 @@ T* ComponentManager::addComponent()
 
 
 template<typename T>
-T *ComponentManager::getComponent() const
+T *ComponentManager::getComponent()
 {
     if (parent == nullptr)
         return nullptr;
+
+    if constexpr (std::is_same_v<Transform, T>) {
+        return parent->getTransform();
+    }
+
     auto iterator = getComponentIterator<T>();
     if (iterator != components.end())
     {
@@ -54,7 +56,7 @@ T *ComponentManager::getComponent() const
 
 
 template<typename T>
-bool ComponentManager::tryGetComponent(T *&out) const
+bool ComponentManager::tryGetComponent(T *&out)
 {
     T *component = getComponent<T>();
     if (component == nullptr)
@@ -80,7 +82,7 @@ void ComponentManager::removeComponent()
 }
 
 template<typename T>
-bool ComponentManager::hasComponent() const
+bool ComponentManager::hasComponent()
 {
     for (const auto& c : components)
     {

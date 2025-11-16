@@ -4,10 +4,10 @@
 
 #include "../../../include/core/game_object/GameObject.h"
 #include "../../../include/core/component/Component.h"
+#include "../../../include/core/component/Transform.h"
 #include "../../../include/core/component/ComponentManager.h"
 #include "../component/TestComponentOne.h"
 #include "../component/TestComponentTwo.h"
-#include "../component/TestComponentThree.h"
 
 #include <gtest/gtest.h>
 
@@ -36,6 +36,25 @@ namespace engine_tests
         EXPECT_EQ(componentManager.getComponentCount(), 1);
     }
 
+
+    TEST(ComponentManagerTests, AddTransformComponentNotAllowed)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        Transform* transform = componentManager.addComponent<Transform>();
+        EXPECT_EQ(transform, nullptr);
+    }
+
+
+    TEST(ComponentManagerTests, GetTransformReturnsGameObjectTransform)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        Transform* transform = componentManager.getComponent<Transform>();
+        EXPECT_EQ(transform, go.getTransform());
+    }
 
     TEST(ComponentManagerTests, GetComponentReturnsFromComponents)
     {

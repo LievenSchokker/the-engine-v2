@@ -1,27 +1,91 @@
 // //
 // // Created by samle on 14/11/2025.
 // //
-//
-//
-// TEST(GameObjectTests, AddTransformDirectlyIsNotAllowed)
-// {
-//     GameObject go;
-//     go.addComponent<Transform>();
-//     EXPECT_NE(go.getTransform(), nullptr);
-//     EXPECT_EQ(go.getComponentManager()->getComponent<Transform>(), nullptr);
-// }
-//
-// TEST(GameObjectTests, ComponentManagerRemovesAllComponents)
-// {
-//     GameObject go;
-//     go.addComponent<TestComponentOne>();
-//     go.addComponent<TestComponentTwo>();
-//     go.addComponent<TestComponentThree>();
-//
-//     bool componentCountBiggerThanZero1 = go.getComponentManager()->components.size() > 0;
-//     EXPECT_EQ(componentCountBiggerThanZero1, true);
-//     go.getComponentManager()->removeAllComponents();
-//     bool componentCountBiggerThanZero2 = go.getComponentManager()->components.size() > 0;
-//
-//     EXPECT_EQ(componentCountBiggerThanZero2, false);
-// }
+
+#include "../../../include/core/game_object/GameObject.h"
+#include "../../../include/core/component/Component.h"
+#include "../../../include/core/component/Transform.h"
+#include "../../../include/core/component/ComponentManager.h"
+#include "../component/TestComponentOne.h"
+#include "../component/TestComponentTwo.h"
+
+#include <gtest/gtest.h>
+
+namespace engine_tests
+{
+    TEST(ComponentTests, AddComponentAddsToComponentManager)
+    {
+        GameObject go;
+        ComponentManager* componentManager = go.getComponentManager();
+
+        TestComponentOne* first = componentManager->addComponent<TestComponentOne>();
+        EXPECT_NE(first, nullptr);
+        EXPECT_TRUE(componentManager->hasComponent(first));
+
+        TestComponentTwo* addedViaComponent = first->addComponent<TestComponentTwo>();
+        EXPECT_NE(addedViaComponent, nullptr);
+        EXPECT_TRUE(componentManager->hasComponent(addedViaComponent));
+
+        TestComponentTwo* retrieved =  componentManager->getComponent<TestComponentTwo>();
+        EXPECT_NE(retrieved, nullptr);
+        EXPECT_EQ(addedViaComponent, retrieved);
+    }
+
+    TEST(ComponentTests, GetComponentReturnsFromComponentManager)
+    {
+        GameObject go;
+        ComponentManager* componentManager = go.getComponentManager();
+        TestComponentOne* added = componentManager->addComponent<TestComponentOne>();
+
+        TestComponentOne* retrievedFromComponent = added->getComponent<TestComponentOne>();
+        TestComponentOne* retrievedFromComponentManager = componentManager->getComponent<TestComponentOne>();
+
+        EXPECT_NE(retrievedFromComponent, nullptr);
+        EXPECT_EQ(retrievedFromComponent, retrievedFromComponentManager);
+    }
+
+
+    TEST(ComponentsTest, GameObjectSetsOnComponentManagerAdd)
+    {
+        GameObject go;
+        ComponentManager* componentManager = go.getComponentManager();
+
+        TestComponentOne* added = componentManager->addComponent<TestComponentOne>();
+
+        EXPECT_EQ(added->getGameObject(), &go);
+    }
+
+
+    TEST(ComponentsTest, TransformReturnsGameObjectTransform)
+    {
+        GameObject go;
+        ComponentManager* componentManager = go.getComponentManager();
+
+        TestComponentOne* added = componentManager->addComponent<TestComponentOne>();
+
+        EXPECT_EQ(added->getTransform(), go.getTransform());
+    }
+
+    TEST(ComponentTests, TryGetReturnsComponentManagerTryGet)
+    {
+        GameObject go;
+        ComponentManager* componentManager = go.getComponentManager();
+
+        TestComponentOne* added_1 = componentManager->addComponent<TestComponentOne>();
+        TestComponentTwo* added_2 = componentManager->addComponent<TestComponentTwo>();
+
+        TestComponentTwo* componentOut = nullptr;
+        TestComponentTwo* managerOut = nullptr;
+
+        bool fromAdded_1 = added_1->tryGetComponent<TestComponentTwo>(componentOut);
+        bool fromManager = componentManager->tryGetComponent<TestComponentTwo>(managerOut);
+
+        EXPECT_EQ(fromAdded_1, fromManager);
+        EXPECT_EQ(componentOut, managerOut);
+    }
+
+    TEST(ComponentTests, SetGameObjectSetsPrivateFields)
+    {
+        GameObject go;
+    }
+}

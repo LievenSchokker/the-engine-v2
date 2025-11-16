@@ -9,13 +9,25 @@
 
 Component::~Component()
 {
-    owner = nullptr;
+    gameObject = nullptr;
     transform = nullptr;
 }
 
 
 void Component::setGameObject(GameObject* object)
 {
-    owner = object;
-    transform = owner->getTransform();
+    gameObject = object;
+    transform = gameObject->getTransform();
+}
+
+
+GameObject* Component::getGameObject() const
+{
+    return gameObject;
+}
+
+
+Transform* Component::getTransform() const
+{
+    return transform;
 }

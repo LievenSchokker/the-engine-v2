@@ -4,7 +4,9 @@
 
 #pragma once
 
-class Behaviour
+#include "core/component/Component.h"
+
+class Behaviour : public Component
 {
     public:
         Behaviour();

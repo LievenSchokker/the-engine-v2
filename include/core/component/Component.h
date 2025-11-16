@@ -16,13 +16,20 @@ class Component
         void setGameObject(GameObject* object);
 
         template <typename T>
-        T* getComponent() const;
+        T* addComponent();
+
+        template <typename T>
+        T* getComponent();
 
         template <typename T>
         bool tryGetComponent(T*& out) const;
 
+    public:
+        GameObject* getGameObject() const;
+        Transform* getTransform() const;
 
-        GameObject* owner = nullptr;
+    private:
+        GameObject* gameObject = nullptr;
         Transform* transform = nullptr;
 };
 

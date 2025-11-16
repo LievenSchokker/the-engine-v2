@@ -5,10 +5,10 @@
 
 #pragma once
 
-
+class Component;
 class GameObject;
 class Behaviour;
-class Component;
+class Transform;
 
 #include <vector>
 #include <memory>
@@ -26,7 +26,7 @@ public:
     T* addComponent();
 
     template <typename T>
-    T* getComponent() const;
+    T* getComponent();
 
     template <typename T>
     bool tryGetComponent(T*& out) const;
@@ -34,9 +34,9 @@ public:
     template <typename T>
     void removeComponent();
 
-    template <typename T> bool hasComponent() const;
+    template <typename T> bool hasComponent();
 
-    bool hasComponent(Component* comp) const;
+    bool hasComponent(Component* comp);
     void removeComponent(Component* component);
 
     void removeAllComponents();
