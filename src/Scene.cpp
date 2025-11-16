@@ -1,6 +1,7 @@
 #include "../include/Scene.h"
 
 #include <algorithm>
+#include <iostream>
 #include <utility>
 
 Scene::Scene(std::string name) : name(std::move(name)) {
@@ -11,15 +12,15 @@ const std::string& Scene::getName() const {
 }
 
 bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject) {
-    if (!gameObject) {
+    if (gameObject == nullptr) {
+        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
         return false;
     }
 
-    auto* rawPtr = gameObject.get();
     gameObjects.emplace_back(std::move(gameObject));
 
     if (active) {
-        rawPtr->onStart();
+        gameObjects.back()->onStart();
     }
 
     return true;

@@ -19,14 +19,11 @@ class SceneManager {
     /**
      * @brief Register a scene owned by the manager.
      *
-     * If a scene with the same name already exists, nullptr is returned to
-     * indicate an error and the scene is not added.
-     *
      * @param scene Scene instance that transfers ownership to the manager.
-     * @return Pointer to the stored scene, or nullptr when the argument is
-     * null or a scene with the same name already exists.
+     * @return true if the scene was successfully added, false if scene was null or a scene with the
+     * same name already exists.
      */
-    Scene* addScene(std::unique_ptr<Scene> scene);
+    bool addScene(std::unique_ptr<Scene> scene);
 
     /**
      * @brief Remove a stored scene.

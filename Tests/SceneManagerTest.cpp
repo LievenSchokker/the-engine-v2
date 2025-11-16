@@ -53,7 +53,10 @@ TEST(SceneManagerTest, MainFlowIntegration) {
     auto gameObject = std::make_unique<MockGameObject>("ExampleGameObject");
     auto* gameObjectPtr = gameObject.get();
     prototypeScene->addGameObject(std::move(gameObject));
-    Scene* scenePtr = sceneManager.addScene(std::move(prototypeScene));
+    bool sceneAdded = sceneManager.addScene(std::move(prototypeScene));
+    ASSERT_TRUE(sceneAdded);
+    Scene* scenePtr = sceneManager.getScene("PrototypeScene");
+    ASSERT_NE(scenePtr, nullptr);
 
     // Act
     sceneManager.setActiveScene("PrototypeScene");
@@ -183,13 +186,13 @@ TEST(SceneManagerTest, ErrorHandling) {
     sceneManager.addScene(std::move(scene1));
 
     // Act & Assert - Null scene
-    Scene* result = sceneManager.addScene(nullptr);
-    EXPECT_EQ(result, nullptr);
+    bool result = sceneManager.addScene(nullptr);
+    EXPECT_FALSE(result);
 
     // Act & Assert - Duplicate scene name
     auto duplicateScene = std::make_unique<Scene>("ValidScene");
     result = sceneManager.addScene(std::move(duplicateScene));
-    EXPECT_EQ(result, nullptr);
+    EXPECT_FALSE(result);
 
     // Act & Assert - Get non-existent scene
     Scene* notFound = sceneManager.getScene("NonExistent");
@@ -207,7 +210,9 @@ TEST(SceneManagerTest, AddGameObjectToActiveScene) {
     auto obj1 = std::make_unique<MockGameObject>("Object1");
     auto* obj1Ptr = obj1.get();
     scene1->addGameObject(std::move(obj1));
-    Scene* scenePtr = sceneManager.addScene(std::move(scene1));
+    bool sceneAdded = sceneManager.addScene(std::move(scene1));
+    ASSERT_TRUE(sceneAdded);
+    Scene* scenePtr = sceneManager.getScene("Scene1");
     ASSERT_NE(scenePtr, nullptr);
 
     // Act & Assert - Add object to inactive scene
