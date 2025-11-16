@@ -33,7 +33,6 @@ class GameObject
         void removeComponent();
 
         bool hasComponent(Component* comp) const;
-        void addComponent(Component* comp);
         void removeComponent(Component* comp);
         bool compareTag(std::string other);
 

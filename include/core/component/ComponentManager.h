@@ -34,8 +34,9 @@ public:
     template <typename T>
     void removeComponent();
 
+    template <typename T> bool hasComponent() const;
+
     bool hasComponent(Component* comp) const;
-    void addComponent(Component* component);
     void removeComponent(Component* component);
 
     void removeAllComponents();
@@ -46,6 +47,8 @@ public:
 
     void deactivateAll();
 
+    int getComponentCount() const;
+
 private:
     template <typename T>
     std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
@@ -54,8 +57,10 @@ private:
     std::vector<std::unique_ptr<Component>>::const_iterator getComponentIterator() const;
 
 public:
-    std::vector<std::unique_ptr<Component>> components;
     GameObject* const parent;
+
+private:
+    std::vector<std::unique_ptr<Component>> components;
 };
 
 /// Template implementations:

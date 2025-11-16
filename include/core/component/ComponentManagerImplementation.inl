@@ -79,6 +79,17 @@ void ComponentManager::removeComponent()
     }
 }
 
+template<typename T>
+bool ComponentManager::hasComponent() const
+{
+    for (const auto& c : components)
+    {
+        if (dynamic_cast<T*>(c.get()) != nullptr)
+            return true;
+    }
+
+    return false;
+}
 
 template<typename T>
 auto ComponentManager::getComponentIterator() -> std::vector<std::unique_ptr<Component> >::iterator

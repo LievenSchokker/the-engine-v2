@@ -39,12 +39,6 @@ bool GameObject::hasComponent(Component* comp) const
 }
 
 
-void GameObject::addComponent(Component* comp)
-{
-    componentManager->addComponent(comp);
-}
-
-
 void GameObject::removeComponent(Component* comp)
 {
     componentManager->removeComponent(comp);
@@ -101,7 +95,7 @@ bool GameObject::getIsStatic() const
 
 int GameObject::getComponentCount() const
 {
-    return componentManager->components.size();
+    return componentManager->getComponentCount();
 }
 
 

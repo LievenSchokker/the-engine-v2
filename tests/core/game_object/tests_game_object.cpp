@@ -30,35 +30,10 @@ namespace engine_tests
     {
         GameObject go;
         TestComponentOne* comp = go.addComponent<TestComponentOne>();
-        auto& components = go.getComponentManager()->components;
-
-        bool exists = std::find_if(
-            components.begin(),
-            components.end(),
-            [&](auto& c) { return c.get() == comp; }
-        ) != components.end();
-
+        bool exists = go.getComponentManager()->hasComponent(comp);
         EXPECT_TRUE(exists);
     }
 
-    TEST(GameObjectTests, AddComponentAddsToComponentManager)
-    {
-        GameObject go;
-        TestComponentOne* comp = new TestComponentOne();
-        go.addComponent(comp);
-
-        ASSERT_EQ(comp, go.getComponentManager()->getComponent<TestComponentOne>());
-
-        auto& components = go.getComponentManager()->components;
-
-        bool exists = std::find_if(
-            components.begin(),
-            components.end(),
-            [&](auto& c) { return c.get() == comp; }
-        ) != components.end();
-
-        EXPECT_TRUE(exists);
-    }
 
     TEST(GameObjectTests, GetComponentGetFromComponentManager)
     {
@@ -90,8 +65,7 @@ namespace engine_tests
     TEST(GameObjectTests, RemoveComponentRemovesFromComponentManager)
     {
         GameObject go;
-        TestComponentOne* comp = new TestComponentOne();
-        go.addComponent(comp);
+        TestComponentOne* comp = go.addComponent<TestComponentOne>();
         ASSERT_EQ(comp, go.getComponentManager()->getComponent<TestComponentOne>());
 
         go.removeComponent(comp);

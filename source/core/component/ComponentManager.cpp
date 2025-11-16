@@ -46,16 +46,6 @@ bool ComponentManager::hasComponent(Component* comp) const
     return it != components.end();
 }
 
-
-void ComponentManager::addComponent(Component* comp)
-{
-    if (comp && !hasComponent(comp))
-    {
-        components.push_back(std::unique_ptr<Component>(comp));
-    }
-}
-
-
 void ComponentManager::removeComponent(Component* comp)
 {
     if (!comp || !hasComponent(comp))
@@ -76,6 +66,9 @@ void ComponentManager::removeAllComponents()
     components.clear();
 }
 
-
+int ComponentManager::getComponentCount() const
+{
+    return components.size();
+}
 
 
