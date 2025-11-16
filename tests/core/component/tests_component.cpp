@@ -31,6 +31,7 @@ namespace engine_tests
         EXPECT_EQ(addedViaComponent, retrieved);
     }
 
+
     TEST(ComponentTests, GetComponentReturnsFromComponentManager)
     {
         GameObject go;
@@ -66,6 +67,7 @@ namespace engine_tests
         EXPECT_EQ(added->getTransform(), go.getTransform());
     }
 
+
     TEST(ComponentTests, TryGetReturnsComponentManagerTryGet)
     {
         GameObject go;
@@ -83,6 +85,7 @@ namespace engine_tests
         EXPECT_EQ(fromAdded_1, fromManager);
         EXPECT_EQ(componentOut, managerOut);
     }
+
 
     TEST(ComponentTests, SetGameObjectSetsPrivateFields)
     {

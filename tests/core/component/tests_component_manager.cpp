@@ -22,6 +22,7 @@ namespace engine_tests
         EXPECT_TRUE(componentManager.hasComponent(testComponentOne));
     }
 
+
     TEST(ComponentManagerTests, AddComponentPreventsDuplicates)
     {
         GameObject go;
@@ -56,6 +57,7 @@ namespace engine_tests
         EXPECT_EQ(transform, go.getTransform());
     }
 
+
     TEST(ComponentManagerTests, GetComponentReturnsFromComponents)
     {
         GameObject go;
@@ -79,6 +81,7 @@ namespace engine_tests
         EXPECT_NO_THROW(comp = componentManager.getComponent<TestComponentOne>());
         EXPECT_EQ(comp, nullptr);
     }
+
 
     TEST(ComponentManagerTests, TryGetComponentReturnsCorrectBool)
     {
@@ -128,6 +131,7 @@ namespace engine_tests
         componentManager.removeComponent(added);
         EXPECT_FALSE(componentManager.hasComponent(added));
     }
+
 
     TEST(ComponentManagerTests, RemoveComponentNoErrorOnMissingComponent)
     {
