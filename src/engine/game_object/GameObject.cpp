@@ -33,7 +33,7 @@ bool GameObject::compareTag(const std::string& other)
 }
 
 
-bool GameObject::hasComponent(Component* comp)
+bool GameObject::hasComponent(Component* comp) const
 {
     return componentManager->hasComponent(comp);
 }

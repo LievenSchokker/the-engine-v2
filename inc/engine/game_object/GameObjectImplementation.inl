@@ -42,6 +42,12 @@ bool GameObject::tryGetComponent(T*& out) const
 }
 
 
+template<typename T>
+bool GameObject::hasComponent() const
+{
+    return componentManager->template hasComponent<T>();
+}
+
 template <typename T>
 void GameObject::removeComponent()
 {
