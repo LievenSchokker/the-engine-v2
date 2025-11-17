@@ -4,7 +4,8 @@ A modern C++20 project.
 
 ## Overview
 
-This project uses modern C++20 features and is built using CMake. It includes several third-party dependencies managed through CMake's dependency system as git submodules.
+This project uses modern C++20 features and is built using CMake. 
+It includes several third-party dependencies managed through CMake's dependency system as git submodules.
 
 ## Prerequisites
 
@@ -16,9 +17,10 @@ This project uses modern C++20 features and is built using CMake. It includes se
 
 ## Dependencies
 The project uses the following external libraries:
-- SDL3 - Simple DirectMedia Layer
+- SDL2 - Simple DirectMedia Layer
 - GameNetworkingSockets - Valve's networking library
 - GoogleTest - For unit testing
+These dependencies are loaded with vcpkg on windows
 
 ## Project Structure
 ```
@@ -28,37 +30,54 @@ the-engine/
 ├─ README.md
 ├─ LICENSE
 │
-├─ include/                 # Public headers for engine_core, client, and server
-│   ├─ core/
-│   │   ├─ Engine.hpp
-│   │   ├─ Renderer.hpp
-│   │   └─ Network.hpp
+├─ inc/                 # Public header files
+│   ├─ Engine/
+│   │   ├─ Debug/
+│   │   ├─ Input/
+│   │   ├─ Window/
+│   │   ├─ Physics/
+│   │   ├─ Renderer/
+│   │   ├─ Scene/
+│   │   ├─ Utils/
+│   │   ├─ GameObject/
+│   │   ├─ Network/
+│   ├─ Server/
+│   ├─ Client/
 │   │
-│   ├─ client/
-│   │   └─ Client.hpp
-│   │
-│   └─ server/
-│       └─ Server.hpp
 │
 ├─ src/                     # Source files
-│   ├─ core/                # Core engine implementation
-│   │   ├─ Engine.cpp
-│   │   ├─ Renderer.cpp
-│   │   └─ Network.cpp
-│   │
-│   ├─ client/              # Client application
-│   │   └─ main.cpp
-│   │
-│   └─ server/              # Server application
-│       └─ main.cpp
+│   ├─ Engine/
+│   │   ├─ Debug/
+│   │   ├─ Input/
+│   │   ├─ Window/
+│   │   ├─ Physics/
+│   │   ├─ Renderer/
+│   │   ├─ Scene/
+│   │   ├─ Utils/
+│   │   ├─ GameObject/
+│   │   ├─ Network/
+│   ├─ Server/
+│   ├─ Client/
+│   ├─ SandBox/
 │
 ├─ tests/                   # Unit tests
-│   ├─ test_main.cpp
-│   └─ test_engine.cpp
-│
-├─ external/                # Dependencies (SDL3, GoogleTests, ValveNetworkingSockets etc)
+│   ├─ Engine/
+│   │   ├─ Core/
+│   │   ├─ Debug/
+│   │   ├─ Input/
+│   │   ├─ Window/
+│   │   ├─ Physics/
+│   │   ├─ Renderer/
+│   │   ├─ Scene/
+│   │   ├─ Utils/
+│   │   ├─ GameObject/
+│   │   ├─ Network/
+│   │
 │
 ├─ cmake-build-debug/       # CMake build output folder (ignored by git)
 │
 └─ .gitignore
 ```
+
+
+
