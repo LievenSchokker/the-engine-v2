@@ -37,6 +37,7 @@ target_link_libraries(program
 add_executable(unit_tests
         ${SOURCES}
         Tests/Rendering/SDL/SDLRenderTest.cpp
+        Tests/Input/InputManagerTest.cpp
 )
 
 target_include_directories(unit_tests PRIVATE
