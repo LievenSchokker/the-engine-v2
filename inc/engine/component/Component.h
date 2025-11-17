@@ -53,7 +53,6 @@ class Component
         template <typename T>
         T* getComponent() const;
 
-
         /**
         * @brief Attempts to retrieve a component of type T from the owning GameObject.
         *

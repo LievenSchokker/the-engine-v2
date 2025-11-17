@@ -3,8 +3,8 @@
 //
 
 
-#include "../../../include/core/game_object/GameObject.h"
-#include "../../../include/core/component/Component.h"
+#include "../../../inc/engine/game_object/GameObject.h"
+#include "../../../inc/engine/component/Component.h"
 #include "../component/TestComponentOne.h"
 #include "../component/TestComponentTwo.h"
 #include "../component/TestComponentThree.h"

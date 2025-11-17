@@ -2,9 +2,9 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "../../../include/core/component/Component.h"
-#include "../../../include/core/component/Transform.h"
-#include "../../../include/core/game_object/GameObject.h"
+#include "../../../inc/engine/component/Component.h"
+#include "../../../inc/engine/component/Transform.h"
+#include "../../../inc/engine/game_object/GameObject.h"
 
 
 Component::~Component()

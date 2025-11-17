@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../../../include/core/component/Component.h"
+#include "../../../inc/engine/component/Component.h"
 
 
 class TestComponentThree : public Component
