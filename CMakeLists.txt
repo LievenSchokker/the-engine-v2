@@ -21,7 +21,7 @@ add_executable(program
 
 
 target_include_directories(program PRIVATE
-        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/inc
         ${CMAKE_SOURCE_DIR}/src
         ${SDL2_INCLUDE_DIRS}
 )
@@ -36,11 +36,12 @@ target_link_libraries(program
 
 add_executable(unit_tests
         ${SOURCES}
-        Tests/core/rendering/SDL/SDLRenderTest.cpp
+        Tests/Rendering/SDL/SDLRenderTest.cpp
+        Tests/Input/InputManagerTest.cpp
 )
 
 target_include_directories(unit_tests PRIVATE
-        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/inc
         ${CMAKE_SOURCE_DIR}/src
         ${SDL2_INCLUDE_DIRS}
 )

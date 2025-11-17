@@ -4,7 +4,8 @@ A modern C++20 project.
 
 ## Overview
 
-This project uses modern C++20 features and is built using CMake. It includes several third-party dependencies managed through CMake's dependency system as git submodules.
+This project uses modern C++20 features and is built using CMake. 
+It includes several third-party dependencies managed through CMake's dependency system as git submodules.
 
 ## Prerequisites
 
@@ -16,7 +17,7 @@ This project uses modern C++20 features and is built using CMake. It includes se
 
 ## Dependencies
 The project uses the following external libraries:
-- SDL3 - Simple DirectMedia Layer
+- SDL2 - Simple DirectMedia Layer
 - GameNetworkingSockets - Valve's networking library
 - GoogleTest - For unit testing
 These dependencies are loaded with vcpkg on windows
@@ -29,9 +30,8 @@ the-engine/
 ├─ README.md
 ├─ LICENSE
 │
-├─ include/                 # Public header files
+├─ inc/                 # Public header files
 │   ├─ Engine/
-│   │   ├─ Core/
 │   │   ├─ Debug/
 │   │   ├─ Input/
 │   │   ├─ Window/
@@ -41,16 +41,12 @@ the-engine/
 │   │   ├─ Utils/
 │   │   ├─ GameObject/
 │   │   ├─ Network/
+│   ├─ Server/
+│   ├─ Client/
 │   │
-│   ├─ client/
-│   │   └─ Client.hpp
-│   │
-│   └─ server/
-│       └─ Server.hpp
 │
 ├─ src/                     # Source files
 │   ├─ Engine/
-│   │   ├─ Core/
 │   │   ├─ Debug/
 │   │   ├─ Input/
 │   │   ├─ Window/
@@ -60,12 +56,9 @@ the-engine/
 │   │   ├─ Utils/
 │   │   ├─ GameObject/
 │   │   ├─ Network/
-│   │
-│   ├─ client/
-│   │   └─ main.cpp
-│   │
-│   └─ server/
-│       └─ main.cpp
+│   ├─ Server/
+│   ├─ Client/
+│   ├─ SandBox/
 │
 ├─ tests/                   # Unit tests
 │   ├─ Engine/
@@ -80,11 +73,6 @@ the-engine/
 │   │   ├─ GameObject/
 │   │   ├─ Network/
 │   │
-│   ├─ client/
-│   │   └─ main.cpp
-│   │
-│   └─ server/
-│       └─ main.cpp 
 │
 ├─ cmake-build-debug/       # CMake build output folder (ignored by git)
 │
