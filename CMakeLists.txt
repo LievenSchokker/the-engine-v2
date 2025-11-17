@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 3.22)
 project(program)
 
 set(CMAKE_CXX_STANDARD 20)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-find_package(SDL2 REQUIRED)
+
+find_package(SDL2 REQUIRED CONFIG)
+find_package(SDL2_image REQUIRED CONFIG)
+find_package(GameNetworkingSockets REQUIRED)
+find_package(GTest REQUIRED)
 
 enable_testing()
 
