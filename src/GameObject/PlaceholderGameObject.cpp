@@ -1,4 +1,4 @@
-#include "../include/PlaceholderGameObject.h"
+#include "../../inc/GameObject/PlaceholderGameObject.h"
 
 #include <iostream>
 #include <utility>

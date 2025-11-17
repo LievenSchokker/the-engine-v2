@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include "GameObject.h"
+#include "../GameObject/GameObject.h"
 
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.

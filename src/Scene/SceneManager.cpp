@@ -1,4 +1,4 @@
-#include "../include/SceneManager.h"
+#include "../../inc/Scene/SceneManager.h"
 
 #include <iostream>
 #include <utility>

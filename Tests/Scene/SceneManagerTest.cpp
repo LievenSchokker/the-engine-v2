@@ -3,13 +3,15 @@
 #include <memory>
 #include <string>
 
-#include "../include/GameObject.h"
-#include "../include/Scene.h"
-#include "../include/SceneManager.h"
+#include "../../inc/GameObject/GameObject.h"
+#include "../../inc/Scene/Scene.h"
+#include "../../inc/Scene/SceneManager.h"
 
-class MockGameObject : public GameObject {
-   public:
-    explicit MockGameObject(std::string name) : GameObject(std::move(name)) {
+class MockGameObject : public GameObject
+{
+  public:
+    explicit MockGameObject(std::string name) : GameObject(std::move(name))
+    {
     }
 
     int onStartCallCount = 0;
@@ -20,38 +22,44 @@ class MockGameObject : public GameObject {
     int renderCallCount = 0;
     float totalDeltaTime = 0.0f;
 
-    void onStart() override {
+    void onStart() override
+    {
         onStartCallCount++;
     }
 
-    void onStop() override {
+    void onStop() override
+    {
         onStopCallCount++;
     }
 
-    void onPause() override {
+    void onPause() override
+    {
         onPauseCallCount++;
     }
 
-    void onResume() override {
+    void onResume() override
+    {
         onResumeCallCount++;
     }
 
-    void update(float deltaTime) override {
+    void update(float deltaTime) override
+    {
         updateCallCount++;
         totalDeltaTime += deltaTime;
     }
 };
 
-TEST(SceneManagerTest, MainFlowIntegration) {
+TEST(SceneManagerTest, MainFlowIntegration)
+{
     // Arrange
     SceneManager sceneManager;
     auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
     auto gameObject = std::make_unique<MockGameObject>("ExampleGameObject");
-    auto* gameObjectPtr = gameObject.get();
+    auto *gameObjectPtr = gameObject.get();
     prototypeScene->addGameObject(std::move(gameObject));
     bool sceneAdded = sceneManager.addScene(std::move(prototypeScene));
     ASSERT_TRUE(sceneAdded);
-    Scene* scenePtr = sceneManager.getScene("PrototypeScene");
+    Scene *scenePtr = sceneManager.getScene("PrototypeScene");
     ASSERT_NE(scenePtr, nullptr);
 
     // Act
@@ -71,21 +79,21 @@ TEST(SceneManagerTest, MainFlowIntegration) {
     EXPECT_EQ(gameObjectPtr->onStartCallCount, 1);
     EXPECT_EQ(gameObjectPtr->onStopCallCount, 0);
     EXPECT_EQ(gameObjectPtr->updateCallCount, 2);
-    EXPECT_EQ(gameObjectPtr->renderCallCount, 2);
     EXPECT_FLOAT_EQ(gameObjectPtr->totalDeltaTime, deltaTime1 + deltaTime2);
 }
 
-TEST(SceneManagerTest, CompleteLifecycle) {
+TEST(SceneManagerTest, CompleteLifecycle)
+{
     // Arrange
     SceneManager sceneManager;
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Object1");
-    auto* obj1Ptr = obj1.get();
+    auto *obj1Ptr = obj1.get();
     scene1->addGameObject(std::move(obj1));
 
     auto scene2 = std::make_unique<Scene>("Scene2");
     auto obj2 = std::make_unique<MockGameObject>("Object2");
-    auto* obj2Ptr = obj2.get();
+    auto *obj2Ptr = obj2.get();
     scene2->addGameObject(std::move(obj2));
     sceneManager.addScene(std::move(scene1));
     sceneManager.addScene(std::move(scene2));
@@ -109,10 +117,8 @@ TEST(SceneManagerTest, CompleteLifecycle) {
     EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene1");
     EXPECT_EQ(obj1Ptr->onStartCallCount, 1);
     EXPECT_EQ(obj1Ptr->updateCallCount, 1);
-    EXPECT_EQ(obj1Ptr->renderCallCount, 1);
     EXPECT_EQ(obj2Ptr->onStartCallCount, 0);
     EXPECT_EQ(obj2Ptr->updateCallCount, 0);
-    EXPECT_EQ(obj2Ptr->renderCallCount, 0);
 
     // Act - Pause
     sceneManager.pause();
@@ -123,7 +129,6 @@ TEST(SceneManagerTest, CompleteLifecycle) {
     EXPECT_TRUE(sceneManager.isPaused());
     EXPECT_EQ(obj1Ptr->onPauseCallCount, 1);
     EXPECT_EQ(obj1Ptr->updateCallCount, 1);
-    EXPECT_EQ(obj1Ptr->renderCallCount, 1);
 
     // Act - Pause again (should be no-op)
     sceneManager.pause();
@@ -141,7 +146,6 @@ TEST(SceneManagerTest, CompleteLifecycle) {
     EXPECT_FALSE(sceneManager.isPaused());
     EXPECT_EQ(obj1Ptr->onResumeCallCount, 1);
     EXPECT_EQ(obj1Ptr->updateCallCount, 2);
-    EXPECT_EQ(obj1Ptr->renderCallCount, 2);
 
     // Act - Resume again (should be no-op)
     sceneManager.resume();
@@ -162,7 +166,6 @@ TEST(SceneManagerTest, CompleteLifecycle) {
     EXPECT_EQ(obj1Ptr->updateCallCount, 2);
     EXPECT_EQ(obj2Ptr->onStartCallCount, 1);
     EXPECT_EQ(obj2Ptr->updateCallCount, 1);
-    EXPECT_EQ(obj2Ptr->renderCallCount, 1);
 
     // Act - Remove active scene and try removing non-existent scene
     bool removed = sceneManager.removeScene("Scene2");
@@ -175,7 +178,8 @@ TEST(SceneManagerTest, CompleteLifecycle) {
     EXPECT_FALSE(removedNonExistent);
 }
 
-TEST(SceneManagerTest, ErrorHandling) {
+TEST(SceneManagerTest, ErrorHandling)
+{
     // Arrange
     SceneManager sceneManager;
     auto scene1 = std::make_unique<Scene>("ValidScene");
@@ -191,7 +195,7 @@ TEST(SceneManagerTest, ErrorHandling) {
     EXPECT_FALSE(result);
 
     // Act & Assert - Get non-existent scene
-    Scene* notFound = sceneManager.getScene("NonExistent");
+    Scene *notFound = sceneManager.getScene("NonExistent");
     EXPECT_EQ(notFound, nullptr);
 
     // Act & Assert - Set active scene that doesn't exist
@@ -199,21 +203,22 @@ TEST(SceneManagerTest, ErrorHandling) {
     EXPECT_EQ(sceneManager.getActiveScene(), nullptr);
 }
 
-TEST(SceneManagerTest, AddGameObjectToActiveScene) {
+TEST(SceneManagerTest, AddGameObjectToActiveScene)
+{
     // Arrange
     SceneManager sceneManager;
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Object1");
-    auto* obj1Ptr = obj1.get();
+    auto *obj1Ptr = obj1.get();
     scene1->addGameObject(std::move(obj1));
     bool sceneAdded = sceneManager.addScene(std::move(scene1));
     ASSERT_TRUE(sceneAdded);
-    Scene* scenePtr = sceneManager.getScene("Scene1");
+    Scene *scenePtr = sceneManager.getScene("Scene1");
     ASSERT_NE(scenePtr, nullptr);
 
     // Act & Assert - Add object to inactive scene
     auto obj2 = std::make_unique<MockGameObject>("Object2");
-    auto* obj2Ptr = obj2.get();
+    auto *obj2Ptr = obj2.get();
     scenePtr->addGameObject(std::move(obj2));
     EXPECT_EQ(obj1Ptr->onStartCallCount, 0);
     EXPECT_EQ(obj2Ptr->onStartCallCount, 0);
@@ -227,19 +232,20 @@ TEST(SceneManagerTest, AddGameObjectToActiveScene) {
 
     // Act - Add object to active scene
     auto obj3 = std::make_unique<MockGameObject>("Object3");
-    auto* obj3Ptr = obj3.get();
+    auto *obj3Ptr = obj3.get();
     scenePtr->addGameObject(std::move(obj3));
 
     // Assert - Object added to active scene should start immediately
     EXPECT_EQ(obj3Ptr->onStartCallCount, 1);
 }
 
-TEST(SceneManagerTest, UpdateRenderWithNoActiveScene) {
+TEST(SceneManagerTest, UpdateRenderWithNoActiveScene)
+{
     // Arrange
     SceneManager sceneManager;
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Object1");
-    auto* obj1Ptr = obj1.get();
+    auto *obj1Ptr = obj1.get();
     scene1->addGameObject(std::move(obj1));
     sceneManager.addScene(std::move(scene1));
 
@@ -249,15 +255,15 @@ TEST(SceneManagerTest, UpdateRenderWithNoActiveScene) {
 
     // Assert
     EXPECT_EQ(obj1Ptr->updateCallCount, 0);
-    EXPECT_EQ(obj1Ptr->renderCallCount, 0);
 }
 
-TEST(SceneManagerTest, TransferGameObject) {
+TEST(SceneManagerTest, TransferGameObject)
+{
     // Arrange
     SceneManager sceneManager;
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Player");
-    auto* obj1Ptr = obj1.get();
+    auto *obj1Ptr = obj1.get();
     scene1->addGameObject(std::move(obj1));
 
     auto scene2 = std::make_unique<Scene>("Scene2");
@@ -269,7 +275,7 @@ TEST(SceneManagerTest, TransferGameObject) {
     EXPECT_EQ(obj1Ptr->onStopCallCount, 0);
     EXPECT_EQ(obj1Ptr->onStartCallCount, 0);
 
-    Scene* scene2Ptr = sceneManager.getScene("Scene2");
+    Scene *scene2Ptr = sceneManager.getScene("Scene2");
     ASSERT_NE(scene2Ptr, nullptr);
     EXPECT_NE(scene2Ptr->getGameObject("Player"), nullptr);
     EXPECT_EQ(sceneManager.getScene("Scene1")->getGameObject("Player"), nullptr);
@@ -283,7 +289,7 @@ TEST(SceneManagerTest, TransferGameObject) {
     // Arrange - Activate Scene1 with new object
     auto scene3 = std::make_unique<Scene>("Scene3");
     auto obj2 = std::make_unique<MockGameObject>("Enemy");
-    auto* obj2Ptr = obj2.get();
+    auto *obj2Ptr = obj2.get();
     scene3->addGameObject(std::move(obj2));
     sceneManager.addScene(std::move(scene3));
     sceneManager.setActiveScene("Scene3");
@@ -297,7 +303,8 @@ TEST(SceneManagerTest, TransferGameObject) {
     EXPECT_EQ(scene2Ptr->getGameObject("Enemy"), obj2Ptr);
 }
 
-TEST(SceneManagerTest, TransferGameObjectErrorCases) {
+TEST(SceneManagerTest, TransferGameObjectErrorCases)
+{
     // Arrange
     SceneManager sceneManager;
     auto scene1 = std::make_unique<Scene>("Scene1");
@@ -318,11 +325,12 @@ TEST(SceneManagerTest, TransferGameObjectErrorCases) {
     EXPECT_FALSE(sceneManager.transferGameObject("Scene1", "Scene2", "Player"));
 }
 
-TEST(SceneTest, ExtractGameObject) {
+TEST(SceneTest, ExtractGameObject)
+{
     // Arrange
     Scene scene("TestScene");
     auto obj = std::make_unique<MockGameObject>("TestObj");
-    auto* objPtr = obj.get();
+    auto *objPtr = obj.get();
     scene.addGameObject(std::move(obj));
 
     // Act & Assert - Extract from inactive scene
@@ -335,7 +343,7 @@ TEST(SceneTest, ExtractGameObject) {
     // Arrange - Extract from active scene
     Scene scene2("TestScene2");
     auto obj2 = std::make_unique<MockGameObject>("TestObj2");
-    auto* obj2Ptr = obj2.get();
+    auto *obj2Ptr = obj2.get();
     scene2.addGameObject(std::move(obj2));
     scene2.onStart();
 

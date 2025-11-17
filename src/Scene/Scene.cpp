@@ -1,4 +1,4 @@
-#include "../include/Scene.h"
+#include "../../inc/Scene/Scene.h"
 
 #include <algorithm>
 #include <iostream>
