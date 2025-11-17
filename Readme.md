@@ -30,9 +30,8 @@ the-engine/
 ├─ README.md
 ├─ LICENSE
 │
-├─ incl/                 # Public header files
+├─ inc/                 # Public header files
 │   ├─ Engine/
-│   │   ├─ Core/
 │   │   ├─ Debug/
 │   │   ├─ Input/
 │   │   ├─ Window/
@@ -42,14 +41,12 @@ the-engine/
 │   │   ├─ Utils/
 │   │   ├─ GameObject/
 │   │   ├─ Network/
-│   │      ├─Server.h
-│   │      ├─Client.h
-│   │
+│   ├─ Server/
+│   ├─ Client/
 │   │
 │
 ├─ src/                     # Source files
 │   ├─ Engine/
-│   │   ├─ Core/
 │   │   ├─ Debug/
 │   │   ├─ Input/
 │   │   ├─ Window/
@@ -59,9 +56,9 @@ the-engine/
 │   │   ├─ Utils/
 │   │   ├─ GameObject/
 │   │   ├─ Network/
-│   │      ├─Server.cpp
-│   │      ├─Client.cpp
-│   │
+│   ├─ Server/
+│   ├─ Client/
+│   ├─ SandBox/
 │
 ├─ tests/                   # Unit tests
 │   ├─ Engine/
