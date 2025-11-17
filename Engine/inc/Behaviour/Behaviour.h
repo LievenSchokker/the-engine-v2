@@ -4,11 +4,98 @@
 
 #pragma once
 
-#include "core/component/Component.h"
+#include "../Engine/inc/Component/Component.h"
 
+/**
+ * @brief This class serves as an abstract component that custom behaviour can derive from.
+ *
+ * Implements lifetime functions that get called by the Engine internally
+ *
+ * Behaviour differs from Component because they can be enabled and disabled, and implement lifetime functions.
+ */
 class Behaviour : public Component
 {
     public:
         Behaviour();
-        ~Behaviour();
+
+        /**
+         * @brief Pure virtual destructor makes this class Abstract.
+         */
+        virtual ~Behaviour() = 0;
+
+        /**
+         * @brief  Called when this Behaviour is first loaded:
+         * - Only on an active @c GameObject.
+         * - Regardless of @c isEnabled status
+         * - Outside of this constructor
+         *
+         * Use Awake instead of the constructor for initialisation, always called once per scene instance.
+         * Awake is always called before @c onEnable() and @c start() functions.
+         */
+        virtual void awake();
+
+        /**
+         * @brief Called when this component is enabled:
+         * - Only on active GameObjects
+         * - after @c isEnabled turns true
+         */
+        virtual void onEnable();
+
+        /**
+         * @brief start is called after @c awake, and before the first @c update call.
+         *
+         * Start on any component is guaranteed to be called after all awake functions on all behaviours in the scene have been called,
+         */
+        virtual void start();
+
+        /**
+         * Update is called every frame when:
+         * - @c isActiveAndEnabled == true, meaning the GameObject is active, and the Behaviour is enabled
+         */
+        virtual void update();
+
+        /**
+         * @brief fixedUpdate is called at regular and fixed intervals as part of the engine's physics loop.
+         *
+         * Use fixedUpdate to perform physics calculations, like applying force to a Rigidbody.
+         *
+         * FixedUpdate may be called zero, one or multiple times per frame depending on the frame rate of the simulation,
+         * to ensure consistent and deterministic physics calculations, regardless of rendering speed.
+         */
+        virtual void fixedUpdate();
+
+        /**
+        * @brief Called when this component is disabled:
+        * - Only on active GameObjects
+        * - after @c isEnabled turns false.
+        */
+        virtual void onDisable();
+
+        /**
+         * @brief Sets the @c isEnabled field of this Behaviour
+         * @param value new value to set
+         */
+        void setEnabled(const bool value);
+
+        /**
+         * @brief Retrieves the state of the @c isEnabled field
+         * @return whether this Behaviour is enabled, value of @c isEnabled
+         */
+        bool getIsEnabled() const;
+
+        /**
+         * @brief Retrieves the state of the @c isActiveAndEnabled member.
+         * @return whether this behaviour is Enabled and  on an active GameObject.
+         */
+        bool getActiveAndEnabled() const;
+
+    private:
+        /// Enabled components are Updated, disaled Beahviours are not.
+        bool isEnabled;
+
+        /// Checks if this behaviour is enabled and on an active GameObject
+        bool isActiveAndEnabled;
+
+        /// Keeps track if awake has been called for this Behaviour.
+        bool hasAwakened;
 };
