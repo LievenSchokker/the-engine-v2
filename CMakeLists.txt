@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(SDL2 REQUIRED)
 find_package(GTest REQUIRED)
 
+
 enable_testing()
 
 file(GLOB_RECURSE ENGINE_SOURCES
@@ -42,6 +43,15 @@ target_link_libraries(program PRIVATE
         engine
         ${SDL2_LIBRARIES}
 )
+
+IF (WIN32)
+target_link_libraries(program
+        PRIVATE
+        $<TARGET_NAME_IF_EXISTS:SDL2::SDL2main>
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+)
+endif ()
+
 
 add_executable(unit_tests
         Tests/Rendering/SDL/SDLRenderTest.cpp
