@@ -2,10 +2,10 @@
 // Created by samle on 15/11/2025.
 //
 
-#include "../../../inc/engine/game_object/GameObject.h"
-#include "../../../inc/engine/component/Component.h"
-#include "../../../inc/engine/game_object/Transform.h"
-#include "../../../inc/engine/component/ComponentManager.h"
+#include "../../../Engine/inc/GameObject/GameObject.h"
+#include "../../../Engine/inc/component/Component.h"
+#include "../../../Engine/inc/Component/Transform.h"
+#include "../../../Engine/inc/component/ComponentManager.h"
 #include "../component/TestComponentOne.h"
 #include "../component/TestComponentTwo.h"
 

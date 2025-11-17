@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include "GameObject.h"
-#include "Vector2.h"
-#include "../Component/Component.h"
+#include "../GameObject/GameObject.h"
+#include "../GameObject/Vector2.h"
+#include "Component.h"
 
 /**
  * @brief Transform holds the position, rotation and scale.
