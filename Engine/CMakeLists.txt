@@ -5,6 +5,16 @@ file(GLOB_RECURSE ENGINE_SOURCES
         "${CMAKE_SOURCE_DIR}/Engine/src/*.cpp"
 )
 
+include(FetchContent)
+
+FetchContent_Declare(
+        Box2D
+        GIT_REPOSITORY https://github.com/erincatto/box2d.git
+        GIT_TAG v3.1.1
+)
+
+FetchContent_MakeAvailable(Box2D)
+
 add_library(engine STATIC ${ENGINE_SOURCES})
 
 target_include_directories(engine PUBLIC

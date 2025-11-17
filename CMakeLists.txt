@@ -9,16 +9,6 @@ find_package(SDL2_image REQUIRED CONFIG)
 find_package(GameNetworkingSockets REQUIRED)
 find_package(GTest REQUIRED)
 
-include(FetchContent)
-
-FetchContent_Declare(
-        Box2D
-        GIT_REPOSITORY https://github.com/erincatto/box2d.git
-        GIT_TAG v3.1.1
-)
-
-FetchContent_MakeAvailable(Box2D)
-
 enable_testing()
 
 add_subdirectory(Engine)
