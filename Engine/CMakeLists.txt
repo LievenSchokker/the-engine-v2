@@ -18,6 +18,7 @@ target_link_libraries(engine PRIVATE
         SDL2::SDL2
         SDL2_image::SDL2_image
         GameNetworkingSockets::GameNetworkingSockets
+        Box2D
 )
 
 add_library(Engine::Core ALIAS engine)
