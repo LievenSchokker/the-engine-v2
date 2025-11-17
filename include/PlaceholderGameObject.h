@@ -11,7 +11,6 @@ class PlaceholderGameObject : public GameObject {
     void onPause() override;
     void onResume() override;
     void update(float deltaTime) override;
-    void render() override;
 
    private:
     float accumulatedTime = 0.0f;

@@ -28,7 +28,3 @@ void PlaceholderGameObject::update(float deltaTime) {
     std::cout << "[PlaceholderGameObject] " << getName()
               << " updated, accumulated time: " << accumulatedTime << "\n";
 }
-
-void PlaceholderGameObject::render() {
-    // Placeholder render hook
-}

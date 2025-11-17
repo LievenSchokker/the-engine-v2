@@ -40,10 +40,6 @@ class MockGameObject : public GameObject {
         updateCallCount++;
         totalDeltaTime += deltaTime;
     }
-
-    void render() override {
-        renderCallCount++;
-    }
 };
 
 TEST(SceneManagerTest, MainFlowIntegration) {

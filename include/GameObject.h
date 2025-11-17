@@ -17,9 +17,8 @@ class GameObject {
 
     virtual void onResume() = 0;
 
+    // TODO: Replace this game object update for a behavior with an update
     virtual void update(float /*deltaTime*/) = 0;
-
-    virtual void render() = 0;
 
    private:
     std::string name;
