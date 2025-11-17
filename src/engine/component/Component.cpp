@@ -3,7 +3,7 @@
 //
 
 #include "../../../inc/engine/component/Component.h"
-#include "../../../inc/engine/component/Transform.h"
+#include "../../../inc/engine/game_object/Transform.h"
 #include "../../../inc/engine/game_object/GameObject.h"
 
 

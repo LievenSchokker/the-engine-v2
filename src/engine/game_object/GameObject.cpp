@@ -4,7 +4,7 @@
 
 #include "../../../inc/engine/game_object/GameObject.h"
 #include "../../../inc/engine/component/ComponentManager.h"
-#include "../../../inc/engine/component/Transform.h"
+#include "../../../inc/engine/game_object/Transform.h"
 
 
 GameObject::GameObject()

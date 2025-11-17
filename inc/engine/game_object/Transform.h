@@ -2,12 +2,13 @@
 
 
 #include "Vector2.h"
-
+#include "../inc/engine/component/Component.h"
 
 /**
  * @brief Transform holds the position, rotation and scale.
  */
-class Transform {
+class Transform : public Component
+{
 public:
     Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0, Vector2 scale = {0.0, 0.0});
     ~Transform();

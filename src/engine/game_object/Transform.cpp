@@ -1,4 +1,4 @@
-#include "../../../include/core/game_object/Transform.h"
+#include "../../../inc/engine/game_object/Transform.h"
 
 Transform::Transform(const Vector2 position, const double rotationAngle, const Vector2 scale) :
     position(position), rotationAngle(rotationAngle), scale(scale){}
