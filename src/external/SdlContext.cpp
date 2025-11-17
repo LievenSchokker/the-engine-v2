@@ -10,7 +10,7 @@
 #include <iostream>
 
 
-#include "../../inc/External/SdlContext.h"
+#include "../../inc/external/SdlContext.h"
 
 
 int SdlContext::referenceCount = 0;

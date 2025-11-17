@@ -3,8 +3,8 @@
 ///
 
 
-#include "Assets/SDLAssetTypes/SDLImage.h"
-#include "Assets/AssetTypes.h"
+#include "assets/sdlAssetTypes/SDLImage.h"
+#include "assets/AssetTypes.h"
 
 
 #include <iostream>

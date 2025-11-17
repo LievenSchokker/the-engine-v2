@@ -1,5 +1,5 @@
-#include "../../inc/Input/InputManager.h"
-#include "../../inc/Input/SDLInputAdapter.h"
+#include "../../inc/input/InputManager.h"
+#include "../../inc/input/SDLInputAdapter.h"
 #include <utility>
 
 
