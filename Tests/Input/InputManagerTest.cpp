@@ -1,6 +1,6 @@
-#include "../../include/input/InputManager.h"
-#include "../../include/input/KeyCode.h"
-#include "../../include/input/MouseButton.h"
+#include "../../inc/Input/InputManager.h"
+#include "../../inc/Input/KeyCode.h"
+#include "../../inc/Input/MouseButton.h"
 #include <SDL.h>
 #include <gtest/gtest.h>
 
