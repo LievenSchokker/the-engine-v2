@@ -8,21 +8,29 @@ find_package(GTest REQUIRED)
 
 enable_testing()
 
-file(GLOB_RECURSE SOURCES
-        "${CMAKE_SOURCE_DIR}/src/*.cpp"
+file(GLOB_RECURSE ENGINE_SOURCES
+        "${CMAKE_SOURCE_DIR}/Engine/src/*.cpp"
 )
 
-list(REMOVE_ITEM SOURCES "${CMAKE_SOURCE_DIR}/src/main.cpp")
+add_library(engine STATIC
+        ${ENGINE_SOURCES}
+)
+
+target_include_directories(engine PUBLIC
+        ${CMAKE_SOURCE_DIR}/Engine/inc
+        ${CMAKE_SOURCE_DIR}/Engine/src
+        ${SDL2_INCLUDE_DIRS}
+)
+
+set(SANDBOX_MAIN "${CMAKE_SOURCE_DIR}/Sandbox/main.cpp")
 
 add_executable(program
-        ${SOURCES}
-        ${CMAKE_SOURCE_DIR}/src/main.cpp
+        ${SANDBOX_MAIN}
 )
 
-
 target_include_directories(program PRIVATE
-        ${CMAKE_SOURCE_DIR}/inc
-        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/Engine/inc
+        ${CMAKE_SOURCE_DIR}/Engine/src
         ${SDL2_INCLUDE_DIRS}
 )
 
@@ -30,25 +38,18 @@ target_link_directories(program PRIVATE
         ${SDL2_TTF_LIBRARY_DIRS}
 )
 
-target_link_libraries(program
+target_link_libraries(program PRIVATE
+        engine
         ${SDL2_LIBRARIES}
 )
 
 add_executable(unit_tests
-        ${SOURCES}
         Tests/Rendering/SDL/SDLRenderTest.cpp
         Tests/Input/InputManagerTest.cpp
 )
 
-target_include_directories(unit_tests PRIVATE
-        ${CMAKE_SOURCE_DIR}/inc
-        ${CMAKE_SOURCE_DIR}/src
-        ${SDL2_INCLUDE_DIRS}
-)
-
-
-
-target_link_libraries(unit_tests
+target_link_libraries(unit_tests PRIVATE
+        engine
         GTest::gtest
         GTest::gtest_main
         ${SDL2_LIBRARIES}
