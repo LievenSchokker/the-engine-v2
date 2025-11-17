@@ -52,7 +52,6 @@ public:
      */
     TransportResult connectByIPAdress(const char *socketAddress, uint16_t port) override;
 
-
     /**
      * @brief Sends a message over the network.
      *
@@ -105,6 +104,7 @@ public:
     */
     bool TransportGNS::closeOpenSocket() override;
 private:
+    void chooseSendFlags(const SendMode sendMode, int& sendFlags);
     /// @name Server Members
     /// @{
     HSteamListenSocket listenSocket;                   /// Listening socket for server mode.
