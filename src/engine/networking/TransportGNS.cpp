@@ -4,13 +4,13 @@
 
 #include "engine/networking/TransportGNS.h"
 #include <iostream>
-#include <steam/steamnetworkingsockets.h>
-#include <steam/isteamnetworkingutils.h>
 #include <mutex>
-#include <string>
+#include <steam/isteamnetworkingutils.h>
+#include <steam/steamnetworkingsockets.h>
 
 
 TransportGNS* TransportGNS::pCallbackInstance = nullptr;
+
 
 TransportGNS::TransportGNS()
     : listenSocket(k_HSteamListenSocket_Invalid)
@@ -42,6 +42,7 @@ TransportGNS::TransportGNS()
         steamNetConnectionStatusChangedCallback
     );
 }
+
 
 TransportGNS::~TransportGNS()
 {
@@ -109,22 +110,6 @@ TransportResult TransportGNS::connectByIPAdress(const char* socketAddress, uint1
     return result;
 }
 
-
-void TransportGNS::chooseSendFlags(const SendMode sendMode, int& sendFlags)
-{
-    switch (sendMode)
-    {
-    case SendMode::ReliableOrdered:
-        sendFlags = k_nSteamNetworkingSend_Reliable;
-        break;
-    case SendMode::ReliableUnordered:
-        sendFlags = k_nSteamNetworkingSend_Reliable | k_nSteamNetworkingSend_UnreliableNoDelay;
-        break;
-    case SendMode::Unreliable:
-        sendFlags = k_nSteamNetworkingSend_Unreliable;
-        break;
-    }
-}
 
 TransportResult TransportGNS::send(const RawMessage& message)
 {
@@ -375,4 +360,21 @@ std::vector<int> TransportGNS::getActiveConnectionIds()
     for (auto& pair : mapConnections)
         ids.push_back(pair.second);
     return ids;
+}
+
+
+void TransportGNS::chooseSendFlags(const SendMode sendMode, int& sendFlags)
+{
+    switch (sendMode)
+    {
+    case SendMode::ReliableOrdered:
+        sendFlags = k_nSteamNetworkingSend_Reliable;
+        break;
+    case SendMode::ReliableUnordered:
+        sendFlags = k_nSteamNetworkingSend_Reliable | k_nSteamNetworkingSend_UnreliableNoDelay;
+        break;
+    case SendMode::Unreliable:
+        sendFlags = k_nSteamNetworkingSend_Unreliable;
+        break;
+    }
 }
