@@ -23,6 +23,8 @@
 class string;
 struct WindowOptions;
 
+#include <string>
+
 
 class IRender
 {
