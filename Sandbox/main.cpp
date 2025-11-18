@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "EntryPoint.h"
+#include "ExampleEntryPoint.h"
 
 int main(int argc, char** argv)
 {
