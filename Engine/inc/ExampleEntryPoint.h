@@ -1,6 +1,7 @@
 #pragma once
-#include "SpelMotor.h"
+#include "Core/SpelMotor.h"
 
+//Example of how the engine can be ran!
 namespace SpelMotorEntry
 {
     inline int main(int argc, char** argv)

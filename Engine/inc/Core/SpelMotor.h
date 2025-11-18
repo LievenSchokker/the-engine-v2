@@ -1,8 +1,10 @@
 #pragma once
 
 #include "ApplicationSpecifications.h"
-#include "Rendering/IRender.h"
 
+
+class Timer;
+class IRender;
 /**
  * @class SpelMotor
  * @brief Core engine class that manages the game loop and system lifecycle.
@@ -11,10 +13,14 @@
  * the lifetime cycle of all engine systems.
  *
  */
+
+
 class SpelMotor
 {
 public:
     SpelMotor(ApplicationSpecifications applicationSpecifications);
+
+    ~SpelMotor();
 
     /**
      * @brief Starts the engine and enters the main game loop.
@@ -45,33 +51,16 @@ private:
      */
     void update();
 
-    /**
-     * @brief Checks shutdown flag and performs cleanup if needed.
-     *
-     * Private method that gets called when calling requestShutdown().
-     * This method cleanly shutsdown each system.
-     *
-     */
-    void processShutdown();
-
     /** @brief Tracks whether the game loop is active. */
     bool running;
 
-    /** @brief Immutable configuration set at construction. Const ensures runtime modifications don't destabilize systems. */
+    /** @brief Immutable configuration set at construction.
+     * Const ensures runtime modifications don't destabilize systems. */
     const ApplicationSpecifications specifications;
 
-    /** @brief Counts frames for profiling and debugging. Useful for frame-rate independent calculations. */
-    int frameCounter;
-
-    /** @brief Duration of the last frame in seconds. Drives delta-time calculations for smooth, frame-rate independent updates. */
-    float frameTime;
-
-    /** @brief Timestamp of the previous frame. Required to calculate frameTime each iteration. */
-    float lastFrameTime;
-
-    /** @brief Clamped frame time used for physics and gameplay. Prevents spiral of death when frame rate drops. */
-    float timeStep;
-
-    /** @brief Polymorphic renderer handle. Unique_ptr ensures single ownership and automatic cleanup. */
+    /** @brief renderer handle. */
     std::unique_ptr<IRender> renderer;
+
+    /** @brief timeStep calculation for engine */
+    std::unique_ptr<Timer> timer;
 };

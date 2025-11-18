@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Rendering/Window/WindowOptions.h"
-#include "Rendering/RenderBackend.h"
+#include "../Rendering/Window/WindowOptions.h"
+#include "../Rendering/RenderBackend.h"
 
 struct ApplicationSpecifications
 {

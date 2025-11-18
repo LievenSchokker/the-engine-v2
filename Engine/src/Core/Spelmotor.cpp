@@ -1,5 +1,9 @@
-#include "ApplicationSpecifications.h"
-#include "SpelMotor.h"
+#include <iostream>
+#include <ostream>
+
+#include "Core/ApplicationSpecifications.h"
+#include "Core/SpelMotor.h"
+#include "Core/Timer.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Rendering/SDL/SDLRender.h"
@@ -8,20 +12,27 @@
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
       specifications(applicationSpecifications),
-      frameCounter(0),
-      frameTime(0),
-      lastFrameTime(0),
-      timeStep(0)
+      timer(nullptr)
 {
     if (applicationSpecifications.renderBackend == RenderBackend::SDL)
     {
         SdlContext context = SdlContext();
+        timer.reset();
+        timer = std::make_unique<Timer>(1.0f / 60.0f, []()
+        {
+            return SDL_GetTicks();
+        });
         renderer = std::make_unique<SDLRender>(SDLRender(context));
     }
 }
 
+SpelMotor::~SpelMotor() = default;
+
+
 void SpelMotor::run()
 {
+    timer->start();
+
     //TODO Server or Client -> Start()
     //TODO Physics -> Start()
     //TODO SceneManager -> Start()
@@ -34,26 +45,10 @@ void SpelMotor::run()
 void SpelMotor::update()
 {
     running = true;
-    lastFrameTime = SDL_GetTicks();
 
     while (running)
     {
-        //Update Systems
-        InputManager::getInstance()->update();
-        //TODO Network->Update()
-        //TODO Physics->Update();
-        //TODO Audio->Update();
-        renderer->presentFrame();
-
-
-
-        //TODO abstract Timer class
-        float time = SDL_GetTicks();
-        frameTime = time - lastFrameTime;
-        timeStep = std::min<float>(lastFrameTime, 0.0333f);
-        lastFrameTime = time;
-        frameCounter++;
-
+        timer->tick();
 
         //TODO REPLACE THIS WITH EVENTMANAGER
         SDL_Event event;
@@ -64,6 +59,19 @@ void SpelMotor::update()
                 shutdown();
             }
         }
+
+        while (timer->shouldFixedUpdate())
+        {
+            InputManager::getInstance()->update();
+            //TODO Physics->Update();
+
+            timer->consumeFixedUpdate();
+        }
+
+
+        //TODO Network->Update()
+        //TODO Audio->Update();
+        renderer->presentFrame();
     }
 }
 
