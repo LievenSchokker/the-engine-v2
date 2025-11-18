@@ -7,7 +7,6 @@
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
-      shouldShutdown(false),
       specifications(applicationSpecifications),
       frameCounter(0),
       frameTime(0),
@@ -46,6 +45,8 @@ void SpelMotor::update()
         //TODO Audio->Update();
         renderer->presentFrame();
 
+
+
         //TODO abstract Timer class
         float time = SDL_GetTicks();
         frameTime = time - lastFrameTime;
@@ -53,31 +54,28 @@ void SpelMotor::update()
         lastFrameTime = time;
         frameCounter++;
 
-        processShutdown();
+
+        //TODO REPLACE THIS WITH EVENTMANAGER
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
+                shutdown();
+            }
+        }
     }
 }
 
-void SpelMotor::processShutdown()
-{
-    if (shouldShutdown)
-    {
-        running = false;
-        shutdown();
-    }
-}
-
-void SpelMotor::requestShutdown()
-{
-    shouldShutdown = true;
-}
 
 void SpelMotor::shutdown()
 {
+    running = false;
+
     //TODO audioSystem->shutdown()
     InputManager::getInstance()->shutdown();
     renderer->close();
     //TODO scenemanager->shutdown()
     //TODO physicsWorld->shutdown()
     //TODO server->shutdown() and client->shutdown()
-    shouldShutdown = false;
 }
