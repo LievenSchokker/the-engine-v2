@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../component/ComponentManager.h"
+#include "Component/ComponentManager.h"
 
 
 template<typename T>

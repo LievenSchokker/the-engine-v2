@@ -2,9 +2,9 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "../../../Engine/inc/GameObject/GameObject.h"
-#include "../../../Engine/inc/component/ComponentManager.h"
-#include "../../inc/Component/Transform.h"
+#include "GameObject/GameObject.h"
+#include "Component/ComponentManager.h"
+#include "Component/Transform.h"
 
 
 GameObject::GameObject()
