@@ -3,6 +3,8 @@
 //
 
 #include "GameObject/GameObject.h"
+
+#include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
 #include "Component/Transform.h"
 
@@ -45,9 +47,20 @@ void GameObject::removeComponent(Component* comp)
 }
 
 
-std::vector<Behaviour*> GameObject::getActiveBehaviours() const
+ std::vector<Behaviour*> GameObject::getActiveBehaviours() const
 {
-    return std::vector<Behaviour*>{};
+    std::vector<Behaviour*> activeBehaviours;
+
+    for (Behaviour* behaviour: componentManager->getAllBehaviours())
+    {
+        if (behaviour == nullptr)
+            continue;
+
+        if (behaviour->getIsEnabled())
+            activeBehaviours.push_back(behaviour);
+    }
+
+    return activeBehaviours;
 }
 
 
