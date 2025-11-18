@@ -3,76 +3,75 @@
 //
 
 
-
-
 #include <string>
 #include <stdexcept>
 #include <iostream>
 
 
-#include "../../inc/External/SdlContext.h"
+#include "External/SdlContext.h"
 
 
 int SdlContext::referenceCount = 0;
 
 SdlContext::SdlContext(Uint32 flags)
 {
-	acquire(flags);
+    acquire(flags);
 }
 
 SdlContext::~SdlContext()
 {
-	release();
+    release();
 }
 
 void SdlContext::acquire(Uint32 requestedFlags)
 {
-	if (referenceCount == 0)
-	{
-		if (SDL_Init(requestedFlags) != 0)
-		{
-			throw std::runtime_error(
-				std::string("SDL_Init failed: ") + SDL_GetError()
-			);
-		}
-	} else
-	{
-		Uint32 alreadyInitialized = SDL_WasInit(0);
-		Uint32 needToInit = requestedFlags & ~alreadyInitialized;
+    if (referenceCount == 0)
+    {
+        if (SDL_Init(requestedFlags) != 0)
+        {
+            throw std::runtime_error(
+                std::string("SDL_Init failed: ") + SDL_GetError()
+            );
+        }
+    }
+    else
+    {
+        Uint32 alreadyInitialized = SDL_WasInit(0);
+        Uint32 needToInit = requestedFlags & ~alreadyInitialized;
 
-		if (needToInit != 0)
-		{
-			if (SDL_InitSubSystem(needToInit) != 0)
-			{
-				throw std::runtime_error(
-					std::string("SDL_InitSubSystem failed: ") + SDL_GetError()
-				);
-			}
-		}
-	}
+        if (needToInit != 0)
+        {
+            if (SDL_InitSubSystem(needToInit) != 0)
+            {
+                throw std::runtime_error(
+                    std::string("SDL_InitSubSystem failed: ") + SDL_GetError()
+                );
+            }
+        }
+    }
 
-	++referenceCount;
-	flags = requestedFlags;
+    ++referenceCount;
+    flags = requestedFlags;
 }
 
 void SdlContext::release()
 {
-	--referenceCount;
+    --referenceCount;
 
-	if (referenceCount == 0)
-	{
-		SDL_Quit();
-	}
+    if (referenceCount == 0)
+    {
+        SDL_Quit();
+    }
 
-	flags = 0;
+    flags = 0;
 }
 
 Uint32 SdlContext::initFlags()
 {
-	return SDL_WasInit(0);
+    return SDL_WasInit(0);
 }
 
 bool SdlContext::wasInit(Uint32 subsystem)
 {
-	return (SDL_WasInit(subsystem) & subsystem) != 0;
+    return (SDL_WasInit(subsystem) & subsystem) != 0;
 }
