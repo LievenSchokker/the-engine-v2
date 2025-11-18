@@ -5,6 +5,8 @@
 #pragma once
 
 
+#include "GameObject/GameObject.h"
+
 #include <algorithm>
 #include <type_traits>
 
