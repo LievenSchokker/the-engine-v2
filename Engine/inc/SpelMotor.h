@@ -2,8 +2,7 @@
 
 
 #include "ApplicationSpecifications.h"
-
-class IRender;
+#include "Rendering/IRender.h"
 
 class SpelMotor
 {
@@ -13,7 +12,6 @@ public:
     void run();
     void shutdown();
     void requestShutdown();
-
 
 private:
     void update();

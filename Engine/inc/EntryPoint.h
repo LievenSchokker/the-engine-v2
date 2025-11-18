@@ -1,15 +1,17 @@
 #pragma once
-
 #include "SpelMotor.h"
 
-inline int Main(int argc, char** argv)
+namespace SpelMotorEntry
 {
-    ApplicationSpecifications specifications {};
+    inline int main(int argc, char** argv)
+    {
+        ApplicationSpecifications specifications{};
 
-    specifications.windowOptions = {"SpelMotor", 1920, 1080};
-    specifications.renderBackend = RenderBackend::SDL;
+        specifications.windowOptions = {"SpelMotor", 1920, 1080};
+        specifications.renderBackend = RenderBackend::SDL;
 
-    SpelMotor engine(specifications);
-    engine.run();
-    return 0;
+        SpelMotor engine(specifications);
+        engine.run();
+        return 0;
+    }
 }

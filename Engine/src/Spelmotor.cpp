@@ -3,6 +3,7 @@
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Rendering/SDL/SDLRender.h"
+#include "Rendering/IRender.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
