@@ -7,7 +7,7 @@ namespace SpelMotorEntry
     {
         ApplicationSpecifications specifications{};
 
-        specifications.windowOptions = {"SpelMotor", 1920, 1080};
+        specifications.windowOptions = {"SpelMotor", 700, 700};
         specifications.renderBackend = RenderBackend::SDL;
 
         SpelMotor engine(specifications);
