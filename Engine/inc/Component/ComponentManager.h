@@ -71,7 +71,7 @@ public:
     /**
    * @brief Removes a component of type T from @c components.
    *
-   * Does NOT throw a warning or error if T doesnt exist in @c components
+   * Does NOT throw a warning or error if T doesn't exist in @c components
    *
    * @tparam T Type of the component to remove
    */
@@ -108,26 +108,26 @@ public:
 
 
     /**
-    * @brief Returns all components derived from Behaviour that are stored in @c components
+    * @brief Returns all behaviours stored by @c behaviours
     * @return Vector of pointers to all exisiting Behaviour components
     */
-    std::vector<Behaviour*> getAllBehaviours();
+    const std::vector<Behaviour*>& getAllBehaviours() const;
 
     /**
    * @brief Activates all @c Behaviour in @c components.
    */
-    void activateAll();
+    void enableAllBehaviours();
 
     /**
     * @brief Deactivates all @c Behaviour in @c components.
     */
-    void deactivateAll();
+    void disableAllBehaviours();
 
     /**
     * @brief Returns the total number of components stored inside @c components
     * @return Number of components
     */
-    int getComponentCount() const;
+    size_t getComponentCount() const;
 
 private:
     /// Helper function to iterate through @c components
@@ -140,8 +140,10 @@ private:
 private:
     /// The @c GameObject this ComponentManager belongs to
     GameObject* const gameObject;
-    /// All components stored by this object
+        /// All components stored by this object
     std::vector<std::unique_ptr<Component>> components;
+
+        /// All behaviours of this object
     std::vector<Behaviour*> behaviours;
 };
 

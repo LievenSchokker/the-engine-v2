@@ -16,7 +16,7 @@
 class Behaviour : public Component
 {
     public:
-        Behaviour();
+        Behaviour() = default;
 
         /**
          * @brief Pure virtual destructor makes this class Abstract.
