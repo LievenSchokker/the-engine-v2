@@ -10,7 +10,6 @@ target_link_libraries(engine_tests PRIVATE
         Engine::Core
         GTest::gtest
         GTest::gtest_main
-        GTest::gmock
 )
 
 include(GoogleTest)
