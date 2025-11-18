@@ -29,7 +29,8 @@ using OnConnectionChangedCallback = std::function<void(int connectionId, bool co
  * and managing connections. Derived classes implement specific networking
  * APIs such as GameNetworkingSockets, ENet, or custom protocols.
  */
-class Transport {
+class Transport
+{
 public:
     virtual ~Transport() = default;
 
@@ -48,28 +49,23 @@ public:
      * @param port Server port.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult connectByIPAdress(const char *serverAddress, uint16_t port) = 0;
+    virtual TransportResult connectByIPAdress(const char* serverAddress, uint16_t port) = 0;
 
 
     /**
      * @brief Sends a message over the network.
-     * @param connectionId The connection to send to (0 for single-client mode).
-     * @param data Pointer to the message buffer.
-     * @param length Length of the message in bytes.
-     * @param send_mode The desired reliability and ordering (SendMode).
+     * @param RawMessage The message to send over the network.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult send(const RawMessage &msg) = 0;
+    virtual TransportResult send(const RawMessage& msg) = 0;
 
 
     /**
      * @brief Sends a message over the network to all active nodes
-     * @param data Pointer to the message buffer.
-     * @param length Length of the message in bytes.
-     * @param send_mode The desired reliability and ordering (SendMode).
+     * @param RawMessage The message to send over the network to all connections.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult sendToAll(const RawMessage &msg) = 0;
+    virtual TransportResult sendToAll(const RawMessage& msg) = 0;
 
 
     /**

@@ -6,7 +6,6 @@
 #pragma once
 #include <map>
 #include <mutex>
-#include <steam/isteamnetworkingutils.h>
 #include <steam/steamnetworkingsockets.h>
 #include "Transport.h"
 
@@ -55,11 +54,6 @@ public:
     /**
      * @brief Sends a message over the network.
      *
-     * The message is sent using the specified SendMode:
-     * - ReliableOrdered: Guarantees in-order delivery.
-     * - ReliableUnordered: Reliable but sent with minimal delay (order not guaranteed).
-     * - Unreliable: May be dropped or arrive out of order.
-     *
      * @param connectionId The logical connection ID (for clients, usually 0).
      * @param data Pointer to the message buffer.
      * @param length Length of the message buffer in bytes.
@@ -90,7 +84,7 @@ public:
      * @param connectionId The ID of the connection to close.
      * @return True if successfully disconnected, false otherwise.
      */
-    bool TransportGNS::disconnectFromSocket(int connectionId) override;
+    bool disconnectFromSocket(int connectionId) override;
 
 
     /**
