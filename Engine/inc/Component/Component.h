@@ -80,7 +80,7 @@ class Component
         */
         const Transform* getTransform() const;
 
-    private:
+    protected:
         /// The @c GameObject this component is attached to, a component is always attached to a GameObject
         GameObject* gameObject;
 

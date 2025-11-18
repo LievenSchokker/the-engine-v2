@@ -16,7 +16,8 @@
 class Behaviour : public Component
 {
     public:
-        Behaviour() = default;
+        Behaviour() :
+         isEnabled(true),  hasAwakened(false), hasStarted(false) {}
 
         /**
          * @brief Pure virtual destructor makes this class Abstract.
@@ -39,12 +40,14 @@ class Behaviour : public Component
          * - Only on active GameObjects
          * - after @c isEnabled turns true
          */
-        virtual void onEnable();
+        virtual void onEnable() {}
 
         /**
          * @brief start is called after @c awake, and before the first @c update call.
          *
          * Start on any component is guaranteed to be called after all awake functions on all behaviours in the scene have been called,
+         *
+         * Start is only called on enabled behaviours.
          */
         virtual void start();
 
@@ -52,7 +55,7 @@ class Behaviour : public Component
          * Update is called every frame when:
          * - @c isActiveAndEnabled == true, meaning the GameObject is active, and the Behaviour is enabled
          */
-        virtual void update();
+        virtual void update() {};
 
         /**
          * @brief fixedUpdate is called at regular and fixed intervals as part of the engine's physics loop.
@@ -62,20 +65,28 @@ class Behaviour : public Component
          * FixedUpdate may be called zero, one or multiple times per frame depending on the frame rate of the simulation,
          * to ensure consistent and deterministic physics calculations, regardless of rendering speed.
          */
-        virtual void fixedUpdate();
+        virtual void fixedUpdate() {};
 
         /**
         * @brief Called when this component is disabled:
         * - Only on active GameObjects
         * - after @c isEnabled turns false.
         */
-        virtual void onDisable();
+        virtual void onDisable() {}
+
+
+        /**
+         * @brief Called when this Behaviour's @c GameObject gets destroyed.
+         */
+        virtual void onDestroy() {};
+
 
         /**
          * @brief Sets the @c isEnabled field of this Behaviour
          * @param value new value to set
          */
-        void setEnabled(const bool value);
+        void setEnabled(bool value);
+
 
         /**
          * @brief Retrieves the state of the @c isEnabled field
@@ -83,19 +94,21 @@ class Behaviour : public Component
          */
         bool getIsEnabled() const;
 
+
         /**
-         * @brief Retrieves the state of the @c isActiveAndEnabled member.
-         * @return whether this behaviour is Enabled and  on an active GameObject.
+         * @brief Checks whether this Behaviour is enabled, and its associated GameObject is active.
+         * @return whether this behaviour is Enabled and on an active GameObject.
          */
-        bool getActiveAndEnabled() const;
+        bool getIsActiveAndEnabled() const;
+
 
     private:
         /// Enabled components are Updated, disaled Beahviours are not.
         bool isEnabled;
 
-        /// Checks if this behaviour is enabled and on an active GameObject
-        bool isActiveAndEnabled;
-
         /// Keeps track if awake has been called for this Behaviour.
         bool hasAwakened;
+
+        /// Keeps track if start function has been called for this behaviour.
+        bool hasStarted;
 };
