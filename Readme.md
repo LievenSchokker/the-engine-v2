@@ -4,8 +4,9 @@ A modern C++20 project.
 
 ## Overview
 
-This project uses modern C++20 features and is built using CMake. 
-It includes several third-party dependencies managed through CMake's dependency system as git submodules.
+This project uses modern C++20 features and is built with CMake. The engine
+code is built as a static library that powers both the sandbox application and
+the automated test suite.
 
 ## Prerequisites
 
@@ -14,6 +15,59 @@ It includes several third-party dependencies managed through CMake's dependency 
   - Clang 11+ or
   - MSVC 2019+ with latest updates
 - CMake 3.28.3 or higher
+
+- ### External Libraries:
+  - SDL2 - Simple DirectMedia Layer
+  - SDL2_Image - Simple DirectMedia Layer
+  - GameNetworkingSockets - Valve's networking library
+  - GoogleTest - For unit testing
+
+### Windows  Setup
+For windows the easiest way to install each of the prerequisited librarie's
+We recommand VCPK a quick setup guide for VCPK can be found via this [link](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell).
+
+To permantly recognize VCPKG as a system wide command use this in POWERSHELL AS ADMIN:
+```shell
+[System.Environment]::SetEnvironmentVariable(
+  "Path",
+  $env:Path + ";C:path\to\vcpkg",
+  [System.EnvironmentVariableTarget]::Machine
+)
+```
+After succesfully installing VCPKG just run the following command to install all dependencies
+
+```bash
+vcpkg install
+```
+And then the following command to make sure Cmake can find each package A variable will be shown
+copy that variable and place it inside the CMAKE build config or for 
+Clion go to -> File | Settings | Build, Execution, Deployment | CMake 
+then copy paste the command into launch options.
+```bash
+vcpkg integrate install
+```
+
+
+### MacOs Setup
+The easiest way to get started on MacOs  is to use Brew to install all 
+the dependencies. HomeBrew can be installed via this [link](https://brew.sh/).
+
+Each of the packages can be installed via the following commands
+```bash
+brew install sdl2
+```
+```bash
+brew install sdl2_image
+```
+```bash
+brew install gamenetworkingsockets
+```
+```bash
+brew install googletest
+```
+
+### Linux Setup
+sorry don't own a linux pc :( good luck!
 
 ## Dependencies
 The project uses the following external libraries:
@@ -28,56 +82,13 @@ the-engine/
 │
 ├─ CMakeLists.txt
 ├─ README.md
-├─ LICENSE
-│
-├─ inc/                 # Public header files
-│   ├─ Engine/
-│   │   ├─ Debug/
-│   │   ├─ Input/
-│   │   ├─ Window/
-│   │   ├─ Physics/
-│   │   ├─ Renderer/
-│   │   ├─ Scene/
-│   │   ├─ Utils/
-│   │   ├─ GameObject/
-│   │   ├─ Network/
-│   ├─ Server/
-│   ├─ Client/
-│   │
-│
-├─ src/                     # Source files
-│   ├─ Engine/
-│   │   ├─ Debug/
-│   │   ├─ Input/
-│   │   ├─ Window/
-│   │   ├─ Physics/
-│   │   ├─ Renderer/
-│   │   ├─ Scene/
-│   │   ├─ Utils/
-│   │   ├─ GameObject/
-│   │   ├─ Network/
-│   ├─ Server/
-│   ├─ Client/
-│   ├─ SandBox/
-│
-├─ tests/                   # Unit tests
-│   ├─ Engine/
-│   │   ├─ Core/
-│   │   ├─ Debug/
-│   │   ├─ Input/
-│   │   ├─ Window/
-│   │   ├─ Physics/
-│   │   ├─ Renderer/
-│   │   ├─ Scene/
-│   │   ├─ Utils/
-│   │   ├─ GameObject/
-│   │   ├─ Network/
-│   │
-│
-├─ cmake-build-debug/       # CMake build output folder (ignored by git)
-│
-└─ .gitignore
+├─ Engine/
+│   ├─ inc/                 # Public engine headers
+│   └─ src/
+├─ Sandbox/
+│   ├─ main.cpp
+│   └─ input.cpp
+└─ Tests/
+    ├─ Input/
+    └─ Rendering/
 ```
-
-
-
