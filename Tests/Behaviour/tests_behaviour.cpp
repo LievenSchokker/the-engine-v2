@@ -21,7 +21,7 @@ namespace engine_tests
 
     TEST(BehaviourTests, AwakeSetsHasAwakened)
     {
-        TestBehaviour b;
+        TestBehaviourOne b;
         EXPECT_FALSE(b.getHasAwakened());
         b.awake();
         EXPECT_TRUE(b.getHasAwakened());
@@ -29,14 +29,14 @@ namespace engine_tests
 
     TEST(BehaviourTests, StartSetsHasStarted)
     {
-        TestBehaviour b;
+        TestBehaviourOne b;
         EXPECT_FALSE(b.getHasStarted());
         b.start();
         EXPECT_TRUE(b.getHasStarted());
     }
 
     TEST(BehaviourTests, SetEnabledCallsHooks) {
-        TestBehaviour b;
+        TestBehaviourOne b;
 
         EXPECT_TRUE(b.getIsEnabled());
 
@@ -50,7 +50,7 @@ namespace engine_tests
     }
 
     TEST(BehaviourTests, SetEnabledDoesNotCallHooksWhenNotChanged) {
-        TestBehaviour b;
+        TestBehaviourOne b;
         b.enableCalled = false;
         b.disableCalled = false;
 
@@ -59,10 +59,11 @@ namespace engine_tests
         EXPECT_FALSE(b.disableCalled);
     }
 
-    TEST(BehaviourTests, ActiveAndEnabled) {
+    TEST(BehaviourTests, ActiveAndEnabled)
+    {
         GameObject go;
         go.setIsActive(true);
-        TestBehaviour* behaviour = go.addComponent<TestBehaviour>();
+        TestBehaviourOne* behaviour = go.addComponent<TestBehaviourOne>();
 
         behaviour->setEnabled(true);
         EXPECT_TRUE(behaviour->getIsActiveAndEnabled());

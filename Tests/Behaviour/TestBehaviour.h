@@ -10,7 +10,7 @@ namespace engine_tests
     {
         public:
             TestBehaviour() = default;
-            ~TestBehaviour() override = default;
+            virtual ~TestBehaviour() = 0;
 
             void awake() override;
             void onEnable() override;
@@ -26,4 +26,26 @@ namespace engine_tests
             bool updateCalled = false;
             bool destroyCalled = false;
     };
+
+    class TestBehaviourOne : public TestBehaviour
+    {
+        public:
+            TestBehaviourOne() = default;
+            ~TestBehaviourOne() override = default;
+    };
+
+    class TestBehaviourTwo : public TestBehaviour
+    {
+        public:
+            TestBehaviourTwo() = default;
+            ~TestBehaviourTwo() override = default;
+    };
+
+    class TestBehaviourThree : public TestBehaviour
+    {
+        public:
+            TestBehaviourThree() = default;
+            ~TestBehaviourThree() override = default;
+    };
+
 }

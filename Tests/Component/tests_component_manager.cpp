@@ -11,6 +11,7 @@
 
 #include <gtest/gtest.h>
 
+#include "../Behaviour/TestBehaviour.h"
 
 namespace engine_tests
 {
@@ -139,5 +140,55 @@ namespace engine_tests
         ComponentManager componentManager(&go);
 
         EXPECT_NO_THROW(componentManager.removeComponent<TestComponentOne>());
+    }
+
+    TEST(ComponentManagerTests, StoresBehavioursInComponents)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        componentManager.addComponent<TestComponentOne>();
+        componentManager.addComponent<TestBehaviourOne>();
+        componentManager.addComponent<TestBehaviourTwo>();
+        componentManager.addComponent<TestBehaviourThree>();
+
+        EXPECT_EQ(componentManager.getComponentCount(), 4);
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourOne>());
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourTwo>());
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourThree>());
+    }
+
+    TEST(ComponentManagerTests, AddGetComponentWorksForBehaviours)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        TestBehaviourOne* addedBehaviour = componentManager.addComponent<TestBehaviourOne>();
+
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourOne>());
+
+        TestBehaviour* retrievedBehaviour = componentManager.getComponent<TestBehaviourOne>();
+
+        EXPECT_NE(retrievedBehaviour, nullptr);
+        EXPECT_EQ(addedBehaviour, retrievedBehaviour);
+    }
+
+    TEST(ComponentManagerTests, GetAllBehavioursReturnsOnlyBehaviours)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        TestComponentOne* addedComponent = componentManager.addComponent<TestComponentOne>();
+
+        TestBehaviour* addedBehaviour1 = componentManager.addComponent<TestBehaviourOne>();
+        TestBehaviour* addedBehaviour2 = componentManager.addComponent<TestBehaviourTwo>();
+        TestBehaviour* addedBehaviour3 = componentManager.addComponent<TestBehaviourThree>();
+
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourThree>());
+
+        auto allBehaviours = componentManager.getAllBehaviours();
+
+        EXPECT_LT(allBehaviours.size(), componentManager.getComponentCount());
+        EXPECT_EQ(allBehaviours.size(), 3);
     }
 }

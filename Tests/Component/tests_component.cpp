@@ -84,10 +84,4 @@ namespace engine_tests
         EXPECT_EQ(fromAdded_1, fromManager);
         EXPECT_EQ(componentOut, managerOut);
     }
-
-
-    TEST(ComponentTests, SetGameObjectSetsPrivateFields)
-    {
-        GameObject go;
-    }
 }

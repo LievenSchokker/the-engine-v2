@@ -4,6 +4,11 @@
 
 #include "TestBehaviour.h"
 
+engine_tests::TestBehaviour::~TestBehaviour()
+{
+
+}
+
 
 void engine_tests::TestBehaviour::awake()
 {
