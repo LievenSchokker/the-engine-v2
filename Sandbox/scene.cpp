@@ -1,32 +1,34 @@
-#include <memory>
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <memory>
 
-#include "../inc/GameObject/PlaceholderGameObject.h"
-#include "../inc/Scene/SceneManager.h"
+#include "../Engine/inc/GameObject/PlaceholderGameObject.h"
+#include "../Engine/inc/Scene/SceneManager.h"
 
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
-int main() {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+int main()
+{
+    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    {
         std::cout << "SDL_Init failed: " << SDL_GetError() << std::endl;
         return 1;
     }
 
 #if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
     // Disable compositor bypass
-    if (!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0")) {
+    if (!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0"))
+    {
         std::cout << "SDL can not disable compositor bypass!" << std::endl;
         return 1;
     }
 #endif
-    SDL_Window* window =
-        SDL_CreateWindow("Basic C++ SDL project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                         SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (!window) {
-        std::cout << "Window could not be created!" << std::endl
-                  << "SDL_Error: " << SDL_GetError() << std::endl;
+    SDL_Window *window =
+        SDL_CreateWindow("Basic C++ SDL project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    if (!window)
+    {
+        std::cout << "Window could not be created!" << std::endl << "SDL_Error: " << SDL_GetError() << std::endl;
         SDL_Quit();
         return 1;
     }
@@ -40,10 +42,13 @@ int main() {
     bool running = true;
     Uint32 lastTicks = SDL_GetTicks();
 
-    while (running) {
+    while (running)
+    {
         SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
+        while (SDL_PollEvent(&event))
+        {
+            if (event.type == SDL_QUIT)
+            {
                 running = false;
             }
         }
@@ -65,4 +70,3 @@ int main() {
     SDL_Quit();
     return 0;
 }
-

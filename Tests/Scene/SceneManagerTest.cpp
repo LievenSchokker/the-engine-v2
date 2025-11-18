@@ -3,9 +3,9 @@
 #include <memory>
 #include <string>
 
-#include "../../inc/GameObject/GameObject.h"
-#include "../../inc/Scene/Scene.h"
-#include "../../inc/Scene/SceneManager.h"
+#include "../../Engine/inc/GameObject/GameObject.h"
+#include "../../Engine/inc/Scene/Scene.h"
+#include "../../Engine/inc/Scene/SceneManager.h"
 
 class MockGameObject : public GameObject
 {

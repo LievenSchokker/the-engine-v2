@@ -2,9 +2,9 @@
 #include <gtest/gtest.h>
 
 
-#include "../../../inc/Rendering/SDL/SDLRender.h"
-#include "../../../inc/External/SdlContext.h"
-#include "../../../inc/Rendering/Window/WindowOptions.h"
+#include "../../../Engine/inc/Rendering/SDL/SDLRender.h"
+#include "../../../Engine/inc/External/SdlContext.h"
+#include "../../../Engine/inc/Rendering/Window/WindowOptions.h"
 
 class SDLRenderTest : public ::testing::Test {
 protected:

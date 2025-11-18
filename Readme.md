@@ -4,8 +4,9 @@ A modern C++20 project.
 
 ## Overview
 
-This project uses modern C++20 features and is built using CMake. 
-It includes several third-party dependencies managed through CMake's dependency system as git submodules.
+This project uses modern C++20 features and is built with CMake. The engine
+code is built as a static library that powers both the sandbox application and
+the automated test suite.
 
 ## Prerequisites
 
@@ -28,56 +29,13 @@ the-engine/
 │
 ├─ CMakeLists.txt
 ├─ README.md
-├─ LICENSE
-│
-├─ inc/                 # Public header files
-│   ├─ Engine/
-│   │   ├─ Debug/
-│   │   ├─ Input/
-│   │   ├─ Window/
-│   │   ├─ Physics/
-│   │   ├─ Renderer/
-│   │   ├─ Scene/
-│   │   ├─ Utils/
-│   │   ├─ GameObject/
-│   │   ├─ Network/
-│   ├─ Server/
-│   ├─ Client/
-│   │
-│
-├─ src/                     # Source files
-│   ├─ Engine/
-│   │   ├─ Debug/
-│   │   ├─ Input/
-│   │   ├─ Window/
-│   │   ├─ Physics/
-│   │   ├─ Renderer/
-│   │   ├─ Scene/
-│   │   ├─ Utils/
-│   │   ├─ GameObject/
-│   │   ├─ Network/
-│   ├─ Server/
-│   ├─ Client/
-│   ├─ SandBox/
-│
-├─ tests/                   # Unit tests
-│   ├─ Engine/
-│   │   ├─ Core/
-│   │   ├─ Debug/
-│   │   ├─ Input/
-│   │   ├─ Window/
-│   │   ├─ Physics/
-│   │   ├─ Renderer/
-│   │   ├─ Scene/
-│   │   ├─ Utils/
-│   │   ├─ GameObject/
-│   │   ├─ Network/
-│   │
-│
-├─ cmake-build-debug/       # CMake build output folder (ignored by git)
-│
-└─ .gitignore
+├─ Engine/
+│   ├─ inc/                 # Public engine headers
+│   └─ src/
+├─ Sandbox/
+│   ├─ main.cpp
+│   └─ input.cpp
+└─ Tests/
+    ├─ Input/
+    └─ Rendering/
 ```
-
-
-
