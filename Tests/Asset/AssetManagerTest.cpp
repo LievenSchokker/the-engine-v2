@@ -4,8 +4,8 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "assets/SDLAssetTypes/SDLImage.h"
-#include "assets/AssetManager.h"
+#include "Assets/SDLAssetTypes/SDLImage.h"
+#include "Assets/AssetManager.h"
 
 
 class AssetManagerTest : public ::testing::Test {
