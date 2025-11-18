@@ -49,3 +49,14 @@ bool Behaviour::getIsActiveAndEnabled() const
     return (isEnabled && gameObject->getIsActive());
 }
 
+
+bool Behaviour::getHasAwakened() const
+{
+    return hasAwakened;
+}
+
+
+bool Behaviour::getHasStarted() const
+{
+    return hasStarted;
+}

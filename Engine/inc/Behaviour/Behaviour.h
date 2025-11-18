@@ -6,6 +6,11 @@
 
 #include "Component/Component.h"
 
+namespace engine_tests
+{
+    class TestBehaviour;
+}
+
 /**
  * @brief This class serves as an abstract component that custom behaviour can derive from.
  *
@@ -101,6 +106,18 @@ class Behaviour : public Component
          */
         bool getIsActiveAndEnabled() const;
 
+        /**
+         * #brief Checks whether awake has been called yet
+         * @return true if this behaviour's awake function has been called, false otherwise
+         */
+        bool getHasAwakened() const;
+
+
+        /**
+        * #brief Checks whether start has been called yet
+        * @return true if this behaviour's start function has been called, false otherwise
+        */
+        bool getHasStarted() const;
 
     private:
         /// Enabled components are Updated, disaled Beahviours are not.
