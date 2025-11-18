@@ -4,9 +4,8 @@
 #include <thread>
 
 #include "ServerInformation.h"
-#include "core/Networking/NetworkID.h"
 #include "../Connection/ConnectionManager.h"
-#include "core/Networking/Transport.h"
+#include "Networking/Transport.h"
 
 /**
  * @brief Manages server-side network connections and client communication.
@@ -51,12 +50,12 @@ public:
      * @brief Disconnects a client from the server.
      * @param clientId The network ID of the client to disconnect.
      */
-    void kickClient(NetworkId clientId);
+    void kickClient(int clientId);
 
 private:
     ServerConnectionInformation setupInformation;
     ServerStatus status;
 
     std::unique_ptr<ConnectionManager> connectionManager;
-    std::vector<NetworkId> clients;
+    std::vector<int> clients;
 };

@@ -54,7 +54,6 @@ TransportGNS::~TransportGNS()
 
 TransportResult TransportGNS::setUpListenSocket(uint16_t port)
 {
-    TransportResult result;
 
     SteamNetworkingIPAddr addr;
     addr.Clear();
@@ -66,8 +65,7 @@ TransportResult TransportGNS::setUpListenSocket(uint16_t port)
     if (listenSocket == k_HSteamListenSocket_Invalid)
     {
         std::cerr << "[GNS] Failed to listen on port " << port << std::endl;
-        result.success = false;
-        return result;
+        return TransportResult::ERROR;
     }
 
     // Create a poll group for managing multiple connections
@@ -75,13 +73,11 @@ TransportResult TransportGNS::setUpListenSocket(uint16_t port)
     if (pollGroup == k_HSteamNetPollGroup_Invalid)
     {
         std::cerr << "[GNS] Failed to create poll group\n";
-        result.success = false;
-        return result;
+        return TransportResult::ERROR;
     }
 
     std::cout << "[GNS] Listening on port " << port << "\n";
-    result.success = true;
-    return result;
+    return TransportResult::SUCCES;
 }
 
 
@@ -93,8 +89,7 @@ TransportResult TransportGNS::connectByIPAdress(const char* socketAddress, uint1
     if (!addr.ParseString(socketAddress))
     {
         std::cerr << "[GNS] Invalid address: " << socketAddress << '\n';
-        result.success = false;
-        return result;
+        return TransportResult::ERROR;
     }
     addr.m_port = port;
 
@@ -103,31 +98,26 @@ TransportResult TransportGNS::connectByIPAdress(const char* socketAddress, uint1
     if (hConn == k_HSteamNetConnection_Invalid)
     {
         std::cerr << "[GNS] ConnectByIPAddress failed\n";
-        result.success = false;
-        return result;
+        return TransportResult::ERROR;
     }
 
-    result.success = true;
-    return result;
+    return TransportResult::SUCCES;
 }
 
 
 TransportResult TransportGNS::send(const RawMessage& message)
 {
-    TransportResult result;
-
     int sendFlags = 0;
     chooseSendFlags(message.getSendMode(), sendFlags);
 
     HSteamNetConnection hConn = getSteamConnection(message.getConnectionID());
     if (hConn == k_HSteamNetConnection_Invalid)
     {
-        result.success = false;
-        return result;
+        return TransportResult::ERROR;
     }
 
     std::vector<std::byte> payload = message.getPayload();
-    EResult r = steamNetworkingSockets->SendMessageToConnection(
+    EResult result = steamNetworkingSockets->SendMessageToConnection(
         hConn,
         payload.data(),
         static_cast<uint32>(payload.size()),
@@ -135,28 +125,29 @@ TransportResult TransportGNS::send(const RawMessage& message)
         nullptr
     );
 
-    result.success = (r == k_EResultOK);
-    return result;
+    if (result == k_EResultOK)
+    {
+        return TransportResult::SUCCES;
+    }
+
+    return TransportResult::ERROR;
 }
 
 
 TransportResult TransportGNS::sendToAll(const RawMessage& message)
 {
-    TransportResult result;
-    result.success = true;
-
     for (int connectionID : getActiveConnectionIds())
     {
         RawMessage clone = message;
         clone.setConnectionID(connectionID);
 
         TransportResult transportResult = send(clone);
-        if (!transportResult.success)
+        if (transportResult == TransportResult::ERROR)
         {
-            result.success = false;
+            return TransportResult::ERROR;
         }
     }
-    return result;
+    return TransportResult::SUCCES;
 }
 
 

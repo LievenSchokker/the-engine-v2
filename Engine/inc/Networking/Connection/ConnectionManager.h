@@ -1,10 +1,9 @@
 #pragma once
 
 
+#include <functional>
 #include <map>
 #include <memory>
-
-#include "core/Networking/RawMessage.h"
 
 
 class RawMessage;
@@ -13,13 +12,12 @@ class Transport;
 
 enum class ConnectionStatus;
 enum class ConnectionMode;
-enum class TransportResult;
 enum class SendMode;
-
+enum class TransportResult;
 
 struct ServerConnectionInformation;
 struct Connection;
-struct NetworkId;
+
 
 
 
@@ -33,9 +31,9 @@ public:
 
     ConnectionStatus init(const ServerConnectionInformation& information, ConnectionMode connectionMode);
 
-    TransportResult send(NetworkId id, SendMode mode, const std::byte *data, size_t length);
+    TransportResult send(int networkId, SendMode mode, const std::byte* data, size_t length);
 
-    void disconnect(NetworkId id);
+    void disconnect(int networkId);
 
     void shutdown();
 
@@ -47,7 +45,7 @@ private:
 
     std::unique_ptr<Transport> transport;
 
-    std::map<NetworkId, Connection> connections;
+    std::map<int, Connection> connections;
 
     int maxConnections;
 

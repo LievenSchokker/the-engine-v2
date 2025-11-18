@@ -1,9 +1,9 @@
-#include "core/Networking/Server/Server.h"
+#include "Networking/Server/Server.h"
 
 #include <iostream>
 
-#include "core/Networking/Connection/ConnectionMode.h"
-#include "core/Networking/Connection/ConnectionStatus.h"
+#include "Networking/Connection/ConnectionMode.h"
+#include "Networking/Connection/ConnectionStatus.h"
 
 Server::Server(const ServerConnectionInformation & serverConnectionInformation)
     : connectionManager(std::make_unique<ConnectionManager>()),
@@ -63,15 +63,14 @@ ServerStatus Server::stop()
 
 void Server::onMessage(RawMessage message)
 {
-    std::cout << "[Client " << message.connectionId << "]: ";
-    for (size_t i = 0; i < message.length; i++) {
-        std::cout << (char)message.payload[i];
+    std::cout << "[Client " << message.getConnectionID() << "]: ";
+    for (size_t i = 0; i < message.getLength(); i++) {
+        std::cout << (char)message.getPayload()[i];
     }
     std::cout << std::endl;
 }
 
-void Server::kickClient(NetworkId clientId)
+void Server::kickClient(int clientId)
 {
-    connectionManager->disconnect(clientId);
 }
 

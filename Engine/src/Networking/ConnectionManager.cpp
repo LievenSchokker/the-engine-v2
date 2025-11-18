@@ -6,8 +6,8 @@
 #include "Networking/Connection/ConnectionStatus.h"
 #include "Networking/TransportGNS.h"
 #include "Networking/Server/ServerInformation.h"
-#include "Networking/NetworkID.h"
 #include "Networking/Connection/Connection.h"
+#include "Networking/RawMessage.h"
 
 
 ConnectionManager::ConnectionManager()
@@ -35,75 +35,35 @@ ConnectionStatus ConnectionManager::init(const ServerConnectionInformation& info
 
 	if (mode == ConnectionMode::Server)
 	{
-		result = transport->startServer(information.port);
+		result = transport->setUpListenSocket(information.port);
 	}
 	else
 	{
-		result = transport->startClient(information.ip.c_str(), information.port);
+		result = transport->connectByIPAdress(information.ip.c_str(), information.port);
 	}
 
-	return (result == TransportResult::SUCCESS) ? ConnectionStatus::Connected : ConnectionStatus::Error;
+	return (result == TransportResult::SUCCES) ? ConnectionStatus::Connected : ConnectionStatus::Error;
 }
 
-TransportResult ConnectionManager::send(NetworkId id, SendMode mode, const std::byte *data, size_t length)
+TransportResult ConnectionManager::send(int networkId, SendMode mode, const std::byte *data, size_t length)
 {
 	TransportResult result {};
-	int transportId = connections.begin()->second.transportConnectionId;
 
-	RawMessage message;
-	message.connectionId = id.networkId;
-	message.mode = mode;
-	std::vector<std::byte> vector;
-	vector.assign(data, data + length);
-	message.payload = vector;
-	if (connections.empty())
-	{
-		return TransportResult::ERROR;
-	}
-
-	auto messageReceiver = connections.find(id);
-
-	if (messageReceiver != connections.end())
-	{
-		return transport->send(message);
-	}
-
-	return TransportResult::SUCCESS;
+	return TransportResult::SUCCES;
 }
 
 
-void ConnectionManager::disconnect(NetworkId networkId) {
-	auto Connection = connections.find(networkId);
+void ConnectionManager::disconnect(int networkId) {
 
-	if (Connection != connections.end()) {
-		transport->disconnect(networkId.networkId);
-		connections.erase(Connection);
-	}
 }
 
 void ConnectionManager::shutdown() {
 	if (transport) {
-		transport->shutdown();
 	}
 	connections.clear();
 }
 
 void ConnectionManager::handleTransportMessage(RawMessage message) {
-	NetworkId networkId{};
-	networkId.networkId = message.connectionId;
-
-
-	auto Connection = connections.find(networkId);
-
-	if (Connection == connections.end())
-	{
-		return;
-	}
-
-	if (onMessage != nullptr)
-	{
-		onMessage(message);
-	}
 }
 
 void ConnectionManager::setOnMessageCallback(
