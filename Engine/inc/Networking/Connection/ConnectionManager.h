@@ -36,7 +36,7 @@ public:
     void disconnect(int networkId);
 
     void shutdown();
-
+    
     void setOnMessageCallback(std::function<void(RawMessage)> callback);
 
     void poll();

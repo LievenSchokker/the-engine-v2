@@ -54,7 +54,7 @@ TransportResult ConnectionManager::send(int networkId, SendMode mode, const std:
 
 
 void ConnectionManager::disconnect(int networkId) {
-
+	transport->disconnectFromSocket(networkId);
 }
 
 void ConnectionManager::shutdown() {
@@ -64,6 +64,7 @@ void ConnectionManager::shutdown() {
 }
 
 void ConnectionManager::handleTransportMessage(RawMessage message) {
+
 }
 
 void ConnectionManager::setOnMessageCallback(

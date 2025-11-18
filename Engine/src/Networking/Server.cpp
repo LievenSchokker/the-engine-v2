@@ -29,7 +29,7 @@ Server::~Server()
 
 ServerStatus Server::start()
 {
-    ConnectionStatus connectie = connectionManager->init(setupInformation, ConnectionMode::Server);
+    ConnectionStatus connnectionStatus = connectionManager->init(setupInformation, ConnectionMode::Server);
 
     //Idk If we want this. Could be a problem if connectionManager Outlives the server.
     connectionManager->setOnMessageCallback(
@@ -37,7 +37,7 @@ ServerStatus Server::start()
             onMessage(message);
         });
 
-    if (connectie == ConnectionStatus::Connected)
+    if (connnectionStatus == ConnectionStatus::Connected)
     {
         status = ServerStatus::Running;
     }
@@ -50,10 +50,8 @@ ServerStatus Server::start()
 
 void Server::update()
 {
-    while (true)
-    {
-        connectionManager->poll();
-    }
+    //If Anything happens callback will link back to server
+    connectionManager->poll();
 }
 
 ServerStatus Server::stop()
@@ -63,6 +61,7 @@ ServerStatus Server::stop()
 
 void Server::onMessage(RawMessage message)
 {
+    //TODO MESSAGE SYSTEM
     std::cout << "[Client " << message.getConnectionID() << "]: ";
     for (size_t i = 0; i < message.getLength(); i++) {
         std::cout << (char)message.getPayload()[i];
@@ -72,5 +71,6 @@ void Server::onMessage(RawMessage message)
 
 void Server::kickClient(int clientId)
 {
+    //TODO KICK CLIENT MESSAGE
 }
 
