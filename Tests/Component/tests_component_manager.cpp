@@ -2,12 +2,12 @@
 // Created by samle on 15/11/2025.
 //
 
-#include "../../Engine/inc/GameObject/GameObject.h"
-#include "../../Engine/inc/component/Component.h"
-#include "../../Engine/inc/Component/Transform.h"
-#include "../../Engine/inc/component/ComponentManager.h"
-#include "../component/TestComponentOne.h"
-#include "../component/TestComponentTwo.h"
+#include "GameObject/GameObject.h"
+#include "Component/Component.h"
+#include "Component/Transform.h"
+#include "Component/ComponentManager.h"
+#include "../Component/TestComponentOne.h"
+#include "../Component/TestComponentTwo.h"
 
 #include <gtest/gtest.h>
 

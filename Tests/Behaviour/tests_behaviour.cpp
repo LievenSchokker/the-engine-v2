@@ -2,11 +2,11 @@
 // Created by samle on 18/11/2025.
 //
 
-#include "../../../Engine/inc/GameObject/GameObject.h"
-#include "../../../Engine/inc/component/Component.h"
-#include "../../../Engine/inc/behaviour/Behaviour.h"
-#include "../../../Engine/inc/component/ComponentManager.h"
-#include "../component/TestComponentOne.h"
+#include "GameObject/GameObject.h"
+#include "Component/Component.h"
+#include "Behaviour/Behaviour.h"
+#include "Component/ComponentManager.h"
+#include "../Component/TestComponentOne.h"
 #include "../component/TestComponentTwo.h"
 
 #include <gtest/gtest.h>
@@ -20,7 +20,4 @@ namespace engine_tests
 
         EXPECT_TRUE(std::is_abstract<Behaviour>::value);
     }
-
-
-
 }

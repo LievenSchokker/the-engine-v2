@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "../../Engine/inc/component/Component.h"
+#include "Component/Component.h"
 
 
 

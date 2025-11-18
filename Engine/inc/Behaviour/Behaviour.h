@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "../Engine/inc/Component/Component.h"
+#include "Component/Component.h"
 
 /**
  * @brief This class serves as an abstract component that custom behaviour can derive from.
