@@ -8,12 +8,12 @@ file(GLOB_RECURSE ENGINE_SOURCES
 include(FetchContent)
 
 FetchContent_Declare(
-        Box2D
+        box2d
         GIT_REPOSITORY https://github.com/erincatto/box2d.git
         GIT_TAG v3.1.1
 )
 
-FetchContent_MakeAvailable(Box2D)
+FetchContent_MakeAvailable(box2d)
 
 add_library(engine STATIC ${ENGINE_SOURCES})
 
@@ -29,7 +29,7 @@ target_link_libraries(engine PRIVATE
         SDL2::SDL2
         SDL2_image::SDL2_image
         GameNetworkingSockets::GameNetworkingSockets
-        Box2D
+        box2d
 )
 
 add_library(Engine::Core ALIAS engine)
