@@ -2,9 +2,9 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "../../../Engine/inc/component/ComponentManager.h"
-#include "../../../Engine/inc/GameObject/GameObject.h"
-#include "../../../Engine/inc/component/Component.h"
+#include "Component/ComponentManager.h"
+#include "GameObject/GameObject.h"
+#include "Component/Component.h"
 
 
 ComponentManager::~ComponentManager()
