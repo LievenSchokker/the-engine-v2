@@ -96,7 +96,7 @@ public:
     /**
      * @brief Shuts down the socket and closes all active connections.
     */
-    bool TransportGNS::closeOpenSocket() override;
+    bool closeOpenSocket() override;
 private:
     void chooseSendFlags(const SendMode sendMode, int& sendFlags);
     /// @name Server Members
