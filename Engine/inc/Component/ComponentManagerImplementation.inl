@@ -57,7 +57,7 @@ T* ComponentManager::getComponent() const
 
 
 template<typename T>
-bool ComponentManager::tryGetComponent(T *&out) const
+bool ComponentManager::tryGetComponent(T*& out) const
 {
     T *component = getComponent<T>();
     if (component == nullptr)

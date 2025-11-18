@@ -39,8 +39,8 @@ bool ComponentManager::hasComponent(Component* comp) const
         return false;
 
     auto it = std::find_if(components.begin(), components.end(),
-                           [&](const std::unique_ptr<Component>& c){
-                               return c.get() == comp;
+                           [&](const std::unique_ptr<Component>& component){
+                               return component.get() == comp;
                            });
 
     return it != components.end();
@@ -53,7 +53,8 @@ void ComponentManager::removeComponent(Component* comp)
         return;
 
     auto it = std::find_if(components.begin(), components.end(),
-                           [&](const std::unique_ptr<Component>& c) { return c.get() == comp; });
+                           [&](const std::unique_ptr<Component>& component)
+                           { return component.get() == comp; });
 
     if (it != components.end())
     {
