@@ -1,22 +1,15 @@
 #pragma once
 
-#include "Application.h"
+#include "SpelMotor.h"
 
-extern Application::Application* Application::CreateApplication(int argc, char** argv);
-bool g_ApplicationRunning = true;
+inline int Main(int argc, char** argv)
+{
+    ApplicationSpecifications specifications {};
 
-namespace Spelmotor
-{
-int Main(int argc, char** argv)
-{
-	while (g_ApplicationRunning) {
-		InitializeCore();
-		Application* app = CreateApplication(argc, argv);
-		HZ_CORE_ASSERT(app, "Client Application is null!");
-		app->Run();
-		delete app;
-		ShutdownCore();
-	}
-	return 0;
-}
+    specifications.windowOptions = {"SpelMotor", 1920, 1080};
+    specifications.renderBackend = RenderBackend::SDL;
+
+    SpelMotor engine(specifications);
+    engine.run();
+    return 0;
 }
