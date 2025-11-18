@@ -5,6 +5,8 @@
 #pragma once
 
 
+#include "GameObject/GameObject.h"
+
 #include <algorithm>
 #include <type_traits>
 
@@ -57,9 +59,9 @@ T* ComponentManager::getComponent() const
 
 
 template<typename T>
-bool ComponentManager::tryGetComponent(T *&out) const
+bool ComponentManager::tryGetComponent(T*& out) const
 {
-    T *component = getComponent<T>();
+    T* component = getComponent<T>();
     if (component == nullptr)
         return false;
     else
