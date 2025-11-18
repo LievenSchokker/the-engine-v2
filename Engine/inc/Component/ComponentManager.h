@@ -142,6 +142,7 @@ private:
     GameObject* const gameObject;
     /// All components stored by this object
     std::vector<std::unique_ptr<Component>> components;
+    std::vector<Behaviour*> behaviours;
 };
 
 /// Template implementations:
