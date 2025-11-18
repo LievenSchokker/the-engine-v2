@@ -2,7 +2,8 @@
 /// Created by thijs on 12-11-2025.
 ///
 
-#include "engine/networking/TransportGNS.h"
+
+#include "Networking/TransportGNS.h"
 #include <iostream>
 #include <mutex>
 #include <steam/isteamnetworkingutils.h>

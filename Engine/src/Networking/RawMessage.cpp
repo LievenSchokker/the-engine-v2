@@ -3,10 +3,10 @@
 //
 
 
-#include "engine/networking/RawMessage.h"
-#include "engine/networking/SendMode.h"
 #include <cstdint>
 #include <string>
+#include "Networking/RawMessage.h"
+#include "Networking/SendMode.h"
 
 
 // Construct from raw bytes

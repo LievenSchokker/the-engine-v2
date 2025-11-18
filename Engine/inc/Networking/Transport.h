@@ -1,9 +1,8 @@
 #pragma once
-#include <cstddef>
 #include <functional>
 #include "RawMessage.h"
 #include "TransportResult.h"
-#include "SendMode.h"
+
 
 /**
  * @typedef OnMessageReceivedCallback

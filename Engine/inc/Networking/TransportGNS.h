@@ -2,14 +2,14 @@
 /// Created by thijs on 12-11-2025.
 ///
 
+
 #pragma once
-#include "Transport.h"
-#include <cstddef>
-#include <functional>
-#include <mutex>
 #include <map>
-#include <steam/steamnetworkingsockets.h>
+#include <mutex>
 #include <steam/isteamnetworkingutils.h>
+#include <steam/steamnetworkingsockets.h>
+#include "Transport.h"
+
 
 /**
  * @class TransportGNS
