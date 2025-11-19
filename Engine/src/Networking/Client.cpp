@@ -3,13 +3,20 @@
 //
 
 
-#include "../inc/Client.h"
+#include "../../inc/Networking/Client.h"
 #include <iostream>
 
 
-Client::Client()
+Client::Client(std::unique_ptr<Transport> newTransport)
 {
-    transport = std::make_unique<TransportGNS>();
+    if (newTransport == nullptr)
+    {
+        transport = std::make_unique<TransportGNS>();
+    }
+    else
+    {
+        transport = std::move(newTransport);
+    }
     setDefaultOnMessageReceived();
     SetDefaultOnConnectionChanged();
 }
@@ -92,7 +99,6 @@ bool Client::sendMessage(const std::string& text)
 
     return true;
 }
-
 
 
 // #TODO New thread created
