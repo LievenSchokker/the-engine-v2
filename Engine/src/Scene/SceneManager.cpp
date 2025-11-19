@@ -3,14 +3,17 @@
 #include <iostream>
 #include <utility>
 
-bool SceneManager::addScene(std::unique_ptr<Scene> scene) {
-    if (scene == nullptr) {
+bool SceneManager::addScene(std::unique_ptr<Scene> scene)
+{
+    if (scene == nullptr)
+    {
         std::cerr << "[SceneManager] Error: Attempted to add a null scene\n";
         return false;
     }
 
     const std::string name = scene->getName();
-    if (scenes.contains(name)) {
+    if (scenes.contains(name))
+    {
         std::cerr << "[SceneManager] Error: Scene with name '" << name << "' already exists\n";
         return false;
     }
@@ -19,17 +22,22 @@ bool SceneManager::addScene(std::unique_ptr<Scene> scene) {
     return true;
 }
 
-bool SceneManager::removeScene(const std::string& name) {
+bool SceneManager::removeScene(const std::string& name)
+{
     const auto it = scenes.find(name);
-    if (it == scenes.end()) {
+    if (it == scenes.end())
+    {
         return false;
     }
 
-    if (it->second.get() == activeScene) {
+    if (it->second.get() == activeScene)
+    {
         activeScene->onStop();
         activeScene = nullptr;
         paused = false;
-    } else {
+    }
+    else
+    {
         it->second->onStop();
     }
 
@@ -37,43 +45,46 @@ bool SceneManager::removeScene(const std::string& name) {
     return true;
 }
 
-Scene* SceneManager::getScene(const std::string& name) const {
+Scene* SceneManager::getScene(const std::string& name) const
+{
     const auto it = scenes.find(name);
-    if (it != scenes.end()) {
+    if (it != scenes.end())
+    {
         return it->second.get();
     }
 
     return nullptr;
 }
 
-bool SceneManager::transferGameObject(const std::string& fromSceneName,
-                                      const std::string& toSceneName,
-                                      const std::string& objectName) {
-    Scene* fromScene = getScene(fromSceneName);
-    Scene* toScene = getScene(toSceneName);
+bool SceneManager::transferGameObject(const std::string& fromSceneName, const std::string& toSceneName, const std::string& objectName)
+{
+    Scene *fromScene = getScene(fromSceneName);
+    Scene *toScene = getScene(toSceneName);
 
-    if (fromScene == nullptr || toScene == nullptr) {
+    if (fromScene == nullptr || toScene == nullptr)
+    {
         std::cerr << "[SceneManager] Error: Scene not found\n";
         return false;
     }
 
     // Check if object exists in source scene
-    if (fromScene->getGameObject(objectName) == nullptr) {
-        std::cerr << "[SceneManager] Error: GameObject '" << objectName << "' not found in scene '"
-                  << fromSceneName << "'\n";
+    if (fromScene->getGameObject(objectName) == nullptr)
+    {
+        std::cerr << "[SceneManager] Error: GameObject '" << objectName << "' not found in scene '" << fromSceneName << "'\n";
         return false;
     }
 
     // Check if object already exists in target scene
-    if (toScene->getGameObject(objectName) != nullptr) {
-        std::cerr << "[SceneManager] Error: GameObject '" << objectName
-                  << "' already exists in scene '" << toSceneName << "'\n";
+    if (toScene->getGameObject(objectName) != nullptr)
+    {
+        std::cerr << "[SceneManager] Error: GameObject '" << objectName << "' already exists in scene '" << toSceneName << "'\n";
         return false;
     }
 
     // Extract and transfer
     auto gameObject = fromScene->extractGameObject(objectName);
-    if (gameObject == nullptr) {
+    if (gameObject == nullptr)
+    {
         return false;
     }
 
@@ -81,19 +92,28 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
     return true;
 }
 
-bool SceneManager::setActiveScene(const std::string& name) {
-    if (activeScene && activeScene->getName() == name) {
+Scene* SceneManager::getActiveScene() const
+{
+    return activeScene;
+}
+
+bool SceneManager::setActiveScene(const std::string& name)
+{
+    if (activeScene && activeScene->getName() == name)
+    {
         std::cout << "[SceneManager] Warning: Scene with name '" << name << "' is already active\n";
         return true;
     }
 
     Scene* nextScene = getScene(name);
-    if (nextScene == nullptr) {
+    if (nextScene == nullptr)
+    {
         std::cerr << "[SceneManager] Error: Scene with name '" << name << "' not found\n";
         return false;
     }
 
-    if (activeScene != nullptr) {
+    if (activeScene != nullptr)
+    {
         activeScene->onStop();
     }
 
@@ -103,12 +123,15 @@ bool SceneManager::setActiveScene(const std::string& name) {
     return true;
 }
 
-bool SceneManager::loadScene(const std::string& name) {
+bool SceneManager::loadScene(const std::string& name)
+{
     return setActiveScene(name);
 }
 
-void SceneManager::pause() {
-    if (activeScene == nullptr || paused) {
+void SceneManager::pause()
+{
+    if (activeScene == nullptr || paused)
+    {
         return;
     }
 
@@ -116,8 +139,10 @@ void SceneManager::pause() {
     activeScene->onPause();
 }
 
-void SceneManager::resume() {
-    if (activeScene == nullptr || !paused) {
+void SceneManager::resume()
+{
+    if (activeScene == nullptr || !paused)
+    {
         return;
     }
 
@@ -125,14 +150,23 @@ void SceneManager::resume() {
     activeScene->onResume();
 }
 
-void SceneManager::update(float deltaTime) {
-    if (activeScene != nullptr && !paused) {
+bool SceneManager::isPaused() const
+{
+    return paused;
+}
+
+void SceneManager::update(float deltaTime)
+{
+    if (activeScene != nullptr && !paused)
+    {
         activeScene->update(deltaTime);
     }
 }
 
-void SceneManager::render() {
-    if (activeScene != nullptr && !paused) {
+void SceneManager::render()
+{
+    if (activeScene != nullptr && !paused)
+    {
         activeScene->render();
     }
 }

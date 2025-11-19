@@ -41,7 +41,7 @@ class SceneManager
      * @param name Name of the scene to remove.
      * @return true when the scene existed and was removed, false otherwise.
      */
-    bool removeScene(const std::string& name);
+    bool removeScene(const std::string &name);
 
     /**
      * @brief Look up a scene by name.
@@ -49,7 +49,7 @@ class SceneManager
      * @param name Name of the scene.
      * @return Pointer to the scene, or nullptr when not found.
      */
-    Scene* getScene(const std::string& name) const;
+    Scene *getScene(const std::string &name) const;
 
     /**
      * @brief Transfer a game object from one scene to another.
@@ -64,17 +64,14 @@ class SceneManager
      * @return true when the transfer succeeds, false otherwise (scene not found,
      * object not found, or object already exists in target scene).
      */
-    bool transferGameObject(const std::string& fromSceneName, const std::string& toSceneName,
-                            const std::string& objectName);
+    bool transferGameObject(const std::string &fromSceneName, const std::string &toSceneName, const std::string &objectName);
 
     /**
      * @brief Get the currently active scene.
      *
      * @return Pointer to the active scene, or nullptr when none is active.
      */
-    Scene* getActiveScene() const {
-        return activeScene;
-    }
+    Scene *getActiveScene() const;
 
     /**
      * @brief Activate a new scene.
@@ -85,7 +82,7 @@ class SceneManager
      * @param name Name of the scene to activate.
      * @return true when the scene exists and becomes active, false otherwise.
      */
-    bool setActiveScene(const std::string& name);
+    bool setActiveScene(const std::string &name);
 
     /**
      * @brief Alias for @ref setActiveScene.
@@ -93,7 +90,7 @@ class SceneManager
      * @param name Name of the scene to activate.
      * @return true when the scene exists and becomes active, false otherwise.
      */
-    bool loadScene(const std::string& name);
+    bool loadScene(const std::string &name);
 
     /**
      * @brief Pause the active scene.
@@ -115,9 +112,7 @@ class SceneManager
      *
      * @return true when the active scene is paused.
      */
-    bool isPaused() const {
-        return paused;
-    }
+    bool isPaused() const;
 
     /**
      * @brief Update the active scene when not paused.
@@ -133,6 +128,6 @@ class SceneManager
 
   private:
     std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
-    Scene* activeScene = nullptr;
+    Scene *activeScene = nullptr;
     bool paused = false;
 };

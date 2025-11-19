@@ -9,7 +9,7 @@ Scene::Scene(std::string name) : name(std::move(name))
 {
 }
 
-const std::string &Scene::getName() const
+const std::string& Scene::getName() const
 {
     return name;
 }
@@ -22,9 +22,10 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
         return false;
     }
 
+    bool isGameObjectActive = gameObject->getIsActive();
     gameObjects.emplace_back(std::move(gameObject));
 
-    if (active && gameObject->getIsActive()) 
+    if (active && isGameObjectActive)
     {
         // TODO: call gameobject on start
     }
@@ -57,7 +58,7 @@ bool Scene::removeGameObject(const std::string &name)
     return false;
 }
 
-GameObject *Scene::getGameObject(const std::string &name) const
+GameObject* Scene::getGameObject(const std::string &name) const
 {
     for (const auto &gameObject : gameObjects)
     {
