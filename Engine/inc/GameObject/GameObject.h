@@ -9,6 +9,7 @@ class Transform;
 class Component;
 class Behaviour;
 class ComponentManager;
+class ScenePlaceholder;
 
 #include <memory>
 #include <string>
@@ -227,15 +228,29 @@ class GameObject
          */
         ComponentManager* getComponentManager() const;
 
+        /**
+         * @brief Marks this object and its components to be destroyed by the Scene.
+         *
+         * @c isDestroyed will be set to true, but the object and its components will be destroyed by the @c scene this object belongs to.
+         *
+         */
+        void destroy();
+
+        /**
+         * Called by @c scenePlaceholder after this GameObject has been marked for destroyment by @c destroy()
+         */
+        void onSceneDestroy();
 
     private:
         std::unique_ptr<ComponentManager> componentManager;
         std::unique_ptr<Transform> transform;
+        ScenePlaceholder* scenePlaceholder;
         std::string name;
         int layer;
         std::string tag;
         bool isActive;
         bool isStatic;
+        bool isDestroyed;
 };
 
 #include "GameObjectImplementation.inl"

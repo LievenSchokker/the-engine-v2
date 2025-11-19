@@ -83,7 +83,7 @@ class Behaviour : public Component
         /**
          * @brief Called when this Behaviour's @c GameObject gets destroyed.
          */
-        virtual void onDestroy() {};
+        void onDestroy() override;
 
 
         /**

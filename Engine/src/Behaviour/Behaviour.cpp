@@ -38,6 +38,12 @@ void Behaviour::setEnabled(const bool value)
 }
 
 
+void Behaviour::onDestroy()
+{
+    Component::onDestroy();
+}
+
+
 bool Behaviour::getIsEnabled() const
 {
     return isEnabled;

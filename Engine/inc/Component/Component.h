@@ -67,6 +67,16 @@ class Component
         template <typename T>
         bool tryGetComponent(T*& out) const;
 
+
+        /**
+         * @brief Called right before this Component gets destroyed
+         *
+         * Gets called internally right before the GameObject this component belongs to gets destroyed by the owning scene.
+         *
+         * Can be overridden to implement custom logic when the component gets destroyed.
+         */
+        virtual void onDestroy() {}
+
       /**
       * @brief Returns the GameObject that this component is attached to.
       * A Component is always attached to a GameObject.

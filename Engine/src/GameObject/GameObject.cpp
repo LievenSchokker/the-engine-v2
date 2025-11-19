@@ -5,6 +5,7 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
 #include "Component/Transform.h"
+#include "GameObject/ScenePlaceholder.h"
 
 GameObject::GameObject()
 {
@@ -19,7 +20,7 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
-    componentManager->removeAllComponents();
+    componentManager->destroyAllComponents();
     transform = nullptr;
 }
 
@@ -55,6 +56,23 @@ ComponentManager *GameObject::getComponentManager() const
 {
     return componentManager.get();
 }
+
+
+void GameObject::destroy()
+{
+    if (isDestroyed)
+        return;
+
+    isDestroyed = true;
+    scenePlaceholder->queueDestroy(this);
+}
+
+
+void GameObject::onSceneDestroy()
+{
+    componentManager->destroyAllComponents();
+}
+
 
 Transform *GameObject::getTransform() const
 {

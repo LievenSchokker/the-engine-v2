@@ -87,7 +87,7 @@ public:
     /**
      * @brief Removes all components stored in @c components
      */
-    void removeAllComponents();
+    void destroyAllComponents();
 
     /**
     * @brief Checks if @c components contains a component of type T.
