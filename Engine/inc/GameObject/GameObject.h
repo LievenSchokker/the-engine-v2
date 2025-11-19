@@ -222,6 +222,14 @@ class GameObject
         void setIsStatic(bool value);
 
         /**
+         * @brief sets the scene this GameObject is currently owned by.
+         *
+         * Used to queue up this object to be destroyed by the scene owner upon calling @c destroy()
+         * @param newScene new owning scene of this GameObject
+         */
+        void setScene(ScenePlaceholder* newScene);
+
+        /**
          * @brief Helper function to get the @c componentManager directly,
          * used primarily for testing (unit tests)
          * @return the @c componentManager of this GameObject.

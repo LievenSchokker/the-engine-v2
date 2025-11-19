@@ -169,3 +169,9 @@ void GameObject::setIsStatic(bool value)
 
     isStatic = value;
 }
+
+
+void GameObject::setScene(ScenePlaceholder *newScene)
+{
+    scenePlaceholder = newScene;
+}
