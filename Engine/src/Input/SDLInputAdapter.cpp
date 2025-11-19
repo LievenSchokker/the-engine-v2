@@ -1,4 +1,4 @@
-#include "../../inc/Input/SDLInputAdapter.h"
+#include "Input/SDLInputAdapter.h"
 
 void SDLInputAdapter::poll(InputManager& input)
 {
