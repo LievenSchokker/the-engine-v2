@@ -3,57 +3,30 @@
 //
 
 
-#include "Client.h"
+#include "../inc/Client.h"
 #include <iostream>
-
-// Thread-safe console input
-std::string GetConsoleInput()
-{
-    std::string line;
-    std::getline(std::cin, line);
-    return line;
-}
 
 
 Client::Client()
 {
-    const uint16_t DEFAULT_PORT = 27020;
-    const char* DEFAULT_SERVER_IP = "127.0.0.1";
-
-    // --- 1. Message callback ---
+    transport = std::make_unique<TransportGNS>();
     setDefaultOnMessageReceived();
-
-    // --- 2. Connection state callback ---
     SetDefaultOnConnectionChanged();
+}
 
-    // --- 3. Initiate connection ---
-    if (connectToServer(DEFAULT_PORT, DEFAULT_SERVER_IP)) return;
 
-    // --- 4. Input thread ---
-    std::thread inputThread;
-    createInputThread(inputThread);
-
-    // --- 5. Main poll loop ---
-    std::thread listenThread;
-    createListenThread(listenThread);
-
-    // --- 6. Cleanup ---
+Client::~Client()
+{
+    running = false;
     transport->closeOpenSocket();
 
-    if (inputThread.joinable())
-        inputThread.join();
-
-    std::cout << "[Client] Shutdown complete.\n";
+    if (listenThread.joinable()) listenThread.join();
 }
 
 
 void Client::SetOnConnectionChanged(const OnConnectionChangedCallback& newCallBack) const
 {
-    if (newCallBack)
-    {
-        transport->setOnConnectionChanged(newCallBack);
-        return;
-    }
+    transport->setOnConnectionChanged(newCallBack);
 }
 
 
@@ -80,65 +53,52 @@ void Client::SetDefaultOnConnectionChanged()
 }
 
 
-void Client::setDefaultOnMessageReceived() const
-{
-    transport->setOnMessageReceived([&](const RawMessage& msg)
-    {
-        std::cout << "[Server]: " << msg.toString() << std::endl;
-    });
-}
-
-
-void Client::setDefaultOnMessageReceived(const OnMessageReceivedCallback& newCallback) const
+void Client::setOnMessageReceived(const OnMessageReceivedCallback& newCallback) const
 {
     transport->setOnMessageReceived(newCallback);
 }
 
 
-bool Client::connectToServer(const uint16_t port, const char* serverIP)
+void Client::setDefaultOnMessageReceived() const
 {
-    std::cout << "[Client] Connecting to " << serverIP
-        << ":" << port << "...\n";
-
-    TransportResult tr = transport->connectByIPAdress(serverIP, port);
-    if (!tr.success)
+    transport->setOnMessageReceived([&](const RawMessage& message)
     {
-        std::cerr << "[Client] Failed to initiate connection.\n";
-        return true;
-    }
-    running = true;
-    return false;
-}
-
-
-void Client::createInputThread(std::thread& inputThread)
-{
-    inputThread = std::thread([&]()
-    {
-        while (running)
-        {
-            std::string input = GetConsoleInput();
-
-            if (input == "/quit")
-            {
-                running = false;
-                transport->disconnectFromSocket(1);
-                break;
-            }
-
-            if (connected)
-            {
-                RawMessage msg(1, input);
-                transport->send(msg);
-            }
-        }
+        std::cout << "[Server]: " << message.toString() << std::endl;
     });
 }
 
 
-void Client::createListenThread(std::thread& ListenThread) const
+bool Client::connectToServer(const uint16_t port, const char* serverIP)
 {
-    ListenThread = std::thread([&]()
+    TransportResult transportResult = transport->connectByIPAdress(serverIP, port);
+    if (transportResult == TransportResult::ERROR)
+    {
+        std::cerr << "[Client] Failed to initiate connection.\n";
+        return false;
+    }
+
+    running = true;
+    createListenThread();
+
+    return true;
+}
+
+bool Client::sendMessage(const std::string& text)
+{
+    if (!connected) return false;
+
+    RawMessage message(1, text);
+    transport->send(message);
+
+    return true;
+}
+
+
+
+// #TODO New thread created
+void Client::createListenThread()
+{
+    listenThread = std::thread([this]()
     {
         while (running)
         {

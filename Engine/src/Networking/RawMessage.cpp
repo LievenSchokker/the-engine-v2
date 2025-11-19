@@ -10,8 +10,8 @@
 
 
 // Construct from raw bytes
-RawMessage::RawMessage(int cid, const std::byte* data, size_t len, SendMode sendMode)
-    : connectionID(cid), payload(data, data + len), sendMode(sendMode), length(len)
+RawMessage::RawMessage(int connectionID, const std::byte* data, size_t len, SendMode sendMode)
+    : connectionID(connectionID), payload(data, data + len), sendMode(sendMode), length(len)
 {
 }
 
