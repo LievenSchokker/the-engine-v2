@@ -114,7 +114,7 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 {
     ConnectionStatus status = message->getStatus();
 
-    std::cout << "[Server] Client " << clientId
+    std::cout << "Client " << clientId
               << " connection message with status: "
               << static_cast<int>(status) << "\n";
 
@@ -122,8 +122,6 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
     {
         case ConnectionStatus::Connected:
         {
-            std::cout << "[Server] Client " << clientId << " acknowledged connection\n";
-
             connectedClients.insert(clientId);
 
             ConnectionMessage response;
@@ -141,7 +139,6 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 
         case ConnectionStatus::Disconnected:
         {
-            std::cout << "[Server] Client " << clientId << " requested disconnect\n";
             connectionManager->disconnect(clientId);
             connectedClients.erase(clientId);
             break;
@@ -149,7 +146,6 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 
         case ConnectionStatus::Error:
         {
-            std::cerr << "[Server] Client " << clientId << " reported error\n";
             break;
         }
     }
@@ -158,9 +154,6 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 
 void Server::kickClient(int clientId)
 {
-    std::cout << "[Server] Kicking client " << clientId << "\n";
-
-    // Send disconnect message
     ConnectionMessage disconnectMsg;
     disconnectMsg.setStatus(ConnectionStatus::Disconnected);
 

@@ -199,7 +199,14 @@ void TransportGNS::pollIncomingMessages()
         }
     }
 
-    for (auto& [steamNetworkConnection, connectionId] : mapConnections)
+    std::vector<std::pair<HSteamNetConnection, int>> connectionsCopy;
+    {
+        std::lock_guard<std::mutex> lock(mapMutex);
+        for (const auto& pair : mapConnections)
+            connectionsCopy.push_back(pair);
+    }
+
+    for (auto& [steamNetworkConnection, connectionId] : connectionsCopy)
     {
         ISteamNetworkingMessage* steamMessage = nullptr;
         while (steamNetworkingSockets->ReceiveMessagesOnConnection(steamNetworkConnection, &steamMessage, 1) == 1)
@@ -314,6 +321,7 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
 
 int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 {
+    std::lock_guard<std::mutex> lock(mapMutex);
     auto it = mapConnections.find(steamNetworkConnection);
     if (it != mapConnections.end())
         return it->second;
@@ -322,6 +330,7 @@ int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 
 HSteamNetConnection TransportGNS::getSteamConnection(int connectionId)
 {
+    std::lock_guard<std::mutex> lock(mapMutex);
     for (const auto& connectionPair : mapConnections)
     {
         if (connectionPair.second == connectionId)

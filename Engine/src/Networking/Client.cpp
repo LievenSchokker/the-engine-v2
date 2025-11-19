@@ -12,7 +12,10 @@
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/SendMode.h"
+
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 Client::Client()
     : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Client))
@@ -24,9 +27,9 @@ Client::Client()
 Client::~Client()
 {
     running = false;
-    connectionManager->shutdown();
     if (listenThread.joinable())
         listenThread.join();
+    connectionManager->shutdown();
 }
 
 bool Client::connectToServer(const uint16_t port, const char* serverIP)
@@ -35,20 +38,17 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
     serverInfo.ip = serverIP;
     serverInfo.port = port;
 
-    // Set up connection changed callback BEFORE connecting
     connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected) {
         if (isConnected)
         {
             clientConnectionId = connId;
             connected = true;
-            std::cout << "[Client] Connected with ID: " << connId << "\n";
         }
         else
         {
             connected = false;
             clientConnectionId = -1;
             running = false;
-            std::cout << "[Client] Disconnected\n";
         }
     });
 
@@ -56,12 +56,8 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
 
     if (status != ConnectionStatus::Connected)
     {
-        std::cerr << "[Client] Failed to connect to " << serverIP << ":" << port << "\n";
         return false;
     }
-
-    std::cout << "[Client] Connecting to " << serverIP << ":" << port << "\n";
-
     running = true;
     createListenThread();
 
@@ -72,13 +68,11 @@ bool Client::sendMessage(IMessage& message)
 {
     if (!connected)
     {
-        std::cerr << "[Client] Cannot send message - not connected\n";
         return false;
     }
 
     if (clientConnectionId == -1)
     {
-        std::cerr << "[Client] Cannot send message - invalid connection ID\n";
         return false;
     }
 
@@ -111,14 +105,10 @@ void Client::setDefaultOnMessageReceived()
 
         if (!message)
         {
-            std::cerr << "[Client] Failed to parse message from server\n";
             return;
         }
 
         MessageTypes messageType = message->getMessageType();
-
-        std::cout << "[Client] Received message type: "
-            << static_cast<int>(messageType) << "\n";
 
         switch (messageType)
         {
@@ -127,22 +117,15 @@ void Client::setDefaultOnMessageReceived()
                 ConnectionMessage* connMsg = static_cast<ConnectionMessage*>(message.get());
                 ConnectionStatus status = connMsg->getStatus();
 
-                if (status == ConnectionStatus::Connected)
-                {
-                    std::cout << "[Client] Server confirmed connection\n";
-                }
-                else if (status == ConnectionStatus::Disconnected)
+                if (status == ConnectionStatus::Disconnected)
                 {
                     connected = false;
                     running = false;
-                    std::cout << "[Client] Disconnected by server\n";
                 }
                 break;
             }
         default:
             {
-                std::cout << "[Client] Unhandled message type: "
-                    << static_cast<int>(messageType) << "\n";
                 break;
             }
         }
@@ -158,14 +141,10 @@ void Client::createListenThread()
 {
     listenThread = std::thread([this]()
     {
-        std::cout << "[Client] Listen thread started\n";
-
         while (running)
         {
             connectionManager->poll();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
-
-        std::cout << "[Client] Listen thread stopped\n";
     });
 }

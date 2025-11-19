@@ -42,20 +42,10 @@ ConnectionStatus ConnectionManager::init(const ServerConnectionInformation& info
         {
             Connection conn = {connId, ConnectionStatus::Connected};
             connections[connId] = conn;
-
-            if (mode == ConnectionMode::Server)
-            {
-                std::cout << "[ConnectionManager] Client " << connId << " connected\n";
-            }
         }
         else
         {
             connections.erase(connId);
-
-            if (mode == ConnectionMode::Server)
-            {
-                std::cout << "[ConnectionManager] Client " << connId << " disconnected\n";
-            }
         }
 
         if (onConnectionChanged)
@@ -104,11 +94,6 @@ void ConnectionManager::handleTransportMessage(const IncomingRawMessage& message
         {
             onMessage(message);
         }
-    }
-    else
-    {
-        std::cerr << "[ConnectionManager] Received message from unknown connection: "
-            << message.connectionID << "\n";
     }
 }
 
