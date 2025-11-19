@@ -6,6 +6,7 @@
 
 #include "GameObject/GameObject.h"
 
+
 template<typename T>
 T* Component::addComponent()
 {
