@@ -1,33 +1,54 @@
-
 #include "Networking/Messages/MessageReader.h"
+
+#include <gtest/gtest-message.h>
 
 #include "Networking/RawMessage.h"
 #include "Networking/Messages/ConnectionMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 
 
-IMessage& MessageReader::ReadMessage(RawMessage message)
+std::unique_ptr<IMessage> MessageReader::readMessage(const RawMessage rawMessage)
 {
-    if (message.getLength() < 0)
+    if (rawMessage.getLength() < sizeof(uint8_t))
     {
-
+        return nullptr;
     }
 
-    if (message.getPayload()[0] == MessageTypes::ConnectionMessage)
-    {
 
+    std::unique_ptr<IMessage> message = createMessage(rawMessage);
+    if (message.get() == nullptr) return nullptr;
+
+    if (message->deserialize(rawMessage.getPayload().data(), rawMessage.getLength()))
+    {
+        return message;
     }
-    return &ConnectionMessage();
+    else
+    {
+        return nullptr;
+    }
 }
 
 
+std::unique_ptr<IMessage> MessageReader::createMessage(const RawMessage rawMessage)
+{
+    MessageTypes messageType = readMessageType(rawMessage);
+    std::unique_ptr<IMessage> message;
 
-uint16_t MessageReader::readMessageType(const RawMessage& message)
+    switch (messageType)
+    {
+    case MessageTypes::ConnectionMessage:
+        message = std::make_unique<ConnectionMessage>();
+        break;
+    }
+
+    return nullptr;
+}
+
+
+MessageTypes MessageReader::readMessageType(const RawMessage& message)
 {
     const std::byte* data = message.getPayload();
-
-    uint16_t type;
-    std::memcpy(&type, data, sizeof(uint16_t));
-
-    return type;
+    MessageTypes messageType;
+    std::memcpy(&messageType, data, sizeof(uint8_t));
+    return messageType;
 }
