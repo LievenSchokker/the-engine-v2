@@ -3,7 +3,6 @@
 //
 #pragma once
 
-#include "../Component/TestComponents.h"
 #include "Behaviour/Behaviour.h"
 
 namespace engine_tests
