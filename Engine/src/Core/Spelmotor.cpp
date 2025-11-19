@@ -22,7 +22,7 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
         timer = std::make_unique<Timer>(1.0f / tickRate, []()
         {
             //Get Ticks retuns ms we need seconds;
-            return SDL_GetTicks() / 1000;
+            return SDL_GetTicks();
         });
         renderer = std::make_unique<SDLRender>(SDLRender(context));
     }
