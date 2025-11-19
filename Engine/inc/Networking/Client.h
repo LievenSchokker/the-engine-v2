@@ -4,8 +4,8 @@
 
 
 #pragma once
-#include "Networking/Transport.h"
-#include "Networking/TransportGNS.h"
+#include "Transport.h"
+#include "TransportGNS.h"
 
 
 class Client

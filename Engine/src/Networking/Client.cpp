@@ -3,7 +3,7 @@
 //
 
 
-#include "../inc/Client.h"
+#include "Networking/Client.h"
 #include <iostream>
 
 

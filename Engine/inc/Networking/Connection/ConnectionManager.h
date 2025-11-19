@@ -10,7 +10,7 @@ class RawMessage;
 class Transport;
 
 
-enum class ConnectionStatus;
+enum class ConnectionStatus : uint8_t;
 enum class ConnectionMode;
 enum class SendMode;
 enum class TransportResult;

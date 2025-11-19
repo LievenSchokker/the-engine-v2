@@ -29,7 +29,6 @@ ConnectionStatus ConnectionManager::init(const ServerConnectionInformation& info
 	}
 
 
-	transport->setOnMessageReceived(handleTransportMessage(message));
 
 	if (mode == ConnectionMode::Server)
 	{
