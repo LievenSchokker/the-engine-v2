@@ -6,14 +6,16 @@
 
 #include "../GameObject/GameObject.h"
 
+
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.
  *
  * Maintains lifecycle state and propagates core calls to its game objects when
  * active.
  */
-class Scene {
-   public:
+class Scene
+{
+  public:
     /**
      * @brief Create a scene with the given identifier.
      *
@@ -31,8 +33,8 @@ class Scene {
     /**
      * @brief Add a game object to the scene.
      *
-     * If the scene is currently active the object receives @ref
-     * GameObject::onStart.
+     * If the scene is currently active the object's components are activated
+     * via its @ref ComponentManager.
      *
      * @param gameObject Game object instance to own.
      * @return true if the object was successfully added, false if gameObject was null.
@@ -42,8 +44,8 @@ class Scene {
     /**
      * @brief Remove a game object by name.
      *
-     * When the scene is active the object receives @ref GameObject::onStop
-     * before removal.
+     * When the scene is active the object's components are deactivated via its
+     * @ref ComponentManager before removal.
      *
      * @warning This call destroys the game object since the scene owns it via
      * std::unique_ptr. If you need to keep the object alive and move it
@@ -67,39 +69,39 @@ class Scene {
      * @brief Extract a game object from the scene without destroying it.
      *
      * Removes the game object from the scene and transfers ownership to the
-     * caller. When the scene is currently active, the object receives @ref
-     * GameObject::onStop before extraction.
+     * caller. When the scene is currently active, the object's components are
+     * deactivated via its @ref ComponentManager before extraction.
      *
      * @param name Name of the game object to extract.
      * @return unique_ptr to the extracted game object, or nullptr if not found.
      */
-    std::unique_ptr<GameObject> extractGameObject(const std::string& name);
+    std::unique_ptr<GameObject> extractGameObject(const std::string &name);
 
     /**
      * @brief Start the scene if it is not already active.
      *
-     * Triggers @ref GameObject::onStart for every stored object.
+     * Activates every stored object's components through their component manager.
      */
     void onStart();
 
     /**
      * @brief Stop the scene if it is active.
      *
-     * Triggers @ref GameObject::onStop for every stored object.
+     * Deactivates every stored object's components through their component manager.
      */
     void onStop();
 
     /**
      * @brief Pause the scene if it is active.
      *
-     * Triggers @ref GameObject::onPause for every stored object.
+     * Temporarily suspends component execution for every stored object.
      */
     void onPause();
 
     /**
      * @brief Resume the scene if it is active.
      *
-     * Triggers @ref GameObject::onResume for every stored object.
+     * Resumes component execution for every stored object.
      */
     void onResume();
 
@@ -108,14 +110,14 @@ class Scene {
      *
      * @param deltaTime Seconds elapsed since the previous update.
      */
-    void update(float deltaTime);
+    void update(float deltaTime) const;
 
     /**
      * @brief Render all game objects when the scene is active.
      */
-    void render();
+    void render() const;
 
-   private:
+  private:
     std::string name;
     std::vector<std::unique_ptr<GameObject>> gameObjects;
     bool active = false;

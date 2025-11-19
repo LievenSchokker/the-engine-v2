@@ -2,7 +2,7 @@
 #include <iostream>
 #include <memory>
 
-#include "../Engine/inc/GameObject/PlaceholderGameObject.h"
+#include "../Engine/inc/GameObject/GameObject.h"
 #include "../Engine/inc/Scene/SceneManager.h"
 
 #define SCREEN_WIDTH 500
@@ -35,7 +35,7 @@ int main()
 
     SceneManager sceneManager;
     auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
-    prototypeScene->addGameObject(std::make_unique<PlaceholderGameObject>("ExampleGameObject"));
+    prototypeScene->addGameObject(std::make_unique<GameObject>());
     sceneManager.addScene(std::move(prototypeScene));
     sceneManager.setActiveScene("PrototypeScene");
 

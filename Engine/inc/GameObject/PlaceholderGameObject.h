@@ -1,17 +1,17 @@
-#pragma once
+// #pragma once
 
-#include "GameObject.h"
+// #include "GameObject.h"
 
-class PlaceholderGameObject : public GameObject {
-   public:
-    explicit PlaceholderGameObject(std::string name);
+// class PlaceholderGameObject : public GameObject {
+//    public:
+//     explicit PlaceholderGameObject(std::string name);
 
-    void onStart() override;
-    void onStop() override;
-    void onPause() override;
-    void onResume() override;
-    void update(float deltaTime) override;
+//     void onStart() override;
+//     void onStop() override;
+//     void onPause() override;
+//     void onResume() override;
+//     void update(float deltaTime) override;
 
-   private:
-    float accumulatedTime = 0.0f;
-};
+//    private:
+//     float accumulatedTime = 0.0f;
+// };

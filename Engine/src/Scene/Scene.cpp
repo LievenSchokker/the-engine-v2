@@ -1,4 +1,5 @@
 #include "../../inc/Scene/Scene.h"
+#include "../../inc/Component/ComponentManager.h"
 
 #include <algorithm>
 #include <iostream>
@@ -23,9 +24,9 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
     gameObjects.emplace_back(std::move(gameObject));
 
-    if (active)
+    if (active && gameObject->getIsActive()) 
     {
-        gameObjects.back()->onStart();
+        // TODO: call gameobject on start
     }
 
     return true;
@@ -38,11 +39,9 @@ bool Scene::removeGameObject(const std::string &name)
                                    {
                                        if (gameObject->getName() == name)
                                        {
-                                           if (active) // TODO: After the gameobject & component
-                                                       // PR, also check here for the gameobject's
-                                                       // component's active state
+                                           if (active && gameObject->getIsActive())
                                            {
-                                               gameObject->onStop();
+                                               // TODO: call gameobject on stop
                                            }
                                            return true;
                                        }
@@ -82,9 +81,9 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string &name)
     }
 
     // Call onStop if scene is active
-    if (active)
+    if (active && it->get()->getIsActive())
     {
-        (*it)->onStop();
+        // TODO: call gameobject on stop
     }
 
     // Move ownership and remove from vector
@@ -103,7 +102,7 @@ void Scene::onStart()
     active = true;
     for (auto &gameObject : gameObjects)
     {
-        gameObject->onStart();
+        // TODO: call gameobject on start
     }
 }
 
@@ -117,7 +116,7 @@ void Scene::onStop()
     active = false;
     for (auto &gameObject : gameObjects)
     {
-        gameObject->onStop();
+        // TODO: call gameobject on stop
     }
 }
 
@@ -130,7 +129,7 @@ void Scene::onPause()
 
     for (auto &gameObject : gameObjects)
     {
-        gameObject->onPause();
+        // TODO: call gameobject on pause
     }
 }
 
@@ -143,32 +142,26 @@ void Scene::onResume()
 
     for (auto &gameObject : gameObjects)
     {
-        gameObject->onResume();
+        // TODO: call gameobject on resume
     }
 }
 
-void Scene::update(float deltaTime)
+void Scene::update(float deltaTime) const
 {
     if (!active)
     {
         return;
     }
 
-    for (auto &gameObject : gameObjects)
-    {
-        gameObject->update(deltaTime);
-    }
+    // TODO: call gameobject update
 }
 
-void Scene::render()
+void Scene::render() const
 {
     if (!active)
     {
         return;
     }
 
-    for (auto &gameObject : gameObjects)
-    {
-        // TODO: Implement render for game objects
-    }
+    // TODO: render gameobjects
 }

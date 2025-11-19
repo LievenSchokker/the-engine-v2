@@ -12,8 +12,9 @@
  * Stores scenes by name, forwards lifecycle calls, and keeps track of the
  * active scene along with a simple paused state.
  */
-class SceneManager {
-   public:
+class SceneManager
+{
+  public:
     SceneManager() = default;
 
     /**
@@ -54,8 +55,8 @@ class SceneManager {
      * @brief Transfer a game object from one scene to another.
      *
      * Extracts the game object from the source scene and adds it to the target
-     * scene. The object's lifecycle methods (onStop/onStart) are called
-     * appropriately based on the active state of both scenes.
+     * scene. Component activation/deactivation is handled automatically based on
+     * the active state of the source and destination scenes.
      *
      * @param fromSceneName Name of the source scene.
      * @param toSceneName Name of the target scene.
@@ -130,7 +131,7 @@ class SceneManager {
      */
     void render();
 
-   private:
+  private:
     std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
     Scene* activeScene = nullptr;
     bool paused = false;
