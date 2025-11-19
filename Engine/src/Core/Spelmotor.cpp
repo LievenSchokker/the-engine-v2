@@ -12,15 +12,17 @@
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
       specifications(applicationSpecifications),
-      timer(nullptr)
+      timer(nullptr),
+      tickRate(60)
 {
     if (applicationSpecifications.renderBackend == RenderBackend::SDL)
     {
         SdlContext context = SdlContext();
         timer.reset();
-        timer = std::make_unique<Timer>(1.0f / 60.0f, []()
+        timer = std::make_unique<Timer>(1.0f / tickRate, []()
         {
-            return SDL_GetTicks();
+            //Get Ticks retuns ms we need seconds;
+            return SDL_GetTicks() / 1000;
         });
         renderer = std::make_unique<SDLRender>(SDLRender(context));
     }
@@ -72,6 +74,8 @@ void SpelMotor::update()
         //TODO Network->Update()
         //TODO Audio->Update();
         renderer->presentFrame();
+        std::cout << timer->getTickRate() << std::endl;
+        std::cout << timer->getTime() << std::endl;
     }
 }
 

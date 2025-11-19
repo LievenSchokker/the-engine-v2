@@ -51,6 +51,7 @@ private:
      */
     void update();
 
+    int tickRate;
     /** @brief Tracks whether the game loop is active. */
     bool running;
 
