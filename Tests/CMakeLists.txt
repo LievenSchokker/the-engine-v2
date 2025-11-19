@@ -3,6 +3,7 @@ project(engine_tests)
 
 add_executable(engine_tests
         Rendering/SDL/SDLRenderTest.cpp
+        Rendering/ShapeRendererTest.cpp
         Input/InputManagerTest.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp

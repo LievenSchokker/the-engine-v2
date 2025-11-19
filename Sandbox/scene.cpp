@@ -2,54 +2,100 @@
 #include <iostream>
 #include <memory>
 
+#include "../Engine/inc/Component/ShapeRenderer.h"
+#include "../Engine/inc/Component/Transform.h"
+#include "../Engine/inc/External/SdlContext.h"
 #include "../Engine/inc/GameObject/GameObject.h"
+#include "../Engine/inc/Rendering/Color.h"
+#include "../Engine/inc/Rendering/SDL/SDLRender.h"
+#include "../Engine/inc/Rendering/Window/WindowOptions.h"
 #include "../Engine/inc/Scene/SceneManager.h"
 
-#define SCREEN_WIDTH 500
-#define SCREEN_HEIGHT 500
+#include "../Engine/inc/Input/InputManager.h"
+
+namespace
+{
+constexpr int SCREEN_WIDTH = 640;
+constexpr int SCREEN_HEIGHT = 480;
+} // namespace
 
 int main()
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
-    {
-        std::cout << "SDL_Init failed: " << SDL_GetError() << std::endl;
-        return 1;
-    }
+    SdlContext context(SDL_INIT_VIDEO);
+    SDLRender renderer(context);
 
-#if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
-    // Disable compositor bypass
-    if (!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0"))
+    WindowOptions options{"Shape Sandbox", SCREEN_WIDTH, SCREEN_HEIGHT};
+    renderer.open(options);
+    if (!renderer.isOpen())
     {
-        std::cout << "SDL can not disable compositor bypass!" << std::endl;
-        return 1;
-    }
-#endif
-    SDL_Window *window =
-        SDL_CreateWindow("Basic C++ SDL project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (!window)
-    {
-        std::cout << "Window could not be created!" << std::endl << "SDL_Error: " << SDL_GetError() << std::endl;
-        SDL_Quit();
+        std::cout << "Failed to open SDL window\n";
         return 1;
     }
 
     SceneManager sceneManager;
+    sceneManager.setRenderer(&renderer);
+    sceneManager.setClearColor(Color::Black());
+
     auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
-    prototypeScene->addGameObject(std::make_unique<GameObject>());
+
+    auto circle = std::make_unique<GameObject>();
+    circle->setName("BlueCircle");
+    circle->getTransform()->setPosition({150.0, 140.0});
+    circle->getTransform()->setScale({1.0, 1.0});
+    circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(Color::LightBlue());
+
+    auto rectangle = std::make_unique<GameObject>();
+    rectangle->setName("YellowRectangle");
+    rectangle->getTransform()->setPosition({320.0, 240.0});
+    rectangle->getTransform()->setRotationAngle(25.0);
+    rectangle->getTransform()->setScale({1.0, 1.0});
+    rectangle->addComponent<ShapeRenderer>()->setRectangle({140.0, 80.0}).setColor(Color::LightRed());
+
+    prototypeScene->addGameObject(std::move(circle));
+    prototypeScene->addGameObject(std::move(rectangle));
+
     sceneManager.addScene(std::move(prototypeScene));
     sceneManager.setActiveScene("PrototypeScene");
 
     bool running = true;
     Uint32 lastTicks = SDL_GetTicks();
+    Color clearColor = Color::DarkGray();
 
-    while (running)
+    InputManager *input = InputManager::getInstance();
+    Scene *activeScene = sceneManager.getActiveScene();
+
+    while (running && renderer.isOpen())
     {
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
+        input->update();
+
+        // ================================ GAME CODE CHECK
+        // ================================
+
+        if (input->wasKeyPressed(KeyCode::SPACE))
         {
-            if (event.type == SDL_QUIT)
+            clearColor = (clearColor == Color::DarkGreen()) ? Color::DarkPurple() : Color::DarkGreen();
+            sceneManager.setClearColor(clearColor);
+        }
+
+        if (input->wheelDeltaY() != 0)
+        {
+            GameObject *rectangle = activeScene->getGameObject("YellowRectangle");
+            if (rectangle != nullptr)
             {
-                running = false;
+                double currentRotation = rectangle->getTransform()->getRotationAngle();
+                rectangle->getTransform()->setRotationAngle(currentRotation + input->wheelDeltaY());
+            }
+        }
+
+        if (input->wheelDeltaX() != 0)
+        {
+            GameObject *circle = activeScene->getGameObject("BlueCircle");
+            if (circle != nullptr)
+            {
+                Vector2 currentPosition = circle->getTransform()->getPosition();
+                circle->getTransform()->setPosition({currentPosition.x + input->wheelDeltaX() * 10, currentPosition.y});
+                Vector2 currentScale = circle->getTransform()->getScale();
+                circle->getTransform()->setScale({currentScale.x + input->wheelDeltaX() * 0.1, currentScale.y + input->wheelDeltaX() * 0.1});
             }
         }
 
@@ -57,16 +103,17 @@ int main()
         float deltaTime = static_cast<float>(currentTicks - lastTicks) / 1000.0f;
         lastTicks = currentTicks;
 
-        // =============== GAME CODE CHECK ===============
+        sceneManager.update(deltaTime);
+        sceneManager.render();
+
+        if (input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE))
         {
-            sceneManager.update(deltaTime);
-            sceneManager.render();
+            running = false;
         }
 
-        SDL_Delay(std::max(0, 16 - static_cast<int>(deltaTime * 1000)));
+        SDL_Delay(16);
     }
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+    renderer.close();
     return 0;
 }

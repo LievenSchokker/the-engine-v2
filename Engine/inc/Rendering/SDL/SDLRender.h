@@ -1,5 +1,5 @@
 /**
-* @file SDLRender.h
+ * @file SDLRender.h
  * @brief SDL2-based implementation of the rendering interface
  * @author Lieven Schokker
  * @date 11/11/2025
@@ -7,34 +7,28 @@
 
 /**
  * @class SDLRender
- * @brief SDL2 implementation of IRender for cross-platform windowing and rendering
+ * @brief SDL2 implementation of IRenderer for cross-platform windowing and rendering
  *
  * This class wraps SDL2's window and renderer API to provide a concrete implementation
- * of the IRender interface. SDL2 was chosen for its cross-platform compatibility and
+ * of the IRenderer interface. SDL2 was chosen for its cross-platform compatibility and
  * hardware acceleration support.
  *
  *
  * @note Requires SDL video subsystem to be initialized via SdlContext
- * @see IRender, SdlContext
+ * @see IRenderer, SdlContext
  */
-
 
 #pragma once
 
-
-#include <map>
 #include <SDL.h>
 
-
-#include "../../../inc/Rendering/IRender.h"
-
+#include "../../../inc/Rendering/IRenderer.h"
 
 class SdlContext;
 
-
-class SDLRender : public IRender
+class SDLRender : public IRenderer
 {
-public:
+  public:
     /**
      * @brief Constructs an SDL renderer with dependency injection of SDL context
      *
@@ -46,7 +40,7 @@ public:
      * @pre context must have SDL_INIT_VIDEO initialized
      * @throws assertion failure if video subsystem not initialized (debug builds)
      */
-    explicit SDLRender(SdlContext & context);
+    explicit SDLRender(SdlContext &context);
 
     /**
      * @brief Ensures proper cleanup of SDL resources in correct order
@@ -65,7 +59,12 @@ public:
      * @param options Window configuration options
      * @note Errors are logged to stderr rather than throwing to allow graceful degradation
      */
-    void open(const WindowOptions & options) override;
+    void open(const WindowOptions &options) override;
+
+    /**
+     * @brief Clear the back buffer with a color.
+     */
+    void beginFrame(const Color &clearColor) override;
 
     /**
      * @brief Checks window existence as indicator of render system state
@@ -95,21 +94,26 @@ public:
      *
      * @param title New window title text
      */
-    void setTitle(const std::string & title) override;
+    void setTitle(const std::string &title) override;
 
     /**
-     * @brief Presents the rendered frame with event processing and screen clearing
-     *
-     * Calls SDL_PumpEvents() to keep the window responsive to OS events (prevents
-     * "not responding" dialogs).
+     * @brief Presents the rendered frame to the screen
      *
      * @note Returns early if renderer is invalid to prevent crashes
      */
     void presentFrame() override;
 
-private:
-    SDL_Window* window = nullptr;      ///< Null indicates closed state; must outlive renderer
-    SDL_Renderer* renderer = nullptr;  ///< Must be destroyed before window; null-checked for safety
-    int windowWidth;                   ///< Cached to avoid repeated SDL queries
-    int windowHeight;                  ///< Cached to avoid repeated SDL queries
+    /**
+     * @brief Draw a filled circle in window space.
+     */
+    void drawCircle(const Vector2 &center, double radius, const Color &color, const Vector2 &scale) override;
+
+    /**
+     * @brief Draw a filled rectangle in window space.
+     */
+    void drawRectangle(const Vector2 &center, const Vector2 &size, double rotationDegrees, const Color &color, const Vector2 &scale) override;
+
+  private:
+    SDL_Window *window = nullptr;     ///< Null indicates closed state; must outlive renderer
+    SDL_Renderer *renderer = nullptr; ///< Must be destroyed before window; null-checked for safety
 };

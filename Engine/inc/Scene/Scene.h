@@ -6,6 +6,7 @@
 
 #include "../GameObject/GameObject.h"
 
+class IRenderer;
 
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.
@@ -28,7 +29,7 @@ class Scene
      *
      * @return Reference to the stored scene name.
      */
-    const std::string& getName() const;
+    const std::string &getName() const;
 
     /**
      * @brief Add a game object to the scene.
@@ -55,7 +56,7 @@ class Scene
      * @param name Name of the game object to remove.
      * @return true when an object was removed, false otherwise.
      */
-    bool removeGameObject(const std::string& name);
+    bool removeGameObject(const std::string &name);
 
     /**
      * @brief Look up a game object by name.
@@ -63,7 +64,7 @@ class Scene
      * @param name Name of the game object to retrieve.
      * @return Pointer to the object, or nullptr when not found.
      */
-    GameObject* getGameObject(const std::string& name) const;
+    GameObject *getGameObject(const std::string &name) const;
 
     /**
      * @brief Extract a game object from the scene without destroying it.
@@ -114,8 +115,10 @@ class Scene
 
     /**
      * @brief Render all game objects when the scene is active.
+     *
+     * @param renderer Render target (optional). When null, render is skipped.
      */
-    void render() const;
+    void render(IRenderer *renderer = nullptr) const;
 
   private:
     std::string name;

@@ -1,5 +1,7 @@
 #include "../../inc/Scene/Scene.h"
 #include "../../inc/Component/ComponentManager.h"
+#include "../../inc/Component/ShapeRenderer.h"
+#include "../../inc/Rendering/IRenderer.h"
 
 #include <algorithm>
 #include <iostream>
@@ -24,7 +26,7 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
     gameObjects.emplace_back(std::move(gameObject));
 
-    if (active && gameObject->getIsActive()) 
+    if (active && gameObject->getIsActive())
     {
         // TODO: call gameobject on start
     }
@@ -156,12 +158,24 @@ void Scene::update(float deltaTime) const
     // TODO: call gameobject update
 }
 
-void Scene::render() const
+void Scene::render(IRenderer *renderer) const
 {
-    if (!active)
+    if (!active || renderer == nullptr)
     {
         return;
     }
 
-    // TODO: render gameobjects
+    for (const auto &gameObject : gameObjects)
+    {
+        if (!gameObject->getIsActive())
+        {
+            continue;
+        }
+
+        auto *shapeRenderer = gameObject->getComponent<ShapeRenderer>();
+        if (shapeRenderer != nullptr)
+        {
+            shapeRenderer->render(*renderer);
+        }
+    }
 }
