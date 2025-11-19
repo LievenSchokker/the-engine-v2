@@ -1,7 +1,7 @@
 #pragma once
 
 
-struct TransportResult {
-    bool success = false;
-    int errorCode = 0;
+enum class TransportResult {
+    SUCCES,
+    ERROR,
 };
