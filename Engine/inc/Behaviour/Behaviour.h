@@ -6,10 +6,6 @@
 
 #include "Component/Component.h"
 
-namespace engine_tests
-{
-    class TestBehaviourBase;
-}
 
 /**
  * @brief This class serves as an abstract component that custom behaviour can derive from.
