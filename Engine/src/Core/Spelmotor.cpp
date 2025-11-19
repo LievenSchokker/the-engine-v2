@@ -40,7 +40,6 @@ void SpelMotor::run()
     //TODO SceneManager -> Start()
     renderer->open(specifications.windowOptions);
     InputManager::getInstance();
-
     update();
 }
 
@@ -74,8 +73,6 @@ void SpelMotor::update()
         //TODO Network->Update()
         //TODO Audio->Update();
         renderer->presentFrame();
-        std::cout << timer->getTickRate() << std::endl;
-        std::cout << timer->getTime() << std::endl;
     }
 }
 
@@ -85,7 +82,7 @@ void SpelMotor::shutdown()
     running = false;
 
     //TODO audioSystem->shutdown()
-    InputManager::getInstance()->shutdown();
+    InputManager::shutdown();
     renderer->close();
     //TODO scenemanager->shutdown()
     //TODO physicsWorld->shutdown()
