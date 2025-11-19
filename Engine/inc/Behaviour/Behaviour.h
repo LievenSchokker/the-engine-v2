@@ -8,7 +8,7 @@
 
 namespace engine_tests
 {
-    class TestBehaviour;
+    class TestBehaviourBase;
 }
 
 /**

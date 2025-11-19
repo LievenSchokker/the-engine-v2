@@ -7,7 +7,7 @@ add_executable(engine_tests
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
         GameObject/tests_game_object.cpp
-        Behaviour/TestBehaviour.cpp
+        Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
 )
 

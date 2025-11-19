@@ -3,11 +3,11 @@
 //
 #include "GameObject/GameObject.h"
 #include "Component/Component.h"
-#include "../component/TestComponentOne.h"
-#include "../component/TestComponentTwo.h"
-#include "../component/TestComponentThree.h"
-#include "../Behaviour/TestBehaviour.h"
+#include "../Component/TestComponents.h"
+#include "../Behaviour/TestBehaviours.h"
+
 #include <gtest/gtest.h>
+
 
 namespace engine_tests
 {
@@ -145,7 +145,7 @@ namespace engine_tests
     {
         GameObject go;
         TestBehaviourOne* added = go.addComponent<TestBehaviourOne>();
-        TestBehaviour* retrieved;
+        TestBehaviourBase* retrieved;
 
         EXPECT_NO_THROW(retrieved = go.getComponent<TestBehaviourOne>());
 

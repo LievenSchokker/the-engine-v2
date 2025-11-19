@@ -5,8 +5,9 @@
 #include "GameObject/GameObject.h"
 #include "Component/Component.h"
 #include "Component/ComponentManager.h"
-#include "../Component/TestComponentOne.h"
-#include "../Component/TestComponentTwo.h"
+#include "../Component/TestComponents.h"
+
+
 
 #include <gtest/gtest.h>
 

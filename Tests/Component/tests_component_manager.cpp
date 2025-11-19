@@ -6,12 +6,11 @@
 #include "Component/Component.h"
 #include "Component/Transform.h"
 #include "Component/ComponentManager.h"
-#include "../Component/TestComponentOne.h"
-#include "../Component/TestComponentTwo.h"
+#include "../Behaviour/TestBehaviours.h"
+#include "../Component/TestComponents.h"
 
 #include <gtest/gtest.h>
 
-#include "../Behaviour/TestBehaviour.h"
 
 namespace engine_tests
 {
@@ -167,7 +166,7 @@ namespace engine_tests
 
         EXPECT_TRUE(componentManager.hasComponent<TestBehaviourOne>());
 
-        TestBehaviour* retrievedBehaviour = componentManager.getComponent<TestBehaviourOne>();
+        TestBehaviourBase* retrievedBehaviour = componentManager.getComponent<TestBehaviourOne>();
 
         EXPECT_NE(retrievedBehaviour, nullptr);
         EXPECT_EQ(addedBehaviour, retrievedBehaviour);
@@ -180,9 +179,9 @@ namespace engine_tests
 
         TestComponentOne* addedComponent = componentManager.addComponent<TestComponentOne>();
 
-        TestBehaviour* addedBehaviour1 = componentManager.addComponent<TestBehaviourOne>();
-        TestBehaviour* addedBehaviour2 = componentManager.addComponent<TestBehaviourTwo>();
-        TestBehaviour* addedBehaviour3 = componentManager.addComponent<TestBehaviourThree>();
+        TestBehaviourBase* addedBehaviour1 = componentManager.addComponent<TestBehaviourOne>();
+        TestBehaviourBase* addedBehaviour2 = componentManager.addComponent<TestBehaviourTwo>();
+        TestBehaviourBase* addedBehaviour3 = componentManager.addComponent<TestBehaviourThree>();
 
         EXPECT_TRUE(componentManager.hasComponent<TestBehaviourThree>());
 
