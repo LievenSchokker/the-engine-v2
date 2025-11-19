@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 
+#include "IncommingRawMessage.h"
 #include "MessageTypes.h"
 
 
@@ -11,9 +12,9 @@ class IMessage;
 class MessageReader
 {
 public:
-    static std::unique_ptr<IMessage> readMessage(const RawMessage message);
-    static MessageTypes readMessageType(const RawMessage& message);
+    static std::unique_ptr<IMessage> readMessage(IncomingRawMessage rawMessage);
+    static MessageTypes readMessageType(const IncomingRawMessage& message);
 
 private:
-    static std::unique_ptr<IMessage> createMessage(RawMessage rawMessage);
+    static std::unique_ptr<IMessage> createMessage(IncomingRawMessage rawMessage);
 };

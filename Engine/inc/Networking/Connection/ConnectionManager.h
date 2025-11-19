@@ -5,10 +5,11 @@
 #include <map>
 #include <memory>
 
+#include "Networking/Messages/IncommingRawMessage.h"
 
-class RawMessage;
+
 class Transport;
-
+class IMessage;
 
 enum class ConnectionStatus : uint8_t;
 enum class ConnectionMode;
@@ -16,33 +17,30 @@ enum class SendMode;
 enum class TransportResult;
 
 struct ServerConnectionInformation;
+struct IncomingRawMessage;
+class OutgoingRawMessage;
 struct Connection;
-
-
 
 
 class ConnectionManager
 {
 public:
-
-    ConnectionManager();
+    ConnectionManager(ConnectionMode mode);
 
     ~ConnectionManager();
 
     ConnectionStatus init(const ServerConnectionInformation& information, ConnectionMode connectionMode);
-
-    static TransportResult send(int networkId, SendMode mode, const std::byte* data, size_t length);
+    TransportResult send(const OutgoingRawMessage& message) const;
 
     void disconnect(int networkId) const;
 
     void shutdown();
-    
-    void setOnMessageCallback(std::function<void(RawMessage)> callback);
 
-    void poll();
+    void setOnMessageCallback(std::function<void(IncomingRawMessage)> callback);
+
+    void poll() const;
 
 private:
-
     std::unique_ptr<Transport> transport;
 
     std::map<int, Connection> connections;
@@ -51,8 +49,7 @@ private:
 
     ConnectionMode mode;
 
+    void handleTransportMessage(const IncomingRawMessage& message);
 
-    void handleTransportMessage(RawMessage message);
-
-    std::function<void(RawMessage)> onMessage;
+    std::function<void(IncomingRawMessage)> onMessage;
 };

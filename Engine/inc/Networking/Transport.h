@@ -1,9 +1,10 @@
 #pragma once
 #include <functional>
-#include "RawMessage.h"
 #include "TransportResult.h"
+#include "Messages/IncommingRawMessage.h"
 
 
+class OutgoingRawMessage;
 /**
  * @typedef OnMessageReceivedCallback
  * @brief Callback invoked when a message is received.
@@ -11,7 +12,7 @@
  * @param data Pointer to the received message data.
  * @param length Length of the received message in bytes.
  */
-using OnMessageReceivedCallback = std::function<void(const RawMessage)>;
+using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage)>;
 
 /**
  * @typedef OnConnectionChangedCallback
@@ -57,7 +58,7 @@ public:
      * @param RawMessage The message to send over the network.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult send(const RawMessage& msg) = 0;
+    virtual TransportResult send(const OutgoingRawMessage& msg) = 0;
 
 
     /**
@@ -65,7 +66,7 @@ public:
      * @param RawMessage The message to send over the network to all connections.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult sendToAll(const RawMessage& msg) = 0;
+    virtual TransportResult sendToAll(const OutgoingRawMessage& msg) = 0;
 
 
     /**

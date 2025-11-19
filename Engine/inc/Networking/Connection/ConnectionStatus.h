@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 
 enum class ConnectionStatus : uint8_t
 {

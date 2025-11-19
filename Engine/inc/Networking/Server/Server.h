@@ -1,61 +1,41 @@
+// Server.h
 #pragma once
 
 #include <memory>
-#include <thread>
+#include <unordered_set>
 
 #include "ServerInformation.h"
-#include "../Connection/ConnectionManager.h"
-#include "Networking/Transport.h"
+#include "Networking/Server/ServerStatus.h"
 
-/**
- * @brief Manages server-side network connections and client communication.
- */
+class ConnectionManager;
+class IMessage;
+class ConnectionMessage;
+class PlayerMoveMessage;
+
+struct ServerConnectionInformation;
+struct IncomingRawMessage;
+
+enum class ConnectionMode;
+enum class ConnectionStatus : uint8_t;
+
 class Server
 {
 public:
-    /**
-     * @brief Constructs a server with the given connection information.
-     * @param serverConnectionInformation Configuration for the server connection.
-     */
-    Server(const ServerConnectionInformation & serverConnectionInformation);
-
+    explicit Server(const ServerConnectionInformation& serverConnectionInformation);
     ~Server();
 
-    /**
-     * @brief Starts the server.
-     * @return The status of the server after attempting to start.
-     */
     ServerStatus start();
-
-    /**
-     * @brief Stops the server.
-     * @return The status of the server after stopping.
-     */
     ServerStatus stop();
 
-    /**
-     * @brief Handles incoming messages from clients.
-     * @param networkId The network ID of the client sending the message.
-     * @param data Pointer to the message data.
-     * @param length Length of the message in bytes.
-     */
-    void onMessage(RawMessage message);
-
-    /**
-     * @brief Updates the server state (call regularly in main loop).
-     */
     void update();
-
-    /**
-     * @brief Disconnects a client from the server.
-     * @param clientId The network ID of the client to disconnect.
-     */
     void kickClient(int clientId);
 
 private:
-    ServerConnectionInformation setupInformation;
-    ServerStatus status;
+    void onMessage(IncomingRawMessage message);
+    void handleConnectionMessage(int clientId, ConnectionMessage* message);
 
     std::unique_ptr<ConnectionManager> connectionManager;
-    std::vector<int> clients;
+    ServerConnectionInformation setupInformation;
+    ServerStatus status;
+    std::unordered_set<int> connectedClients;
 };

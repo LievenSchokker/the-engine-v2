@@ -1,15 +1,14 @@
 #include "Networking/Messages/MessageReader.h"
 
 #include <gtest/gtest-message.h>
-
-#include "Networking/RawMessage.h"
 #include "Networking/Messages/ConnectionMessage.h"
+#include "Networking/Messages/IncommingRawMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 
 
-std::unique_ptr<IMessage> MessageReader::readMessage(const RawMessage rawMessage)
+std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage rawMessage)
 {
-    if (rawMessage.getLength() < sizeof(uint8_t))
+    if (rawMessage.length < sizeof(uint8_t))
     {
         return nullptr;
     }
@@ -18,7 +17,7 @@ std::unique_ptr<IMessage> MessageReader::readMessage(const RawMessage rawMessage
     std::unique_ptr<IMessage> message = createMessage(rawMessage);
     if (message.get() == nullptr) return nullptr;
 
-    if (message->deserialize(rawMessage.getPayload().data(), rawMessage.getLength()))
+    if (message->deserialize(rawMessage.data, rawMessage.length))
     {
         return message;
     }
@@ -29,7 +28,7 @@ std::unique_ptr<IMessage> MessageReader::readMessage(const RawMessage rawMessage
 }
 
 
-std::unique_ptr<IMessage> MessageReader::createMessage(const RawMessage rawMessage)
+std::unique_ptr<IMessage> MessageReader::createMessage(const IncomingRawMessage rawMessage)
 {
     MessageTypes messageType = readMessageType(rawMessage);
     std::unique_ptr<IMessage> message;
@@ -45,9 +44,9 @@ std::unique_ptr<IMessage> MessageReader::createMessage(const RawMessage rawMessa
 }
 
 
-MessageTypes MessageReader::readMessageType(const RawMessage& message)
+MessageTypes MessageReader::readMessageType(const IncomingRawMessage& message)
 {
-    const std::byte* data = message.getPayload();
+    const std::byte* data = message.data;
     MessageTypes messageType;
     std::memcpy(&messageType, data, sizeof(uint8_t));
     return messageType;

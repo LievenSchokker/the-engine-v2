@@ -1,109 +1,153 @@
-//
-// Created by thijs on 18-11-2025.
-//
-
-
 #include "Networking/Client.h"
+#include "Networking/Connection/ConnectionManager.h"
+#include "Networking/Connection/ConnectionMode.h"
+#include "Networking/Connection/ConnectionStatus.h"
+#include "Networking/Server/ServerInformation.h"
+#include "Networking/Messages/IMessage.h"
+#include "Networking/Messages/MessageReader.h"
+#include "Networking/Messages/MessageWriter.h"
+#include "Networking/Messages/ConnectionMessage.h"
+#include "Networking/Messages/IncommingRawMessage.h"
+#include "Networking/Messages/OutgoingRawMessage.h"
+#include "Networking/Messages/MessageTypes.h"
+#include "Networking/SendMode.h"
 #include <iostream>
 
-
 Client::Client()
+    : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Client))
 {
-    transport = std::make_unique<TransportGNS>();
     setDefaultOnMessageReceived();
-    SetDefaultOnConnectionChanged();
+    setDefaultOnConnectionChanged();
 }
-
 
 Client::~Client()
 {
     running = false;
-    transport->closeOpenSocket();
-
-    if (listenThread.joinable()) listenThread.join();
+    connectionManager->shutdown();
+    if (listenThread.joinable())
+        listenThread.join();
 }
-
-
-void Client::SetOnConnectionChanged(const OnConnectionChangedCallback& newCallBack) const
-{
-    transport->setOnConnectionChanged(newCallBack);
-}
-
-
-void Client::SetDefaultOnConnectionChanged()
-{
-    transport->setOnConnectionChanged([&](int assignedId, bool isConnected)
-    {
-        if (isConnected)
-        {
-            connected = true;
-            clientConnectionId = assignedId;
-
-            std::cout << "[Client] Connected. Assigned ID: "
-                << clientConnectionId << "\n";
-            std::cout << "Type messages. /quit to disconnect.\n";
-        }
-        else
-        {
-            connected = false;
-            running = false;
-            std::cout << "[Client] Disconnected.\n";
-        }
-    });
-}
-
-
-void Client::setOnMessageReceived(const OnMessageReceivedCallback& newCallback) const
-{
-    transport->setOnMessageReceived(newCallback);
-}
-
-
-void Client::setDefaultOnMessageReceived() const
-{
-    transport->setOnMessageReceived([&](const RawMessage& message)
-    {
-        std::cout << "[Server]: " << message.toString() << std::endl;
-    });
-}
-
 
 bool Client::connectToServer(const uint16_t port, const char* serverIP)
 {
-    TransportResult transportResult = transport->connectByIPAdress(serverIP, port);
-    if (transportResult == TransportResult::ERROR)
+    ServerConnectionInformation serverInfo;
+    serverInfo.ip = serverIP;
+    serverInfo.port = port;
+
+    ConnectionStatus status = connectionManager->init(serverInfo, ConnectionMode::Client);
+
+    if (status != ConnectionStatus::Connected)
     {
-        std::cerr << "[Client] Failed to initiate connection.\n";
+        std::cerr << "Failed to connect to " << serverIP << ":" << port << "\n";
         return false;
     }
 
+    clientConnectionId = 0;
+    connected = true;
     running = true;
     createListenThread();
 
     return true;
 }
 
-bool Client::sendMessage(const std::string& text)
+bool Client::sendMessage(IMessage& message)
 {
-    if (!connected) return false;
+    if (!connected)
+    {
+        std::cerr << "[Client] Cannot send message - not connected\n";
+        return false;
+    }
 
-    RawMessage message(1, text);
-    transport->send(message);
+    if (clientConnectionId == -1)
+    {
+        std::cerr << "[Client] Cannot send message - invalid connection ID\n";
+        return false;
+    }
+
+    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+        message,
+        clientConnectionId,
+        SendMode::ReliableOrdered
+    );
+
+    connectionManager->send(outgoing);
 
     return true;
 }
 
+void Client::setOnMessageReceived(const OnMessageReceivedCallback& callback)
+{
+    connectionManager->setOnMessageCallback(callback);
+}
+
+void Client::setOnConnectionChanged(const OnConnectionChangedCallback& callback)
+{
+}
+
+void Client::setDefaultOnMessageReceived()
+{
+    connectionManager->setOnMessageCallback([this](const IncomingRawMessage& rawMessage)
+    {
+        std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+
+        if (!message)
+        {
+            std::cerr << "[Client] Failed to parse message from server\n";
+            return;
+        }
+
+        MessageTypes messageType = message->getMessageType();
+
+        std::cout << "[Client] Received message type: "
+            << static_cast<int>(messageType) << "\n";
+
+        switch (messageType)
+        {
+        case MessageTypes::ConnectionMessage:
+            {
+                ConnectionMessage* connMsg = static_cast<ConnectionMessage*>(message.get());
+                ConnectionStatus status = connMsg->getStatus();
+
+                if (status == ConnectionStatus::Connected)
+                {
+                    connected = true;
+                    clientConnectionId = rawMessage.connectionID;
+                }
+                else if (status == ConnectionStatus::Disconnected)
+                {
+                    connected = false;
+                    running = false;
+                    std::cout << "[Client] Disconnected by server\n";
+                }
+                break;
+            }
+        default:
+            {
+                std::cout << "Unhandled message type: "
+                    << static_cast<int>(messageType) << "\n";
+                break;
+            }
+        }
+    });
+}
 
 
-// #TODO New thread created
+void Client::setDefaultOnConnectionChanged()
+{
+}
+
 void Client::createListenThread()
 {
     listenThread = std::thread([this]()
     {
+        std::cout << "[Client] Listen thread started\n";
+
         while (running)
         {
-            transport->poll();
+            connectionManager->poll();
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
+
+        std::cout << "[Client] Listen thread stopped\n";
     });
 }

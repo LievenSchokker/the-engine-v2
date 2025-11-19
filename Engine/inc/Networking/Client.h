@@ -1,31 +1,41 @@
-//
-// Created by thijs on 18-11-2025.
-//
-
-
+// Client.h
 #pragma once
-#include "Transport.h"
-#include "TransportGNS.h"
 
+#include <atomic>
+#include <functional>
+#include <memory>
+#include <thread>
+
+class ConnectionManager;
+class IMessage;
+struct IncomingRawMessage;
+struct ServerConnectionInformation;
+
+using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage&)>;
+using OnConnectionChangedCallback = std::function<void(int, bool)>;
 
 class Client
 {
 public:
     Client();
     ~Client();
-    void SetOnConnectionChanged(const OnConnectionChangedCallback& newCallback) const;
-    void SetDefaultOnConnectionChanged();
-    void setDefaultOnMessageReceived() const;
-    void setOnMessageReceived(const OnMessageReceivedCallback& newCallback) const;
+
     bool connectToServer(uint16_t port, const char* serverIP);
-    bool sendMessage(const std::string& text);
+    bool sendMessage(IMessage& message);
+    bool isConnected() const { return connected; }
+    int getConnectionId() const { return clientConnectionId; }
+
+    void setOnMessageReceived(const OnMessageReceivedCallback& callback);
+    void setOnConnectionChanged(const OnConnectionChangedCallback& callback);
 
 private:
-    void createListenThread();
-
-    std::unique_ptr<TransportGNS> transport;
-    std::atomic<bool> connected = false;
-    std::atomic<bool> running = false;
-    int clientConnectionId = -1;
+    std::unique_ptr<ConnectionManager> connectionManager;
     std::thread listenThread;
+    std::atomic<bool> running{false};
+    std::atomic<bool> connected{false};
+    int clientConnectionId{-1};
+
+    void createListenThread();
+    void setDefaultOnMessageReceived();
+    void setDefaultOnConnectionChanged();
 };

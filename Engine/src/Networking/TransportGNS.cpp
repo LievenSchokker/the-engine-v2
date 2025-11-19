@@ -6,7 +6,7 @@
 
 #include "Networking/SendMode.h"
 #include "Networking/Messages/IncommingRawMessage.h"
-#include "Networking/Messages/SendingRawMessage.h"
+#include "Networking/Messages/OutgoingRawMessage.h"
 
 TransportGNS* TransportGNS::pCallbackInstance = nullptr;
 
@@ -230,6 +230,7 @@ void TransportGNS::steamNetConnectionStatusChangedCallback(
     pCallbackInstance->onSteamNetConnectionStatusChanged(pointerConnectionStatusInformation);
 }
 
+
 void TransportGNS::onSteamNetConnectionStatusChanged(
     const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
 {
@@ -240,18 +241,12 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
             if (pointerConnectionStatusInformation->m_info.m_hListenSocket == listenSocket &&
                 listenSocket != k_HSteamListenSocket_Invalid)
             {
-                int connectionId;
-                {
-                    std::lock_guard<std::mutex> lock(mapMutex);
-                    connectionId = nextConnectionId++;
-                    mapConnections[pointerConnectionStatusInformation->m_hConn] = connectionId;
-                }
-
                 if (steamNetworkingSockets->AcceptConnection(pointerConnectionStatusInformation->m_hConn) !=
                     k_EResultOK)
                 {
                     steamNetworkingSockets->CloseConnection(pointerConnectionStatusInformation->m_hConn, 0, nullptr,
                                                             false);
+                    std::cerr << "[GNS] Failed to accept connection\n";
                     return;
                 }
 
@@ -260,8 +255,17 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
                 {
                     steamNetworkingSockets->CloseConnection(pointerConnectionStatusInformation->m_hConn, 0, nullptr,
                                                             false);
+                    std::cerr << "[GNS] Failed to add connection to poll group\n";
                     return;
                 }
+
+                {
+                    std::lock_guard<std::mutex> lock(mapMutex);
+                    int connectionId = nextConnectionId++;
+                    mapConnections[pointerConnectionStatusInformation->m_hConn] = connectionId;
+                }
+
+                std::cout << "[GNS] Accepted incoming connection\n";
             }
             break;
         }
@@ -271,8 +275,17 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
             int connectionId;
             {
                 std::lock_guard<std::mutex> lock(mapMutex);
-                connectionId = nextConnectionId++;
-                mapConnections[pointerConnectionStatusInformation->m_hConn] = connectionId;
+
+                auto it = mapConnections.find(pointerConnectionStatusInformation->m_hConn);
+                if (it != mapConnections.end())
+                {
+                    connectionId = it->second;
+                }
+                else
+                {
+                    connectionId = nextConnectionId++;
+                    mapConnections[pointerConnectionStatusInformation->m_hConn] = connectionId;
+                }
             }
 
             if (onConnectionChanged)
@@ -292,8 +305,13 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
                     mapConnections.erase(pointerConnectionStatusInformation->m_hConn);
             }
 
-            if (connectionId != -1 && onConnectionChanged)
-                onConnectionChanged(connectionId, false);
+            if (connectionId != -1)
+            {
+                std::cout << "[GNS] Connection " << connectionId << " closed\n";
+
+                if (onConnectionChanged)
+                    onConnectionChanged(connectionId, false);
+            }
 
             steamNetworkingSockets->CloseConnection(pointerConnectionStatusInformation->m_hConn, 0, nullptr, false);
 

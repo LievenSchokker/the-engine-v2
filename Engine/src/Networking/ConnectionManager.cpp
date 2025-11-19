@@ -1,4 +1,7 @@
-#include <memory>
+// ConnectionManager.cpp
+
+
+#include <iostream>
 
 
 #include "Networking/Connection/ConnectionManager.h"
@@ -7,79 +10,108 @@
 #include "Networking/TransportGNS.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/Connection/Connection.h"
-#include "Networking/RawMessage.h"
+#include "Networking/Messages/IncommingRawMessage.h"
 
 
-ConnectionManager::ConnectionManager()
-	:
-transport(std::make_unique<TransportGNS>()),
-maxConnections(100),
-      mode(ConnectionMode::Server)
+ConnectionManager::ConnectionManager(ConnectionMode mode)
+    : transport(std::make_unique<TransportGNS>())
+      , maxConnections(100)
+      , mode(mode)
 {
 }
+
 ConnectionManager::~ConnectionManager() = default;
 
 ConnectionStatus ConnectionManager::init(const ServerConnectionInformation& information,
-									  ConnectionMode connectionMode) {
-	mode = connectionMode;
-	TransportResult result{};
-
-	if (!transport) {
-		return ConnectionStatus::Error;
-	}
-
-
-
-	if (mode == ConnectionMode::Server)
-	{
-		result = transport->setUpListenSocket(information.port);
-	}
-	else
-	{
-		result = transport->connectByIPAdress(information.ip.c_str(), information.port);
-	}
-
-	return (result == TransportResult::SUCCES) ? ConnectionStatus::Connected : ConnectionStatus::Error;
-}
-
-TransportResult ConnectionManager::send(int networkId, SendMode mode, const std::byte *data, size_t length)
+                                         ConnectionMode connectionMode)
 {
-	TransportResult result {};
+    mode = connectionMode;
 
-	return TransportResult::SUCCES;
+    if (!transport)
+    {
+        return ConnectionStatus::Error;
+    }
+
+    transport->setOnMessageReceived([this](const IncomingRawMessage& msg)
+    {
+        handleTransportMessage(msg);
+    });
+
+    if (mode == ConnectionMode::Server)
+    {
+        transport->setOnConnectionChanged([this](int connId, bool connected) {
+            if (connected)
+            {
+                Connection conn = {connId, ConnectionStatus::Connected};
+                connections[connId] = conn;
+                std::cout << "[ConnectionManager] Client " << connId << " connected\n";
+            }
+            else
+            {
+                connections.erase(connId);
+                std::cout << "[ConnectionManager] Client " << connId << " disconnected\n";
+            }
+        });
+    }
+
+
+    TransportResult result;
+    if (mode == ConnectionMode::Server)
+    {
+        result = transport->setUpListenSocket(information.port);
+    }
+    else
+    {
+        result = transport->connectByIPAdress(information.ip.c_str(), information.port);
+    }
+
+    return (result == TransportResult::SUCCES) ? ConnectionStatus::Connected : ConnectionStatus::Error;
 }
 
+TransportResult ConnectionManager::send(const OutgoingRawMessage& message) const
+{
+    return transport->send(message);
+}
 
 void ConnectionManager::disconnect(int networkId) const
 {
-	transport->disconnectFromSocket(networkId);
+    transport->disconnectFromSocket(networkId);
 }
 
-void ConnectionManager::shutdown() {
-	if (transport) {
-	}
-	connections.clear();
-}
-
-void ConnectionManager::handleTransportMessage(RawMessage message) {
-	if ( connections.find(message.getConnectionID()) == connections.end()) {
-		onMessage(message);
-	} else {
-		Connection connection = {message.getConnectionID(), ConnectionStatus::Connected};
-		connections.insert({message.getConnectionID(), connection});
-	}
-}
-
-void ConnectionManager::setOnMessageCallback(
-	std::function<void(RawMessage)> callback)
+void ConnectionManager::shutdown()
 {
-	onMessage = std::move(callback);
+    if (transport)
+    {
+        transport->closeOpenSocket();
+    }
+    connections.clear();
 }
 
-void ConnectionManager::poll()
+void ConnectionManager::handleTransportMessage(const IncomingRawMessage& message)
 {
-	if (transport)
-	{
-		transport->poll();
-	}
+    if (connections.find(message.connectionID) != connections.end())
+    {
+        if (onMessage)
+        {
+            onMessage(message);
+        }
+    }
+    else
+    {
+        std::cerr << "[ConnectionManager] Received message from unknown connection: "
+            << message.connectionID << "\n";
+    }
+}
+
+void ConnectionManager::setOnMessageCallback(std::function<void(IncomingRawMessage)> callback)
+{
+    onMessage = std::move(callback);
+}
+
+void ConnectionManager::poll() const
+{
+    if (transport)
+    {
+        transport->poll();
+    }
 }
