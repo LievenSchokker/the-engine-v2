@@ -16,5 +16,5 @@ public:
     static MessageTypes readMessageType(const IncomingRawMessage& message);
 
 private:
-    static std::unique_ptr<IMessage> createMessage(IncomingRawMessage rawMessage);
+    static std::unique_ptr<IMessage> createMessage(MessageTypes messageType);
 };

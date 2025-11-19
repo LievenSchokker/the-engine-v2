@@ -1,3 +1,4 @@
+// Client.cpp
 #include "Networking/Client.h"
 #include "Networking/Connection/ConnectionManager.h"
 #include "Networking/Connection/ConnectionMode.h"
@@ -34,16 +35,20 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
     serverInfo.ip = serverIP;
     serverInfo.port = port;
 
+    // Set up connection changed callback BEFORE connecting
     connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected) {
         if (isConnected)
         {
             clientConnectionId = connId;
             connected = true;
+            std::cout << "[Client] Connected with ID: " << connId << "\n";
         }
         else
         {
             connected = false;
             clientConnectionId = -1;
+            running = false;
+            std::cout << "[Client] Disconnected\n";
         }
     });
 
@@ -51,11 +56,11 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
 
     if (status != ConnectionStatus::Connected)
     {
-        std::cerr << "Failed to connect to " << serverIP << ":" << port << "\n";
+        std::cerr << "[Client] Failed to connect to " << serverIP << ":" << port << "\n";
         return false;
     }
 
-    std::cout << "Connecting to " << serverIP << ":" << port << "\n";
+    std::cout << "[Client] Connecting to " << serverIP << ":" << port << "\n";
 
     running = true;
     createListenThread();
@@ -95,6 +100,7 @@ void Client::setOnMessageReceived(const OnMessageReceivedCallback& callback)
 
 void Client::setOnConnectionChanged(const OnConnectionChangedCallback& callback)
 {
+    // Could store and forward to user callback if needed
 }
 
 void Client::setDefaultOnMessageReceived()
@@ -123,8 +129,7 @@ void Client::setDefaultOnMessageReceived()
 
                 if (status == ConnectionStatus::Connected)
                 {
-                    connected = true;
-                    clientConnectionId = rawMessage.connectionID;
+                    std::cout << "[Client] Server confirmed connection\n";
                 }
                 else if (status == ConnectionStatus::Disconnected)
                 {
@@ -136,7 +141,7 @@ void Client::setDefaultOnMessageReceived()
             }
         default:
             {
-                std::cout << "Unhandled message type: "
+                std::cout << "[Client] Unhandled message type: "
                     << static_cast<int>(messageType) << "\n";
                 break;
             }
@@ -144,9 +149,9 @@ void Client::setDefaultOnMessageReceived()
     });
 }
 
-
 void Client::setDefaultOnConnectionChanged()
 {
+    // Already set in connectToServer
 }
 
 void Client::createListenThread()

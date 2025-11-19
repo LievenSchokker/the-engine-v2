@@ -19,7 +19,6 @@ TransportGNS::TransportGNS()
     SteamDatagramErrMsg errorMessage;
     if (!GameNetworkingSockets_Init(nullptr, errorMessage))
     {
-        std::cerr << "GameNetworkingSockets_Init failed: " << errorMessage << std::endl;
         return;
     }
 
@@ -53,18 +52,15 @@ TransportResult TransportGNS::setUpListenSocket(const uint16_t port)
     listenSocket = steamNetworkingSockets->CreateListenSocketIP(address, 0, nullptr);
     if (listenSocket == k_HSteamListenSocket_Invalid)
     {
-        std::cerr << "[GNS] Failed to listen on port " << port << std::endl;
         return TransportResult::ERROR;
     }
 
     pollGroup = steamNetworkingSockets->CreatePollGroup();
     if (pollGroup == k_HSteamNetPollGroup_Invalid)
     {
-        std::cerr << "[GNS] Failed to create poll group\n";
         return TransportResult::ERROR;
     }
 
-    std::cout << "[GNS] Listening on port " << port << "\n";
     return TransportResult::SUCCES;
 }
 
@@ -73,7 +69,6 @@ TransportResult TransportGNS::connectByIPAdress(const char* socketAddress, uint1
     SteamNetworkingIPAddr address{};
     if (!address.ParseString(socketAddress))
     {
-        std::cerr << "[GNS] Invalid address: " << socketAddress << '\n';
         return TransportResult::ERROR;
     }
     address.m_port = port;
@@ -82,14 +77,12 @@ TransportResult TransportGNS::connectByIPAdress(const char* socketAddress, uint1
 
     if (steamNetworkConnection == k_HSteamNetConnection_Invalid)
     {
-        std::cerr << "[GNS] ConnectByIPAddress failed\n";
         return TransportResult::ERROR;
     }
 
     return TransportResult::SUCCES;
 }
 
-// KEY CHANGE: Now takes OutgoingMessage instead of RawMessage
 TransportResult TransportGNS::send(const OutgoingRawMessage& message)
 {
     int sendFlags = getSendFlags(message.sendMode);
@@ -100,7 +93,6 @@ TransportResult TransportGNS::send(const OutgoingRawMessage& message)
         return TransportResult::ERROR;
     }
 
-    // Send directly from the OutgoingMessage buffer
     EResult result = steamNetworkingSockets->SendMessageToConnection(
         steamNetworkConnection,
         message.data(),
@@ -136,7 +128,8 @@ bool TransportGNS::closeOpenSocket()
 {
     for (auto& pair : mapConnections)
     {
-        steamNetworkingSockets->CloseConnection(pair.first, 0, "Close open socket", true);
+        steamNetworkingSockets->
+            CloseConnection(pair.first, 0, "Close open socket", true);
     }
     mapConnections.clear();
 
@@ -162,7 +155,8 @@ bool TransportGNS::disconnectFromSocket(int connectionId)
     if (steamNetworkConnection == k_HSteamNetConnection_Invalid)
         return false;
 
-    steamNetworkingSockets->CloseConnection(steamNetworkConnection, 0, "Disconnected", true);
+    steamNetworkingSockets->
+        CloseConnection(steamNetworkConnection, 0, "Disconnected", true);
 
     std::lock_guard<std::mutex> lock(mapMutex);
     mapConnections.erase(steamNetworkConnection);
@@ -246,7 +240,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
                 {
                     steamNetworkingSockets->CloseConnection(pointerConnectionStatusInformation->m_hConn, 0, nullptr,
                                                             false);
-                    std::cerr << "[GNS] Failed to accept connection\n";
                     return;
                 }
 
@@ -255,7 +248,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
                 {
                     steamNetworkingSockets->CloseConnection(pointerConnectionStatusInformation->m_hConn, 0, nullptr,
                                                             false);
-                    std::cerr << "[GNS] Failed to add connection to poll group\n";
                     return;
                 }
 
@@ -265,7 +257,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
                     mapConnections[pointerConnectionStatusInformation->m_hConn] = connectionId;
                 }
 
-                std::cout << "[GNS] Accepted incoming connection\n";
             }
             break;
         }
@@ -307,8 +298,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
 
             if (connectionId != -1)
             {
-                std::cout << "[GNS] Connection " << connectionId << " closed\n";
-
                 if (onConnectionChanged)
                     onConnectionChanged(connectionId, false);
             }

@@ -37,23 +37,32 @@ ConnectionStatus ConnectionManager::init(const ServerConnectionInformation& info
         handleTransportMessage(msg);
     });
 
-    if (mode == ConnectionMode::Server)
-    {
-        transport->setOnConnectionChanged([this](int connId, bool connected) {
-            if (connected)
+    transport->setOnConnectionChanged([this](int connId, bool connected) {
+        if (connected)
+        {
+            Connection conn = {connId, ConnectionStatus::Connected};
+            connections[connId] = conn;
+
+            if (mode == ConnectionMode::Server)
             {
-                Connection conn = {connId, ConnectionStatus::Connected};
-                connections[connId] = conn;
                 std::cout << "[ConnectionManager] Client " << connId << " connected\n";
             }
-            else
+        }
+        else
+        {
+            connections.erase(connId);
+
+            if (mode == ConnectionMode::Server)
             {
-                connections.erase(connId);
                 std::cout << "[ConnectionManager] Client " << connId << " disconnected\n";
             }
-        });
-    }
+        }
 
+        if (onConnectionChanged)
+        {
+            onConnectionChanged(connId, connected);
+        }
+    });
 
     TransportResult result;
     if (mode == ConnectionMode::Server)
