@@ -128,6 +128,6 @@ private:
     void pollIncomingMessages();                 /// Processes all queued incoming messages.
     void pollConnectionStateChanges();           /// Handles connection state change events.
     int getConnectionId(HSteamNetConnection hConn); /// Retrieves internal ID for a connection handle.
-    HSteamNetConnection getSteamConnection(int connectionId); /// Retrieves connection handle from ID.
+    HSteamNetConnection getSteamConnection(int connectionId) const; /// Retrieves connection handle from ID.
     /// @}
 };
