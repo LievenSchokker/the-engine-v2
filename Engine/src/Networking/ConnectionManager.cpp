@@ -11,8 +11,9 @@
 
 
 ConnectionManager::ConnectionManager()
-	: transport(std::make_unique<TransportGNS>()),
-      maxConnections(100),
+	:
+transport(std::make_unique<TransportGNS>()),
+maxConnections(100),
       mode(ConnectionMode::Server)
 {
 }
@@ -53,7 +54,8 @@ TransportResult ConnectionManager::send(int networkId, SendMode mode, const std:
 }
 
 
-void ConnectionManager::disconnect(int networkId) {
+void ConnectionManager::disconnect(int networkId) const
+{
 	transport->disconnectFromSocket(networkId);
 }
 
@@ -64,7 +66,12 @@ void ConnectionManager::shutdown() {
 }
 
 void ConnectionManager::handleTransportMessage(RawMessage message) {
-
+	if ( connections.find(message.getConnectionID()) == connections.end()) {
+		onMessage(message);
+	} else {
+		Connection connection = {message.getConnectionID(), ConnectionStatus::Connected};
+		connections.insert({message.getConnectionID(), connection});
+	}
 }
 
 void ConnectionManager::setOnMessageCallback(

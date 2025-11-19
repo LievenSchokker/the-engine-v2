@@ -31,9 +31,9 @@ public:
 
     ConnectionStatus init(const ServerConnectionInformation& information, ConnectionMode connectionMode);
 
-    TransportResult send(int networkId, SendMode mode, const std::byte* data, size_t length);
+    static TransportResult send(int networkId, SendMode mode, const std::byte* data, size_t length);
 
-    void disconnect(int networkId);
+    void disconnect(int networkId) const;
 
     void shutdown();
     
