@@ -98,7 +98,7 @@ public:
     */
     bool closeOpenSocket() override;
 private:
-    void chooseSendFlags(const SendMode sendMode, int& sendFlags);
+    static void chooseSendFlags(const SendMode sendMode, int& sendFlags);
     /// @name Server Members
     /// @{
     HSteamListenSocket listenSocket;                   /// Listening socket for server mode.
@@ -119,7 +119,7 @@ private:
     /// @{
     static TransportGNS *pCallbackInstance;      /// Static instance pointer for static callbacks.
     static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t *pInfo);
-    void onSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t *pInfo);
+    void onSteamNetConnectionStatusChanged(const SteamNetConnectionStatusChangedCallback_t *pInfo);
     /// @}
 
 
