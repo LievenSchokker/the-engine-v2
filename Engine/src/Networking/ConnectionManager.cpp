@@ -108,6 +108,11 @@ void ConnectionManager::setOnMessageCallback(std::function<void(IncomingRawMessa
     onMessage = std::move(callback);
 }
 
+void ConnectionManager::setOnConnectionChangedCallback(std::function<void(int, bool)> callback)
+{
+    onConnectionChanged = std::move(callback);
+}
+
 void ConnectionManager::poll() const
 {
     if (transport)

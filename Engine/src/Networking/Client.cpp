@@ -34,6 +34,19 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
     serverInfo.ip = serverIP;
     serverInfo.port = port;
 
+    connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected) {
+        if (isConnected)
+        {
+            clientConnectionId = connId;
+            connected = true;
+        }
+        else
+        {
+            connected = false;
+            clientConnectionId = -1;
+        }
+    });
+
     ConnectionStatus status = connectionManager->init(serverInfo, ConnectionMode::Client);
 
     if (status != ConnectionStatus::Connected)
@@ -42,8 +55,8 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
         return false;
     }
 
-    clientConnectionId = 0;
-    connected = true;
+    std::cout << "Connecting to " << serverIP << ":" << port << "\n";
+
     running = true;
     createListenThread();
 

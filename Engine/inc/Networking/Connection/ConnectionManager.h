@@ -37,6 +37,7 @@ public:
     void shutdown();
 
     void setOnMessageCallback(std::function<void(IncomingRawMessage)> callback);
+    void setOnConnectionChangedCallback(std::function<void(int, bool)> callback);
 
     void poll() const;
 
@@ -52,4 +53,5 @@ private:
     void handleTransportMessage(const IncomingRawMessage& message);
 
     std::function<void(IncomingRawMessage)> onMessage;
+    std::function<void(int, bool)> onConnectionChanged;
 };
