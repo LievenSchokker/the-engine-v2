@@ -4,6 +4,8 @@ project(engine_tests)
 add_executable(engine_tests
         Rendering/SDL/SDLRenderTest.cpp
         Input/InputManagerTest.cpp
+        Component/tests_TestComponents.cpp
+        Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
         GameObject/tests_game_object.cpp

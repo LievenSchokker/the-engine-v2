@@ -190,4 +190,23 @@ namespace engine_tests
         EXPECT_LT(allBehaviours.size(), componentManager.getComponentCount());
         EXPECT_EQ(allBehaviours.size(), 3);
     }
+
+    TEST(ComponentManagerTests, ComponentManagerDeletesAllComponentsOnGameObjectDestroy)
+    {
+        GameObject go;
+        ComponentManager* componentManager = go.getComponentManager();
+
+        go.addComponent<TestComponentOne>();
+        go.addComponent<TestComponentTwo>();
+        go.addComponent<TestComponentThree>();
+
+        EXPECT_EQ(componentManager->getComponentCount(), 3);
+        EXPECT_EQ(go.getComponentCount(), 3);
+
+        go.destroy();
+        go.onSceneDestroy(); /// Normally scene would call this after go.destroy() was called, but then we dont have acces to the GO anymore, so simulate it instead.
+
+        EXPECT_EQ(componentManager->getComponentCount(), 0);
+        EXPECT_EQ(go.getComponentCount(), 0);
+    }
 }

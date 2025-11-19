@@ -16,7 +16,12 @@ GameObject::GameObject()
     tag = "";
     isActive = true;
     isStatic = false;
+    isDestroyed = false;
+
+    /// TODO: Remove this line:
+    scenePlaceholder = nullptr;
 }
+
 
 GameObject::~GameObject()
 {
@@ -24,20 +29,24 @@ GameObject::~GameObject()
     transform = nullptr;
 }
 
+
 bool GameObject::compareTag(const std::string &other)
 {
     return tag == other;
 }
+
 
 bool GameObject::hasComponent(Component *comp) const
 {
     return componentManager->hasComponent(comp);
 }
 
+
 void GameObject::removeComponent(Component *comp)
 {
     componentManager->removeComponent(comp);
 }
+
 
 std::vector<Behaviour *> GameObject::getActiveBehaviours() const
 {
@@ -64,7 +73,11 @@ void GameObject::destroy()
         return;
 
     isDestroyed = true;
-    scenePlaceholder->queueDestroy(this);
+    setActive(false);
+
+    /// TEMP if statement, remove when scene is implemented!
+    if (scenePlaceholder != nullptr)
+        scenePlaceholder->queueDestroy(this);
 }
 
 
@@ -79,58 +92,75 @@ Transform *GameObject::getTransform() const
     return transform.get();
 }
 
+
 std::string GameObject::getName() const
 {
     return name;
 }
+
 
 int GameObject::getLayer() const
 {
     return layer;
 }
 
+
 std::string GameObject::getTag() const
 {
     return tag;
 }
+
 
 bool GameObject::getIsActive() const
 {
     return isActive;
 }
 
+
 bool GameObject::getIsStatic() const
 {
     return isStatic;
 }
+
 
 int GameObject::getComponentCount() const
 {
     return componentManager->getComponentCount();
 }
 
+
+bool GameObject::getIsDestroyed() const
+{
+    return isDestroyed;
+}
+
+
 void GameObject::setName(const std::string &newName)
 {
     name = std::move(newName);
 }
+
 
 void GameObject::setLayer(int newLayer)
 {
     layer = newLayer;
 }
 
+
 void GameObject::setTag(const std::string &newTag)
 {
     tag = std::move(newTag);
 }
 
-void GameObject::setIsActive(bool value)
+
+void GameObject::setActive(bool value)
 {
     if (isActive == value)
         return;
 
     isActive = value;
 }
+
 
 void GameObject::setIsStatic(bool value)
 {

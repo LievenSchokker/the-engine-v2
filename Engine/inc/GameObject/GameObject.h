@@ -212,7 +212,7 @@ class GameObject
         * @brief Sets whether this GameObject is active.
         * @param value true to activate, false to deactivate
         */
-        void setIsActive(bool value);
+        void setActive(bool value);
 
 
         /**
@@ -240,6 +240,14 @@ class GameObject
          * Called by @c scenePlaceholder after this GameObject has been marked for destroyment by @c destroy()
          */
         void onSceneDestroy();
+
+        /**
+         * Checks whether this GameObject has been queued to be destroyed.
+         *
+         * Use this to determine if a GameObject is still present in memory, but should be removed at the end of the frame.
+         * @return the value of @c isDestroyed, set true in @c destroy() method.
+         */
+        bool getIsDestroyed() const;
 
     private:
         std::unique_ptr<ComponentManager> componentManager;

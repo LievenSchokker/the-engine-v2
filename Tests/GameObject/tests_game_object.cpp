@@ -173,4 +173,27 @@ namespace engine_tests
 
         EXPECT_EQ(currentActiveBehaviours.size(), 1);
     }
+
+    TEST(GameObjectTests, GameObjectDestroySetsFlag)
+    {
+        GameObject go;
+
+        EXPECT_FALSE(go.getIsDestroyed());
+        go.destroy();
+        EXPECT_TRUE(go.getIsDestroyed());
+    }
+
+    TEST(GameObjectTests, SetInactiveWhenDestroyCalled)
+    {
+        GameObject go;
+
+        EXPECT_TRUE(go.getIsActive());
+
+        /// Destroy doesnt delete the object itself, the scene is resonsible for doing so.
+        /// The object does become inactive however, so we test if that still works as intended.
+        go.destroy();
+        EXPECT_FALSE(go.getIsActive());
+        EXPECT_TRUE(go.getIsDestroyed());
+    }
+
 }

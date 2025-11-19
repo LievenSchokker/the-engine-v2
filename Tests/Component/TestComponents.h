@@ -14,34 +14,16 @@ namespace engine_tests
     class TestComponentBase : public Component
     {
         public:
-            TestComponentBase() = default;
-            ~TestComponentBase() = 0 {}
+            TestComponentBase();
+            ~TestComponentBase() override;
+
+            void onDestroy() override;
+
+            static int instanceCount;
+            bool destroyCalled = false;
     };
 
-
-
-    class TestComponentOne : public TestComponentBase
-    {
-        public:
-            TestComponentOne() = default;
-            ~TestComponentOne() = default;
-    };
-
-
-
-    class TestComponentTwo : public TestComponentBase
-    {
-        public:
-            TestComponentTwo() = default;
-            ~TestComponentTwo() = default;
-    };
-
-
-
-    class TestComponentThree : public TestComponentBase
-    {
-        public:
-            TestComponentThree() = default;
-            ~TestComponentThree() = default;
-    };
+    class TestComponentOne : public TestComponentBase {};
+    class TestComponentTwo : public TestComponentBase {};
+    class TestComponentThree : public TestComponentBase {};
 }

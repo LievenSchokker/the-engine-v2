@@ -60,7 +60,7 @@ namespace engine_tests
     TEST(BehaviourTests, ActiveAndEnabled)
     {
         GameObject go;
-        go.setIsActive(true);
+        go.setActive(true);
         TestBehaviourOne* behaviour = go.addComponent<TestBehaviourOne>();
 
         behaviour->setEnabled(true);
@@ -69,7 +69,7 @@ namespace engine_tests
         behaviour->setEnabled(false);
         EXPECT_FALSE(behaviour->getIsActiveAndEnabled());
 
-        go.setIsActive(false);
+        go.setActive(false);
         behaviour->setEnabled(true);
         EXPECT_FALSE(behaviour->getIsActiveAndEnabled());
     }
