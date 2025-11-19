@@ -73,4 +73,49 @@ namespace engine_tests
         behaviour->setEnabled(true);
         EXPECT_FALSE(behaviour->getIsActiveAndEnabled());
     }
+
+    TEST(BehaviourTest, ConstructorSetsInitialStatesCorrect)
+    {
+        TestBehaviourOne b;
+
+        EXPECT_TRUE(b.getIsEnabled());
+        EXPECT_FALSE(b.getHasAwakened());
+        EXPECT_FALSE(b.getHasStarted());
+        EXPECT_FALSE(b.destroyCalled);
+    }
+
+    TEST(BehaviourTest, ComponentInheritedMethods)
+    {
+        /// setup.
+        GameObject go;
+        TestBehaviourOne* behaviour = go.addComponent<TestBehaviourOne>();
+
+        /// 1) Inherited getGameObject function.
+        EXPECT_EQ(behaviour->getGameObject(), &go);
+
+        /// 2) Inherited getComponent function
+        TestComponentOne* retrievedFromGo = go.getComponent<TestComponentOne>();
+        TestComponentOne* retrievedFromBehaviour = behaviour->getComponent<TestComponentOne>();
+
+        /// Checks if the inherited getComponent function called from behaviour returns the same component as the one returned from go.GetComponent
+        EXPECT_EQ(retrievedFromGo, retrievedFromBehaviour);
+
+        /// 3) Inherited addComponent function
+        TestComponentThree* addedFromBehaviour = behaviour->addComponent<TestComponentThree>();
+
+        /// Checks if the inherited addComponent function works as intended:
+        /// The GO should now hold the by Behaviour added component.
+        EXPECT_TRUE(go.hasComponent(addedFromBehaviour));
+
+        /// 4) Inherited TryGetComponent function.
+        go.addComponent<TestBehaviourTwo>();
+        TestBehaviourTwo* outTryGetFromGo = nullptr;
+        TestBehaviourTwo* outTryGetFromBehaviour = nullptr;
+
+        bool tryGetFromGo = go.tryGetComponent<TestBehaviourTwo>(outTryGetFromGo);
+        bool tryGetFromBehaviour = go.tryGetComponent<TestBehaviourTwo>(outTryGetFromBehaviour);
+
+        EXPECT_EQ(tryGetFromGo, tryGetFromBehaviour);
+        EXPECT_EQ(outTryGetFromGo, outTryGetFromBehaviour);
+    }
 }

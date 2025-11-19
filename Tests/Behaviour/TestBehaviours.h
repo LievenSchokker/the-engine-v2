@@ -2,6 +2,8 @@
 // Created by samle on 18/11/2025.
 //
 #pragma once
+
+#include "../Component/TestComponents.h"
 #include "Behaviour/Behaviour.h"
 
 namespace engine_tests
@@ -27,25 +29,8 @@ namespace engine_tests
             bool destroyCalled = false;
     };
 
-    class TestBehaviourOne : public TestBehaviourBase
-    {
-        public:
-            TestBehaviourOne() = default;
-            ~TestBehaviourOne() override = default;
-    };
 
-    class TestBehaviourTwo : public TestBehaviourBase
-    {
-        public:
-            TestBehaviourTwo() = default;
-            ~TestBehaviourTwo() override = default;
-    };
-
-    class TestBehaviourThree : public TestBehaviourBase
-    {
-        public:
-            TestBehaviourThree() = default;
-            ~TestBehaviourThree() override = default;
-    };
-
+    class TestBehaviourOne : public TestBehaviourBase {};
+    class TestBehaviourTwo : public TestBehaviourBase {};
+    class TestBehaviourThree : public TestBehaviourBase {};
 }
