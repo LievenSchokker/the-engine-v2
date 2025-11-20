@@ -5,6 +5,9 @@
 #pragma once
 #include "Transport.h"
 #include "TransportGNS.h"
+#include <memory>
+#include <thread>
+
 
 /**
  * @brief Represents a network client that communicates with a server using TransportGNS.
