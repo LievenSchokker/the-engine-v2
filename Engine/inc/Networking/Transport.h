@@ -41,7 +41,7 @@ public:
      * @param port The port to bind and listen on.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult setUpListenSocket(uint16_t port) = 0;
+    virtual TransportResult setUpListenSocket(const uint16_t& port) = 0;
 
 
     /**
@@ -50,7 +50,7 @@ public:
      * @param port Server port.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult connectByIPAdress(const char* serverAddress, uint16_t port) = 0;
+    virtual TransportResult connectByIPAdress(const char* serverAddress, const uint16_t& port) = 0;
 
 
     /**
@@ -58,7 +58,7 @@ public:
      * @param RawMessage The message to send over the network.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult send(const OutgoingRawMessage& msg) = 0;
+    virtual TransportResult send(const OutgoingRawMessage& message) = 0;
 
 
     /**
@@ -66,7 +66,7 @@ public:
      * @param RawMessage The message to send over the network to all connections.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult sendToAll(const OutgoingRawMessage& msg) = 0;
+    virtual TransportResult sendToAll(OutgoingRawMessage& message) = 0;
 
 
     /**
@@ -74,7 +74,7 @@ public:
      * @param connectionId The connection ID to disconnect.
      * @return True if successful, false otherwise.
      */
-    virtual bool disconnectFromSocket(int connectionId) = 0;
+    virtual bool disconnectFromSocket(const int& connectionId) = 0;
 
 
     /**
@@ -93,14 +93,14 @@ public:
      * @brief Sets the callback for message reception.
      * @param callback A callable to invoke when a message is received.
      */
-    void setOnMessageReceived(OnMessageReceivedCallback callback) { onMessageReceived = callback; }
+    void setOnMessageReceived(const OnMessageReceivedCallback& callback) { onMessageReceived = callback; }
 
 
     /**
      * @brief Sets the callback for connection state changes.
      * @param callback A callable to invoke when a connection is established or closed.
      */
-    void setOnConnectionChanged(OnConnectionChangedCallback callback) { onConnectionChanged = callback; }
+    static void setOnConnectionChanged(const OnConnectionChangedCallback& callback) { onConnectionChanged = callback; }
 
 protected:
     OnMessageReceivedCallback onMessageReceived; ///< Callback for received messages.

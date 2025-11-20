@@ -14,9 +14,10 @@ public:
     {
     }
 
+
     int connectionID;
-    std::vector<std::byte> buffer;
-    SendMode sendMode;
+    const std::vector<std::byte> buffer;
+    const SendMode sendMode;
 
     const std::byte* data() const { return buffer.data(); }
     size_t size() const { return buffer.size(); }

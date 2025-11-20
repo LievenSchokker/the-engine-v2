@@ -8,7 +8,6 @@
 #include "Networking/Messages/IncommingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 
-TransportGNS* TransportGNS::pCallbackInstance = nullptr;
 
 TransportGNS::TransportGNS()
     : listenSocket(k_HSteamListenSocket_Invalid)
@@ -16,6 +15,13 @@ TransportGNS::TransportGNS()
       , steamNetworkingSockets(nullptr)
       , nextConnectionId(1)
 {
+
+    //Only single transport can exist at once because of static pointer callback refrence.
+    if (transportGNSCallbackInstance != nullptr)
+    {
+        throw std::runtime_error("TransportGNS: Only one instance can exist at a time");
+    }
+
     SteamDatagramErrMsg errorMessage;
     if (!GameNetworkingSockets_Init(nullptr, errorMessage))
     {
@@ -32,9 +38,7 @@ TransportGNS::TransportGNS()
         }
     );
 
-    SteamNetworkingUtils()->SetGlobalCallback_SteamNetConnectionStatusChanged(
-        steamNetConnectionStatusChangedCallback
-    );
+    SteamNetworkingUtils()->SetGlobalCallback_SteamNetConnectionStatusChanged(onSteamNetConnectionStatusChanged);
 }
 
 TransportGNS::~TransportGNS()
@@ -43,13 +47,14 @@ TransportGNS::~TransportGNS()
     GameNetworkingSockets_Kill();
 }
 
-TransportResult TransportGNS::setUpListenSocket(const uint16_t port)
+TransportResult TransportGNS::setUpListenSocket(const uint16_t& port)
 {
     SteamNetworkingIPAddr address{};
     address.Clear();
     address.m_port = port;
 
     listenSocket = steamNetworkingSockets->CreateListenSocketIP(address, 0, nullptr);
+
     if (listenSocket == k_HSteamListenSocket_Invalid)
     {
         return TransportResult::ERROR;
@@ -64,7 +69,7 @@ TransportResult TransportGNS::setUpListenSocket(const uint16_t port)
     return TransportResult::SUCCES;
 }
 
-TransportResult TransportGNS::connectByIPAdress(const char* socketAddress, uint16_t port)
+TransportResult TransportGNS::connectByIPAdress(const char* socketAddress, const uint16_t& port)
 {
     SteamNetworkingIPAddr address{};
     if (!address.ParseString(socketAddress))
@@ -104,18 +109,15 @@ TransportResult TransportGNS::send(const OutgoingRawMessage& message)
     return (result == k_EResultOK) ? TransportResult::SUCCES : TransportResult::ERROR;
 }
 
-TransportResult TransportGNS::sendToAll(const OutgoingRawMessage& message)
+TransportResult TransportGNS::sendToAll(OutgoingRawMessage& message)
 {
     std::vector<int> connectionIds = getActiveConnectionIds();
 
     for (int connectionID : connectionIds)
     {
-        std::vector<std::byte> bufferCopy = message.buffer;
-
-        OutgoingRawMessage messageCopy
-            (connectionID, std::move(bufferCopy), message.sendMode);
-
-        TransportResult result = send(messageCopy);
+        message.connectionID = connectionID;
+        TransportResult result = send(message);
+        
         if (result == TransportResult::ERROR)
         {
             return TransportResult::ERROR;
@@ -148,7 +150,7 @@ bool TransportGNS::closeOpenSocket()
     return true;
 }
 
-bool TransportGNS::disconnectFromSocket(int connectionId)
+bool TransportGNS::disconnectFromSocket(const int& connectionId)
 {
     HSteamNetConnection steamNetworkConnection = getSteamConnection(connectionId);
 
@@ -169,9 +171,8 @@ void TransportGNS::poll()
     pollIncomingMessages();
 }
 
-void TransportGNS::pollConnectionStateChanges()
+void TransportGNS::pollConnectionStateChanges() const
 {
-    pCallbackInstance = this;
     steamNetworkingSockets->RunCallbacks();
 }
 
@@ -190,7 +191,7 @@ void TransportGNS::pollIncomingMessages()
             {
                 IncomingRawMessage incoming(
                     cid,
-                    (const std::byte*)steamMessage->m_pData,
+                    static_cast<const std::byte*>(steamMessage->m_pData),
                     steamMessage->m_cbSize
                 );
                 onMessageReceived(incoming);
@@ -203,7 +204,7 @@ void TransportGNS::pollIncomingMessages()
     {
         std::lock_guard<std::mutex> lock(mapMutex);
         for (const auto& pair : mapConnections)
-            connectionsCopy.push_back(pair);
+            connectionsCopy.emplace_back(pair);
     }
 
     for (auto& [steamNetworkConnection, connectionId] : connectionsCopy)
@@ -213,7 +214,7 @@ void TransportGNS::pollIncomingMessages()
         {
             IncomingRawMessage incoming(
                 connectionId,
-                (const std::byte*)steamMessage->m_pData,
+                static_cast<const std::byte*>(steamMessage->m_pData),
                 steamMessage->m_cbSize
             );
 
@@ -228,12 +229,10 @@ void TransportGNS::pollIncomingMessages()
 void TransportGNS::steamNetConnectionStatusChangedCallback(
     SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
 {
-    pCallbackInstance->onSteamNetConnectionStatusChanged(pointerConnectionStatusInformation);
+    transportGNSCallbackInstance->onSteamNetConnectionStatusChanged(pointerConnectionStatusInformation);
 }
 
-
-void TransportGNS::onSteamNetConnectionStatusChanged(
-    const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
+void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
 {
     switch (pointerConnectionStatusInformation->m_info.m_eState)
     {
@@ -321,7 +320,7 @@ void TransportGNS::onSteamNetConnectionStatusChanged(
 
 int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 {
-    std::lock_guard<std::mutex> lock(mapMutex);
+    std::lock_guard lock(mapMutex);
     auto it = mapConnections.find(steamNetworkConnection);
     if (it != mapConnections.end())
         return it->second;
@@ -330,18 +329,18 @@ int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 
 HSteamNetConnection TransportGNS::getSteamConnection(int connectionId)
 {
-    std::lock_guard<std::mutex> lock(mapMutex);
-    for (const auto& connectionPair : mapConnections)
+    std::lock_guard lock(mapMutex);
+    for (const auto& [steamConnection, mappedConnectionId] : mapConnections)
     {
-        if (connectionPair.second == connectionId)
-            return connectionPair.first;
+        if (mappedConnectionId == connectionId)
+            return mappedConnectionId;
     }
     return k_HSteamNetConnection_Invalid;
 }
 
 std::vector<int> TransportGNS::getActiveConnectionIds()
 {
-    std::lock_guard<std::mutex> lock(mapMutex);
+    std::lock_guard lock(mapMutex);
     std::vector<int> ids;
     for (auto& connectionPair : mapConnections)
         ids.push_back(connectionPair.second);

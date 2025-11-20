@@ -14,7 +14,7 @@
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation)
     : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Server))
-    , status(ServerStatus::Stopping)
+      , status(ServerStatus::Stopping)
 {
     if (serverConnectionInformation.port == 0)
     {
@@ -40,7 +40,8 @@ ServerStatus Server::start()
     ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Server);
 
     // Set up message callback
-    connectionManager->setOnMessageCallback([this](IncomingRawMessage message) {
+    connectionManager->setOnMessageCallback([this](IncomingRawMessage message)
+    {
         onMessage(message);
     });
 
@@ -48,7 +49,7 @@ ServerStatus Server::start()
     {
         status = ServerStatus::Running;
         std::cout << "[Server] Started successfully on port "
-                  << setupInformation.port << "\n";
+            << setupInformation.port << "\n";
     }
     else
     {
@@ -79,13 +80,12 @@ ServerStatus Server::stop()
 
 void Server::onMessage(IncomingRawMessage rawMessage)
 {
-    std::cout << "Handle message" << std::endl;
     std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
     if (!message)
     {
         std::cerr << "Failed to parse message from client "
-                  << rawMessage.connectionID << "\n";
+            << rawMessage.connectionID << "\n";
         return;
     }
 
@@ -93,12 +93,12 @@ void Server::onMessage(IncomingRawMessage rawMessage)
     int clientId = rawMessage.connectionID;
 
     std::cout << "Received message type "
-              << static_cast<int>(messageType)
-              << " from client " << clientId << "\n";
+        << static_cast<int>(messageType)
+        << " from client " << clientId << "\n";
 
     switch (messageType)
     {
-        case MessageTypes::ConnectionMessage:
+    case MessageTypes::ConnectionMessage:
         {
             handleConnectionMessage(clientId, static_cast<ConnectionMessage*>(message.get()));
             break;
@@ -115,12 +115,12 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
     ConnectionStatus status = message->getStatus();
 
     std::cout << "Client " << clientId
-              << " connection message with status: "
-              << static_cast<int>(status) << "\n";
+        << " connection message with status: "
+        << static_cast<int>(status) << "\n";
 
     switch (status)
     {
-        case ConnectionStatus::Connected:
+    case ConnectionStatus::Connected:
         {
             connectedClients.insert(clientId);
 
@@ -137,14 +137,14 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
             break;
         }
 
-        case ConnectionStatus::Disconnected:
+    case ConnectionStatus::Disconnected:
         {
             connectionManager->disconnect(clientId);
             connectedClients.erase(clientId);
             break;
         }
 
-        case ConnectionStatus::Error:
+    case ConnectionStatus::Error:
         {
             break;
         }
