@@ -100,7 +100,7 @@ public:
      * @brief Sets the callback for connection state changes.
      * @param callback A callable to invoke when a connection is established or closed.
      */
-    static void setOnConnectionChanged(const OnConnectionChangedCallback& callback) { onConnectionChanged = callback; }
+     void setOnConnectionChanged(const OnConnectionChangedCallback& callback) { onConnectionChanged = callback; }
 
 protected:
     OnMessageReceivedCallback onMessageReceived; ///< Callback for received messages.

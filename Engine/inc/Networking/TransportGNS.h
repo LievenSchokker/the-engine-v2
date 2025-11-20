@@ -105,8 +105,8 @@ private:
 
     void onSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
-    static void steamNetConnectionStatusChangedCallback(
-    SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+    static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t*
+        pointerConnectionStatusInformation);
 
     /// Retrieves internal ID for a connection handle.
     int getConnectionId(HSteamNetConnection steamConn);
@@ -120,8 +120,8 @@ private:
     static int getSendFlags(SendMode sendMode);
 
 
-    //Steam provides global C style callback which doesn't support usage of the THIS type callback,
-    //Creates a static refrence to the currently active callback
+    /// GNS provides global C style callback which doesn't support usage of the THIS type callback,
+    /// Creates a static refrence to the currently active callback
     static TransportGNS* transportGNSCallbackInstance;
 
     HSteamListenSocket listenSocket;
@@ -133,3 +133,5 @@ private:
     int nextConnectionId;
     static TransportGNS* callbackInstance;
 };
+
+
