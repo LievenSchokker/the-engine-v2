@@ -27,55 +27,55 @@ struct Color {
 	static Color fromRGBA(uint8_t red, uint8_t green, uint8_t blue,
 						  uint8_t alpha = 255);
 
-	static Color Black(uint8_t alpha = 255);
+	static Color black(uint8_t alpha = 255);
 
-	static Color White(uint8_t alpha = 255);
+	static Color white(uint8_t alpha = 255);
 
-	static Color Blue(uint8_t alpha = 255);
+	static Color blue(uint8_t alpha = 255);
 
-	static Color Yellow(uint8_t alpha = 255);
+	static Color yellow(uint8_t alpha = 255);
 
-	static Color Red(uint8_t alpha = 255);
+	static Color red(uint8_t alpha = 255);
 
-	static Color Green(uint8_t alpha = 255);
+	static Color green(uint8_t alpha = 255);
 
-	static Color Purple(uint8_t alpha = 255);
+	static Color purple(uint8_t alpha = 255);
 
-	static Color Orange(uint8_t alpha = 255);
+	static Color orange(uint8_t alpha = 255);
 
-	static Color Pink(uint8_t alpha = 255);
+	static Color pink(uint8_t alpha = 255);
 
-	static Color Brown(uint8_t alpha = 255);
+	static Color brown(uint8_t alpha = 255);
 
-	static Color Gray(uint8_t alpha = 255);
+	static Color gray(uint8_t alpha = 255);
 
-	static Color LightGray(uint8_t alpha = 255);
+	static Color lightGray(uint8_t alpha = 255);
 
-	static Color DarkGray(uint8_t alpha = 255);
+	static Color darkGray(uint8_t alpha = 255);
 
-	static Color LightBlue(uint8_t alpha = 255);
+	static Color lightBlue(uint8_t alpha = 255);
 
-	static Color DarkBlue(uint8_t alpha = 255);
+	static Color darkBlue(uint8_t alpha = 255);
 
-	static Color LightGreen(uint8_t alpha = 255);
+	static Color lightGreen(uint8_t alpha = 255);
 
-	static Color DarkGreen(uint8_t alpha = 255);
+	static Color darkGreen(uint8_t alpha = 255);
 
-	static Color LightRed(uint8_t alpha = 255);
+	static Color lightRed(uint8_t alpha = 255);
 
-	static Color DarkRed(uint8_t alpha = 255);
+	static Color darkRed(uint8_t alpha = 255);
 
-	static Color LightYellow(uint8_t alpha = 255);
+	static Color lightYellow(uint8_t alpha = 255);
 
-	static Color DarkYellow(uint8_t alpha = 255);
+	static Color darkYellow(uint8_t alpha = 255);
 
-	static Color LightPurple(uint8_t alpha = 255);
+	static Color lightPurple(uint8_t alpha = 255);
 
-	static Color DarkPurple(uint8_t alpha = 255);
+	static Color darkPurple(uint8_t alpha = 255);
 
-	static Color LightOrange(uint8_t alpha = 255);
+	static Color lightOrange(uint8_t alpha = 255);
 
-	static Color DarkOrange(uint8_t alpha = 255);
+	static Color darkOrange(uint8_t alpha = 255);
 
-	static Color LightPink(uint8_t alpha = 255);
+	static Color lightPink(uint8_t alpha = 255);
 };
