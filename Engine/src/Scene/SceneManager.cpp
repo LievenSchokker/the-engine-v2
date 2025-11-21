@@ -157,7 +157,19 @@ void SceneManager::update(float deltaTime)
 
 void SceneManager::render()
 {
-	if ( activeScene != nullptr && !paused ) {
-		activeScene->render();
+	if ( activeScene != nullptr && !paused && renderer != nullptr ) {
+		renderer->beginFrame(clearColor);
+		activeScene->render(renderer);
+		renderer->presentFrame();
 	}
+}
+
+void SceneManager::setRenderer(IRenderer* renderer)
+{
+	this->renderer = renderer;
+}
+
+void SceneManager::setClearColor(const Color& color)
+{
+	this->clearColor = color;
 }
