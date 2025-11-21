@@ -20,7 +20,7 @@ protected:
 
 		std::filesystem::path testFilePath = __FILE__;
 		std::filesystem::path testDir = testFilePath.parent_path();
-		testImagePath = (testDir / "Sprite" / "MissingTexture.jpg").string();
+		testImagePath = (testDir / "Sprite" / "MissingTexture.png").string();
 	}
 
 	void TearDown() override {
