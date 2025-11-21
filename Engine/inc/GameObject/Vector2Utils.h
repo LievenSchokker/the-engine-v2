@@ -16,4 +16,4 @@ namespace Vector2Utils
  * @return The sanitized vector.
  */
 Vector2 sanitizeScale(Vector2 scale);
-} // namespace Vector2Utils
+}  // namespace Vector2Utils
