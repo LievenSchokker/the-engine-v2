@@ -20,13 +20,14 @@
 Client::Client()
     : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Client))
 {
-    setDefaultOnMessageReceived();
-    setDefaultOnConnectionChanged();
+    connectionManager->setOnMessageCallback([this](const IncomingRawMessage& rawMessage)
+    {
+        onMessageReceived(rawMessage);
+    });
 }
 
 Client::~Client()
 {
-    running = false;
     if (listenThread.joinable())
         listenThread.join();
     connectionManager->shutdown();
@@ -38,7 +39,8 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
     serverInfo.ip = serverIP;
     serverInfo.port = port;
 
-    connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected) {
+    connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected)
+    {
         if (isConnected)
         {
             clientConnectionId = connId;
@@ -58,7 +60,6 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
     {
         return false;
     }
-    running = true;
     createListenThread();
 
     return true;
@@ -66,19 +67,14 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
 
 bool Client::sendMessage(IMessage& message)
 {
-    if (!connected)
-    {
-        return false;
-    }
-
-    if (clientConnectionId == -1)
+    if (currentConnection.connectionStatus == ConnectionStatus::Disconnected)
     {
         return false;
     }
 
     OutgoingRawMessage outgoing = MessageWriter::writeMessage(
         message,
-        clientConnectionId,
+        currentConnection.transportConnectionId,
         SendMode::ReliableOrdered
     );
 
@@ -87,64 +83,38 @@ bool Client::sendMessage(IMessage& message)
     return true;
 }
 
-void Client::setOnMessageReceived(const OnMessageReceivedCallback& callback)
+void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 {
-    connectionManager->setOnMessageCallback(callback);
-}
+    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
-void Client::setOnConnectionChanged(const OnConnectionChangedCallback& callback)
-{
-    // Could store and forward to user callback if needed
-}
-
-void Client::setDefaultOnMessageReceived()
-{
-    connectionManager->setOnMessageCallback([this](const IncomingRawMessage& rawMessage)
+    if (!message)
     {
-        std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+        return;
+    }
 
-        if (!message)
+    MessageTypes messageType = message->getMessageType();
+
+    switch (messageType)
+    {
+    case MessageTypes::ConnectionMessage:
         {
-            return;
+            ConnectionMessage* connMsg = static_cast<ConnectionMessage*>(message.get());
+            ConnectionStatus status = connMsg->getStatus();
+            break;
         }
-
-        MessageTypes messageType = message->getMessageType();
-
-        switch (messageType)
+    default:
         {
-        case MessageTypes::ConnectionMessage:
-            {
-                ConnectionMessage* connMsg = static_cast<ConnectionMessage*>(message.get());
-                ConnectionStatus status = connMsg->getStatus();
-
-                if (status == ConnectionStatus::Disconnected)
-                {
-                    connected = false;
-                    running = false;
-                }
-                break;
-            }
-        default:
-            {
-                break;
-            }
+            break;
         }
-    });
+    }
 }
 
-void Client::setDefaultOnConnectionChanged()
+void Client::onConnectionChanged()
 {
     // Already set in connectToServer
 }
 
-void Client::createListenThread()
+void Client::poll()
 {
-    listenThread = std::thread([this]()
-    {
-        while (running)
-        {
-            connectionManager->poll();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        }
-    });
+    connectionManager->poll();
 }
