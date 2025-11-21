@@ -13,40 +13,6 @@ class MockGameObject: public GameObject
 	{
 		setName(name);
 	}
-
-	// int onStartCallCount = 0;
-	// int onStopCallCount = 0;
-	// int onPauseCallCount = 0;
-	// int onResumeCallCount = 0;
-	// int updateCallCount = 0;
-	// int renderCallCount = 0;
-	// float totalDeltaTime = 0.0f;
-
-	// void onStart() override
-	// {
-	//     onStartCallCount++;
-	// }
-
-	// void onStop() override
-	// {
-	//     onStopCallCount++;
-	// }
-
-	// void onPause() override
-	// {
-	//     onPauseCallCount++;
-	// }
-
-	// void onResume() override
-	// {
-	//     onResumeCallCount++;
-	// }
-
-	// void update(float deltaTime) override
-	// {
-	//     updateCallCount++;
-	//     totalDeltaTime += deltaTime;
-	// }
 };
 
 TEST(SceneManagerTest, MainFlowIntegration)
@@ -76,10 +42,6 @@ TEST(SceneManagerTest, MainFlowIntegration)
 	EXPECT_EQ(scenePtr->getName(), "PrototypeScene");
 	ASSERT_NE(sceneManager.getActiveScene(), nullptr);
 	EXPECT_EQ(sceneManager.getActiveScene()->getName(), "PrototypeScene");
-	// EXPECT_EQ(gameObjectPtr->onStartCallCount, 1);
-	// EXPECT_EQ(gameObjectPtr->onStopCallCount, 0);
-	// EXPECT_EQ(gameObjectPtr->updateCallCount, 2);
-	// EXPECT_FLOAT_EQ(gameObjectPtr->totalDeltaTime, deltaTime1 + deltaTime2);
 }
 
 TEST(SceneManagerTest, CompleteLifecycle)
@@ -115,10 +77,6 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
 	// Assert
 	EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene1");
-	// EXPECT_EQ(obj1Ptr->onStartCallCount, 1);
-	// EXPECT_EQ(obj1Ptr->updateCallCount, 1);
-	// EXPECT_EQ(obj2Ptr->onStartCallCount, 0);
-	// EXPECT_EQ(obj2Ptr->updateCallCount, 0);
 
 	// Act - Pause
 	sceneManager.pause();
@@ -127,15 +85,12 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
 	// Assert
 	EXPECT_TRUE(sceneManager.isPaused());
-	// EXPECT_EQ(obj1Ptr->onPauseCallCount, 1);
-	// EXPECT_EQ(obj1Ptr->updateCallCount, 1);
 
 	// Act - Pause again (should be no-op)
 	sceneManager.pause();
 
 	// Assert
 	EXPECT_TRUE(sceneManager.isPaused());
-	// EXPECT_EQ(obj1Ptr->onPauseCallCount, 1);
 
 	// Act - Resume
 	sceneManager.resume();
@@ -144,15 +99,12 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
 	// Assert
 	EXPECT_FALSE(sceneManager.isPaused());
-	// EXPECT_EQ(obj1Ptr->onResumeCallCount, 1);
-	// EXPECT_EQ(obj1Ptr->updateCallCount, 2);
 
 	// Act - Resume again (should be no-op)
 	sceneManager.resume();
 
 	// Assert
 	EXPECT_FALSE(sceneManager.isPaused());
-	// EXPECT_EQ(obj1Ptr->onResumeCallCount, 1);
 
 	// Act - Switch to Scene2
 	sceneManager.setActiveScene("Scene2");
@@ -162,10 +114,6 @@ TEST(SceneManagerTest, CompleteLifecycle)
 	// Assert
 	EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene2");
 	EXPECT_FALSE(sceneManager.isPaused());
-	// EXPECT_EQ(obj1Ptr->onStopCallCount, 1);
-	// EXPECT_EQ(obj1Ptr->updateCallCount, 2);
-	// EXPECT_EQ(obj2Ptr->onStartCallCount, 1);
-	// EXPECT_EQ(obj2Ptr->updateCallCount, 1);
 
 	// Act - Remove active scene and try removing non-existent scene
 	bool removed = sceneManager.removeScene("Scene2");
@@ -220,15 +168,11 @@ TEST(SceneManagerTest, AddGameObjectToActiveScene)
 	auto obj2 = std::make_unique<MockGameObject>("Object2");
 	auto* obj2Ptr = obj2.get();
 	scenePtr->addGameObject(std::move(obj2));
-	// EXPECT_EQ(obj1Ptr->onStartCallCount, 0);
-	// EXPECT_EQ(obj2Ptr->onStartCallCount, 0);
 
 	// Act - Activate scene
 	sceneManager.setActiveScene("Scene1");
 
 	// Assert - Objects added before activation should start
-	// EXPECT_EQ(obj1Ptr->onStartCallCount, 1);
-	// EXPECT_EQ(obj2Ptr->onStartCallCount, 1);
 
 	// Act - Add object to active scene
 	auto obj3 = std::make_unique<MockGameObject>("Object3");
@@ -236,7 +180,6 @@ TEST(SceneManagerTest, AddGameObjectToActiveScene)
 	scenePtr->addGameObject(std::move(obj3));
 
 	// Assert - Object added to active scene should start immediately
-	// EXPECT_EQ(obj3Ptr->onStartCallCount, 1);
 }
 
 TEST(SceneManagerTest, UpdateRenderWithNoActiveScene)
@@ -253,8 +196,7 @@ TEST(SceneManagerTest, UpdateRenderWithNoActiveScene)
 	sceneManager.update(0.1f);
 	sceneManager.render();
 
-	// Assert
-	// EXPECT_EQ(obj1Ptr->updateCallCount, 0);
+	// Assert - No updates should occur without active scene
 }
 
 TEST(SceneManagerTest, TransferGameObject)
@@ -272,8 +214,6 @@ TEST(SceneManagerTest, TransferGameObject)
 
 	// Act & Assert - Transfer while both scenes are inactive
 	EXPECT_TRUE(sceneManager.transferGameObject("Scene1", "Scene2", "Player"));
-	// EXPECT_EQ(obj1Ptr->onStopCallCount, 0);
-	// EXPECT_EQ(obj1Ptr->onStartCallCount, 0);
 
 	Scene* scene2Ptr = sceneManager.getScene("Scene2");
 	ASSERT_NE(scene2Ptr, nullptr);
@@ -284,8 +224,7 @@ TEST(SceneManagerTest, TransferGameObject)
 	// Act - Activate Scene2
 	sceneManager.setActiveScene("Scene2");
 
-	// Assert
-	// EXPECT_EQ(obj1Ptr->onStartCallCount, 1);
+	// Assert - Object should be started when scene becomes active
 
 	// Arrange - Activate Scene1 with new object
 	auto scene3 = std::make_unique<Scene>("Scene3");
@@ -294,13 +233,11 @@ TEST(SceneManagerTest, TransferGameObject)
 	scene3->addGameObject(std::move(obj2));
 	sceneManager.addScene(std::move(scene3));
 	sceneManager.setActiveScene("Scene3");
-	// EXPECT_EQ(obj2Ptr->onStartCallCount, 1);
 
 	// Act - Transfer from active scene
 	EXPECT_TRUE(sceneManager.transferGameObject("Scene3", "Scene2", "Enemy"));
 
-	// Assert
-	// EXPECT_EQ(obj2Ptr->onStopCallCount, 1);
+	// Assert - Object should be stopped when transferred from active scene
 	EXPECT_EQ(scene2Ptr->getGameObject("Enemy"), obj2Ptr);
 }
 
@@ -342,7 +279,6 @@ TEST(SceneTest, ExtractGameObject)
 	ASSERT_NE(extracted, nullptr);
 	EXPECT_EQ(extracted.get(), objPtr);
 	EXPECT_EQ(scene.getGameObject("TestObj"), nullptr);
-	// EXPECT_EQ(objPtr->onStopCallCount, 0);
 
 	// Arrange - Extract from active scene
 	Scene scene2("TestScene2");
@@ -356,7 +292,6 @@ TEST(SceneTest, ExtractGameObject)
 	ASSERT_NE(extracted2, nullptr);
 	EXPECT_EQ(extracted2.get(), obj2Ptr);
 	EXPECT_EQ(scene2.getGameObject("TestObj2"), nullptr);
-	// EXPECT_EQ(obj2Ptr->onStopCallCount, 1);
 
 	// Act & Assert - Extract non-existent object
 	auto extracted3 = scene2.extractGameObject("NonExistent");
