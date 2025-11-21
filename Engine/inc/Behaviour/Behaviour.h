@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "core/component/Component.h"
+#include "Component/Component.h"
 
 
 class Behaviour : public Component

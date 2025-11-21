@@ -8,6 +8,7 @@ add_executable(engine_tests
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
         GameObject/tests_game_object.cpp
+        Scene/SceneManagerTest.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
