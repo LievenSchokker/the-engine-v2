@@ -22,21 +22,21 @@ class RawMessage
 public:
     /**
      * @brief Construct a RawMessage from raw memory.
-     * @param cid The connection ID associated with this message.
+     * @param connectionID The connection ID associated with this message.
      * @param data Pointer to the raw byte data.
      * @param len Length of the data pointed to by @p data.
      * @param sendMode The send mode for transmission (Reliable, Unreliable, etc.).
      */
-    RawMessage(int cid, const std::byte* data, size_t len,
+    RawMessage(int connectionID, const std::byte* data, size_t len,
                SendMode sendMode = SendMode::Unreliable);
 
     /**
      * @brief Construct a RawMessage from a string.
-     * @param cid The connection ID associated with this message.
+     * @param connectionID The connection ID associated with this message.
      * @param str The payload string.
      * @param sendMode The send mode for transmission.
      */
-    RawMessage(int cid, const std::string& str,
+    RawMessage(int connectionID, const std::string& str,
                SendMode sendMode = SendMode::ReliableOrdered);
 
     /**
