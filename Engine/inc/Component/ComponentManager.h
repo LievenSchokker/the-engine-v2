@@ -85,7 +85,7 @@ public:
     void removeComponent(Component* component);
 
     /**
-     * @brief Removes all components stored in @c components
+     * @brief removes and destroys all components stored in @c components
      */
     void destroyAllComponents();
 

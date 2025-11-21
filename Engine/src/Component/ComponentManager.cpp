@@ -31,10 +31,10 @@ void ComponentManager::enableAllBehaviours()
 
 void ComponentManager::disableAllBehaviours()
 {
-    // for (auto& behaviour : behaviours)
-    // {
-    //     behaviour->setEnabled(false);
-    // }
+    for (auto& behaviour : behaviours)
+    {
+        behaviour->setEnabled(false);
+    }
 }
 
 

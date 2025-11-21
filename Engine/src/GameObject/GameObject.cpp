@@ -30,7 +30,7 @@ GameObject::~GameObject()
 }
 
 
-bool GameObject::compareTag(const std::string &other)
+bool GameObject::compareTag(const std::string& other)
 {
     return tag == other;
 }

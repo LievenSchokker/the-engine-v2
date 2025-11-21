@@ -116,7 +116,7 @@ class Behaviour : public Component
         bool getHasStarted() const;
 
     private:
-        /// Enabled components are Updated, disaled Beahviours are not.
+        /// Enabled components are Updated, disabled Beahviours are not.
         bool isEnabled;
 
         /// Keeps track if awake has been called for this Behaviour.
