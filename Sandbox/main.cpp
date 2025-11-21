@@ -6,6 +6,7 @@
 #include <atomic>
 #include <set>
 #include "Networking/Client.h"
+#include "Networking/TransportGNS.h"
 #include "Networking/Server/Server.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/Messages/ConnectionMessage.h"
@@ -15,7 +16,7 @@ std::atomic<int> firstClientId{-1};
 
 void runServer()
 {
-    ServerConnectionInformation serverInformation{8080, "145.49.85.218"};
+    ServerConnectionInformation serverInformation{8080, "127.0.0.1"};
     Server server{serverInformation};
 
     server.start();
@@ -68,7 +69,7 @@ void runClient()
 
     std::cout << "Connecting to server" << std::endl;
 
-    if (!client.connectToServer(8080, "145.49.85.218"))
+    if (!client.connectToServer(8080, "127.0.0.1"))
     {
         return;
     }
