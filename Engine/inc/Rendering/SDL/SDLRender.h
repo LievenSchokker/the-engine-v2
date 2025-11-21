@@ -26,7 +26,7 @@
 #include <SDL.h>
 
 
-#include "../../../inc/rendering/IRender.h"
+#include "../../../inc/Rendering/IRender.h"
 
 
 class SdlContext;

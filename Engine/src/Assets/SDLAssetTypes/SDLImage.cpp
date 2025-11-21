@@ -12,7 +12,7 @@
 
 
 
-SDLImage::SDLImage()
+SDLImage::SDLImage() : surface(nullptr)
 {
 	assetType = AssetType::Sprite;
 }
