@@ -25,7 +25,7 @@ target_include_directories(engine PUBLIC
 )
 
 
-target_link_libraries(engine PRIVATE
+target_link_libraries(engine PUBLIC
         SDL2::SDL2
         SDL2_image::SDL2_image
         GameNetworkingSockets::GameNetworkingSockets

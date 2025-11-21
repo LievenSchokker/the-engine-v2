@@ -1,6 +1,4 @@
 #pragma once
-#ifndef INPUT_MANAGER_H
-#define INPUT_MANAGER_H
 
 #include "KeyCode.h"
 #include "MouseButton.h"
@@ -238,4 +236,3 @@ class InputManager
     bool quitSignaled = false;
 };
 
-#endif // INPUT_MANAGER_H
