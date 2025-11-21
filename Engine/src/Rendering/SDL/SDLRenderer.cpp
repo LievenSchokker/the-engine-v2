@@ -2,7 +2,7 @@
 /// Created by Lieven Schokker on 11/11/2025.
 ///
 
-#include "../../../inc/Rendering/SDL/SDLRender.h"
+#include "../../../inc/Rendering/SDL/SDLRenderer.h"
 
 #include "../../../inc/External/SdlContext.h"
 #include "../../../inc/GameObject/Vector2Utils.h"
@@ -21,17 +21,17 @@ constexpr double kRotationThresholdDegrees = 0.01; // Threshold below which rota
 constexpr int kMinWindowDimension = 1;             // Minimum window width/height
 } // namespace
 
-SDLRender::SDLRender(SdlContext &context)
+SDLRenderer::SDLRenderer(SdlContext &context)
 {
     assert(context.wasInit(SDL_INIT_VIDEO) && "SDL video subsystem not initialized");
 }
 
-SDLRender::~SDLRender()
+SDLRenderer::~SDLRenderer()
 {
     close();
 }
 
-void SDLRender::open(const WindowOptions &opts)
+void SDLRenderer::open(const WindowOptions &opts)
 {
     // Validate window dimensions
     if (opts.width < kMinWindowDimension || opts.height < kMinWindowDimension)
@@ -72,12 +72,12 @@ void SDLRender::open(const WindowOptions &opts)
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 }
 
-bool SDLRender::isOpen()
+bool SDLRenderer::isOpen()
 {
     return window != nullptr;
 }
 
-void SDLRender::close()
+void SDLRenderer::close()
 {
     if (renderer != nullptr)
     {
@@ -92,7 +92,7 @@ void SDLRender::close()
     }
 }
 
-void SDLRender::setTitle(const std::string &title)
+void SDLRenderer::setTitle(const std::string &title)
 {
     if (window != nullptr)
     {
@@ -100,7 +100,7 @@ void SDLRender::setTitle(const std::string &title)
     }
 }
 
-void SDLRender::beginFrame(const Color &clearColor)
+void SDLRenderer::beginFrame(const Color &clearColor)
 {
     if (renderer == nullptr)
     {
@@ -111,7 +111,7 @@ void SDLRender::beginFrame(const Color &clearColor)
     SDL_RenderClear(renderer);
 }
 
-void SDLRender::presentFrame()
+void SDLRenderer::presentFrame()
 {
     if (renderer == nullptr)
     {
@@ -121,7 +121,7 @@ void SDLRender::presentFrame()
     SDL_RenderPresent(renderer);
 }
 
-void SDLRender::drawCircle(const Vector2 &center, double radius, const Color &color, const Vector2 &scale)
+void SDLRenderer::drawCircle(const Vector2 &center, double radius, const Color &color, const Vector2 &scale)
 {
     if (renderer == nullptr)
     {
@@ -154,7 +154,7 @@ void SDLRender::drawCircle(const Vector2 &center, double radius, const Color &co
     }
 }
 
-void SDLRender::drawRectangle(const Vector2 &center, const Vector2 &size, double rotationDegrees, const Color &color, const Vector2 &scale)
+void SDLRenderer::drawRectangle(const Vector2 &center, const Vector2 &size, double rotationDegrees, const Color &color, const Vector2 &scale)
 {
     if (renderer == nullptr)
     {

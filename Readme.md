@@ -120,4 +120,4 @@ sceneManager.render(); // Draws both shapes using the object's transforms
 ```
 
 Shapes automatically follow the owning object's position, rotation, and scale every frame. Use
-`SceneManager::setRenderer` to hook the active renderer (e.g., `SDLRender`) into the render loop.
+`SceneManager::setRenderer` to hook the active renderer (e.g., `SDLRenderer`) into the render loop.

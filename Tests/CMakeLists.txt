@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(engine_tests)
 
 add_executable(engine_tests
-        Rendering/SDL/SDLRenderTest.cpp
+        Rendering/SDL/SDLRendererTest.cpp
         Rendering/ShapeRendererTest.cpp
         Input/InputManagerTest.cpp
         Component/tests_component.cpp

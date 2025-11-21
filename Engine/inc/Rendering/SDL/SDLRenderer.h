@@ -1,12 +1,12 @@
 /**
- * @file SDLRender.h
+ * @file SDLRenderer.h
  * @brief SDL2-based implementation of the rendering interface
  * @author Lieven Schokker
  * @date 11/11/2025
  */
 
 /**
- * @class SDLRender
+ * @class SDLRenderer
  * @brief SDL2 implementation of IRenderer for cross-platform windowing and rendering
  *
  * This class wraps SDL2's window and renderer API to provide a concrete implementation
@@ -26,7 +26,7 @@
 
 class SdlContext;
 
-class SDLRender : public IRenderer
+class SDLRenderer : public IRenderer
 {
   public:
     /**
@@ -40,14 +40,14 @@ class SDLRender : public IRenderer
      * @pre context must have SDL_INIT_VIDEO initialized
      * @throws assertion failure if video subsystem not initialized (debug builds)
      */
-    explicit SDLRender(SdlContext &context);
+    explicit SDLRenderer(SdlContext &context);
 
     /**
      * @brief Ensures proper cleanup of SDL resources in correct order
      *
      * Automatically calls close() to prevent resource leaks if the user forgets.
      */
-    ~SDLRender() override;
+    ~SDLRenderer() override;
 
     /**
      * @brief Creates SDL window with hardware-accelerated rendering
