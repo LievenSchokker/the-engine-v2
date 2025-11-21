@@ -25,7 +25,7 @@ TEST_F(TimerTest, OneSecondEqualsTickRate) {
     const double fixedDeltaTime = 1.0 / targetTickRate;
 
     Timer timer(fixedDeltaTime, []() {
-        return SDL_GetTicks();
+        return SDL_GetTicks() / 1000.0;
     });
 
     timer.start();
@@ -83,7 +83,7 @@ TEST_F(TimerTest, SpiralOfDeathPrevention) {
     const double maxFrameTime = 0.25;
 
     Timer timer(fixedDeltaTime, []() {
-        return SDL_GetTicks();
+        return SDL_GetTicks() / 1000.0;
     });
 
     //Act

@@ -17,11 +17,12 @@ void Timer::start()
     currentTime = getClock();
     accumulatedTime = 0.0;
     simulationTime = 0.0;
+    tickRate = 0;
 }
 
 void Timer::tick()
 {
-    double newTime = getClock() / 1000.0;
+    double newTime = getClock();
     double frameTime = newTime - currentTime;
 
     // This is to prevent spiral of death.
