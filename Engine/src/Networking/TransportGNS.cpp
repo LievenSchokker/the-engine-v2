@@ -21,21 +21,14 @@ TransportGNS::TransportGNS()
     transportGNSCallbackInstance = this;
 
     SteamDatagramErrMsg errorMessage;
+
     if (!GameNetworkingSockets_Init(nullptr, errorMessage))
     {
         return;
     }
 
     steamNetworkingSockets = SteamNetworkingSockets();
-
-    SteamNetworkingUtils()->SetDebugOutputFunction(
-        k_ESteamNetworkingSocketsDebugOutputType_Msg,
-        [](ESteamNetworkingSocketsDebugOutputType eType, const char* message)
-        {
-            std::cout << message << std::endl;
-        }
-    );
-
+    SteamNetworkingUtils()->SetDebugOutputFunction(k_ESteamNetworkingSocketsDebugOutputType_Msg, debugOutput);
     SteamNetworkingUtils()->SetGlobalCallback_SteamNetConnectionStatusChanged(steamNetConnectionStatusChangedCallback);
 }
 
@@ -348,4 +341,9 @@ void TransportGNS::addNewConnection(const SteamNetConnectionStatusChangedCallbac
 
     //After creating the new connection still need to notify other layers.
     safeOnConnectionChanged(connection);
+}
+
+void TransportGNS::debugOutput(ESteamNetworkingSocketsDebugOutputType eType, const char* message)
+{
+    std::cout << message << std::endl;
 }

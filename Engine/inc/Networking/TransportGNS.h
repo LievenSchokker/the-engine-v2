@@ -4,6 +4,7 @@
 #include <map>
 #include <mutex>
 #include <vector>
+#include <steam/steamnetworkingtypes.h>
 #include <steam/steamtypes.h>
 
 #include "Transport.h"
@@ -121,8 +122,7 @@ private:
     static int getSendFlags(SendMode sendMode);
     void safeOnConnectionChanged(const Connection& connection);
     void addNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
-    void AddNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
-
+    static void debugOutput(ESteamNetworkingSocketsDebugOutputType eType, const char* message);
 
     /// GNS provides global C style callback which doesn't support usage of the THIS type callback,
     /// Creates a static refrence to the currently active callback
@@ -131,7 +131,6 @@ private:
     HSteamListenSocket listenSocket;
     HSteamNetPollGroup pollGroup;
     ISteamNetworkingSockets* steamNetworkingSockets;
-
     std::map<HSteamNetConnection, int> mapConnections;
     std::mutex mapMutex;
     int nextConnectionId;
