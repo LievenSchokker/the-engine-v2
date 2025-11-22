@@ -27,7 +27,7 @@ bool ConnectionMessage::deserialize(const std::byte* data, size_t length)
     uint8_t statusValue;
     std::memcpy(&statusValue, data, sizeof(uint8_t));
 
-    if (statusValue > static_cast<uint8_t>(ConnectionStatus::Error))
+    if (statusValue > static_cast<uint8_t>(ConnectionStatus::Death))
     {
         return false;
     }

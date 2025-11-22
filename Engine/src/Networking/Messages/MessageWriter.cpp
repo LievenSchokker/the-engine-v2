@@ -10,11 +10,17 @@
 
 #include <cstring>
 
-
 OutgoingRawMessage MessageWriter::writeMessage(
     const IMessage& message,
     int connectionId,
     SendMode sendMode)
 {
-    return {connectionId, message.serialize(), sendMode};
+    std::vector<std::byte> payload = message.serialize();
+
+    std::vector<std::byte> buffer(sizeof(uint8_t) + payload.size());
+    auto typeValue = static_cast<uint8_t>(message.getMessageType());
+    std::memcpy(buffer.data(), &typeValue, sizeof(uint8_t));
+    std::memcpy(buffer.data() + sizeof(uint8_t), payload.data(), payload.size());
+
+    return {connectionId, std::move(buffer), sendMode};
 }
