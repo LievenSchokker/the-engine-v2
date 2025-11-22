@@ -27,7 +27,6 @@ enum class ConnectionStatus : uint8_t;
 class Server
 {
 public:
-    explicit Server(const ServerConnectionInformation& serverConnectionInformation);
     Server(const ServerConnectionInformation& serverConnectionInformation,
            std::unique_ptr<ITransport> injectedTransport);
 
