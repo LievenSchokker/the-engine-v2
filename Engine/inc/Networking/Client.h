@@ -8,7 +8,6 @@
 #include <memory>
 #include <thread>
 
-
 /**
  * @brief Represents a network client that communicates with a server using TransportGNS.
  *
