@@ -2,7 +2,7 @@
 #ifndef SDL_INPUT_ADAPTER_H
 #define SDL_INPUT_ADAPTER_H
 
-#include <SDL2/SDL.h>
+
 #include "KeyCode.h"
 #include "MouseButton.h"
 #include "IInputAdapter.h"

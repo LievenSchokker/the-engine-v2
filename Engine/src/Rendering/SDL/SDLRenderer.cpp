@@ -1,12 +1,7 @@
-///
-/// Created by Lieven Schokker on 11/11/2025.
-///
-
-#include "../../../inc/Rendering/SDL/SDLRenderer.h"
-
-#include "../../../inc/External/SdlContext.h"
-#include "../../../inc/GameObject/Vector2Utils.h"
-#include "../../../inc/Rendering/Window/WindowOptions.h"
+#include "External/SdlContext.h"
+#include "GameObject/Vector2Utils.h"
+#include "Rendering/Window/WindowOptions.h"
+#include "Rendering/SDL/SDLRenderer.h"
 
 #include <algorithm>
 #include <array>
@@ -17,10 +12,9 @@
 namespace
 {
 constexpr double kPi = 3.14159265358979323846;
-constexpr double kRotationThresholdDegrees =
-	0.01;  // Threshold below which rotation is treated as zero
-constexpr int kMinWindowDimension = 1;	// Minimum window width/height
-}  // namespace
+constexpr double kRotationThresholdDegrees = 0.01;
+constexpr int kMinWindowDimension = 1;
+}
 
 SDLRenderer::SDLRenderer(SdlContext& context)
 {
