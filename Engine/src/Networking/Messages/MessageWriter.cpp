@@ -12,13 +12,13 @@ OutgoingRawMessage MessageWriter::writeMessage(
     SendMode sendMode)
 {
     std::vector<std::byte> packet = buildPacket(message);
-    return OutgoingRawMessage(connectionId, std::move(packet), sendMode);
+    return {connectionId, std::move(packet), sendMode};
 }
 
 std::vector<std::byte> MessageWriter::buildPacket(const IMessage& message)
 {
     MessageTypes messageType = message.getMessageType();
-    uint8_t typeValue = static_cast<uint8_t>(messageType);
+    auto typeValue = static_cast<uint8_t>(messageType);
     std::vector<std::byte> payload = message.serialize();
     std::vector<std::byte> packet(sizeof(uint8_t) + payload.size());
 

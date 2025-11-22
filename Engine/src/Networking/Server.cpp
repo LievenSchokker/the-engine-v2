@@ -12,6 +12,8 @@
 #include "Networking/SendMode.h"
 #include <iostream>
 
+#include "Networking/TransportResult.h"
+
 Server::Server(const ServerConnectionInformation& serverConnectionInformation)
     : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Server))
       , status(ServerStatus::Stopping)
@@ -98,12 +100,17 @@ void Server::onMessage(IncomingRawMessage rawMessage)
     {
     case MessageTypes::ConnectionMessage:
         {
-            handleConnectionMessage(clientId, static_cast<ConnectionMessage*>(message.get()));
+            if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get())) {
+                handleConnectionMessage(clientId, connMsg);
+            } else {
+                std::cerr << "Message type mismatch" << std::endl;
+            }
             break;
         }
     default:
         {
-            throw std::runtime_error("Unknown message type");
+            std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
+            break;
         }
     }
 }
@@ -161,9 +168,11 @@ void Server::kickClient(int clientId)
         SendMode::ReliableOrdered
     );
 
-    connectionManager->send(outgoing);
+    TransportResult  result = connectionManager->send(outgoing);
 
-    connectionManager->disconnect(clientId);
-
-    connectedClients.erase(clientId);
+    if (result == TransportResult::SUCCES)
+    {
+        connectionManager->disconnect(clientId);
+        connectedClients.erase(clientId);
+    }
 }
