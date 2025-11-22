@@ -37,23 +37,6 @@ ConnectionStatus ConnectionManager::init(const ServerConnectionInformation& info
         handleTransportMessage(msg);
     });
 
-    transport->setOnConnectionChanged([this](int connId, bool connected) {
-        if (connected)
-        {
-            Connection conn = {connId, ConnectionStatus::Connected};
-            connections[connId] = conn;
-        }
-        else
-        {
-            connections.erase(connId);
-        }
-
-        if (onConnectionChanged)
-        {
-            onConnectionChanged(connId, connected);
-        }
-    });
-
     TransportResult result;
     if (mode == ConnectionMode::Host)
     {
@@ -100,11 +83,6 @@ void ConnectionManager::handleTransportMessage(const IncomingRawMessage& message
 void ConnectionManager::setOnMessageCallback(std::function<void(IncomingRawMessage)> callback)
 {
     onMessage = std::move(callback);
-}
-
-void ConnectionManager::setOnConnectionChangedCallback(std::function<void(int, bool)> callback)
-{
-    onConnectionChanged = std::move(callback);
 }
 
 void ConnectionManager::poll() const

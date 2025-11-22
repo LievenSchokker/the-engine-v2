@@ -43,11 +43,6 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
     serverInfo.ip = serverIP;
     serverInfo.port = port;
 
-    connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected)
-    {
-        onConnectionChanged();
-    });
-
     ConnectionStatus status = connectionManager->init(serverInfo, ConnectionMode::Client);
 
     if (status != ConnectionStatus::Connected)

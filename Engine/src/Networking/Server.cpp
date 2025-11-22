@@ -38,7 +38,7 @@ Server::~Server()
 
 ServerStatus Server::start()
 {
-    ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Server);
+    ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Host);
 
     connectionManager->setOnMessageCallback([this](IncomingRawMessage message)
     {
