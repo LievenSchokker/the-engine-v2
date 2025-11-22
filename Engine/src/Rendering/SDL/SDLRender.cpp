@@ -2,10 +2,9 @@
 /// Created by Lieven Schokker on 11/11/2025.
 ///
 
-#include "../../../inc/Rendering/SDL/SDLRender.h"
-
-#include "../../../inc/External/SdlContext.h"
-#include "../../../inc/Rendering/Window/WindowOptions.h"
+#include "Rendering/SDL/SDLRender.h"
+#include "External/SdlContext.h"
+#include "Rendering/Window/WindowOptions.h"
 
 #include <algorithm>
 #include <cassert>
