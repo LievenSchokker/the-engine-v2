@@ -1,6 +1,6 @@
 #pragma once
 
 enum class TransportResult {
-    SUCCES,
+    SUCCESS,
     ERROR,
 };

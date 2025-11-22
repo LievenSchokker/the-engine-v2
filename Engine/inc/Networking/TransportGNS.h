@@ -103,6 +103,7 @@ private:
 
     /// Processes all queued incoming messages.
     void pollIncomingMessages();
+    void processMessage(ISteamNetworkingMessage* steamMessage);
 
     void onSteamNetConnectionStatusChanged(
         const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
@@ -122,6 +123,7 @@ private:
     static int getSendFlags(SendMode sendMode);
     void safeOnConnectionChanged(const Connection& connection);
     void addNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+    void removeDeathConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
     static void debugOutput(ESteamNetworkingSocketsDebugOutputType eType, const char* message);
 
     /// GNS provides global C style callback which doesn't support usage of the THIS type callback,
