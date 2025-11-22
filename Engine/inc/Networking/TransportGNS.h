@@ -119,6 +119,9 @@ private:
     std::vector<int> getActiveConnectionIds() const;
 
     static int getSendFlags(SendMode sendMode);
+    void safeOnConnectionChanged(const Connection& connection);
+    void addNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+    void AddNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
 
     /// GNS provides global C style callback which doesn't support usage of the THIS type callback,

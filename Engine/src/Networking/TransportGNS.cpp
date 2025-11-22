@@ -241,7 +241,7 @@ void TransportGNS::onSteamNetConnectionStatusChanged(const SteamNetConnectionSta
             Connection connection{};
             connection.connectionStatus = ConnectionStatus::Error;
             connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
-            onConnectionChanged(connection);
+            safeOnConnectionChanged(connection);
             break;
         }
     case k_ESteamNetworkingConnectionState_Dead:
@@ -249,7 +249,7 @@ void TransportGNS::onSteamNetConnectionStatusChanged(const SteamNetConnectionSta
             Connection connection{};
             connection.connectionStatus = ConnectionStatus::Death;
             connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
-            onConnectionChanged(connection);
+            safeOnConnectionChanged(connection);
             break;
         }
     case k_ESteamNetworkingConnectionState_Connecting:
@@ -257,16 +257,13 @@ void TransportGNS::onSteamNetConnectionStatusChanged(const SteamNetConnectionSta
             Connection connection{};
             connection.connectionStatus = ConnectionStatus::Connecting;
             connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
-            onConnectionChanged(connection);
+            safeOnConnectionChanged(connection);
             break;
         }
 
     case k_ESteamNetworkingConnectionState_Connected:
         {
-            Connection connection{};
-            connection.connectionStatus = ConnectionStatus::Connected;
-            connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
-            onConnectionChanged(connection);
+            addNewConnection(pointerConnectionStatusInformation);
             break;
         }
     case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
@@ -274,14 +271,14 @@ void TransportGNS::onSteamNetConnectionStatusChanged(const SteamNetConnectionSta
             Connection connection{};
             connection.connectionStatus = ConnectionStatus::Error;
             connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
-            onConnectionChanged(connection);
+            safeOnConnectionChanged(connection);
             break;
         }
     default:
         Connection connection{};
         connection.connectionStatus = ConnectionStatus::Invalid;
         connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
-        onConnectionChanged(connection);
+        safeOnConnectionChanged(connection);
         break;
     }
 }
@@ -329,4 +326,26 @@ int TransportGNS::getSendFlags(SendMode sendMode)
     default:
         return k_nSteamNetworkingSend_Reliable;
     }
+}
+
+void TransportGNS::safeOnConnectionChanged(const Connection& connection)
+{
+    if (onConnectionChanged)
+    {
+        onConnectionChanged(connection);
+    }
+}
+
+void TransportGNS::addNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
+{
+    HSteamNetConnection steamConn = pointerConnectionStatusInformation->m_hConn;
+
+    int connectionId = nextConnectionId++;
+    mapConnections[steamConn] = connectionId;
+    Connection connection{};
+    connection.connectionStatus = ConnectionStatus::Connected;
+    connection.transportConnectionId = connectionId;
+
+    //After creating the new connection still need to notify other layers.
+    safeOnConnectionChanged(connection);
 }
