@@ -12,18 +12,15 @@ class MessageReaderTest : public ::testing::Test
 {
 };
 
-//Test 1:
 TEST_F(MessageReaderTest, ReadsConnectionMessageCorrectly)
 {
-    // Create and serialize a message
     ConnectionMessage original;
     original.setStatus(ConnectionStatus::Connected);
-    const std::vector<std::byte> serialized = original.serialize();
 
-    // Create incoming raw message from serialized data
-    const IncomingRawMessage raw(1, serialized.data(), serialized.size());
+    // Use MessageWriter to get properly formatted data with header
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(original, 1, SendMode::ReliableOrdered);
+    const IncomingRawMessage raw(1, outgoing.data(), outgoing.size());
 
-    // Read it back
     const std::unique_ptr<IMessage> result = MessageReader::readMessage(raw);
 
     ASSERT_NE(result, nullptr);
@@ -34,9 +31,11 @@ TEST_F(MessageReaderTest, ReadsConnectionStatusCorrectly)
 {
     ConnectionMessage original;
     original.setStatus(ConnectionStatus::Disconnected);
-    const std::vector<std::byte> serialized = original.serialize();
 
-    const IncomingRawMessage raw(1, serialized.data(), serialized.size());
+    // Use MessageWriter to get properly formatted data with header
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(original, 1, SendMode::ReliableOrdered);
+    const IncomingRawMessage raw(1, outgoing.data(), outgoing.size());
+
     const std::unique_ptr<IMessage> result = MessageReader::readMessage(raw);
 
     ASSERT_NE(result, nullptr);

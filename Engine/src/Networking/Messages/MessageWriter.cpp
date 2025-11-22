@@ -10,6 +10,7 @@
 
 #include <cstring>
 
+
 OutgoingRawMessage MessageWriter::writeMessage(
     const IMessage& message,
     int connectionId,
