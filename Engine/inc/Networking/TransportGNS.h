@@ -116,7 +116,7 @@ private:
     HSteamNetConnection getSteamConnection(int connectionId);
 
     /// Get all connection ids which are active
-    std::vector<int> getActiveConnectionIds();
+    std::vector<int> getActiveConnectionIds() const;
 
     static int getSendFlags(SendMode sendMode);
 

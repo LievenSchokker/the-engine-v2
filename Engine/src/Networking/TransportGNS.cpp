@@ -285,9 +285,9 @@ void TransportGNS::onSteamNetConnectionStatusChanged(const SteamNetConnectionSta
 
 int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 {
-    auto it = mapConnections.find(steamNetworkConnection);
-    if (it != mapConnections.end())
-        return it->second;
+    auto connectionCombo = mapConnections.find(steamNetworkConnection);
+    if (connectionCombo != mapConnections.end())
+        return connectionCombo->second;
     return -1;
 }
 
@@ -301,11 +301,15 @@ HSteamNetConnection TransportGNS::getSteamConnection(int connectionId)
     return k_HSteamNetConnection_Invalid;
 }
 
-std::vector<int> TransportGNS::getActiveConnectionIds()
+std::vector<int> TransportGNS::getActiveConnectionIds() const
 {
     std::vector<int> ids;
+    ids.reserve(mapConnections.size());
+
     for (auto& connectionPair : mapConnections)
+    {
         ids.push_back(connectionPair.second);
+    }
     return ids;
 }
 
@@ -316,7 +320,7 @@ int TransportGNS::getSendFlags(SendMode sendMode)
     case SendMode::ReliableOrdered:
         return k_nSteamNetworkingSend_Reliable;
     case SendMode::ReliableUnordered:
-        return k_nSteamNetworkingSend_Reliable | k_nSteamNetworkingSend_NoDelay;
+        return k_nSteamNetworkingSend_NoDelay;
     case SendMode::Unreliable:
         return k_nSteamNetworkingSend_Unreliable;
     default:
