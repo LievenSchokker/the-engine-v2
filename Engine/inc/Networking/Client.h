@@ -27,7 +27,7 @@ private:
     std::unique_ptr<ConnectionManager> connectionManager;
     std::thread listenThread;
 
-    void onMessageReceived(const IncomingRawMessage& rawMessage);
+    static void onMessageReceived(const IncomingRawMessage& rawMessage);
     void onConnectionChanged();
     void poll();
 };

@@ -17,14 +17,11 @@
 #include <thread>
 #include <chrono>
 
+#include "Networking/TransportResult.h"
+
 Client::Client()
     : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Client))
-{
-    connectionManager->setOnMessageCallback([this](const IncomingRawMessage& rawMessage)
-    {
-        onMessageReceived(rawMessage);
-    });
-}
+{}
 
 Client::~Client()
 {
@@ -35,13 +32,17 @@ Client::~Client()
 
 bool Client::connectToServer(const uint16_t port, const char* serverIP)
 {
+
+
+    connectionManager->setOnMessageCallback([this](const IncomingRawMessage& rawMessage)
+    {
+        onMessageReceived(rawMessage);
+    });
+
     ServerConnectionInformation serverInfo;
     serverInfo.ip = serverIP;
     serverInfo.port = port;
 
-    connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected)
-    {
-    });
 
     ConnectionStatus status = connectionManager->init(serverInfo, ConnectionMode::Client);
 
@@ -65,9 +66,15 @@ bool Client::sendMessage(IMessage& message)
         SendMode::ReliableOrdered
     );
 
-    connectionManager->send(outgoing);
-
-    return true;
+     TransportResult result = connectionManager->send(outgoing);
+    if (result == TransportResult::SUCCES)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
 }
 
 
@@ -87,8 +94,8 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
     {
     case MessageTypes::ConnectionMessage:
         {
-            ConnectionMessage* connMsg = static_cast<ConnectionMessage*>(message.get());
-            ConnectionStatus status = connMsg->getStatus();
+            ConnectionMessage* connectionMessage = static_cast<ConnectionMessage*>(message.get());
+            ConnectionStatus status = connectionMessage->getStatus();
             break;
         }
     default:

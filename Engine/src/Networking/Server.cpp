@@ -36,10 +36,8 @@ Server::~Server()
 
 ServerStatus Server::start()
 {
-    // Initialize connection manager
     ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Server);
 
-    // Set up message callback
     connectionManager->setOnMessageCallback([this](IncomingRawMessage message)
     {
         onMessage(message);
@@ -48,13 +46,13 @@ ServerStatus Server::start()
     if (connectionStatus == ConnectionStatus::Connected)
     {
         status = ServerStatus::Running;
-        std::cout << "[Server] Started successfully on port "
-            << setupInformation.port << "\n";
+        std::cout << "Started successfully on port "
+            << setupInformation.port << std::endl;
     }
     else
     {
         status = ServerStatus::Error;
-        std::cerr << "[Server] Failed to start\n";
+        std::cerr << "Failed to start" << std::endl;
     }
 
     return status;
@@ -73,7 +71,7 @@ ServerStatus Server::stop()
         connectionManager->shutdown();
         connectedClients.clear();
         status = ServerStatus::Stopping;
-        std::cout << "[Server] Stopped\n";
+        std::cout << "Stopped" << std::endl;
     }
     return status;
 }
@@ -85,7 +83,7 @@ void Server::onMessage(IncomingRawMessage rawMessage)
     if (!message)
     {
         std::cerr << "Failed to parse message from client "
-            << rawMessage.connectionID << "\n";
+            << rawMessage.connectionID << std::endl;
         return;
     }
 
@@ -94,7 +92,7 @@ void Server::onMessage(IncomingRawMessage rawMessage)
 
     std::cout << "Received message type "
         << static_cast<int>(messageType)
-        << " from client " << clientId << "\n";
+        << " from client " << clientId << std::endl;
 
     switch (messageType)
     {
@@ -116,7 +114,7 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 
     std::cout << "Client " << clientId
         << " connection message with status: "
-        << static_cast<int>(status) << "\n";
+        << static_cast<int>(status) << std::endl;
 
     switch (status)
     {
