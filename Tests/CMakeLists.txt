@@ -9,6 +9,9 @@ add_executable(engine_tests
         Component/tests_component_manager.cpp
         GameObject/tests_game_object.cpp
         Scene/SceneManagerTest.cpp
+        Networking/Messages/MessageReaderTest.cpp
+        Networking/Messages/MessageWriterTest.cpp
+        Networking/ServerTest.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
