@@ -1,6 +1,4 @@
 #pragma once
-#ifndef INPUT_ADAPTER_H
-#define INPUT_ADAPTER_H
 
 
 class InputManager;
@@ -12,4 +10,3 @@ class IInputAdapter
     virtual void poll(InputManager& input) = 0;
 };
 
-#endif // INPUT_ADAPTER_H

@@ -3,5 +3,5 @@ cmake-build-*/
 build
 .vscode
 .clangd
-.clang-format
 /vcpkg_installed
+.cache
