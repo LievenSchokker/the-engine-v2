@@ -4,7 +4,11 @@
 enum class ConnectionStatus : uint8_t
 {
     Connected = 0,
-    Disconnected = 1,
-    Error = 2,
+    Connecting = 1,
+    Disconnected = 2,
+    Error = 3,
+    Invalid = 4,
+    Unknown = 5,
+    Death = 6,
 };
 

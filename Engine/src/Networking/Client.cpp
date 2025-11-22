@@ -8,7 +8,7 @@
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/ConnectionMessage.h"
-#include "Networking/Messages/IncommingRawMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/SendMode.h"
@@ -41,6 +41,7 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
 
     connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected)
     {
+        onConnectionChanged();
     });
 
     ConnectionStatus status = connectionManager->init(serverInfo, ConnectionMode::Client);
@@ -100,6 +101,7 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 
 void Client::onConnectionChanged()
 {
+
 }
 
 void Client::poll()

@@ -1,9 +1,10 @@
 #pragma once
 #include <functional>
 #include "TransportResult.h"
-#include "Messages/IncommingRawMessage.h"
+#include "Messages/IncomingRawMessage.h"
 
 
+struct Connection;
 class OutgoingRawMessage;
 /**
  * @typedef OnMessageReceivedCallback
@@ -20,7 +21,7 @@ using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage&)>
  * @param connectionId ID of the connection.
  * @param connected True if connection is now active, false if disconnected.
  */
-using OnConnectionChangedCallback = std::function<void(int connectionId, bool connected)>;
+using OnConnectionChangedCallback = std::function<void(Connection connection)>;
 
 /**
  * @class Transport

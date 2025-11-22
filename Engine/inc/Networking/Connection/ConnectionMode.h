@@ -2,6 +2,6 @@
 
 
 enum class ConnectionMode {
-    Server,
+    Host,
     Client
 };

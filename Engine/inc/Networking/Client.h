@@ -23,7 +23,7 @@ public:
     bool sendMessage(IMessage& message);
 
 private:
-    Connection currentConnection;
+    Connection currentConnection{};
     std::unique_ptr<ConnectionManager> connectionManager;
     std::thread listenThread;
 

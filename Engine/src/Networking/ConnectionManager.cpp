@@ -10,7 +10,7 @@
 #include "Networking/TransportGNS.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/Connection/Connection.h"
-#include "Networking/Messages/IncommingRawMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
 
 
 ConnectionManager::ConnectionManager(ConnectionMode mode)
@@ -55,7 +55,7 @@ ConnectionStatus ConnectionManager::init(const ServerConnectionInformation& info
     });
 
     TransportResult result;
-    if (mode == ConnectionMode::Server)
+    if (mode == ConnectionMode::Host)
     {
         result = transport->setUpListenSocket(information.port);
     }

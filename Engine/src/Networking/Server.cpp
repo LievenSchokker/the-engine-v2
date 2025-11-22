@@ -7,13 +7,13 @@
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/ConnectionMessage.h"
 #include "Networking/Messages/MessageTypes.h"
-#include "Networking/Messages/IncommingRawMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
 #include <iostream>
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation)
-    : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Server))
+    : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Host))
       , status(ServerStatus::Stopping)
 {
     if (serverConnectionInformation.port == 0)
@@ -37,7 +37,7 @@ Server::~Server()
 ServerStatus Server::start()
 {
     // Initialize connection manager
-    ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Server);
+    ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Host);
 
     // Set up message callback
     connectionManager->setOnMessageCallback([this](IncomingRawMessage message)
