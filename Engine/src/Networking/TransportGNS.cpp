@@ -18,6 +18,8 @@ TransportGNS::TransportGNS()
       , steamNetworkingSockets(nullptr)
       , nextConnectionId(1)
 {
+    transportGNSCallbackInstance = this;
+
     SteamDatagramErrMsg errorMessage;
     if (!GameNetworkingSockets_Init(nullptr, errorMessage))
     {
@@ -264,6 +266,7 @@ void TransportGNS::onSteamNetConnectionStatusChanged(const SteamNetConnectionSta
             Connection connection{};
             connection.connectionStatus = ConnectionStatus::Connected;
             connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
+            onConnectionChanged(connection);
             break;
         }
     case k_ESteamNetworkingConnectionState_ProblemDetectedLocally:
