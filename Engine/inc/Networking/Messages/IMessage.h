@@ -1,9 +1,11 @@
-// IMessage.h
 #pragma once
+
+
 #include <cstddef>
 #include <vector>
 #include <cstdint>
 #include "MessageTypes.h"
+
 
 class IMessage
 {

@@ -1,5 +1,6 @@
-// TransportGNS.h
 #pragma once
+
+
 #include <functional>
 #include <map>
 #include <mutex>
@@ -7,8 +8,10 @@
 #include <steam/steamnetworkingtypes.h>
 #include <steam/steamtypes.h>
 
+
 #include "Transport.h"
 #include "TransportResult.h"
+
 
 class OutgoingRawMessage;
 struct IncomingRawMessage;
@@ -18,6 +21,7 @@ struct SteamNetConnectionStatusChangedCallback_t;
 typedef uint32 HSteamNetConnection;
 typedef uint32 HSteamListenSocket;
 typedef uint32 HSteamNetPollGroup;
+
 
 /**
  * @class TransportGNS
@@ -105,9 +109,11 @@ private:
     void pollIncomingMessages();
     void processMessage(const ISteamNetworkingMessage* steamMessage);
 
+    /// OnconnectionChangedCallback router method
     void onSteamNetConnectionStatusChanged(
         const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
+    /// static wrapper method for steam OnConnectionChangedCallback
     static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
     /// Retrieves internal ID for a connection handle.
@@ -119,14 +125,25 @@ private:
     /// Get all connection ids which are active
     std::vector<int> getActiveConnectionIds() const;
 
+    /// Get steamSend specefic sendflag via sendmode
     static int getSendFlags(SendMode sendMode);
+
+    /// nullptr check to global callback
     void safeOnConnectionChanged(const Connection& connection);
+
+    /// Adds a new connection to transportLayer map and call's onConnnectionChanged with that
+    /// new connections
     void addNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+
+    /// Removes a new connection to transportLayer map and call's onConnnectionChanged with that
+    /// removed connections
     void removeDeathConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+
+    /// static helper method for debug output of GNS
     static void debugOutput(ESteamNetworkingSocketsDebugOutputType eType, const char* message);
 
-    /// GNS provides global C style callback which doesn't support usage of the THIS type callback,
-    /// Creates a static refrence to the currently active callback
+    /// GNS provides global C style callback which doesn't support usage of the type callback,
+    /// Creates a static reference to the currently active callback
     static TransportGNS* transportGNSCallbackInstance;
 
     HSteamListenSocket listenSocket;

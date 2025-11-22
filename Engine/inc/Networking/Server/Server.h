@@ -1,19 +1,24 @@
 #pragma once
 
+
 #include <memory>
 #include <unordered_set>
+
 
 #include "ServerInformation.h"
 #include "Networking/SendMode.h"
 #include "Networking/Server/ServerStatus.h"
 
+
 class TransportGNS;
 class IMessage;
 class ConnectionMessage;
 
+
 struct ServerConnectionInformation;
 struct IncomingRawMessage;
 struct Connection;
+
 
 enum class ConnectionStatus : uint8_t;
 

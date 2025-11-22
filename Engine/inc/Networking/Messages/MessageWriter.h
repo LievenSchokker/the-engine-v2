@@ -1,13 +1,18 @@
 #pragma once
+
+
 #include <memory>
 #include <vector>
 #include <cstdint>
 
+
 #include "Networking/SendMode.h"
+
 
 class OutgoingRawMessage;
 class IMessage;
 enum class SendMode;
+
 
 class MessageWriter
 {
