@@ -175,7 +175,7 @@ void TransportGNS::pollIncomingMessages()
     if (pollGroup != k_HSteamNetPollGroup_Invalid)
     {
             ISteamNetworkingMessage* steamMessage = nullptr;
-            int numberOfmessages = steamNetworkingSockets->ReceiveMessagesOnConnection(pollGroup, &steamMessage, 1);
+            int numberOfmessages = steamNetworkingSockets->ReceiveMessagesOnPollGroup(pollGroup, &steamMessage, 1);
 
             if (numberOfmessages == 0) return;
             if (numberOfmessages < 0 ) throw "Error checking for messages";
@@ -251,7 +251,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
                 }
 
                 {
-                    std::lock_guard<std::mutex> lock(mapMutex);
                     int connectionId = nextConnectionId++;
                     mapConnections[pointerConnectionStatusInformation->m_hConn] = connectionId;
                 }
@@ -264,8 +263,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
         {
             int connectionId;
             {
-                std::lock_guard<std::mutex> lock(mapMutex);
-
                 auto it = mapConnections.find(pointerConnectionStatusInformation->m_hConn);
                 if (it != mapConnections.end())
                 {
@@ -289,7 +286,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
         {
             int connectionId;
             {
-                std::lock_guard<std::mutex> lock(mapMutex);
                 connectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
                 if (connectionId != -1)
                     mapConnections.erase(pointerConnectionStatusInformation->m_hConn);
@@ -313,7 +309,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
 
 int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 {
-    std::lock_guard lock(mapMutex);
     auto it = mapConnections.find(steamNetworkConnection);
     if (it != mapConnections.end())
         return it->second;
@@ -322,18 +317,16 @@ int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 
 HSteamNetConnection TransportGNS::getSteamConnection(int connectionId)
 {
-    std::lock_guard lock(mapMutex);
     for (const auto& [steamConnection, mappedConnectionId] : mapConnections)
     {
         if (mappedConnectionId == connectionId)
-            return mappedConnectionId;
+            return steamConnection;
     }
     return k_HSteamNetConnection_Invalid;
 }
 
 std::vector<int> TransportGNS::getActiveConnectionIds()
 {
-    std::lock_guard lock(mapMutex);
     std::vector<int> ids;
     for (auto& connectionPair : mapConnections)
         ids.push_back(connectionPair.second);
