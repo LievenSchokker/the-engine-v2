@@ -2,11 +2,13 @@
 
 
 #include <memory>
+#include <memory>
 #include <unordered_set>
 
 
 #include "ServerInformation.h"
 #include "Networking/SendMode.h"
+#include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
 
 
@@ -26,6 +28,9 @@ class Server
 {
 public:
     explicit Server(const ServerConnectionInformation& serverConnectionInformation);
+    Server(const ServerConnectionInformation& serverConnectionInformation,
+           std::unique_ptr<ITransport> injectedTransport);
+
     ~Server();
 
     ServerStatus start();
@@ -44,7 +49,7 @@ private:
     void onConnectionChanged(const Connection& connection);
     void handleConnectionMessage(int clientId, ConnectionMessage* message);
 
-    std::unique_ptr<TransportGNS> transport;
+    std::unique_ptr<ITransport> transport;
     ServerConnectionInformation setupInformation;
     ServerStatus status;
     std::unordered_set<int> connectedClients;

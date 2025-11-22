@@ -28,17 +28,17 @@ using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage&)>
 using OnConnectionChangedCallback = std::function<void(Connection connection)>;
 
 /**
- * @class Transport
+ * @class ITransport
  * @brief Abstract base class for network transport layers.
  *
  * Provides an interface for server/client networking, sending messages,
  * and managing connections. Derived classes implement specific networking
  * APIs such as GameNetworkingSockets, ENet, or custom protocols.
  */
-class Transport
+class ITransport
 {
 public:
-    virtual ~Transport() = default;
+    virtual ~ITransport() = default;
 
 
     /**

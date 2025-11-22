@@ -9,7 +9,7 @@
 #include <steam/steamtypes.h>
 
 
-#include "Transport.h"
+#include "ITransport.h"
 #include "TransportResult.h"
 
 
@@ -34,7 +34,7 @@ typedef uint32 HSteamNetPollGroup;
  * mode behaves similarly to reliable ordered, but with reduced latency due to
  * disabled message coalescing.
  */
-class TransportGNS : public Transport
+class TransportGNS : public ITransport
 {
 public:
     TransportGNS();

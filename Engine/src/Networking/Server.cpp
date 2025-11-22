@@ -16,15 +16,15 @@
 #include <iostream>
 
 
-Server::Server(const ServerConnectionInformation& serverConnectionInformation)
-    : transport(std::make_unique<TransportGNS>())
-      , status(ServerStatus::Stopping)
+Server::Server(const ServerConnectionInformation& serverConnectionInformation,
+               std::unique_ptr<ITransport> injectedTransport)
+    : transport(std::move(injectedTransport))
+    , status(ServerStatus::Stopping)
 {
     if (serverConnectionInformation.port == 0)
     {
         throw std::runtime_error("Port is not set");
     }
-
     setupInformation = serverConnectionInformation;
 }
 
