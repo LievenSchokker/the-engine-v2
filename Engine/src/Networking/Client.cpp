@@ -36,7 +36,7 @@ Client::~Client()
     disconnect();
 }
 
-bool Client::connectToServer(uint16_t port, const char* serverIP)
+bool Client::connectToServer(uint16_t port, const char* serverIP) const
 {
     TransportResult result = transport->connectByIPAdress(serverIP, port);
 
@@ -59,7 +59,7 @@ void Client::disconnect()
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
 
-bool Client::sendMessage(IMessage& message)
+bool Client::sendMessage(IMessage& message) const
 {
     if (currentConnection.connectionStatus != ConnectionStatus::Connected)
     {
@@ -76,7 +76,7 @@ bool Client::sendMessage(IMessage& message)
     return result == TransportResult::SUCCESS;
 }
 
-void Client::poll()
+void Client::poll() const
 {
     transport->poll();
 }
@@ -120,9 +120,7 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
         return;
     }
 
-    MessageTypes messageType = message->getMessageType();
-
-    switch (messageType)
+    switch (MessageTypes messageType = message->getMessageType())
     {
     case MessageTypes::ConnectionMessage:
         {

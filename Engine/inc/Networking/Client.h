@@ -15,11 +15,11 @@ public:
     Client();
     ~Client();
 
-    bool connectToServer(uint16_t port, const char* serverIP);
+    bool connectToServer(uint16_t port, const char* serverIP) const;
     void disconnect();
 
-    bool sendMessage(IMessage& message);
-    void poll();
+    bool sendMessage(IMessage& message) const;
+    void poll() const;
 
     bool isConnected() const;
 
