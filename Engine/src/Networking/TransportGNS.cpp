@@ -89,6 +89,7 @@ TransportResult TransportGNS::send(const OutgoingRawMessage& message)
     int sendFlags = getSendFlags(message.sendMode);
 
     HSteamNetConnection steamNetworkConnection = getSteamConnection(message.connectionID);
+
     if (steamNetworkConnection == k_HSteamNetConnection_Invalid)
     {
         return TransportResult::ERROR;
@@ -119,6 +120,7 @@ TransportResult TransportGNS::sendToAll(OutgoingRawMessage& message)
             return TransportResult::ERROR;
         }
     }
+
     return TransportResult::SUCCES;
 }
 
@@ -129,6 +131,7 @@ bool TransportGNS::closeOpenSocket()
         steamNetworkingSockets->
             CloseConnection(pair.first, 0, "Socket closed by host", true);
     }
+
     mapConnections.clear();
 
     if (listenSocket != k_HSteamListenSocket_Invalid)
@@ -178,10 +181,10 @@ void TransportGNS::pollIncomingMessages()
         ISteamNetworkingMessage* steamMessage = nullptr;
         int numberOfmessages = steamNetworkingSockets->ReceiveMessagesOnConnection(pollGroup, &steamMessage, 1);
 
-        if (numberOfmessages == 0) return;
-        if (numberOfmessages < 0) throw "Error checking for messages";
+        if (numberOfmessages < 1) return;
 
         int connectionId = getConnectionId(steamMessage->m_conn);
+
         if (onMessageReceived)
         {
             IncomingRawMessage incoming(
@@ -191,19 +194,18 @@ void TransportGNS::pollIncomingMessages()
             );
             onMessageReceived(incoming);
         }
+
         steamMessage->Release();
     }
-
-    std::vector<std::pair<HSteamNetConnection, int>> connectionsCopy;
-    {
-        for (const auto& pair : mapConnections)
-            connectionsCopy.emplace_back(pair);
-    }
-
-    for (auto& [steamNetworkConnection, connectionId] : connectionsCopy)
+    
+    for (auto& [steamNetworkConnection, connectionId] : mapConnections)
     {
         ISteamNetworkingMessage* steamMessage = nullptr;
-        while (steamNetworkingSockets->ReceiveMessagesOnConnection(steamNetworkConnection, &steamMessage, 1) == 1)
+        while
+        (
+            steamNetworkingSockets->
+            ReceiveMessagesOnConnection(steamNetworkConnection, &steamMessage, 1) == 1
+        )
         {
             IncomingRawMessage incoming(
                 connectionId,
@@ -212,7 +214,9 @@ void TransportGNS::pollIncomingMessages()
             );
 
             if (onMessageReceived)
+            {
                 onMessageReceived(incoming);
+            }
 
             steamMessage->Release();
         }
