@@ -281,7 +281,6 @@ void TransportGNS::onSteamNetConnectionStatusChanged(SteamNetConnectionStatusCha
 
 int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 {
-    std::lock_guard lock(mapMutex);
     auto it = mapConnections.find(steamNetworkConnection);
     if (it != mapConnections.end())
         return it->second;
@@ -290,18 +289,16 @@ int TransportGNS::getConnectionId(HSteamNetConnection steamNetworkConnection)
 
 HSteamNetConnection TransportGNS::getSteamConnection(int connectionId)
 {
-    std::lock_guard lock(mapMutex);
     for (const auto& [steamConnection, mappedConnectionId] : mapConnections)
     {
         if (mappedConnectionId == connectionId)
-            return mappedConnectionId;
+            return steamConnection;
     }
     return k_HSteamNetConnection_Invalid;
 }
 
 std::vector<int> TransportGNS::getActiveConnectionIds()
 {
-    std::lock_guard lock(mapMutex);
     std::vector<int> ids;
     for (auto& connectionPair : mapConnections)
         ids.push_back(connectionPair.second);

@@ -12,6 +12,8 @@
 #include "Networking/SendMode.h"
 #include <iostream>
 
+#include "Networking/TransportResult.h"
+
 Server::Server(const ServerConnectionInformation& serverConnectionInformation)
     : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Host))
       , status(ServerStatus::Stopping)
@@ -36,10 +38,8 @@ Server::~Server()
 
 ServerStatus Server::start()
 {
-    // Initialize connection manager
-    ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Host);
+    ConnectionStatus connectionStatus = connectionManager->init(setupInformation, ConnectionMode::Server);
 
-    // Set up message callback
     connectionManager->setOnMessageCallback([this](IncomingRawMessage message)
     {
         onMessage(message);
@@ -48,13 +48,13 @@ ServerStatus Server::start()
     if (connectionStatus == ConnectionStatus::Connected)
     {
         status = ServerStatus::Running;
-        std::cout << "[Server] Started successfully on port "
-            << setupInformation.port << "\n";
+        std::cout << "Started successfully on port "
+            << setupInformation.port << std::endl;
     }
     else
     {
         status = ServerStatus::Error;
-        std::cerr << "[Server] Failed to start\n";
+        std::cerr << "Failed to start" << std::endl;
     }
 
     return status;
@@ -73,7 +73,7 @@ ServerStatus Server::stop()
         connectionManager->shutdown();
         connectedClients.clear();
         status = ServerStatus::Stopping;
-        std::cout << "[Server] Stopped\n";
+        std::cout << "Stopped" << std::endl;
     }
     return status;
 }
@@ -85,7 +85,7 @@ void Server::onMessage(IncomingRawMessage rawMessage)
     if (!message)
     {
         std::cerr << "Failed to parse message from client "
-            << rawMessage.connectionID << "\n";
+            << rawMessage.connectionID << std::endl;
         return;
     }
 
@@ -94,18 +94,23 @@ void Server::onMessage(IncomingRawMessage rawMessage)
 
     std::cout << "Received message type "
         << static_cast<int>(messageType)
-        << " from client " << clientId << "\n";
+        << " from client " << clientId << std::endl;
 
     switch (messageType)
     {
     case MessageTypes::ConnectionMessage:
         {
-            handleConnectionMessage(clientId, static_cast<ConnectionMessage*>(message.get()));
+            if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get())) {
+                handleConnectionMessage(clientId, connMsg);
+            } else {
+                std::cerr << "Message type mismatch" << std::endl;
+            }
             break;
         }
     default:
         {
-            throw std::runtime_error("Unknown message type");
+            std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
+            break;
         }
     }
 }
@@ -116,7 +121,7 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 
     std::cout << "Client " << clientId
         << " connection message with status: "
-        << static_cast<int>(status) << "\n";
+        << static_cast<int>(status) << std::endl;
 
     switch (status)
     {
@@ -163,9 +168,11 @@ void Server::kickClient(int clientId)
         SendMode::ReliableOrdered
     );
 
-    connectionManager->send(outgoing);
+    TransportResult  result = connectionManager->send(outgoing);
 
-    connectionManager->disconnect(clientId);
-
-    connectedClients.erase(clientId);
+    if (result == TransportResult::SUCCES)
+    {
+        connectionManager->disconnect(clientId);
+        connectedClients.erase(clientId);
+    }
 }
