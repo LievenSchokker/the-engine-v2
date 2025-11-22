@@ -18,7 +18,7 @@ public:
     bool connectToServer(uint16_t port, const char* serverIP) const;
     void disconnect();
 
-    bool sendMessage(IMessage& message) const;
+    bool sendMessage(const IMessage& message) const;
     void poll() const;
 
     bool isConnected() const;

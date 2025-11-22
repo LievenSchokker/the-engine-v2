@@ -13,7 +13,9 @@
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
 
+
 #include <iostream>
+
 
 Client::Client()
     : transport(std::make_unique<TransportGNS>())
@@ -57,7 +59,7 @@ void Client::disconnect()
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
 
-bool Client::sendMessage(IMessage& message) const
+bool Client::sendMessage(const IMessage& message) const
 {
     if (currentConnection.connectionStatus != ConnectionStatus::Connected)
     {
@@ -118,12 +120,12 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
         return;
     }
 
+    
     switch (MessageTypes messageType = message->getMessageType())
     {
     case MessageTypes::ConnectionMessage:
         {
-            auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get());
-            if (connMsg && connMsg->getStatus() == ConnectionStatus::Disconnected)
+            if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
             {
                 disconnect();
             }
