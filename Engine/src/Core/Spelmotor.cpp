@@ -1,6 +1,7 @@
 #include <iostream>
 #include <ostream>
 
+
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
 #include "Core/Timer.h"
@@ -8,6 +9,7 @@
 #include "Input/InputManager.h"
 #include "Rendering/SDL/SDLRender.h"
 #include "Rendering/IRender.h"
+
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),

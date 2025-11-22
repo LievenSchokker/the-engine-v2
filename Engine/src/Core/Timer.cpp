@@ -1,6 +1,8 @@
-// Timer.cpp
+
+
 #include "Core/Timer.h"
 #include <algorithm>
+
 
 Timer::Timer(double fixedDeltaTime, ClockFunction clockFunc)
     : getClock(clockFunc),
