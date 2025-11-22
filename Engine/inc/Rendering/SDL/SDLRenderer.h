@@ -21,9 +21,9 @@
 
 #pragma once
 
-#include "../../../inc/Rendering/IRenderer.h"
 
-#include <SDL.h>
+#include "Rendering/IRenderer.h"
+
 
 class SdlContext;
 
