@@ -4,6 +4,7 @@ project(engine_tests)
 add_executable(engine_tests
         Rendering/SDL/SDLRenderTest.cpp
         Input/InputManagerTest.cpp
+        Networking/ServerTest.cpp
         Networking/Messages/MessageWriterTest.cpp
         Networking/Messages/MessageReaderTest.cpp
 )
