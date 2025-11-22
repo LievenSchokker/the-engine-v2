@@ -1,9 +1,6 @@
-//
-// Created by thijs on 24-11-2025.
-//
-
-
 #pragma once
+
+
 #include "Component/Component.h"
 #include "Physics/PhysicsShapes.h"
 

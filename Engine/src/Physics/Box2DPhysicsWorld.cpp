@@ -8,8 +8,7 @@
 
 Box2DPhysicsWorld::Box2DPhysicsWorld()
 	: worldId(0)
-{
-}
+{}
 
 
 void Box2DPhysicsWorld::start()

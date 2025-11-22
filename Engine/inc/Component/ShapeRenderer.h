@@ -31,7 +31,7 @@ class ShapeRenderer: public Component
 
    private:
 	Color color = Color::white();
-	float radius = 25.0;
+	double radius = 25.0;
 	Vector2 size = {50.0, 50.0};
 	ShapeRenderType type = ShapeRenderType::None;
 };
