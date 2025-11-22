@@ -9,7 +9,6 @@ std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage ra
 {
     if (rawMessage.length < sizeof(uint8_t))
     {
-        std::cerr << "[MessageReader] Message too short\n";
         return nullptr;
     }
 
@@ -19,8 +18,6 @@ std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage ra
 
     if (message == nullptr)
     {
-        std::cerr << "[MessageReader] Unknown message type: "
-                  << static_cast<int>(messageType) << "\n";
         return nullptr;
     }
 
@@ -33,8 +30,6 @@ std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage ra
     }
     else
     {
-        std::cerr << "[MessageReader] Failed to deserialize message type: "
-                  << static_cast<int>(messageType) << "\n";
         return nullptr;
     }
 }

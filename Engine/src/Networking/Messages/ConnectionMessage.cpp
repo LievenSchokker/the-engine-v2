@@ -11,7 +11,7 @@ ConnectionMessage::ConnectionMessage()
 std::vector<std::byte> ConnectionMessage::serialize() const
 {
     std::vector<std::byte> buffer(sizeof(uint8_t));
-    uint8_t statusValue = static_cast<uint8_t>(status);
+    auto statusValue = static_cast<uint8_t>(status);
     std::memcpy(buffer.data(), &statusValue, sizeof(uint8_t));
 
     return buffer;
@@ -21,7 +21,6 @@ bool ConnectionMessage::deserialize(const std::byte* data, size_t length)
 {
     if (length < sizeof(uint8_t))
     {
-        std::cerr << "[ConnectionMessage] Insufficient data\n";
         return false;
     }
 
@@ -30,7 +29,6 @@ bool ConnectionMessage::deserialize(const std::byte* data, size_t length)
 
     if (statusValue > static_cast<uint8_t>(ConnectionStatus::Error))
     {
-        std::cerr << "[ConnectionMessage] Invalid status value\n";
         return false;
     }
 

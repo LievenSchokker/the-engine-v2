@@ -178,7 +178,7 @@ void TransportGNS::pollIncomingMessages()
             int numberOfmessages = steamNetworkingSockets->ReceiveMessagesOnConnection(pollGroup, &steamMessage, 1);
 
             if (numberOfmessages == 0) return;
-            if (numberOfmessages < 0 ) throw std::exception("Error checking for messages");
+            if (numberOfmessages < 0 ) throw "Error checking for messages";
 
             int connectionId = getConnectionId(steamMessage->m_conn);
             if (onMessageReceived)

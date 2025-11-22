@@ -6,7 +6,7 @@
 #include <vector>
 #include <steam/steamtypes.h>
 
-#include "Transport.h"  // ← ADD THIS
+#include "Transport.h"
 #include "TransportResult.h"
 
 class OutgoingRawMessage;

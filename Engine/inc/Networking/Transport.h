@@ -12,7 +12,7 @@ class OutgoingRawMessage;
  * @param data Pointer to the received message data.
  * @param length Length of the received message in bytes.
  */
-using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage)>;
+using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage&)>;
 
 /**
  * @typedef OnConnectionChangedCallback
@@ -100,7 +100,7 @@ public:
      * @brief Sets the callback for connection state changes.
      * @param callback A callable to invoke when a connection is established or closed.
      */
-     void setOnConnectionChanged(const OnConnectionChangedCallback& callback) { onConnectionChanged = callback; }
+    void setOnConnectionChanged(const OnConnectionChangedCallback& callback) { onConnectionChanged = callback; }
 
 protected:
     OnMessageReceivedCallback onMessageReceived; ///< Callback for received messages.

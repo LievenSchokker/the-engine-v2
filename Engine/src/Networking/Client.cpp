@@ -41,17 +41,6 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
 
     connectionManager->setOnConnectionChangedCallback([this](int connId, bool isConnected)
     {
-        if (isConnected)
-        {
-            clientConnectionId = connId;
-            connected = true;
-        }
-        else
-        {
-            connected = false;
-            clientConnectionId = -1;
-            running = false;
-        }
     });
 
     ConnectionStatus status = connectionManager->init(serverInfo, ConnectionMode::Client);
@@ -60,8 +49,6 @@ bool Client::connectToServer(const uint16_t port, const char* serverIP)
     {
         return false;
     }
-    createListenThread();
-
     return true;
 }
 
@@ -83,6 +70,8 @@ bool Client::sendMessage(IMessage& message)
     return true;
 }
 
+
+//This switch case now lives here but should be moved to messageHandler
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 {
     std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
@@ -111,7 +100,6 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 
 void Client::onConnectionChanged()
 {
-    // Already set in connectToServer
 }
 
 void Client::poll()
