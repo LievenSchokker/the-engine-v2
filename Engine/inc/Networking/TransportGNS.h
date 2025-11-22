@@ -104,7 +104,7 @@ private:
     void pollIncomingMessages();
 
     void onSteamNetConnectionStatusChanged(
-        SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+        const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
     static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t*
         pointerConnectionStatusInformation);
