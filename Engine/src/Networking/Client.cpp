@@ -16,8 +16,8 @@
 #include <iostream>
 
 
-Client::Client()
-    : transport(std::make_unique<TransportGNS>())
+Client::Client(std::unique_ptr<ITransport> injectedTransport)
+    : transport(std::move(injectedTransport))
 {
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 

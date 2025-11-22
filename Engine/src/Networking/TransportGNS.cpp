@@ -34,6 +34,7 @@ TransportGNS::TransportGNS()
 
 TransportGNS::~TransportGNS()
 {
+    transportGNSCallbackInstance = nullptr;
     TransportGNS::closeOpenSocket();
     GameNetworkingSockets_Kill();
 }

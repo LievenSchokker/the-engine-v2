@@ -7,6 +7,7 @@
 #include "Connection/Connection.h"
 
 
+class ITransport;
 class TransportGNS;
 class IMessage;
 
@@ -25,7 +26,7 @@ public:
     /**
      * @brief Constructs a Client and initializes the transport layer.
      */
-    Client();
+    explicit Client(std::unique_ptr<ITransport> transport);
 
     /**
      * @brief Destructor. Cleans up the transport and any active connection.
@@ -80,6 +81,6 @@ private:
      */
     void onConnectionChanged(const Connection& connection);
 
-    std::unique_ptr<TransportGNS> transport;  ///< The underlying network transport.
+    std::unique_ptr<ITransport> transport;  ///< The underlying network transport.
     Connection currentConnection{};            ///< The current server connection.
 };
