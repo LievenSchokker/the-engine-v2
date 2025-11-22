@@ -103,13 +103,12 @@ private:
 
     /// Processes all queued incoming messages.
     void pollIncomingMessages();
-    void processMessage(ISteamNetworkingMessage* steamMessage);
+    void processMessage(const ISteamNetworkingMessage* steamMessage);
 
     void onSteamNetConnectionStatusChanged(
         const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
-    static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t*
-        pointerConnectionStatusInformation);
+    static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
     /// Retrieves internal ID for a connection handle.
     int getConnectionId(HSteamNetConnection steamConn);

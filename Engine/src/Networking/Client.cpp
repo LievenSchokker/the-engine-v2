@@ -36,11 +36,9 @@ Client::~Client()
     disconnect();
 }
 
-bool Client::connectToServer(uint16_t port, const char* serverIP) const
+bool Client::connectToServer(const uint16_t port, const char* serverIP) const
 {
-    TransportResult result = transport->connectByIPAdress(serverIP, port);
-
-    if (result != TransportResult::SUCCESS)
+    if (transport->connectByIPAdress(serverIP, port) != TransportResult::SUCCESS)
     {
         std::cerr << "Failed to connect to " << serverIP << ":" << port << std::endl;
         return false;
@@ -112,7 +110,7 @@ void Client::onConnectionChanged(const Connection& connection)
 
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 {
-    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
     if (!message)
     {

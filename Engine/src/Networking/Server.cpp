@@ -16,7 +16,7 @@
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation)
     : transport(std::make_unique<TransportGNS>())
-    , status(ServerStatus::Stopping)
+      , status(ServerStatus::Stopping)
 {
     if (serverConnectionInformation.port == 0)
     {
@@ -59,7 +59,7 @@ ServerStatus Server::start()
     return status;
 }
 
-void Server::update()
+void Server::update() const
 {
     transport->poll();
 }
@@ -78,7 +78,7 @@ ServerStatus Server::stop()
 
 void Server::onConnectionChanged(const Connection& connection)
 {
-    int clientId = connection.transportConnectionId;
+    const int clientId = connection.transportConnectionId;
 
     switch (connection.connectionStatus)
     {
@@ -101,13 +101,13 @@ void Server::onConnectionChanged(const Connection& connection)
 void Server::onMessage(const IncomingRawMessage& rawMessage)
 {
     // Ignore messages from unknown connections
-    if (connectedClients.find(rawMessage.connectionID) == connectedClients.end())
+    if (!connectedClients.contains(rawMessage.connectionID))
     {
         std::cerr << "Message from unknown client " << rawMessage.connectionID << std::endl;
         return;
     }
 
-    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
     if (!message)
     {
@@ -116,7 +116,7 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
     }
 
     MessageTypes messageType = message->getMessageType();
-    int clientId = rawMessage.connectionID;
+    const int clientId = rawMessage.connectionID;
 
     switch (messageType)
     {
@@ -135,9 +135,7 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
 
 void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 {
-    ConnectionStatus connStatus = message->getStatus();
-
-    switch (connStatus)
+    switch (message->getStatus())
     {
     case ConnectionStatus::Disconnected:
         transport->disconnectFromSocket(clientId);
@@ -149,33 +147,32 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
     }
 }
 
-bool Server::sendMessage(int clientId, IMessage& message, const SendMode& mode)
+bool Server::sendMessage(const int clientId, const IMessage& message, const SendMode& mode) const
 {
-    if (connectedClients.find(clientId) == connectedClients.end())
+    if (!connectedClients.contains(clientId))
     {
         return false;
     }
 
-    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
         message,
         clientId,
         mode
     );
 
-    TransportResult result = transport->send(outgoing);
-    return result == TransportResult::SUCCESS;
+    return transport->send(outgoing) == TransportResult::SUCCESS;
 }
 
-bool Server::sendMessage(int clientId, IMessage& message)
+bool Server::sendMessage(const int clientId, const IMessage& message) const
 {
     return sendMessage(clientId, message, SendMode::ReliableOrdered);
 }
 
-bool Server::broadcastMessage(IMessage& message)
+bool Server::broadcastMessage(const IMessage& message) const
 {
     bool allSucceeded = true;
 
-    for (int clientId : connectedClients)
+    for (const int clientId : connectedClients)
     {
         if (!sendMessage(clientId, message))
         {
@@ -186,11 +183,11 @@ bool Server::broadcastMessage(IMessage& message)
     return allSucceeded;
 }
 
-bool Server::broadcastMessage(IMessage& message, int excludeClientId)
+bool Server::broadcastMessage(const IMessage& message, const int excludeClientId) const
 {
     bool allSucceeded = true;
 
-    for (int clientId : connectedClients)
+    for (const int clientId : connectedClients)
     {
         if (clientId != excludeClientId)
         {
@@ -204,20 +201,18 @@ bool Server::broadcastMessage(IMessage& message, int excludeClientId)
     return allSucceeded;
 }
 
-void Server::kickClient(int clientId)
+void Server::kickClient(const int clientId)
 {
     ConnectionMessage disconnectMessage;
     disconnectMessage.setStatus(ConnectionStatus::Disconnected);
 
-    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
         disconnectMessage,
         clientId,
         SendMode::ReliableOrdered
     );
 
-    TransportResult result = transport->send(outgoing);
-
-    if (result == TransportResult::SUCCESS)
+    if (transport->send(outgoing) == TransportResult::SUCCESS)
     {
         transport->disconnectFromSocket(clientId);
         connectedClients.erase(clientId);

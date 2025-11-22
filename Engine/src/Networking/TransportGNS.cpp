@@ -204,7 +204,7 @@ void TransportGNS::pollIncomingMessages()
     }
 }
 
-void TransportGNS::processMessage(ISteamNetworkingMessage* steamMessage)
+void TransportGNS::processMessage(const ISteamNetworkingMessage* steamMessage)
 {
     if (!steamMessage || !onMessageReceived)
         return;
@@ -221,7 +221,7 @@ void TransportGNS::processMessage(ISteamNetworkingMessage* steamMessage)
 }
 
 void TransportGNS::steamNetConnectionStatusChangedCallback(
-    SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
+     SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
 {
     if (transportGNSCallbackInstance)
     {
@@ -346,7 +346,7 @@ void TransportGNS::safeOnConnectionChanged(const Connection& connection)
 
 void TransportGNS::addNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
 {
-    HSteamNetConnection steamConn = pointerConnectionStatusInformation->m_hConn;
+    const HSteamNetConnection steamConn = pointerConnectionStatusInformation->m_hConn;
 
     int connectionId = nextConnectionId++;
     mapConnections[steamConn] = connectionId;

@@ -26,13 +26,13 @@ public:
     ServerStatus start();
     ServerStatus stop();
 
-    void update();
+    void update() const;
     void kickClient(int clientId);
 
-    bool sendMessage(int clientId, IMessage& message, const SendMode& mode);
-    bool sendMessage(int clientId, IMessage& message);
-    bool broadcastMessage(IMessage& message);
-    bool broadcastMessage(IMessage& message, int excludeClientId);
+    bool sendMessage(int clientId, const IMessage& message, const SendMode& mode) const;
+    bool sendMessage(int clientId, const IMessage& message) const;
+    bool broadcastMessage(const IMessage& message) const;
+    bool broadcastMessage(const IMessage& message, int excludeClientId) const;
 
 private:
     void onMessage(const IncomingRawMessage& message);
