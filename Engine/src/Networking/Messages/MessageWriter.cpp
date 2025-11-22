@@ -16,6 +16,5 @@ OutgoingRawMessage MessageWriter::writeMessage(
     int connectionId,
     SendMode sendMode)
 {
-    return {connectionId,  message.serialize(), sendMode};
+    return {connectionId, message.serialize(), sendMode};
 }
-

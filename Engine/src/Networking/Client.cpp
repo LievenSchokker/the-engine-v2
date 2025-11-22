@@ -2,7 +2,6 @@
 #include "Networking/TransportGNS.h"
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
-#include "Networking/Server/ServerInformation.h"
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
@@ -120,7 +119,6 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
         return;
     }
 
-    
     switch (MessageTypes messageType = message->getMessageType())
     {
     case MessageTypes::ConnectionMessage:
