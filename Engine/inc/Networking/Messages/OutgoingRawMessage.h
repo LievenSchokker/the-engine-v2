@@ -7,7 +7,7 @@ class OutgoingRawMessage
 {
 public:
     OutgoingRawMessage(int connectionID, std::vector<std::byte> payload,
-        SendMode mode = SendMode::ReliableOrdered)
+                       SendMode mode = SendMode::ReliableOrdered)
         : connectionID(connectionID)
           , buffer(std::move(payload))
           , sendMode(mode)
@@ -19,6 +19,13 @@ public:
     const std::vector<std::byte> buffer;
     const SendMode sendMode;
 
-    const std::byte* data() const { return buffer.data(); }
-    size_t size() const { return buffer.size(); }
+    const std::byte* data() const
+    {
+        return buffer.data();
+    }
+
+    size_t size() const
+    {
+        return buffer.size();
+    }
 };

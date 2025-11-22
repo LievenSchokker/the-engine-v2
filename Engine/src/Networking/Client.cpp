@@ -32,8 +32,6 @@ Client::~Client()
 
 bool Client::connectToServer(const uint16_t port, const char* serverIP)
 {
-
-
     connectionManager->setOnMessageCallback([this](const IncomingRawMessage& rawMessage)
     {
         onMessageReceived(rawMessage);

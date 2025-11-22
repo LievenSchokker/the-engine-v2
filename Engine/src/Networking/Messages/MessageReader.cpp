@@ -12,7 +12,7 @@ std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage ra
         return nullptr;
     }
 
-    MessageTypes messageType = readMessageType(rawMessage);
+    MessageTypes messageType = readMessageHeader(rawMessage);
 
     std::unique_ptr<IMessage> message = createMessage(messageType);
 
@@ -50,7 +50,7 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
     return message;
 }
 
-MessageTypes MessageReader::readMessageType(const IncomingRawMessage& message)
+MessageTypes MessageReader::readMessageHeader(const IncomingRawMessage& message)
 {
     const std::byte* data = message.data;
     MessageTypes messageType;

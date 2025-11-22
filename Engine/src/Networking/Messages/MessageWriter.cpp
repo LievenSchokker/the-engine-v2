@@ -19,7 +19,10 @@ std::vector<std::byte> MessageWriter::buildPacket(const IMessage& message)
 {
     MessageTypes messageType = message.getMessageType();
     auto typeValue = static_cast<uint8_t>(messageType);
+
+
     std::vector<std::byte> payload = message.serialize();
+
     std::vector<std::byte> packet(sizeof(uint8_t) + payload.size());
 
     std::memcpy(packet.data(), &typeValue, sizeof(uint8_t));
@@ -27,8 +30,8 @@ std::vector<std::byte> MessageWriter::buildPacket(const IMessage& message)
     if (!payload.empty())
     {
         std::memcpy(packet.data() + sizeof(uint8_t),
-                   payload.data(),
-                   payload.size());
+                    payload.data(),
+                    payload.size());
     }
 
     return packet;

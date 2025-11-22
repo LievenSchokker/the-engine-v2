@@ -25,7 +25,7 @@ struct Connection;
 class ConnectionManager
 {
 public:
-    ConnectionManager(ConnectionMode mode);
+    explicit ConnectionManager(ConnectionMode mode);
 
     ~ConnectionManager();
 
@@ -53,5 +53,5 @@ private:
     void handleTransportMessage(const IncomingRawMessage& message);
 
     std::function<void(IncomingRawMessage)> onMessage;
-    std::function<void(int, bool)> onConnectionChanged;
+    std::function<void(Connection connection)> onConnectionChanged;
 };
