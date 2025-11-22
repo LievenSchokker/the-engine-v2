@@ -1,7 +1,6 @@
-// Client.cpp
 #include "Networking/Client.h"
-#include "Networking/Connection/ConnectionManager.h"
-#include "Networking/Connection/ConnectionMode.h"
+#include "Networking/TransportGNS.h"
+#include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/Messages/IMessage.h"
@@ -12,47 +11,57 @@
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/SendMode.h"
-
-#include <iostream>
-#include <thread>
-#include <chrono>
-
 #include "Networking/TransportResult.h"
 
+#include <iostream>
+
 Client::Client()
-    : connectionManager(std::make_unique<ConnectionManager>(ConnectionMode::Client))
-{}
+    : transport(std::make_unique<TransportGNS>())
+{
+    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
+
+    transport->setOnMessageReceived([this](const IncomingRawMessage& message)
+    {
+        onMessageReceived(message);
+    });
+
+    transport->setOnConnectionChanged([this](const Connection& connection)
+    {
+        onConnectionChanged(connection);
+    });
+}
 
 Client::~Client()
 {
-    if (listenThread.joinable())
-        listenThread.join();
-    connectionManager->shutdown();
+    disconnect();
 }
 
-bool Client::connectToServer(const uint16_t port, const char* serverIP)
+bool Client::connectToServer(uint16_t port, const char* serverIP)
 {
-    connectionManager->setOnMessageCallback([this](const IncomingRawMessage& rawMessage)
+    TransportResult result = transport->connectByIPAdress(serverIP, port);
+
+    if (result != TransportResult::SUCCESS)
     {
-        onMessageReceived(rawMessage);
-    });
-
-    ServerConnectionInformation serverInfo;
-    serverInfo.ip = serverIP;
-    serverInfo.port = port;
-
-    ConnectionStatus status = connectionManager->init(serverInfo, ConnectionMode::Client);
-
-    if (status != ConnectionStatus::Connected)
-    {
+        std::cerr << "Failed to connect to " << serverIP << ":" << port << std::endl;
         return false;
     }
+
     return true;
+}
+
+void Client::disconnect()
+{
+    if (currentConnection.connectionStatus == ConnectionStatus::Connected)
+    {
+        transport->disconnectFromSocket(currentConnection.transportConnectionId);
+    }
+    transport->closeOpenSocket();
+    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
 
 bool Client::sendMessage(IMessage& message)
 {
-    if (currentConnection.connectionStatus == ConnectionStatus::Disconnected)
+    if (currentConnection.connectionStatus != ConnectionStatus::Connected)
     {
         return false;
     }
@@ -63,25 +72,51 @@ bool Client::sendMessage(IMessage& message)
         SendMode::ReliableOrdered
     );
 
-     TransportResult result = connectionManager->send(outgoing);
-    if (result == TransportResult::SUCCES)
+    TransportResult result = transport->send(outgoing);
+    return result == TransportResult::SUCCESS;
+}
+
+void Client::poll()
+{
+    transport->poll();
+}
+
+bool Client::isConnected() const
+{
+    return currentConnection.connectionStatus == ConnectionStatus::Connected;
+}
+
+void Client::onConnectionChanged(const Connection& connection)
+{
+    currentConnection = connection;
+
+    switch (connection.connectionStatus)
     {
-        return false;
-    }
-    else
-    {
-        return true;
+    case ConnectionStatus::Connected:
+        std::cout << "Connected to server" << std::endl;
+        break;
+
+    case ConnectionStatus::Connecting:
+        std::cout << "Connecting..." << std::endl;
+        break;
+
+    case ConnectionStatus::Error:
+        disconnect();
+        std::cout << "Disconnected from server" << std::endl;
+        break;
+
+    default:
+        break;
     }
 }
 
-
-//This switch case now lives here but should be moved to messageHandler
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 {
     std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
     if (!message)
     {
+        std::cerr << "Failed to parse message" << std::endl;
         return;
     }
 
@@ -91,23 +126,14 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
     {
     case MessageTypes::ConnectionMessage:
         {
-            ConnectionMessage* connectionMessage = static_cast<ConnectionMessage*>(message.get());
-            ConnectionStatus status = connectionMessage->getStatus();
+            auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get());
+            if (connMsg && connMsg->getStatus() == ConnectionStatus::Disconnected)
+            {
+                disconnect();
+            }
             break;
         }
     default:
-        {
-            break;
-        }
+        break;
     }
-}
-
-void Client::onConnectionChanged()
-{
-
-}
-
-void Client::poll()
-{
-    connectionManager->poll();
 }

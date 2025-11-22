@@ -1,17 +1,13 @@
-// Client.h
 #pragma once
 
-#include <atomic>
-#include <functional>
 #include <memory>
-#include <thread>
 
 #include "Connection/Connection.h"
 
-class ConnectionManager;
+class TransportGNS;
 class IMessage;
+
 struct IncomingRawMessage;
-struct ServerConnectionInformation;
 
 class Client
 {
@@ -20,14 +16,17 @@ public:
     ~Client();
 
     bool connectToServer(uint16_t port, const char* serverIP);
+    void disconnect();
+
     bool sendMessage(IMessage& message);
+    void poll();
+
+    bool isConnected() const;
 
 private:
-    Connection currentConnection{};
-    std::unique_ptr<ConnectionManager> connectionManager;
-    std::thread listenThread;
+    void onMessageReceived(const IncomingRawMessage& rawMessage);
+    void onConnectionChanged(const Connection& connection);
 
-    static void onMessageReceived(const IncomingRawMessage& rawMessage);
-    void onConnectionChanged();
-    void poll();
+    std::unique_ptr<TransportGNS> transport;
+    Connection currentConnection{};
 };
