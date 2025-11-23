@@ -17,12 +17,6 @@ void Box2DPhysicsWorld::start()
 	worldDef.gravity = {0.0f, 10.0f};
 	b2WorldId box2dWorldId = b2CreateWorld(&worldDef);
 	worldId = box2dWorldId;
-
-	b2BodyDef groundBodyDef = b2DefaultBodyDef();
-	groundBodyDef.position = {0.0f, -10.0f};
-
-	b2BodyId groundId = b2CreateBody(worldId, &groundBodyDef);
-	b2Polygon groundBox = b2MakeBox(50.0f, 10.0f);
 }
 
 void Box2DPhysicsWorld::update()
@@ -37,8 +31,15 @@ b2BodyId Box2DPhysicsWorld::addBody(const Transform* transform)
 {
 	b2BodyDef bodyDef = b2DefaultBodyDef();
 	bodyDef.type = b2_dynamicBody;
-	bodyDef.position = {static_cast<float>(transform->getPosition().x), static_cast<float>(transform->getPosition().y)};
+	bodyDef.position = {static_cast<float>(transform->getPosition().x),
+						static_cast<float>(transform->getPosition().y)};
 	b2BodyId bodyId = b2CreateBody(worldId, &bodyDef);
+
+
+	b2Circle circle = {{0.0f, 0.0f}, 50.0f};
+	b2ShapeDef shapeDef = b2DefaultShapeDef();
+	shapeDef.density = 1.0f;
+	b2CreateCircleShape(bodyId, &shapeDef, &circle);
 	return bodyId;
 }
 
