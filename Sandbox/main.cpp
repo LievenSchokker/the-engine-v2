@@ -46,17 +46,19 @@ int main()
 	sceneManager.addScene(std::move(prototypeScene));
 	sceneManager.setActiveScene("PrototypeScene");
 
+
 	bool running = true;
 	Uint32 lastTicks = SDL_GetTicks();
 	Color clearColor = Color::darkGray();
 
 	InputManager* input = InputManager::getInstance();
 	Scene* activeScene = sceneManager.getActiveScene();
-
+	auto circleNew =  activeScene->getGameObject("BlueCircle");
 
 	PhysicsSystem physics = PhysicsSystem();
 	Box2DPhysicsWorld* world = physics.GetWorld();
-	b2BodyId bodyId = world->addBody(circle->getTransform());
+	world->start();
+	b2BodyId bodyId = world->addBody(circleNew->getTransform());
 
 
 	while ( running && renderer.isOpen() ) {
