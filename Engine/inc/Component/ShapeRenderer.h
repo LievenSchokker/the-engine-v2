@@ -30,7 +30,7 @@ class ShapeRenderer: public Component
 	void render(IRenderer& renderer) const;
 
    private:
-	Color color = Color::White();
+	Color color = Color::white();
 	double radius = 25.0;
 	Vector2 size = {50.0, 50.0};
 	ShapeType type = ShapeType::None;

@@ -148,5 +148,5 @@ class SceneManager
 	Scene* activeScene = nullptr;
 	bool paused = false;
 	IRenderer* renderer = nullptr;
-	Color clearColor = Color::Black();
+	Color clearColor = Color::black();
 };

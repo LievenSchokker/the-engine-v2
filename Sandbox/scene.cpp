@@ -32,7 +32,7 @@ int main()
 
 	SceneManager sceneManager;
 	sceneManager.setRenderer(&renderer);
-	sceneManager.setClearColor(Color::Black());
+	sceneManager.setClearColor(Color::black());
 
 	auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
 
@@ -41,7 +41,7 @@ int main()
 	circle->getTransform()->setPosition({150.0, 140.0});
 	circle->getTransform()->setScale({1.0, 1.0});
 	circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(
-		Color::LightBlue());
+		Color::lightBlue());
 
 	auto rectangle = std::make_unique<GameObject>();
 	rectangle->setName("YellowRectangle");
@@ -50,7 +50,7 @@ int main()
 	rectangle->getTransform()->setScale({1.0, 1.0});
 	rectangle->addComponent<ShapeRenderer>()
 		->setRectangle({140.0, 80.0})
-		.setColor(Color::LightRed());
+		.setColor(Color::lightRed());
 
 	prototypeScene->addGameObject(std::move(circle));
 	prototypeScene->addGameObject(std::move(rectangle));
@@ -60,7 +60,7 @@ int main()
 
 	bool running = true;
 	Uint32 lastTicks = SDL_GetTicks();
-	Color clearColor = Color::DarkGray();
+	Color clearColor = Color::darkGray();
 
 	InputManager* input = InputManager::getInstance();
 	Scene* activeScene = sceneManager.getActiveScene();
@@ -72,9 +72,9 @@ int main()
 		// ================================
 
 		if ( input->wasKeyPressed(KeyCode::SPACE) ) {
-			clearColor = (clearColor == Color::DarkGreen())
-							 ? Color::DarkPurple()
-							 : Color::DarkGreen();
+			clearColor = (clearColor == Color::darkGreen())
+							 ? Color::darkPurple()
+							 : Color::darkGreen();
 			sceneManager.setClearColor(clearColor);
 		}
 
