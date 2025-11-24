@@ -167,7 +167,7 @@ void SceneManager::buildRenderQueue(RenderQueue& queue) const
 
 void SceneManager::setClearColor(const Color& color)
 {
-	this->clearColor = color;
+	clearColor = color;
 }
 
 Color SceneManager::getClearColor() const

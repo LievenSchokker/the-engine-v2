@@ -185,7 +185,6 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 		return;
 	}
 
-#if SDL_VERSION_ATLEAST(2, 0, 18)
 	const double radians = rotationDegrees * (kPi / 180.0);
 	const double cosTheta = std::cos(radians);
 	const double sinTheta = std::sin(radians);
@@ -213,10 +212,4 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 
 	const int indices[6] = {0, 1, 2, 2, 3, 0};
 	SDL_RenderGeometry(renderer, nullptr, vertices, 4, indices, 6);
-#else
-	SDL_FRect rect{static_cast<float>(center.x - halfWidth),
-				   static_cast<float>(center.y - halfHeight),
-				   static_cast<float>(width), static_cast<float>(height)};
-	SDL_RenderFillRectF(renderer, &rect);
-#endif
 }

@@ -40,17 +40,25 @@ int main()
 	circle->setName("BlueCircle");
 	circle->getTransform()->setPosition({150.0, 140.0});
 	circle->getTransform()->setScale({1.0, 1.0});
-	circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(
-		Color::lightBlue());
+	auto* circleRenderer = circle->addComponent<ShapeRenderer>();
+	if ( circleRenderer == nullptr ) {
+		std::cerr << "[Sandbox] Failed to add ShapeRenderer to BlueCircle\n";
+		return 1;
+	}
+	circleRenderer->setCircle(50.0).setColor(Color::lightBlue());
 
 	auto rectangle = std::make_unique<GameObject>();
 	rectangle->setName("YellowRectangle");
 	rectangle->getTransform()->setPosition({320.0, 240.0});
 	rectangle->getTransform()->setRotationAngle(25.0);
 	rectangle->getTransform()->setScale({1.0, 1.0});
-	rectangle->addComponent<ShapeRenderer>()
-		->setRectangle({140.0, 80.0})
-		.setColor(Color::lightRed());
+	auto* rectangleRenderer = rectangle->addComponent<ShapeRenderer>();
+	if ( rectangleRenderer == nullptr ) {
+		std::cerr
+			<< "[Sandbox] Failed to add ShapeRenderer to YellowRectangle\n";
+		return 1;
+	}
+	rectangleRenderer->setRectangle({140.0, 80.0}).setColor(Color::lightRed());
 
 	prototypeScene->addGameObject(std::move(circle));
 	prototypeScene->addGameObject(std::move(rectangle));
