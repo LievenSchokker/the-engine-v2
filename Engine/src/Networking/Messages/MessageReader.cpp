@@ -27,7 +27,7 @@ std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage ra
 
     if (message->deserialize(payloadData, payloadLength))
     {
-        return std::move(message);
+        return message;
     }
     else
     {
