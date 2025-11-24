@@ -5,8 +5,8 @@
 #include "GameObject/GameObject.h"
 #include "Component/Component.h"
 #include "Component/ComponentManager.h"
-#include "../Component/TestComponentOne.h"
-#include "../Component/TestComponentTwo.h"
+#include "GameObject/ScenePlaceholder.h"
+#include "../Component/TestComponents.h"
 
 #include <gtest/gtest.h>
 
@@ -85,9 +85,34 @@ namespace engine_tests
         EXPECT_EQ(componentOut, managerOut);
     }
 
-
-    TEST(ComponentTests, SetGameObjectSetsPrivateFields)
+    TEST(ComponentTests, ComponentGetsDeletedOnGameObjectDestroy)
     {
         GameObject go;
+        TestComponentOne* comp = go.addComponent<TestComponentOne>();
+
+        /// Ensure component has been set up on the game object correctly.
+        EXPECT_TRUE(go.hasComponent(comp));
+        EXPECT_EQ(TestComponentBase::instanceCount, 1);
+
+        EXPECT_FALSE(comp->destroyCalled);
+        go.destroy();
+
+
+    	int destroyCount = TestComponentBase::destroyCount;
+
+        /// Normally the scene would call this after go.destroy was called at the end of the Update loop.
+        /// But the scene destroys the GameObject right after, so we can't use that to test.
+        /// Calling the function manually simulates what would happen when a GameObject would be deleted by the scene,
+        /// but without deleting the GameObject from memeory itself (which happens right after scene would call this function)
+        go.onSceneDestroy();
+
+    	/// Components should get their onDestroy() function called when their go.onSceneDestroy() function gets called.
+    	/// Need to check onDestroy this way since comp is now freed memory
+    	EXPECT_EQ((destroyCount + 1), TestComponentBase::destroyCount);
+
+        /// Instance count gets decremented in the destructor, so should be 0 here (after deletion)
+        EXPECT_EQ(TestComponentBase::instanceCount, 0);
     }
+
+
 }

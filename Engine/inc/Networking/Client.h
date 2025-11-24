@@ -5,6 +5,7 @@
 
 
 #include "Connection/Connection.h"
+#include "Server/ServerInformation.h"
 
 
 class ITransport;
@@ -40,7 +41,7 @@ public:
      * @return True if the connection attempt was initiated successfully,
      *         false otherwise.
      */
-    bool connectToServer(uint16_t port, const char* serverIP) const;
+    bool connectToServer(const ServerConnectionInformation&  serverInformartion) const;
 
     /**
      * @brief Disconnects from the server.

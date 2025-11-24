@@ -8,6 +8,11 @@ ConnectionMessage::ConnectionMessage()
 {
 }
 
+MessageTypes ConnectionMessage::getMessageType() const
+{
+	return MessageTypes::ConnectionMessage;
+}
+
 std::vector<std::byte> ConnectionMessage::serialize() const
 {
     std::vector<std::byte> buffer(sizeof(uint8_t));
