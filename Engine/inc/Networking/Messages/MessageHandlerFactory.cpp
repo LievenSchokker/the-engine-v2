@@ -1,7 +1,7 @@
 //
 // Created by samle on 24/11/2025.
 //
-#include "NetworkMessageHandler.h"
+#include "MessageHandlerFactory.h"
 
 namespace spelmotor_networking
 {

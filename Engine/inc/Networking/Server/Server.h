@@ -1,54 +1,58 @@
 #pragma once
-
-
 #include <memory>
 #include <unordered_set>
-
-
 #include "ServerInformation.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
 
+namespace spelmotor_networking
+{
+    class MessageHandlerFactory;
+}
 
 class TransportGNS;
 class IMessage;
 class ConnectionMessage;
-
-
 struct ServerConnectionInformation;
 struct IncomingRawMessage;
 struct Connection;
-
-
 enum class ConnectionStatus : uint8_t;
 
 class Server
 {
-public:
-    Server(const ServerConnectionInformation& serverConnectionInformation,
-           std::unique_ptr<ITransport> injectedTransport);
+    public:
+        Server(const ServerConnectionInformation &serverConnectionInformation,
+               std::unique_ptr<ITransport> injectedTransport);
 
-    ~Server();
+        ~Server();
 
-    ServerStatus start();
-    ServerStatus stop();
+        ServerStatus start();
 
-    void update() const;
-    void kickClient(int clientId);
+        ServerStatus stop();
 
-    bool sendMessage(int clientId, const IMessage& message, const SendMode& mode) const;
-    bool sendMessage(int clientId, const IMessage& message) const;
-    bool broadcastMessage(const IMessage& message) const;
-    bool broadcastMessage(const IMessage& message, int excludeClientId) const;
+        void update() const;
 
-private:
-    void onMessage(const IncomingRawMessage& message);
-    void onConnectionChanged(const Connection& connection);
-    void handleConnectionMessage(int clientId, ConnectionMessage* message);
+        void kickClient(int clientId);
 
-    std::unique_ptr<ITransport> transport;
-    ServerConnectionInformation setupInformation;
-    ServerStatus status;
-    std::unordered_set<int> connectedClients;
+        bool sendMessage(int clientId, const IMessage &message, const SendMode &mode) const;
+
+        bool sendMessage(int clientId, const IMessage &message) const;
+
+        bool broadcastMessage(const IMessage &message) const;
+
+        bool broadcastMessage(const IMessage &message, int excludeClientId) const;
+
+    private:
+        void onMessage(const IncomingRawMessage &message);
+
+        void onConnectionChanged(const Connection &connection);
+
+        void handleConnectionMessage(int clientId, ConnectionMessage *message);
+
+        std::unique_ptr<ITransport> transport;
+        std::unique_ptr<spelmotor_networking::MessageHandlerFactory>;
+        ServerConnectionInformation setupInformation;
+        ServerStatus status;
+        std::unordered_set<int> connectedClients;
 };
