@@ -13,9 +13,9 @@ namespace engine_tests
             TestBehaviourBase() = default;
             virtual ~TestBehaviourBase() = 0;
 
-            void awake() override;
+            void onAwake() override;
             void onEnable() override;
-            void start() override;
+            void onStart() override;
             void update() override;
             void onDisable() override;
             void onDestroy() override;

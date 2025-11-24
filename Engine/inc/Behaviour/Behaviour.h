@@ -31,10 +31,15 @@ class Behaviour : public Component
          * - Regardless of @c isEnabled status
          * - Outside of this constructor
          *
-         * Use Awake instead of the constructor for initialisation, always called once per scene instance.
-         * Awake is always called before @c onEnable() and @c start() functions.
+         * Use Awake instead of the constructor for initialisation, always called by the engine once per scene instance.
+         * Awake is always called by the engine before @c onEnable() and @c start() functions.
          */
-        virtual void awake();
+        void awake();
+
+        /**
+         * Callback for when @c awake() is called by the engine on this behaviour.
+         */
+        virtual void onAwake() {};
 
         /**
          * @brief Called when this component is enabled:
@@ -46,11 +51,16 @@ class Behaviour : public Component
         /**
          * @brief start is called after @c awake, and before the first @c update call.
          *
-         * Start on any component is guaranteed to be called after all awake functions on all behaviours in the scene have been called,
+         * Start on any component is guaranteed to be called by the engine after all awake functions on all behaviours in the scene have been called,
          *
          * Start is only called on enabled behaviours.
          */
-        virtual void start();
+        void start();
+
+        /**
+         * Callback when @ref start() is called by the engine on this behaviour.
+         */
+        virtual void onStart() {};
 
         /**
          * Update is called every frame when:

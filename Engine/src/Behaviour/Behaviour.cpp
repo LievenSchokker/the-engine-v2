@@ -14,7 +14,9 @@ void Behaviour::awake()
         return;
 
     hasAwakened = true;
+    onAwake();
 }
+
 
 void Behaviour::start()
 {
@@ -22,6 +24,7 @@ void Behaviour::start()
         return;
 
     hasStarted = true;
+    onStart();
 }
 
 

@@ -13,7 +13,7 @@ namespace engine_tests
     }
 
 
-    void TestBehaviourBase::awake()
+    void TestBehaviourBase::onAwake()
     {
         Behaviour::awake();
         awakeCalled = true;
@@ -27,7 +27,7 @@ namespace engine_tests
     }
 
 
-    void TestBehaviourBase::start()
+    void TestBehaviourBase::onStart()
     {
         Behaviour::start();
         startCalled = true;
