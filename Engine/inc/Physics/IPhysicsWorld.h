@@ -1,6 +1,6 @@
 #pragma once
+#include "GameObject/GameObject.h"
 
-class Transform;
 struct b2BodyId;
 
 class IPhysicsWorld
@@ -11,5 +11,5 @@ class IPhysicsWorld
 	virtual void start() = 0;
 	virtual void update() = 0;
 	virtual void shutdown() = 0;
-	virtual b2BodyId addBody(const Transform* transform) = 0;
+	virtual b2BodyId createBody(const GameObject* gameObject) =0;
 };

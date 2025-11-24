@@ -67,15 +67,15 @@ struct FakeRenderer: public IRenderer {
 	int presentCalls = 0;
 	int circleCalls = 0;
 	int rectangleCalls = 0;
-	Color lastClearColor = Color::Black();
+	Color lastClearColor = Color::black();
 	Vector2 lastCircleCenter{};
 	double lastCircleRadius = 0.0;
-	Color lastCircleColor = Color::Black();
+	Color lastCircleColor = Color::black();
 	Vector2 lastCircleScale{};
 	Vector2 lastRectCenter{};
 	Vector2 lastRectSize{};
 	double lastRectRotation = 0.0;
-	Color lastRectColor = Color::Black();
+	Color lastRectColor = Color::black();
 	Vector2 lastRectScale{};
 };
 }  // namespace
@@ -94,7 +94,7 @@ TEST(ShapeRendererTest, RendersCircleShapeThroughSceneManager)
 	circle->getTransform()->setPosition({42.0, 24.0});
 	circle->getTransform()->setScale({1.0, 1.0});
 	circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(
-		Color::Blue());
+		Color::blue());
 	scene->addGameObject(std::move(circle));
 
 	manager.addScene(std::move(scene));
@@ -113,7 +113,7 @@ TEST(ShapeRendererTest, RendersCircleShapeThroughSceneManager)
 
 	// Assert - Verify circle properties were passed correctly
 	EXPECT_DOUBLE_EQ(renderer.lastCircleRadius, 25.0);
-	EXPECT_EQ(renderer.lastCircleColor.b, Color::Blue().b);
+	EXPECT_EQ(renderer.lastCircleColor.b, Color::blue().b);
 }
 
 // Check that SceneManager correctly renders a GameObject with a rectangle
@@ -132,7 +132,7 @@ TEST(ShapeRendererTest, RendersRectangleShapeThroughSceneManager)
 	rect->getTransform()->setScale({1.0, 1.0});
 	rect->addComponent<ShapeRenderer>()
 		->setRectangle({80.0, 40.0})
-		.setColor(Color::Yellow());
+		.setColor(Color::yellow());
 	scene->addGameObject(std::move(rect));
 
 	manager.addScene(std::move(scene));
@@ -147,5 +147,5 @@ TEST(ShapeRendererTest, RendersRectangleShapeThroughSceneManager)
 
 	// Assert - Verify rectangle properties were passed correctly
 	EXPECT_DOUBLE_EQ(renderer.lastRectRotation, 33.0);
-	EXPECT_EQ(renderer.lastRectColor.g, Color::Yellow().g);
+	EXPECT_EQ(renderer.lastRectColor.g, Color::yellow().g);
 }
