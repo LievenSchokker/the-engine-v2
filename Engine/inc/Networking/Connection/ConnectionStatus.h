@@ -12,5 +12,5 @@ enum class ConnectionStatus : uint8_t
     Error = 3,         ///< Connection failed due to an error.
     Invalid = 4,       ///< Connection is in an invalid state.
     Unknown = 5,       ///< Connection state could not be determined.
-    Death = 6,         ///< Connection was terminated unexpectedly.
+    Terminated = 6  ///< Connection was terminated unexpectedly.
 };
