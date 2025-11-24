@@ -32,14 +32,14 @@ SDLRenderer::~SDLRenderer()
 	close();
 }
 
-void SDLRenderer::open(const WindowOptions& opts)
+void SDLRenderer::open(const WindowOptions& options)
 {
 	// Validate window dimensions
-	if ( opts.width < kMinWindowDimension ||
-		 opts.height < kMinWindowDimension ) {
-		std::cerr << "Invalid window dimensions: " << opts.width << "x"
-				  << opts.height << " (minimum: " << kMinWindowDimension << "x"
-				  << kMinWindowDimension << ")\n";
+	if ( options.width < kMinWindowDimension ||
+		 options.height < kMinWindowDimension ) {
+		std::cerr << "Invalid window dimensions: " << options.width << "x"
+				  << options.height << " (minimum: " << kMinWindowDimension
+				  << "x" << kMinWindowDimension << ")\n";
 		return;
 	}
 
@@ -53,9 +53,9 @@ void SDLRenderer::open(const WindowOptions& opts)
 	}
 #endif
 
-	window = SDL_CreateWindow(opts.title.c_str(), SDL_WINDOWPOS_UNDEFINED,
-							  SDL_WINDOWPOS_UNDEFINED, opts.width, opts.height,
-							  flags);
+	window = SDL_CreateWindow(options.title.c_str(), SDL_WINDOWPOS_UNDEFINED,
+							  SDL_WINDOWPOS_UNDEFINED, options.width,
+							  options.height, flags);
 
 	if ( window == nullptr ) {
 		std::cerr << "Window could not be created! SDL_Error: "

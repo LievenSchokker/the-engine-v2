@@ -68,7 +68,7 @@ class SceneManager
 	 */
 	bool transferGameObject(const std::string& fromSceneName,
 							const std::string& toSceneName,
-							const std::string& objectName);
+							const std::string& objectName) const;
 
 	/**
 	 * @brief Get the currently active scene.

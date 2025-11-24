@@ -52,7 +52,7 @@ Scene* SceneManager::getScene(const std::string& name) const
 
 bool SceneManager::transferGameObject(const std::string& fromSceneName,
 									  const std::string& toSceneName,
-									  const std::string& objectName)
+									  const std::string& objectName) const
 {
 	Scene* fromScene = getScene(fromSceneName);
 	Scene* toScene = getScene(toSceneName);
