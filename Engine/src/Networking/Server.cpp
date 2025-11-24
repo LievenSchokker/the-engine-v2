@@ -168,7 +168,7 @@ bool Server::sendMessage(const int clientId, const IMessage& message, const Send
 
 bool Server::sendMessage(const int clientId, const IMessage& message) const
 {
-    return sendMessage(clientId, message, SendMode::ReliableOrdered);
+    return sendMessage(clientId, message, SendMode::Unreliable);
 }
 
 bool Server::broadcastMessage(const IMessage& message) const
