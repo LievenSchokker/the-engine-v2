@@ -9,4 +9,5 @@ struct ApplicationSpecifications
 {
     WindowOptions windowOptions;
     RenderBackend renderBackend;
+    int tickRate;
 };

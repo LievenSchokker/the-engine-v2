@@ -15,7 +15,7 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
       specifications(applicationSpecifications),
       timer(nullptr),
-      tickRate(60)
+      tickRate(applicationSpecifications.tickRate)
 {
     if (applicationSpecifications.renderBackend == RenderBackend::SDL)
     {
