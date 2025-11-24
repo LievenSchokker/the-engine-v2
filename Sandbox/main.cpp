@@ -2,9 +2,8 @@
 // Created by Lieven Schokker on 07/11/2025.
 //
 
+#include "EntryPoint.h"
 #include <iostream>
-
-#include "ExampleEntryPoint.h"
 
 int main(int argc, char** argv)
 {
