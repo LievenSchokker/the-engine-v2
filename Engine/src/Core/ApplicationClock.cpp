@@ -1,10 +1,12 @@
 
 
-#include "Core/Timer.h"
+#include "Core/ApplicationClock.h"
+
+
 #include <algorithm>
 
 
-Timer::Timer(double fixedDeltaTime, ClockFunction clockFunc)
+ApplicationClock::ApplicationClock(double fixedDeltaTime, ClockFunction clockFunc)
     : getClock(clockFunc),
       fixedDeltaTime(fixedDeltaTime),
       currentTime(0.0),
@@ -14,7 +16,7 @@ Timer::Timer(double fixedDeltaTime, ClockFunction clockFunc)
 {
 }
 
-void Timer::start()
+void ApplicationClock::start()
 {
     currentTime = getClock();
     accumulatedTime = 0.0;
@@ -22,7 +24,7 @@ void Timer::start()
     tickRate = 0;
 }
 
-void Timer::tick()
+void ApplicationClock::tick()
 {
     double newTime = getClock();
     double frameTime = newTime - currentTime;
@@ -37,39 +39,39 @@ void Timer::tick()
     accumulatedTime += frameTime;
 }
 
-bool Timer::shouldFixedUpdate()
+bool ApplicationClock::shouldFixedUpdate()
 {
     return accumulatedTime >= fixedDeltaTime;
 }
 
-void Timer::consumeFixedUpdate()
+void ApplicationClock::consumeFixedUpdate()
 {
     accumulatedTime -= fixedDeltaTime;
     simulationTime += fixedDeltaTime;
     tickRate++;
 }
 
-double Timer::getAlpha() const
+double ApplicationClock::getAlpha() const
 {
     return accumulatedTime / fixedDeltaTime;
 }
 
-double Timer::getTime() const
+double ApplicationClock::getTime() const
 {
     return simulationTime;
 }
 
-double Timer::getDeltaTime() const
+double ApplicationClock::getDeltaTime() const
 {
     return fixedDeltaTime;
 }
 
-double Timer::getAccumulatedTime() const
+double ApplicationClock::getAccumulatedTime() const
 {
     return accumulatedTime;
 }
 
-int Timer::getTickRate() const
+int ApplicationClock::getTickRate() const
 {
     return tickRate;
 }

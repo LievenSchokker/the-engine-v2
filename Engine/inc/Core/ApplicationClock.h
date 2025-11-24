@@ -6,14 +6,14 @@
 
 
 /**
- * @class Timer
+ * @class ApplicationClock
  * @brief frame timing with fixed timestep accumulation for deterministic simulation.
  *
  * Implements the "Fix Your Timestep" from: https://gafferongames.com/post/fix_your_timestep/
  * This ensures physics and game logic run at a tick rate
  * making deterministic networking via lockstep synchronization possible.
  */
-class Timer
+class ApplicationClock
 {
 public:
     using ClockFunction = std::function<double()>;
@@ -27,7 +27,7 @@ public:
      *       hardware and prevents the "spiral of death" where slow frames cause more
      *       updates which cause even slower frames.
      */
-    Timer(double fixedDeltaTime, ClockFunction clockFunc);
+    ApplicationClock(double fixedDeltaTime, ClockFunction clockFunc);
 
     /**
      * @brief Initializes timing state at application start.

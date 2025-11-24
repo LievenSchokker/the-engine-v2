@@ -7,7 +7,7 @@
 #include "ApplicationSpecifications.h"
 
 
-class Timer;
+class ApplicationClock;
 class IRender;
 /**
  * @class SpelMotor
@@ -67,5 +67,5 @@ private:
     std::unique_ptr<IRender> renderer;
 
     /** @brief timeStep calculation for engine */
-    std::unique_ptr<Timer> timer;
+    std::unique_ptr<ApplicationClock> timer;
 };

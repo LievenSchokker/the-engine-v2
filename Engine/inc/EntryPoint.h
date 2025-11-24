@@ -1,6 +1,9 @@
 #pragma once
+
+
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
+
 
 namespace SpelMotorEntry
 {

@@ -3,7 +3,7 @@
 #include <thread>
 #include <chrono>
 #include <SDL2/SDL.h>
-#include "Core/Timer.h"
+#include "Core/ApplicationClock.h"
 
 class TimerTest : public ::testing::Test {
 protected:
@@ -24,7 +24,7 @@ TEST_F(TimerTest, OneSecondEqualsTickRate) {
     const int targetTickRate = 60;
     const double fixedDeltaTime = 1.0 / targetTickRate;
 
-    Timer timer(fixedDeltaTime, []() {
+    ApplicationClock timer(fixedDeltaTime, []() {
         return SDL_GetTicks() / 1000.0;
     });
 
@@ -82,7 +82,7 @@ TEST_F(TimerTest, SpiralOfDeathPrevention) {
     const double fixedDeltaTime = 1.0 / targetTickRate;
     const double maxFrameTime = 0.25;
 
-    Timer timer(fixedDeltaTime, []() {
+    ApplicationClock timer(fixedDeltaTime, []() {
         return SDL_GetTicks() / 1000.0;
     });
 

@@ -4,7 +4,7 @@
 
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
-#include "Core/Timer.h"
+#include "Core/ApplicationClock.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Rendering/SDL/SDLRender.h"
@@ -21,11 +21,12 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     {
         SdlContext context = SdlContext();
         timer.reset();
-        timer = std::make_unique<Timer>(1.0f / tickRate, []()
+        timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
         {
             //Get Ticks retuns ms we need seconds;
             return (SDL_GetTicks() / 1000.0);
         });
+
         renderer = std::make_unique<SDLRender>(SDLRender(context));
     }
 }
