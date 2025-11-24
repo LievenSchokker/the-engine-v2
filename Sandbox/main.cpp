@@ -3,8 +3,10 @@
 //
 
 #include <iostream>
-int main()
+
+#include "ExampleEntryPoint.h"
+
+int main(int argc, char** argv)
 {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
+    return SpelMotorEntry::main(argc, argv);
 }
