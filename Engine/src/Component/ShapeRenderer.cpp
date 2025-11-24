@@ -4,7 +4,6 @@
 #include "GameObject/Vector2Utils.h"
 
 #include <algorithm>
-#include <cmath>
 
 namespace
 {
@@ -19,14 +18,14 @@ ShapeRenderer& ShapeRenderer::setColor(const Color& newColor)
 
 ShapeRenderer& ShapeRenderer::setCircle(double newRadius)
 {
-	type = ShapeType::Circle;
+	type = ShapeRenderType::Circle;
 	radius = std::max(newRadius, kEpsilon);
 	return *this;
 }
 
 ShapeRenderer& ShapeRenderer::setRectangle(Vector2 newSize)
 {
-	type = ShapeType::Rectangle;
+	type = ShapeRenderType::Rectangle;
 	size.x = std::max(newSize.x, kEpsilon);
 	size.y = std::max(newSize.y, kEpsilon);
 	return *this;
@@ -47,26 +46,30 @@ Vector2 ShapeRenderer::getSize() const
 	return size;
 }
 
-ShapeRenderer::ShapeType ShapeRenderer::getShapeType() const
+ShapeRenderType ShapeRenderer::getShapeType() const
 {
 	return type;
 }
 
-void ShapeRenderer::render(IRenderer& renderer) const
+std::optional<ShapeRenderCommand> ShapeRenderer::buildRenderCommand() const
 {
 	const Transform* transform = getTransform();
-	if ( transform == nullptr || type == ShapeType::None ) {
-		return;
+	if ( transform == nullptr || type == ShapeRenderType::None ) {
+		return std::nullopt;
 	}
 
 	const Vector2 position = transform->getPosition();
 	const double rotation = transform->getRotationAngle();
 	const Vector2 scale = Vector2Utils::sanitizeScale(transform->getScale());
 
-	if ( type == ShapeType::Circle ) {
-		renderer.drawCircle(position, radius, color, scale);
-		return;
-	}
+	ShapeRenderCommand command;
+	command.type = type;
+	command.position = position;
+	command.size = size;
+	command.radius = radius;
+	command.rotationDegrees = rotation;
+	command.scale = scale;
+	command.color = color;
 
-	renderer.drawRectangle(position, size, rotation, color, scale);
+	return command;
 }

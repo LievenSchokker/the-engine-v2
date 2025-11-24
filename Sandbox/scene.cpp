@@ -4,6 +4,7 @@
 #include "../Engine/inc/GameObject/GameObject.h"
 #include "../Engine/inc/Input/InputManager.h"
 #include "../Engine/inc/Rendering/Color.h"
+#include "../Engine/inc/Rendering/RenderQueue.h"
 #include "../Engine/inc/Rendering/SDL/SDLRenderer.h"
 #include "../Engine/inc/Rendering/Window/WindowOptions.h"
 #include "../Engine/inc/Scene/SceneManager.h"
@@ -31,7 +32,6 @@ int main()
 	}
 
 	SceneManager sceneManager;
-	sceneManager.setRenderer(&renderer);
 	sceneManager.setClearColor(Color::black());
 
 	auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
@@ -61,6 +61,7 @@ int main()
 	bool running = true;
 	Uint32 lastTicks = SDL_GetTicks();
 	Color clearColor = Color::darkGray();
+	RenderQueue renderQueue;
 
 	InputManager* input = InputManager::getInstance();
 	Scene* activeScene = sceneManager.getActiveScene();
@@ -109,7 +110,8 @@ int main()
 		lastTicks = currentTicks;
 
 		sceneManager.update(deltaTime);
-		sceneManager.render();
+		sceneManager.buildRenderQueue(renderQueue);
+		executeRenderQueue(renderer, renderQueue);
 
 		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) ) {
 			running = false;

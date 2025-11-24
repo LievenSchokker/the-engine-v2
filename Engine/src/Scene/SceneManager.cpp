@@ -1,7 +1,5 @@
 #include "../../inc/Scene/SceneManager.h"
 
-#include "../../inc/Rendering/IRenderer.h"
-
 #include <iostream>
 #include <utility>
 
@@ -155,21 +153,24 @@ void SceneManager::update(float deltaTime)
 	}
 }
 
-void SceneManager::render()
+void SceneManager::buildRenderQueue(RenderQueue& queue) const
 {
-	if ( activeScene != nullptr && !paused && renderer != nullptr ) {
-		renderer->beginFrame(clearColor);
-		activeScene->render(renderer);
-		renderer->presentFrame();
-	}
-}
+	queue.clear();
+	queue.clearColor = clearColor;
 
-void SceneManager::setRenderer(IRenderer* renderer)
-{
-	this->renderer = renderer;
+	if ( activeScene == nullptr || paused ) {
+		return;
+	}
+
+	activeScene->collectRenderCommands(queue.shapes);
 }
 
 void SceneManager::setClearColor(const Color& color)
 {
 	this->clearColor = color;
+}
+
+Color SceneManager::getClearColor() const
+{
+	return clearColor;
 }

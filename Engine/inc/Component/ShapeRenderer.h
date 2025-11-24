@@ -2,8 +2,10 @@
 
 #include "../GameObject/Vector2.h"
 #include "../Rendering/Color.h"
-#include "../Rendering/IRenderer.h"
+#include "../Rendering/RenderQueue.h"
 #include "Component.h"
+
+#include <optional>
 
 /**
  * @brief Simple component that renders primitive shapes for a GameObject.
@@ -11,8 +13,6 @@
 class ShapeRenderer: public Component
 {
    public:
-	enum class ShapeType { None, Circle, Rectangle };
-
 	ShapeRenderer() = default;
 
 	ShapeRenderer& setColor(const Color& newColor);
@@ -22,16 +22,16 @@ class ShapeRenderer: public Component
 	Color getColor() const;
 	double getRadius() const;
 	Vector2 getSize() const;
-	ShapeType getShapeType() const;
+	ShapeRenderType getShapeType() const;
 
 	/**
-	 * @brief Draws the configured shape using the owning transform.
+	 * @brief Builds a render command that the renderer can consume later.
 	 */
-	void render(IRenderer& renderer) const;
+	std::optional<ShapeRenderCommand> buildRenderCommand() const;
 
    private:
 	Color color = Color::white();
 	double radius = 25.0;
 	Vector2 size = {50.0, 50.0};
-	ShapeType type = ShapeType::None;
+	ShapeRenderType type = ShapeRenderType::None;
 };

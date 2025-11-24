@@ -3,6 +3,7 @@
 #include "GameObject/GameObject.h"
 #include "Rendering/Color.h"
 #include "Rendering/IRenderer.h"
+#include "Rendering/RenderQueue.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
@@ -87,7 +88,7 @@ TEST(ShapeRendererTest, RendersCircleShapeThroughSceneManager)
 	// Arrange
 	FakeRenderer renderer;
 	SceneManager manager;
-	manager.setRenderer(&renderer);
+	manager.setClearColor(Color::black());
 
 	auto scene = std::make_unique<Scene>("ShapeScene");
 	auto circle = std::make_unique<GameObject>();
@@ -101,7 +102,9 @@ TEST(ShapeRendererTest, RendersCircleShapeThroughSceneManager)
 	manager.setActiveScene("ShapeScene");
 
 	// Act
-	manager.render();
+	RenderQueue queue;
+	manager.buildRenderQueue(queue);
+	executeRenderQueue(renderer, queue);
 
 	// Assert - Verify frame lifecycle was called
 	EXPECT_EQ(renderer.beginCalls, 1);
@@ -123,7 +126,7 @@ TEST(ShapeRendererTest, RendersRectangleShapeThroughSceneManager)
 	// Arrange
 	FakeRenderer renderer;
 	SceneManager manager;
-	manager.setRenderer(&renderer);
+	manager.setClearColor(Color::black());
 
 	auto scene = std::make_unique<Scene>("RectScene");
 	auto rect = std::make_unique<GameObject>();
@@ -139,7 +142,9 @@ TEST(ShapeRendererTest, RendersRectangleShapeThroughSceneManager)
 	manager.setActiveScene("RectScene");
 
 	// Act
-	manager.render();
+	RenderQueue queue;
+	manager.buildRenderQueue(queue);
+	executeRenderQueue(renderer, queue);
 
 	// Assert - Verify rectangle was drawn, not circle
 	EXPECT_EQ(renderer.rectangleCalls, 1);

@@ -4,7 +4,8 @@ project(program)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(SDL2 REQUIRED CONFIG)
+# SDL2 2.0.18 is the minimum version required for the SDL_RenderFillRectF function
+find_package(SDL2 2.0.18 REQUIRED CONFIG)
 find_package(SDL2_image REQUIRED CONFIG)
 find_package(GameNetworkingSockets REQUIRED CONFIG)
 find_package(GTest REQUIRED)

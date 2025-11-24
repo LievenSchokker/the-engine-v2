@@ -2,7 +2,7 @@
 
 #include "../../inc/Component/ComponentManager.h"
 #include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Rendering/IRenderer.h"
+#include "../../inc/Rendering/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
@@ -144,9 +144,9 @@ void Scene::update(float deltaTime) const
 	// TODO: call gameobject update
 }
 
-void Scene::render(IRenderer* renderer) const
+void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 {
-	if ( !active || renderer == nullptr ) {
+	if ( !active ) {
 		return;
 	}
 
@@ -157,7 +157,10 @@ void Scene::render(IRenderer* renderer) const
 
 		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
 		if ( shapeRenderer != nullptr ) {
-			shapeRenderer->render(*renderer);
+			const auto command = shapeRenderer->buildRenderCommand();
+			if ( command.has_value() ) {
+				out.emplace_back(*command);
+			}
 		}
 	}
 }

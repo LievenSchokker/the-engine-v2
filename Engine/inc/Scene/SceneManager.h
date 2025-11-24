@@ -1,13 +1,12 @@
 #pragma once
 
 #include "../Rendering/Color.h"
+#include "../Rendering/RenderQueue.h"
 #include "Scene.h"
 
 #include <memory>
 #include <string>
 #include <unordered_map>
-
-class IRenderer;
 
 /**
  * @brief Coordinates ownership and activation of scenes.
@@ -127,26 +126,25 @@ class SceneManager
 	void update(float deltaTime);
 
 	/**
-	 * @brief Render the active scene when not paused.
-	 */
-	void render();
-
-	/**
-	 * @brief Set the renderer used during SceneManager::render.
+	 * @brief Populate a render queue with the active scene's primitives.
 	 *
-	 * Ownership is not transferred.
+	 * The queue is cleared before filling to avoid stale commands.
 	 */
-	void setRenderer(IRenderer* renderer);
+	void buildRenderQueue(RenderQueue& queue) const;
 
 	/**
 	 * @brief Change the clear color used at the start of each frame.
 	 */
 	void setClearColor(const Color& color);
 
+	/**
+	 * @brief Retrieve the currently configured clear color.
+	 */
+	Color getClearColor() const;
+
    private:
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;
-	IRenderer* renderer = nullptr;
 	Color clearColor = Color::black();
 };

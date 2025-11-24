@@ -104,20 +104,22 @@ circleGO->getTransform()->setPosition({150.0, 140.0});
 circleGO->getTransform()->setScale({1.0, 1.0});
 circleGO->addComponent<ShapeRenderer>()
     ->setCircle(50.0)
-    .setColor(Color::Blue());
+    .setColor(Color::blue());
 
 auto rectGO = std::make_unique<GameObject>();
 rectGO->getTransform()->setPosition({320.0, 240.0});
 rectGO->getTransform()->setRotationAngle(25.0);
 rectGO->addComponent<ShapeRenderer>()
     ->setRectangle({140.0, 80.0})
-    .setColor(Color::Yellow());
+    .setColor(Color::yellow());
 
 scene->addGameObject(std::move(circleGO));
 scene->addGameObject(std::move(rectGO));
-sceneManager.setRenderer(&renderer);
-sceneManager.render(); // Draws both shapes using the object's transforms
+
+RenderQueue queue;
+sceneManager.buildRenderQueue(queue);
+executeRenderQueue(renderer, queue); // Draws both shapes using the object's transforms
 ```
 
-Shapes automatically follow the owning object's position, rotation, and scale every frame. Use
-`SceneManager::setRenderer` to hook the active renderer (e.g., `SDLRenderer`) into the render loop.
+Shapes automatically follow the owning object's position, rotation, and scale every frame. Build a
+`RenderQueue` from the active scene when you're ready and let the renderer consume it on its own timing.
