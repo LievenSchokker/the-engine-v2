@@ -16,7 +16,7 @@ namespace engine_tests
         EXPECT_EQ(TestComponentBase::instanceCount, 3);
 
         /// This function internally destroys all Components attached to the GO, deleting them from memeory.
-        go.onSceneDestroy();
+    	go.onSceneDestroy();
         EXPECT_EQ(TestComponentBase::instanceCount, 0);
 
     }

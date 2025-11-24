@@ -7,7 +7,7 @@
 namespace engine_tests
 {
     int TestComponentBase::instanceCount = 0;
-
+	int TestComponentBase::destroyCount = 0;
     TestComponentBase::TestComponentBase()
     {
         instanceCount++;
@@ -21,5 +21,6 @@ namespace engine_tests
     void TestComponentBase::onDestroy()
     {
         destroyCalled = true;
+    	destroyCount++;
     }
 }

@@ -20,7 +20,9 @@ namespace engine_tests
             void onDestroy() override;
 
             static int instanceCount;
+    		static int destroyCount;
             bool destroyCalled = false;
+
     };
 
     class TestComponentOne : public TestComponentBase {};
