@@ -4,6 +4,10 @@ project(engine_tests)
 add_executable(engine_tests
         Rendering/SDL/SDLRenderTest.cpp
         Input/InputManagerTest.cpp
+        Asset/AssetManagerTest.cpp
+        Scene/SceneManagerTest.cpp
+        Core/SpelMotorTest.cpp
+        Core/TimerTest.cpp
         Component/tests_TestComponents.cpp
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
