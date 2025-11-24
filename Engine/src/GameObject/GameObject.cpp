@@ -1,28 +1,31 @@
 //
 // Created by samle on 10/11/2025.
 //
-
 #include "GameObject/GameObject.h"
+#include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
 #include "Component/Transform.h"
-
+#include "GameObject/ScenePlaceholder.h"
 
 GameObject::GameObject()
 {
     componentManager = std::make_unique<ComponentManager>(this);
     transform = std::make_unique<Transform>();
-
     name = "GameObject";
     layer = 0;
     tag = "";
     isActive = true;
     isStatic = false;
+    isDestroyed = false;
+
+    /// TODO: Remove this line:
+    scenePlaceholder = nullptr;
 }
 
 
 GameObject::~GameObject()
 {
-    componentManager->removeAllComponents();
+    componentManager->destroyAllComponents();
     transform = nullptr;
 }
 
@@ -33,31 +36,58 @@ bool GameObject::compareTag(const std::string& other)
 }
 
 
-bool GameObject::hasComponent(Component* comp) const
+bool GameObject::hasComponent(Component *comp) const
 {
     return componentManager->hasComponent(comp);
 }
 
 
-void GameObject::removeComponent(Component* comp)
+void GameObject::removeComponent(Component *comp)
 {
     componentManager->removeComponent(comp);
 }
 
 
-std::vector<Behaviour*> GameObject::getActiveBehaviours() const
+std::vector<Behaviour *> GameObject::getActiveBehaviours() const
 {
-    return std::vector<Behaviour*>{};
+    std::vector<Behaviour *> activeBehaviours;
+    for (Behaviour *behaviour: componentManager->getAllBehaviours())
+    {
+        if (behaviour == nullptr)
+            continue;
+        if (behaviour->getIsEnabled())
+            activeBehaviours.push_back(behaviour);
+    }
+    return activeBehaviours;
 }
 
-
-ComponentManager* GameObject::getComponentManager() const
+ComponentManager *GameObject::getComponentManager() const
 {
     return componentManager.get();
 }
 
 
-Transform* GameObject::getTransform() const
+void GameObject::destroy()
+{
+    if (isDestroyed)
+        return;
+
+    isDestroyed = true;
+    setActive(false);
+
+    /// TEMP if statement, remove when scene is implemented!
+    if (scenePlaceholder != nullptr)
+        scenePlaceholder->queueDestroy(this);
+}
+
+
+void GameObject::onSceneDestroy()
+{
+    componentManager->destroyAllComponents();
+}
+
+
+Transform *GameObject::getTransform() const
 {
     return transform.get();
 }
@@ -99,7 +129,13 @@ int GameObject::getComponentCount() const
 }
 
 
-void GameObject::setName(const std::string& newName)
+bool GameObject::getIsDestroyed() const
+{
+    return isDestroyed;
+}
+
+
+void GameObject::setName(const std::string &newName)
 {
     name = std::move(newName);
 }
@@ -111,27 +147,31 @@ void GameObject::setLayer(int newLayer)
 }
 
 
-void GameObject::setTag(const std::string& newTag)
+void GameObject::setTag(const std::string &newTag)
 {
     tag = std::move(newTag);
 }
 
 
-void GameObject::setIsActive(bool value)
+void GameObject::setActive(bool value)
 {
+    if (isActive == value)
+        return;
+
     isActive = value;
 }
 
 
 void GameObject::setIsStatic(bool value)
 {
+    if (isStatic == value)
+        return;
+
     isStatic = value;
 }
 
 
-
-
-
-
-
-
+void GameObject::setScene(ScenePlaceholder *newScene)
+{
+    scenePlaceholder = newScene;
+}

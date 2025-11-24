@@ -34,6 +34,12 @@ T* ComponentManager::addComponent()
     auto& component = components.emplace_back(std::make_unique<T>());
     component->setGameObject(gameObject);
 
+    /// Add T component to the @c behaviours if T is a subclass of @c Behaviour
+    if constexpr (std::is_base_of_v<Behaviour, T>)
+    {
+        behaviours.push_back(static_cast<Behaviour*>(component.get()));
+    }
+
     return dynamic_cast<T*>(component.get());
 }
 
