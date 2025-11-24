@@ -24,11 +24,7 @@ public:
      * @brief Returns the message type identifier.
      * @return Always returns MessageTypes::ConnectionMessage.
      */
-    MessageTypes getMessageType() const override
-    {
-        return MessageTypes::ConnectionMessage;
-    }
-
+    MessageTypes getMessageType() const override;
     /**
      * @brief Serializes the message into a byte buffer.
      * @return A vector of bytes representing the serialized message.
