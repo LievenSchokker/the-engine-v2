@@ -58,11 +58,7 @@ public:
     /**
      * @brief Sends a message over the network.
      *
-     * @param message
-     * @param connectionId The logical connection ID (for clients, usually 0).
-     * @param data Pointer to the message buffer.
-     * @param length Length of the message buffer in bytes.
-     * @param send_mode The desired transmission mode.
+     * @param message OutGoingRawMessage which contains everything needed for transport
      * @return A TransportResult indicating success or failure.
      */
     TransportResult send(const OutgoingRawMessage& message) override;
@@ -76,9 +72,7 @@ public:
      * - ReliableUnordered: Reliable but sent with minimal delay (order not guaranteed).
      * - Unreliable: May be dropped or arrive out of order.
      *
-     * @param data Pointer to the message buffer.
-     * @param length Length of the message buffer in bytes.
-     * @param send_mode The desired transmission mode.
+     * @param message OutGoingRawMessage which contains everything needed for transport
      * @return A TransportResult indicating success or failure.
      */
     TransportResult sendToAll(OutgoingRawMessage& message) override;
