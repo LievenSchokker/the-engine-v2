@@ -9,14 +9,13 @@
 #include "../../../inc/Rendering/Window/WindowOptions.h"
 
 #include <algorithm>
-#include <array>
 #include <cassert>
 #include <cmath>
 #include <iostream>
+#include <math.h>
 
 namespace
 {
-constexpr double kPi = 3.14159265358979323846;
 constexpr double kRotationThresholdDegrees =
 	0.01;  // Threshold below which rotation is treated as zero
 constexpr int kMinWindowDimension = 1;	// Minimum window width/height
@@ -83,6 +82,8 @@ bool SDLRenderer::isOpen()
 
 void SDLRenderer::close()
 {
+	destroySolidQuadTexture();
+
 	if ( renderer != nullptr ) {
 		SDL_DestroyRenderer(renderer);
 		renderer = nullptr;
@@ -172,44 +173,62 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 		return;
 	}
 
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-
-	const double halfWidth = width * 0.5;
-	const double halfHeight = height * 0.5;
-
-	if ( std::abs(rotationDegrees) < kRotationThresholdDegrees ) {
-		SDL_FRect rect{static_cast<float>(center.x - halfWidth),
-					   static_cast<float>(center.y - halfHeight),
-					   static_cast<float>(width), static_cast<float>(height)};
-		SDL_RenderFillRectF(renderer, &rect);
+	if ( !ensureSolidQuadTexture() ) {
 		return;
 	}
 
-	const double radians = rotationDegrees * (kPi / 180.0);
-	const double cosTheta = std::cos(radians);
-	const double sinTheta = std::sin(radians);
-	const std::array<Vector2, 4> corners = {{
-		{-halfWidth, -halfHeight},
-		{halfWidth, -halfHeight},
-		{halfWidth, halfHeight},
-		{-halfWidth, halfHeight},
-	}};
+	SDL_SetTextureColorMod(solidQuadTexture, color.r, color.g, color.b);
+	SDL_SetTextureAlphaMod(solidQuadTexture, color.a);
 
-	SDL_Vertex vertices[4];
-	const SDL_Color sdlColor{color.r, color.g, color.b, color.a};
+	const double halfWidth = width * 0.5;
+	const double halfHeight = height * 0.5;
+	SDL_FRect rect{static_cast<float>(center.x - halfWidth),
+				   static_cast<float>(center.y - halfHeight),
+				   static_cast<float>(width), static_cast<float>(height)};
 
-	for ( size_t i = 0; i < corners.size(); ++i ) {
-		const double rotatedX =
-			corners[i].x * cosTheta - corners[i].y * sinTheta;
-		const double rotatedY =
-			corners[i].x * sinTheta + corners[i].y * cosTheta;
-		vertices[i].position.x = static_cast<float>(center.x + rotatedX);
-		vertices[i].position.y = static_cast<float>(center.y + rotatedY);
-		vertices[i].color = sdlColor;
-		vertices[i].tex_coord.x = 0.0f;
-		vertices[i].tex_coord.y = 0.0f;
+	if ( std::abs(rotationDegrees) < kRotationThresholdDegrees ) {
+		SDL_RenderCopyF(renderer, solidQuadTexture, nullptr, &rect);
+		return;
 	}
 
-	const int indices[6] = {0, 1, 2, 2, 3, 0};
-	SDL_RenderGeometry(renderer, nullptr, vertices, 4, indices, 6);
+	SDL_RenderCopyExF(renderer, solidQuadTexture, nullptr, &rect,
+					  rotationDegrees, nullptr, SDL_FLIP_NONE);
+}
+
+bool SDLRenderer::ensureSolidQuadTexture()
+{
+	if ( solidQuadTexture != nullptr ) {
+		return true;
+	}
+
+	if ( renderer == nullptr ) {
+		return false;
+	}
+
+	solidQuadTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+										 SDL_TEXTUREACCESS_STATIC, 1, 1);
+	if ( solidQuadTexture == nullptr ) {
+		std::cerr << "SDL_CreateTexture Error: " << SDL_GetError() << "\n";
+		return false;
+	}
+
+	const Uint32 pixel = 0xFFFFFFFF;
+	if ( SDL_UpdateTexture(solidQuadTexture, nullptr, &pixel, sizeof(pixel)) !=
+		 0 ) {
+		std::cerr << "SDL_UpdateTexture Error: " << SDL_GetError() << "\n";
+		SDL_DestroyTexture(solidQuadTexture);
+		solidQuadTexture = nullptr;
+		return false;
+	}
+
+	SDL_SetTextureBlendMode(solidQuadTexture, SDL_BLENDMODE_BLEND);
+	return true;
+}
+
+void SDLRenderer::destroySolidQuadTexture()
+{
+	if ( solidQuadTexture != nullptr ) {
+		SDL_DestroyTexture(solidQuadTexture);
+		solidQuadTexture = nullptr;
+	}
 }

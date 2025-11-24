@@ -124,8 +124,13 @@ class SDLRenderer: public IRenderer
 					   const Vector2& scale) override;
 
    private:
+	bool ensureSolidQuadTexture();
+	void destroySolidQuadTexture();
+
 	SDL_Window* window =
 		nullptr;  ///< Null indicates closed state; must outlive renderer
 	SDL_Renderer* renderer =
 		nullptr;  ///< Must be destroyed before window; null-checked for safety
+	SDL_Texture* solidQuadTexture =
+		nullptr;  ///< Texture for solid quad rendering
 };
