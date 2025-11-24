@@ -3,10 +3,9 @@
 
 #include "box2d/id.h"
 #include "Physics/IPhysicsWorld.h"
-#include "Physics/Components/DynamicBody.h"
 
 
-class Box2DPhysicsWorld : public IPhysicsWorld
+class Box2DPhysicsWorld: public IPhysicsWorld
 {
 public:
 	Box2DPhysicsWorld();
@@ -14,9 +13,8 @@ public:
 	void start() override;
 	void update() override;
 	void shutdown() override;
-	b2BodyId addBody(const Transform* transform) override;
-
-	b2WorldId GetWorldId() const;
+	b2BodyId createBody(const GameObject* gameObject) override;
+	void destroyBody(b2BodyId body);
 
 private:
 	b2WorldId worldId;
