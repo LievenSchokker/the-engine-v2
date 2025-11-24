@@ -20,7 +20,7 @@ class Component
 {
     public:
         Component() = default;
-        virtual ~Component();
+        virtual ~Component() = 0;
 
       /**
       * @brief Sets the GameObject that this component lives on.
@@ -67,8 +67,19 @@ class Component
         template <typename T>
         bool tryGetComponent(T*& out) const;
 
+
+        /**
+         * @brief Called right before this Component gets destroyed
+         *
+         * Gets called internally right before the GameObject this component belongs to gets destroyed by the owning scene.
+         *
+         * Can be overridden to implement custom logic when the component gets destroyed.
+         */
+        virtual void onDestroy() {}
+
       /**
-      * @brief Returns the GameObject that this component belongs to.
+      * @brief Returns the GameObject that this component is attached to.
+      * A Component is always attached to a GameObject.
       * @return Pointer to the owning GameObject.
       */
         GameObject* getGameObject() const;
@@ -79,8 +90,11 @@ class Component
         */
         const Transform* getTransform() const;
 
-    private:
-        GameObject* gameObject = nullptr;
+    protected:
+        /// The @c GameObject this component is attached to, a component is always attached to a GameObject
+        GameObject* gameObject;
+
+        /// The @c Transform that is attached to the associated GameObject.
         const Transform* transform = nullptr;
 };
 

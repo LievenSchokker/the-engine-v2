@@ -5,31 +5,36 @@
 #include "Component/ComponentManager.h"
 #include "GameObject/GameObject.h"
 #include "Component/Component.h"
+#include "Behaviour/Behaviour.h"
 
 
 ComponentManager::~ComponentManager()
 {
-    removeAllComponents();
+    destroyAllComponents();
 }
 
 
-std::vector<Behaviour*> ComponentManager::getAllBehaviours()
+const std::vector<Behaviour*>& ComponentManager::getAllBehaviours() const
 {
-    // implement with behaviour.
-    return {};
+    return behaviours;
 }
 
 
-void ComponentManager::activateAll()
+void ComponentManager::enableAllBehaviours()
 {
-    // implement with behaviour.
+    for (auto& behaviour : behaviours)
+    {
+        behaviour->setEnabled(true);
+    }
 }
 
 
-void ComponentManager::deactivateAll()
+void ComponentManager::disableAllBehaviours()
 {
-    // implement with behaviour.
-
+    for (auto& behaviour : behaviours)
+    {
+        behaviour->setEnabled(false);
+    }
 }
 
 
@@ -63,13 +68,22 @@ void ComponentManager::removeComponent(Component* comp)
 }
 
 
-void ComponentManager::removeAllComponents()
+void ComponentManager::destroyAllComponents()
 {
+    for (auto& comp : components)
+    {
+        if (comp != nullptr)
+        {
+            comp->onDestroy();
+        }
+    }
+
+    /// clear() deletes the components internally, because they are stored as unique_ptr inside the components vector.
     components.clear();
 }
 
 
-int ComponentManager::getComponentCount() const
+size_t ComponentManager::getComponentCount() const
 {
     return components.size();
 }

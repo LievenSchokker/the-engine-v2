@@ -6,8 +6,8 @@
 #include "Component/Component.h"
 #include "Component/Transform.h"
 #include "Component/ComponentManager.h"
-#include "../Component/TestComponentOne.h"
-#include "../Component/TestComponentTwo.h"
+#include "../Behaviour/TestBehaviours.h"
+#include "../Component/TestComponents.h"
 
 #include <gtest/gtest.h>
 
@@ -139,5 +139,74 @@ namespace engine_tests
         ComponentManager componentManager(&go);
 
         EXPECT_NO_THROW(componentManager.removeComponent<TestComponentOne>());
+    }
+
+    TEST(ComponentManagerTests, StoresBehavioursInComponents)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        componentManager.addComponent<TestComponentOne>();
+        componentManager.addComponent<TestBehaviourOne>();
+        componentManager.addComponent<TestBehaviourTwo>();
+        componentManager.addComponent<TestBehaviourThree>();
+
+        EXPECT_EQ(componentManager.getComponentCount(), 4);
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourOne>());
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourTwo>());
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourThree>());
+    }
+
+    TEST(ComponentManagerTests, AddGetComponentWorksForBehaviours)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        TestBehaviourOne* addedBehaviour = componentManager.addComponent<TestBehaviourOne>();
+
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourOne>());
+
+        TestBehaviourBase* retrievedBehaviour = componentManager.getComponent<TestBehaviourOne>();
+
+        EXPECT_NE(retrievedBehaviour, nullptr);
+        EXPECT_EQ(addedBehaviour, retrievedBehaviour);
+    }
+
+    TEST(ComponentManagerTests, GetAllBehavioursReturnsOnlyBehaviours)
+    {
+        GameObject go;
+        ComponentManager componentManager(&go);
+
+        TestComponentOne* addedComponent = componentManager.addComponent<TestComponentOne>();
+
+        TestBehaviourBase* addedBehaviour1 = componentManager.addComponent<TestBehaviourOne>();
+        TestBehaviourBase* addedBehaviour2 = componentManager.addComponent<TestBehaviourTwo>();
+        TestBehaviourBase* addedBehaviour3 = componentManager.addComponent<TestBehaviourThree>();
+
+        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourThree>());
+
+        auto allBehaviours = componentManager.getAllBehaviours();
+
+        EXPECT_LT(allBehaviours.size(), componentManager.getComponentCount());
+        EXPECT_EQ(allBehaviours.size(), 3);
+    }
+
+    TEST(ComponentManagerTests, ComponentManagerDeletesAllComponentsOnGameObjectDestroy)
+    {
+        GameObject go;
+        ComponentManager* componentManager = go.getComponentManager();
+
+        go.addComponent<TestComponentOne>();
+        go.addComponent<TestComponentTwo>();
+        go.addComponent<TestComponentThree>();
+
+        EXPECT_EQ(componentManager->getComponentCount(), 3);
+        EXPECT_EQ(go.getComponentCount(), 3);
+
+        go.destroy();
+        go.onSceneDestroy(); /// Normally scene would call this after go.destroy() was called, but then we dont have acces to the GO anymore, so simulate it instead.
+
+        EXPECT_EQ(componentManager->getComponentCount(), 0);
+        EXPECT_EQ(go.getComponentCount(), 0);
     }
 }
