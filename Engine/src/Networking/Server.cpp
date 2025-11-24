@@ -89,7 +89,8 @@ void Server::onConnectionChanged(const Connection& connection)
         std::cout << "Client " << clientId << " connected" << std::endl;
         break;
 
-    case ConnectionStatus::Death:
+    case ConnectionStatus::Terminated:
+    	break;
     case ConnectionStatus::Error:
         connectedClients.erase(clientId);
         std::cout << "Client " << clientId << " disconnected" << std::endl;
