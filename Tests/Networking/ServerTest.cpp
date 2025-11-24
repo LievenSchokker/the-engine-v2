@@ -89,7 +89,7 @@ public:
 
     void simulateClientDisconnected(int clientId)
     {
-        Connection conn{ConnectionMode::Client, clientId, ConnectionStatus::Death};
+        Connection conn{ConnectionMode::Client, clientId, ConnectionStatus::Terminated};
         if (onConnectionChanged) onConnectionChanged(conn);
     }
 

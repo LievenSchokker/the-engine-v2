@@ -363,7 +363,7 @@ void TransportGNS::removeDeathConnection(
     const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation)
 {
     Connection connection{};
-    connection.connectionStatus = ConnectionStatus::Death;
+    connection.connectionStatus = ConnectionStatus::Terminated;
     connection.transportConnectionId = getConnectionId(pointerConnectionStatusInformation->m_hConn);
     mapConnections.erase(pointerConnectionStatusInformation->m_hConn);
     safeOnConnectionChanged(connection);
