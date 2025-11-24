@@ -7,12 +7,11 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Scene/SceneManager.h"
-#include "box2d/box2d.h"
 #include "Physics/PhysicsSystem.h"
-#include "Physics/Box2D/Box2DPhysicsWorld.h"
 
 #include <SDL2/SDL.h>
 #include <iostream>
+#include <memory>
 
 #include "EntryPoint.h"
 
