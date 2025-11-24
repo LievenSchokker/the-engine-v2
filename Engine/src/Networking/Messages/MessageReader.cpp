@@ -3,6 +3,8 @@
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include <iostream>
+#include <cstring>
+
 
 std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage rawMessage)
 {
