@@ -26,6 +26,7 @@ class IPhysicsWorld
 public:
 	virtual ~IPhysicsWorld() = default;
 
+
 	/**
 	 * @brief Initializes the physics world.
 	 *
@@ -34,6 +35,7 @@ public:
 	 */
 	virtual void start() = 0;
 
+
 	/**
 	 * @brief Steps the physics simulation forward.
 	 *
@@ -41,6 +43,7 @@ public:
 	 * and should update all physics bodies accordingly.
 	 */
 	virtual void update() = 0;
+
 
 	/**
 	 * @brief Cleans up and shuts down the physics world.
@@ -59,6 +62,7 @@ public:
 	 * @param gameObject Pointer to a GameObject with Collider + RigidBody components.
 	 */
 	virtual void createBody(const GameObject* gameObject) = 0;
+
 
 	/**
 	 * @brief Destroys a previously created physics body.
