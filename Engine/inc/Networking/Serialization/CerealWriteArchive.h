@@ -3,7 +3,6 @@
 #include <sstream>
 #include <vector>
 #include <string>
-#include <concepts>
 
 #include <cereal/archives/binary.hpp>
 #include <cereal/types/string.hpp>
@@ -29,10 +28,11 @@ public:
 		archive(value);
 	}
 
-	std::vector<uint8_t> getBytes()
+	std::vector<std::byte> getBytes()
 	{
 		auto data = stream.str();
-		return {data.begin(), data.end()};
+		return {reinterpret_cast<const std::byte*>(data.data()),
+				reinterpret_cast<const std::byte*>(data.data() + data.size())};
 	}
 
 private:

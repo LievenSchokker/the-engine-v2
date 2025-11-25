@@ -6,9 +6,9 @@
 class CerealReadArchive
 {
 public:
-	CerealReadArchive(const uint8_t* data, size_t length)
-		: stream(std::string(reinterpret_cast<const char*>(data), length), std::ios::binary)
-		, archive(stream)
+	CerealReadArchive(const std::byte* data, size_t length)
+	   : stream(std::string(reinterpret_cast<const char*>(data), length), std::ios::binary)
+	   , archive(stream)
 	{}
 
 	template<typename T>
