@@ -16,6 +16,8 @@ add_executable(engine_tests
         GameObject/tests_game_object.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
+        Scene/SceneManagerTest.cpp
+        Physics/PhysicsSystemTest.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
