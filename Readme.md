@@ -122,3 +122,34 @@ the-engine/
     ├─ Input/
     └─ Rendering/
 ```
+
+## Rendering Simple Shapes
+
+GameObjects can render solid 2D primitives without touching SDL directly. Attach a `ShapeRenderer`
+component and describe the shape, color, and transform.
+
+```
+auto circleGO = std::make_unique<GameObject>();
+circleGO->getTransform()->setPosition({150.0, 140.0});
+circleGO->getTransform()->setScale({1.0, 1.0});
+circleGO->addComponent<ShapeRenderer>()
+    ->setCircle(50.0)
+    .setColor(Color::blue());
+
+auto rectGO = std::make_unique<GameObject>();
+rectGO->getTransform()->setPosition({320.0, 240.0});
+rectGO->getTransform()->setRotationAngle(25.0);
+rectGO->addComponent<ShapeRenderer>()
+    ->setRectangle({140.0, 80.0})
+    .setColor(Color::yellow());
+
+scene->addGameObject(std::move(circleGO));
+scene->addGameObject(std::move(rectGO));
+
+RenderQueue queue;
+sceneManager.buildRenderQueue(queue);
+executeRenderQueue(renderer, queue); // Draws both shapes using the object's transforms
+```
+
+Shapes automatically follow the owning object's position, rotation, and scale every frame. Build a
+`RenderQueue` from the active scene when you're ready and let the renderer consume it on its own timing.
