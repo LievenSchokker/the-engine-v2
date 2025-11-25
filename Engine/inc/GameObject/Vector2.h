@@ -5,6 +5,6 @@
  * @brief A struct for storing 2D vector points.
  */
 struct Vector2 {
-    double x;
-    double y;
+    float x;
+    float y;
 };
