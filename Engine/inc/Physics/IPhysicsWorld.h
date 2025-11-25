@@ -1,8 +1,10 @@
 #pragma once
 
+
 #include "GameObject/GameObject.h"
 #include "GameObject/Vector2.h"
 #include "box2d/id.h"
+
 
 /**
  * @interface IPhysicsWorld
@@ -16,6 +18,7 @@ class IPhysicsWorld
 public:
 	virtual ~IPhysicsWorld() = default;
 
+
 	/**
 	 * @brief Initializes the physics world.
 	 *
@@ -23,12 +26,14 @@ public:
 	 */
 	virtual void start() = 0;
 
+
 	/**
 	 * @brief Steps the physics simulation forward.
 	 *
 	 * The concrete implementation decides on timestep size (fixed, variable, etc.).
 	 */
 	virtual void update() = 0;
+
 
 	/**
 	 * @brief Cleans up and shuts down the physics world.
@@ -48,6 +53,7 @@ public:
 	 * @return A valid physics body ID or b2_nullBodyId on failure.
 	 */
 	virtual b2BodyId createBody(const GameObject* gameObject) = 0;
+
 
 	/**
 	 * @brief Destroys a previously created Box2D body.
