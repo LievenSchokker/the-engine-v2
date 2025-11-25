@@ -3,6 +3,8 @@
 #include "box2d/id.h"
 #include "Physics/IPhysicsWorld.h"
 
+#include <unordered_map>
+
 /**
  * @class Box2DPhysicsWorld
  * @brief Low-level implementation of the physics world using Box2D.
@@ -14,7 +16,7 @@
  * The PhysicsSystem owns a single instance of this class and delegates all
  * physics operations to it.
  */
-class Box2DPhysicsWorld : public IPhysicsWorld
+class Box2DPhysicsWorld: public IPhysicsWorld
 {
 public:
 	/**
@@ -23,6 +25,12 @@ public:
 	 * The actual Box2D world is not created until start() is called.
 	 */
 	Box2DPhysicsWorld();
+
+	/**
+	 * @brief Destructor.
+	 *
+	 * Currently defaulted. All cleanup should be handled in shutdown().
+	 */
 	~Box2DPhysicsWorld() override = default;
 
 	/**
@@ -45,43 +53,58 @@ public:
 	/**
 	 * @brief Shuts down the physics world.
 	 *
-	 * Currently a no-op, but included for interface completeness and future
-	 * extensibility. All bodies should be destroyed before shutdown.
+	 * All Box2D bodies are destroyed and the world is cleared. After this call,
+	 * the world must be restarted with start() to simulate again.
 	 */
 	void shutdown() override;
 
 	/**
-	 * @brief Creates a Box2D body from the components of a GameObject.
+	 * @brief Creates a physics body for the given GameObject.
 	 *
 	 * The method inspects the GameObject's Collider and RigidBody components
-	 * to configure and create the appropriate body in the Box2D world.
+	 * to configure and create the appropriate Box2D body.
 	 *
-	 * @param gameObject The GameObject containing physics components.
-	 * @return The created Box2D body ID, or b2_nullBodyId on failure.
+	 * @param gameObject Pointer to the GameObject containing physics components.
 	 */
-	b2BodyId createBody(const GameObject* gameObject) override;
+	void createBody(const GameObject* gameObject) override;
 
 	/**
-	 * @brief Destroys a previously created Box2D body.
+	 * @brief Destroys a previously created physics body.
 	 *
-	 * @param body The body ID returned from createBody().
+	 * Removes the body from the physics world and internal mappings.
+	 *
+	 * @param gameObject Pointer to the GameObject whose body should be destroyed.
 	 */
-	void destroyBody(b2BodyId body) override;
+	void destroyBody(const GameObject* gameObject) override;
 
 	/**
-	 * @brief Applies a force to the center of mass of a Box2D body.
+	 * @brief Applies a force to the center of mass of a physics body.
 	 *
-	 * @param body The body to which the force should be applied.
-	 * @param force The force vector, in world units.
+	 * @param gameObject Pointer to the GameObject whose body will receive the force.
+	 * @param force Force vector in world units.
 	 */
-	void applyForce(b2BodyId body, Vector2 force) override;
+	void applyForce(const GameObject* gameObject, Vector2 force) override;
+
+	/**
+	 * @brief Synchronizes all registered GameObject transforms with the physics world.
+	 *
+	 * After stepping the simulation, this function updates each GameObject's
+	 * Transform component to match the corresponding Box2D body's position and rotation.
+	 */
+	void syncTransforms() override;
 
 private:
 	/**
-	 * @brief The internal Box2D world instance identifier.
+	 * @brief Box2D world identifier.
 	 *
-	 * This value is created in start() and used for all subsequent
-	 * Box2D operations such as stepping the simulation or creating bodies.
+	 * Created in start() and used for all subsequent Box2D operations.
 	 */
 	b2WorldId worldId;
+
+	/**
+	 * @brief Mapping from GameObject pointers to their corresponding Box2D bodies.
+	 *
+	 * This allows direct GameObject-based operations without needing a separate body ID map.
+	 */
+	std::unordered_map<const GameObject*, b2BodyId> bodies;
 };

@@ -7,14 +7,15 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Scene/SceneManager.h"
-#include "Physics/PhysicsSystem.h"
+#include "Physics/IPhysicsWorld.h"
+#include "Physics/Box2D/Box2DPhysicsWorld.h"
+#include "Physics/Components/Collider.h"
+#include "Physics/Components/RigidBody.h"
+#include "GameObject/Vector2.h"
 
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <memory>
-#include "Physics/Components/Collider.h"
-#include "Physics/Components/RigidBody.h"
-#include "GameObject/Vector2.h"
 
 
 void createCircle(std::unique_ptr<GameObject>& circle)
@@ -26,26 +27,24 @@ void createCircle(std::unique_ptr<GameObject>& circle)
 	circle->addComponent<ShapeRenderer>()->setCircle(50).setColor(
 		Color::lightBlue());
 
-	// Physics components
-	circle->addComponent<RigidBody>(); // dynamic by default
-	circle->addComponent<Collider>()->setCircle(50); // collider radius 50
+	circle->addComponent<RigidBody>();
+	circle->addComponent<Collider>()->setCircle(50);
 }
 
-void createRactangle(std::unique_ptr<GameObject>& rectangle)
+
+void createRectangle(std::unique_ptr<GameObject>& rectangle)
 {
 	rectangle = std::make_unique<GameObject>();
 	rectangle->setName("OrangeSquare");
 	rectangle->getTransform()->setPosition({30.0, 450.0});
-
 	rectangle->addComponent<ShapeRenderer>()->setRectangle({400, 50}).setColor(
 		Color::orange());
 
-	// Physics components
 	auto rb = rectangle->addComponent<RigidBody>();
 	rb->makeStatic();
-
-	rectangle->addComponent<Collider>()->setRectangle({400, 50}); // full size
+	rectangle->addComponent<Collider>()->setRectangle({400, 50});
 }
+
 
 int main()
 {
@@ -62,40 +61,36 @@ int main()
 		return 1;
 	}
 
-	// Create scene manger
 	SceneManager sceneManager;
 	sceneManager.setRenderer(&renderer);
 	sceneManager.setClearColor(Color::black());
 
-	auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
+	auto scene = std::make_unique<Scene>("PrototypeScene");
 
 	std::unique_ptr<GameObject> circle;
-	createCircle(circle);
-
 	std::unique_ptr<GameObject> rectangle;
-	createRactangle(rectangle);
 
-	// Add game object to scene
-	prototypeScene->addGameObject(std::move(circle));
-	prototypeScene->addGameObject(std::move(rectangle));
+	createCircle(circle);
+	createRectangle(rectangle);
 
-	// Add scene to scene manger
-	sceneManager.addScene(std::move(prototypeScene));
+	scene->addGameObject(std::move(circle));
+	scene->addGameObject(std::move(rectangle));
+
+	sceneManager.addScene(std::move(scene));
 	sceneManager.setActiveScene("PrototypeScene");
 
-	// -------------------------------------
-
 	Scene* activeScene = sceneManager.getActiveScene();
-	GameObject* circleNew = activeScene->getGameObject("BlueCircle");
-	GameObject* rectangleNew = activeScene->getGameObject("OrangeSquare");
+	GameObject* circleGO = activeScene->getGameObject("BlueCircle");
+	GameObject* rectangleGO = activeScene->getGameObject("OrangeSquare");
 
-	// Physics
-	std::unique_ptr<PhysicsSystem> physics = std::make_unique<PhysicsSystem>();
-	physics->start();
+	// --- Physics World ---
+	std::unique_ptr<IPhysicsWorld> physicsWorld = std::make_unique<
+		Box2DPhysicsWorld>();
+	physicsWorld->start();
 
-	// Register physics body
-	physics->registerBody(circleNew);
-	physics->registerBody(rectangleNew);
+	// Register GameObjects directly
+	physicsWorld->createBody(circleGO);
+	physicsWorld->createBody(rectangleGO);
 
 	bool running = true;
 	Uint32 lastTicks = SDL_GetTicks();
@@ -103,36 +98,34 @@ int main()
 	while (running && renderer.isOpen()) {
 		input->update();
 
-		// Update the physics world -- TODO WILL CRASH IF NO OBJECTS IN THE WORLD
-		physics->update(lastTicks);
-		physics->syncData();
+		// --- Physics update ---
+		physicsWorld->update();
+
+		// Sync transforms
+		physicsWorld->syncTransforms();
 
 		// Clock
 		Uint32 currentTicks = SDL_GetTicks();
-		float deltaTime = static_cast<float>(currentTicks - lastTicks) /
-		                  1000.0f;
+		float deltaTime = (currentTicks - lastTicks) / 1000.0f;
 		lastTicks = currentTicks;
 
-		// Update scenes
+		// Update and render
 		sceneManager.update(deltaTime);
-
-		// Render
 		sceneManager.render();
 
 		// Input
 		if (input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE)) {
 			running = false;
 		}
+
 		if (input->wasKeyPressed(KeyCode::W)) {
-			physics->unregisterBody(rectangleNew);
+			physicsWorld->destroyBody(rectangleGO);
 		}
+
 		if (input->wasKeyPressed(KeyCode::SPACE)) {
-			constexpr Vector2 force = Vector2(0, 100);
-			physics->applyForce(rectangleNew, force);
+			constexpr Vector2 force = {0, 100};
+			physicsWorld->applyForce(rectangleGO, force);
 		}
-
-		physics->syncData();
-
 
 		SDL_Delay(16);
 	}
