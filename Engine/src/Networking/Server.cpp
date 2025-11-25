@@ -11,11 +11,12 @@
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
+#include "Networking/MessageHandlers/IMessageHandler.h"
 
 
 #include <iostream>
 
-#include "Networking/Messages/MessageDispatcherFactory.h"
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
