@@ -12,7 +12,6 @@ class RigidBody: public Component
 {
 public:
 	bool isDynamic = true;
-	b2BodyId bodyId = b2_nullBodyId;
 
 	void makeStatic()
 	{

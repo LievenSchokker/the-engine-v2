@@ -9,7 +9,6 @@
 #include "Scene/SceneManager.h"
 #include "Physics/PhysicsSystem.h"
 
-#include <SDL2/SDL.h>
 #include <iostream>
 #include <memory>
 

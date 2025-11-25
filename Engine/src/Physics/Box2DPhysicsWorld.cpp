@@ -93,6 +93,14 @@ void Box2DPhysicsWorld::destroyBody(b2BodyId body)
 	}
 }
 
+void Box2DPhysicsWorld::applyForce(b2BodyId body, Vector2 force)
+{
+	if (body.index1 == b2_nullBodyId.index1) return;
+
+	b2Vec2 b2Forece = {force.x, force.y};
+	b2Body_ApplyForceToCenter(body, b2Forece, true);
+}
+
 void Box2DPhysicsWorld::shutdown()
 {
 }
