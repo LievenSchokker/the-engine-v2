@@ -23,10 +23,10 @@ the automated test suite.
   - GoogleTest - For unit testing
 
 ### Windows  Setup
-For windows the easiest way to install each of the prerequisited librarie's
-We recommand VCPK a quick setup guide for VCPK can be found via this [link](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell).
+The easiest way to install the prerequisited libraries on Windows is to make use of vcpkg.
+A quick setup guide for vcpkg can be found via this [link](https://learn.microsoft.com/en-us/vcpkg/get_started/get-started?pivots=shell-powershell).
 
-To permantly recognize VCPKG as a system wide command use this in POWERSHELL AS ADMIN:
+To permanently recognize vcpkg as a system-wide command use this in POWERSHELL AS ADMIN:
 ```shell
 [System.Environment]::SetEnvironmentVariable(
   "Path",
@@ -34,22 +34,24 @@ To permantly recognize VCPKG as a system wide command use this in POWERSHELL AS 
   [System.EnvironmentVariableTarget]::Machine
 )
 ```
-After succesfully installing VCPKG just run the following command to install all dependencies
+After successfully installing vcpkg run the following command to install all dependencies:
 
 ```bash
 vcpkg install
 ```
-And then the following command to make sure Cmake can find each package A variable will be shown
-copy that variable and place it inside the CMAKE build config or for 
-Clion go to -> File | Settings | Build, Execution, Deployment | CMake 
-then copy paste the command into launch options.
+
+The following command is to make sure CMake can find each package.
+A variable will be shown, copy that variable and place it inside the CMAKE build config.
+
+For Clion go to -> File | Settings | Build, Execution, Deployment | CMake,
+then copy and paste the command into launch options.
 ```bash
 vcpkg integrate install
 ```
 
 
-### MacOs Setup
-The easiest way to get started on MacOs  is to use Brew to install all 
+### MacOS Setup
+The easiest way to get started on macOS  is to use Brew to install all 
 the dependencies. HomeBrew can be installed via this [link](https://brew.sh/).
 
 Each of the packages can be installed via the following commands
@@ -67,14 +69,42 @@ brew install googletest
 ```
 
 ### Linux Setup
-sorry don't own a linux pc :( good luck!
+Most external packages can be installed from your distro's package manager.
+
+Apt:
+```
+# apt install libsdl2-2.0-0 libsdl2-dev ibjpeg-dev libwebp-dev
+libtiff5-dev libsdl2-image-dev libsdl2-image-2.0-0
+libmikmod-dev libfishsound1-dev libsmpeg-dev liboggz2-dev libflac-dev
+libfluidsynth-dev libsdl2-mixer-dev libsdl2-mixer-2.0-0
+libfreetype6-dev libsdl2-ttf-dev libsdl2-ttf-2.0-0
+googletest libgtest-dev
+```
+
+Some packages need to be manually installed, like Valve's  GameNetworkingSockets:
+```
+# apt install libssl-dev libprotobuf-dev protobuf-compiler
+
+$ git clone https://github.com/ValveSoftware/GameNetworkingSockets.git
+
+$ mkdir build
+
+$ cd build
+
+$ cmake -G Ninja ..
+
+$ ninja
+
+# cmake --install .
+```
 
 ## Dependencies
 The project uses the following external libraries:
 - SDL2 - Simple DirectMedia Layer
 - GameNetworkingSockets - Valve's networking library
 - GoogleTest - For unit testing
-These dependencies are loaded with vcpkg on windows
+
+These dependencies are installed with vcpkg on windows, and it also has been confirmed that it is possible to install the packaged with MSYS2 on Windows.
 
 ## Project Structure
 ```
