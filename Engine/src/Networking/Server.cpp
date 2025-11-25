@@ -125,6 +125,10 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
     MessageTypes messageType = message->getMessageType();
     const int clientId = rawMessage.connectionID;
 
+    messageDispatcher->dispatchMessage(*message);
+
+    /// #TODO: Remove below code into ConnectionMessageHandler
+    return;
     switch (messageType)
     {
     case MessageTypes::ConnectionMessage:
