@@ -6,6 +6,10 @@
 
 #include "Connection/Connection.h"
 
+namespace spelmotor_networking
+{
+    class MessageDispatcher;
+}
 
 class ITransport;
 class TransportGNS;
@@ -82,5 +86,6 @@ private:
     void onConnectionChanged(const Connection& connection);
 
     std::unique_ptr<ITransport> transport;  ///< The underlying network transport.
+        std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
     Connection currentConnection{};            ///< The current server connection.
 };

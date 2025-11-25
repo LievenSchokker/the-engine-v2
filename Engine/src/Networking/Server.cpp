@@ -29,7 +29,7 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
     }
     setupInformation = serverConnectionInformation;
 
-    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher();
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Host);
 }
 
 Server::~Server()
@@ -125,23 +125,22 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
     MessageTypes messageType = message->getMessageType();
     const int clientId = rawMessage.connectionID;
 
-    messageDispatcher->dispatchMessage(*message);
+    messageDispatcher->processMessage(*message);
 
     /// #TODO: Remove below code into ConnectionMessageHandler
-    return;
-    switch (messageType)
-    {
-    case MessageTypes::ConnectionMessage:
-        if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
-        {
-            handleConnectionMessage(clientId, connMsg);
-        }
-        break;
-
-    default:
-        std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
-        break;
-    }
+    // switch (messageType)
+    // {
+    // case MessageTypes::ConnectionMessage:
+    //     if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
+    //     {
+    //         handleConnectionMessage(clientId, connMsg);
+    //     }
+    //     break;
+    //
+    // default:
+    //     std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
+    //     break;
+    // }
 }
 
 void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)

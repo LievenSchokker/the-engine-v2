@@ -21,7 +21,7 @@ namespace spelmotor_networking
     {
         public:
             virtual ~MessageDispatcher() = default;
-            void dispatchMessage(const IMessage& message);
+            void processMessage(const IMessage& message);
             bool registerMessageHandler(MessageTypes type, std::unique_ptr<IMessageHandler> handler);
             bool deregisterMessageHandler(MessageTypes type);
 

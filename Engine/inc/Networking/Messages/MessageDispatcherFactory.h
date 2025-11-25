@@ -6,6 +6,8 @@
 #pragma once
 
 #include "Networking/Messages/MessageDispatcher.h"
+#include "Networking/Connection/ConnectionMode.h"
+
 
 class IMessage;
 class IMessageHandler;
@@ -16,6 +18,6 @@ namespace spelmotor_networking
     class MessageDispatcherFactory
     {
         public:
-            static std::unique_ptr<MessageDispatcher> createMessageDispatcher();
+            static std::unique_ptr<MessageDispatcher> createMessageDispatcher(ConnectionMode connectionMode);
     };
 } // spelmotor_networking

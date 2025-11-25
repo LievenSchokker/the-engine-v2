@@ -6,7 +6,13 @@
 #include "Networking/MessageHandlers/ConnectionMessageHandler.h"
 
 
-void ConnectionMessageHandler::handleMessage(const ConnectionMessage &msg)
+void ConnectionMessageHandler::handleMessageClient(const ConnectionMessage &msg)
+{
+
+}
+
+
+void ConnectionMessageHandler::handleMessageServer(const ConnectionMessage &msg)
 {
 
 }

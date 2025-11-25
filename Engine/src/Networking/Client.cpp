@@ -11,6 +11,8 @@
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
+#include "Networking/MessageHandlers/IMessageHandler.h"
 
 
 #include <iostream>
@@ -30,6 +32,8 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
     {
         onConnectionChanged(connection);
     });
+
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client);
 }
 
 Client::~Client()
@@ -119,17 +123,20 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
         return;
     }
 
-    switch (MessageTypes messageType = message->getMessageType())
-    {
-    case MessageTypes::ConnectionMessage:
-        {
-            if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
-            {
-                disconnect();
-            }
-            break;
-        }
-    default:
-        break;
-    }
+    messageDispatcher->processMessage(*message);
+
+
+    // switch (MessageTypes messageType = message->getMessageType())
+    // {
+    // case MessageTypes::ConnectionMessage:
+    //     {
+    //         if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
+    //         {
+    //             disconnect();
+    //         }
+    //         break;
+    //     }
+    // default:
+    //     break;
+    // }
 }
