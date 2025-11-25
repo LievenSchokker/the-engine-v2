@@ -4,6 +4,7 @@
 #pragma once
 #include "IMessageHandler.h"
 #include "Networking/Connection/ConnectionMode.h"
+#include "Networking/Context/INetworkContext.h"
 #include <type_traits>
 /**
  * Abstract base class for all concrete MessageHandlers.
@@ -20,7 +21,7 @@ class BaseMessageHandler : public IMessageHandler
                   "[BaseMessageHandler]: TMessage must derive from IMessage.");
 
     public:
-        explicit BaseMessageHandler(ConnectionMode mode) : connectionMode(mode) {}
+        explicit BaseMessageHandler(ConnectionMode mode, const INetworkContext& networkContext_) : connectionMode(mode), networkContext(networkContext_) {}
         ~BaseMessageHandler() override = default;
 
         void handleMessage(const IMessage &message) override
@@ -28,6 +29,7 @@ class BaseMessageHandler : public IMessageHandler
             const TMessage *concreteMessage = dynamic_cast<const TMessage *>(&message);
             if (concreteMessage != nullptr)
             {
+                /// A)
                 switch (connectionMode)
                 {
                     case ConnectionMode::Client:
@@ -35,12 +37,17 @@ class BaseMessageHandler : public IMessageHandler
                     case ConnectionMode::Host:
                         handleMessageServer(*concreteMessage);
                 }
+
+                /// B)
+
             }
         }
 
     protected:
-        virtual void handleMessageClient(const TMessage &message) = 0;
-        virtual void handleMessageServer(const TMessage &message) = 0;
+        virtual void handleMessage(const TMessage& message) = 0; /// B
+        virtual void handleMessageClient(const TMessage &message) = 0; /// A
+        virtual void handleMessageServer(const TMessage &message) = 0; /// A
 
-        ConnectionMode connectionMode;
+        ConnectionMode connectionMode; /// A
+        const INetworkContext& networkContext; /// B
 };

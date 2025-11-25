@@ -13,11 +13,12 @@
 class ConnectionMessageHandler : public BaseMessageHandler<ConnectionMessage>
 {
     public:
-        explicit ConnectionMessageHandler(ConnectionMode mode)
-            : BaseMessageHandler(mode) {};
+        explicit ConnectionMessageHandler(ConnectionMode mode, const INetworkContext& networkContext)
+            : BaseMessageHandler(mode, networkContext) {};
 
         ~ConnectionMessageHandler() override = default;
 
+        void handleMessage(const ConnectionMessage &message) override;
         void handleMessageClient(const ConnectionMessage& msg) override;
         void handleMessageServer(const ConnectionMessage& msg) override;
 };

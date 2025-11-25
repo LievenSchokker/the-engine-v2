@@ -6,6 +6,12 @@
 #include "Networking/MessageHandlers/ConnectionMessageHandler.h"
 
 
+void ConnectionMessageHandler::handleMessage(const ConnectionMessage &message)
+{
+
+}
+
+
 void ConnectionMessageHandler::handleMessageClient(const ConnectionMessage &msg)
 {
 

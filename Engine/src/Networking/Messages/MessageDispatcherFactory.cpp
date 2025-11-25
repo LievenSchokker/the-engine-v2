@@ -16,4 +16,5 @@ namespace spelmotor_networking
 
         return dispatcher;
     }
-} // spelmotor_networking
+}
+// spelmotor_networking
