@@ -5,7 +5,7 @@
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
-
+#include "Networking/Messages/MessageDispatcherFactory.h"
 
 class TransportGNS;
 class IMessage;
@@ -47,6 +47,7 @@ class Server
         void handleConnectionMessage(int clientId, ConnectionMessage *message);
 
         std::unique_ptr<ITransport> transport;
+        std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
         ServerConnectionInformation setupInformation;
         ServerStatus status;
         std::unordered_set<int> connectedClients;

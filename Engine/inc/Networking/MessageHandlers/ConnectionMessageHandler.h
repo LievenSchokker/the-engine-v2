@@ -16,5 +16,5 @@ class ConnectionMessageHandler : public BaseMessageHandler<ConnectionMessage>
         ConnectionMessageHandler() = default;
         ~ConnectionMessageHandler() override = default;
 
-        void handleMessage(ConnectionMessage& msg) override;
+        void handleMessage(const ConnectionMessage& msg) override;
 };

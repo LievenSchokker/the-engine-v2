@@ -3,4 +3,4 @@
 //
 
 
-#include "Networking/Messages/CommandMessage.h"
+#include "Networking/Messages/Concretes/CommandMessage.h"

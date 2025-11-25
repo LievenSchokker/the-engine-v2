@@ -26,9 +26,13 @@
 
             void handleMessage(const IMessage& message) override
             {
-                handleMessage(static_cast<TMessage&>(message));
+                const TMessage* concreteMessage = dynamic_cast<const TMessage*>(&message);
+                if (concreteMessage != nullptr)
+                {
+                    handleMessage(*concreteMessage);
+                }
             }
 
         protected:
-            virtual void handleMessage(TMessage& message) = 0;
+            virtual void handleMessage(const TMessage& message) = 0;
     };

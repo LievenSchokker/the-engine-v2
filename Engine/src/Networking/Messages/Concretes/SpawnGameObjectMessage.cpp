@@ -3,4 +3,4 @@
 //
 
 
-#include "Networking/Messages/SpawnGameObjectMessage.h"
+#include "Networking/Messages/Concretes/SpawnGameObjectMessage.h"

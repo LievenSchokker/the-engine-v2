@@ -15,6 +15,7 @@
 
 #include <iostream>
 
+#include "Networking/Messages/MessageDispatcherFactory.h"
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
@@ -26,6 +27,8 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
         throw std::runtime_error("Port is not set");
     }
     setupInformation = serverConnectionInformation;
+
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher();
 }
 
 Server::~Server()

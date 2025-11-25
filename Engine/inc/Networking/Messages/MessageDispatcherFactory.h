@@ -4,10 +4,8 @@
 
 
 #pragma once
-namespace spelmotor_networking
-{
-    class MessageDispatcher;
-}
+
+#include "Networking/Messages/MessageDispatcher.h"
 
 class IMessage;
 class IMessageHandler;
@@ -18,6 +16,6 @@ namespace spelmotor_networking
     class MessageDispatcherFactory
     {
         public:
-            static unique_ptr<MessageDispatcher> createMessageDispatcher();
+            static std::unique_ptr<MessageDispatcher> createMessageDispatcher();
     };
 } // spelmotor_networking
