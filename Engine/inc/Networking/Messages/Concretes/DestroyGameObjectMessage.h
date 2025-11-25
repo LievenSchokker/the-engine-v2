@@ -5,11 +5,11 @@
 #pragma once
 
 
-#include "IMessage.h"
+#include "../IMessage.h"
 
 namespace spelmotor_networking
 {
-    class RpcMessage : public IMessage
+    class DestroyGameObjectMessage : public IMessage
     {
 
     };
