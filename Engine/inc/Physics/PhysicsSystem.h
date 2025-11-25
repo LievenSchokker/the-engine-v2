@@ -97,11 +97,11 @@ public:
 	 */
 	void applyForce(const GameObject* gameObject, Vector2 force);
 
-private:
+protected:
 	/**
 	 * @brief The underlying Box2D physics world instance.
 	 */
-	std::unique_ptr<Box2DPhysicsWorld> world;
+	std::unique_ptr<IPhysicsWorld> world;
 
 	/**
 	 * @brief Mapping of registered GameObjects to their corresponding Box2D body IDs.
