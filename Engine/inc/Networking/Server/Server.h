@@ -6,10 +6,6 @@
 #include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
 
-namespace spelmotor_networking
-{
-    class MessageHandlerFactory;
-}
 
 class TransportGNS;
 class IMessage;
@@ -51,7 +47,6 @@ class Server
         void handleConnectionMessage(int clientId, ConnectionMessage *message);
 
         std::unique_ptr<ITransport> transport;
-        std::unique_ptr<spelmotor_networking::MessageHandlerFactory>;
         ServerConnectionInformation setupInformation;
         ServerStatus status;
         std::unordered_set<int> connectedClients;
