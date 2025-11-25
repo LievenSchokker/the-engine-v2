@@ -12,8 +12,8 @@ class SceneManager;
 class ServerNetworkContext : public INetworkContext
 {
     public:
-        ServerNetworkContext(const SceneManager& sceneManager_) : sceneManager(&sceneManager_) {}
-        ~ServerNetworkContext() override = default;
+        ServerNetworkContext() = default;
+        ~ServerNetworkContext() override;
 
         bool spawnGameObject(uint32_t netId, Vector2 position) override;
         bool destroyGameObject(uint32_t netId) override;
@@ -21,5 +21,5 @@ class ServerNetworkContext : public INetworkContext
         bool sendCommand() override;
 
     private:
-        const SceneManager* sceneManager;
+        const SceneManager* sceneManager = nullptr;
 };

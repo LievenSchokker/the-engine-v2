@@ -36,6 +36,8 @@ class BaseMessageHandler : public IMessageHandler
                         handleMessageClient(*concreteMessage);
                     case ConnectionMode::Host:
                         handleMessageServer(*concreteMessage);
+                    default:
+                        break;
                 }
 
                 /// B)
@@ -44,7 +46,7 @@ class BaseMessageHandler : public IMessageHandler
         }
 
     protected:
-        virtual void handleMessage(const TMessage& message) = 0; /// B
+        virtual void handleMessageContextBased(const TMessage& message) = 0; /// B
         virtual void handleMessageClient(const TMessage &message) = 0; /// A
         virtual void handleMessageServer(const TMessage &message) = 0; /// A
 

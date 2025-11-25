@@ -5,8 +5,10 @@
 
 #include "Networking/MessageHandlers/ConnectionMessageHandler.h"
 
+ConnectionMessageHandler::~ConnectionMessageHandler() = default;
 
-void ConnectionMessageHandler::handleMessage(const ConnectionMessage &message)
+
+void ConnectionMessageHandler::handleMessageContextBased(const ConnectionMessage &message)
 {
 
 }

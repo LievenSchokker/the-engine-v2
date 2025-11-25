@@ -16,9 +16,9 @@ class ConnectionMessageHandler : public BaseMessageHandler<ConnectionMessage>
         explicit ConnectionMessageHandler(ConnectionMode mode, const INetworkContext& networkContext)
             : BaseMessageHandler(mode, networkContext) {};
 
-        ~ConnectionMessageHandler() override = default;
+        ~ConnectionMessageHandler() override;
 
-        void handleMessage(const ConnectionMessage &message) override;
+        void handleMessageContextBased(const ConnectionMessage &message) override;
         void handleMessageClient(const ConnectionMessage& msg) override;
         void handleMessageServer(const ConnectionMessage& msg) override;
 };

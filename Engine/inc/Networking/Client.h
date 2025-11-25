@@ -5,6 +5,7 @@
 
 
 #include "Connection/Connection.h"
+class INetworkContext;
 
 namespace spelmotor_networking
 {
@@ -87,5 +88,7 @@ private:
 
     std::unique_ptr<ITransport> transport;  ///< The underlying network transport.
         std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
+        std::unique_ptr<INetworkContext> networkContext;
+
     Connection currentConnection{};            ///< The current server connection.
 };

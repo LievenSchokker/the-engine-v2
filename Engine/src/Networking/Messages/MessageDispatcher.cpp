@@ -12,7 +12,7 @@
 
 namespace spelmotor_networking
 {
-    void MessageDispatcher::dispatchMessage(const IMessage& message)
+    void MessageDispatcher::processMessage(const IMessage& message)
     {
         IMessageHandler* handler = getMessageHandler(message.getMessageType());
 

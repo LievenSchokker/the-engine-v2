@@ -48,6 +48,7 @@ class Server
 
         std::unique_ptr<ITransport> transport;
         std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
+        std::unique_ptr<INetworkContext> networkContext;
         ServerConnectionInformation setupInformation;
         ServerStatus status;
         std::unordered_set<int> connectedClients;

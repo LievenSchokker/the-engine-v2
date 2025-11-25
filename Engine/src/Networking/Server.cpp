@@ -17,6 +17,7 @@
 
 #include <iostream>
 
+#include "Networking/Context/ServerNetworkContext.h"
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
@@ -29,7 +30,8 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
     }
     setupInformation = serverConnectionInformation;
 
-    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Host);
+    networkContext = std::make_unique<ServerNetworkContext>();
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Host, *networkContext);
 }
 
 Server::~Server()

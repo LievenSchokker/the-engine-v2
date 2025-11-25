@@ -17,6 +17,7 @@
 
 #include <iostream>
 
+#include "Networking/Context/ClientNetworkContext.h"
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport))
@@ -33,7 +34,8 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
         onConnectionChanged(connection);
     });
 
-    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client);
+    networkContext = std::make_unique<ClientNetworkContext>();
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *networkContext);
 }
 
 Client::~Client()

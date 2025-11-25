@@ -1,7 +1,7 @@
 //
 // Created by samle on 25/11/2025.
 //
-#include "ServerNetworkContext.h"
+#include "../../../inc/Networking/Context/ServerNetworkContext.h"
 
 #include <random>
 
@@ -9,6 +9,8 @@
 #include "Scene/Scene.h"
 #include "GameObject/Vector2.h"
 #include "Scene/SceneManager.h"
+
+ServerNetworkContext::~ServerNetworkContext() = default;
 
 
 bool ServerNetworkContext::spawnGameObject(uint32_t netId, Vector2 position)
@@ -29,10 +31,12 @@ bool ServerNetworkContext::destroyGameObject(uint32_t netId)
 bool ServerNetworkContext::sendRPC()
 {
 
+    return false;
 }
 
 bool ServerNetworkContext::sendCommand()
 {
+    return false;
 
 }
 
