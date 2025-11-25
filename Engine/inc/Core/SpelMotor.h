@@ -8,7 +8,8 @@
 
 
 class ApplicationClock;
-class IRender;
+class IRenderer;
+
 /**
  * @class SpelMotor
  * @brief Core engine class that manages the game loop and system lifecycle.
@@ -63,8 +64,8 @@ private:
      * Const ensures runtime modifications don't destabilize systems. */
     const ApplicationSpecifications specifications;
 
-    /** @brief renderer handle. */
-    std::unique_ptr<IRender> renderer;
+	/** @brief renderer handle. */
+	std::unique_ptr<IRenderer> renderer;
 
     /** @brief timeStep calculation for engine */
     std::unique_ptr<ApplicationClock> timer;

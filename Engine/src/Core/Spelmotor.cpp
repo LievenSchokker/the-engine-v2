@@ -7,9 +7,8 @@
 #include "Core/ApplicationClock.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
-#include "Rendering/SDL/SDLRender.h"
-#include "Rendering/IRender.h"
-
+#include "Rendering/IRenderer.h"
+#include "Rendering/SDL/SDLRenderer.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
@@ -27,8 +26,8 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
             return (SDL_GetTicks() / 1000.0);
         });
 
-        renderer = std::make_unique<SDLRender>(SDLRender(context));
-    }
+		renderer = std::make_unique<SDLRenderer>(context);
+	}
 }
 
 SpelMotor::~SpelMotor() = default;
