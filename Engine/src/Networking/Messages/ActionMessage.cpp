@@ -8,19 +8,11 @@ ActionMessage::ActionMessage(uint32_t compId, uint32_t objId, std::string action
 	, tick(t)
 {}
 
-void ActionMessage::process(IArchive& archive)
-{
-	archive.process(networkComponentIdentity);
-	archive.process(networkGameObjectIdentity);
-	archive.process(actionKey);
-	archive.process(tick);
-}
-
 std::vector<uint8_t> ActionMessage::serialize() const
 {
-	auto archive = createWriteArchive();
-	const_cast<ActionMessage*>(this)->process(*archive);
-	return getArchiveBytes(archive.get());
+	WriteArchive archive;
+	const_cast<ActionMessage*>(this)->process(archive);
+	return archive.getBytes();
 }
 
 bool ActionMessage::deserialize(const uint8_t* data, size_t length)
@@ -29,8 +21,8 @@ bool ActionMessage::deserialize(const uint8_t* data, size_t length)
 
 	try
 	{
-		auto archive = createReadArchive(data, length);
-		process(*archive);
+		ReadArchive archive(data, length);
+		process(archive);
 		return validate();
 	}
 	catch (...)

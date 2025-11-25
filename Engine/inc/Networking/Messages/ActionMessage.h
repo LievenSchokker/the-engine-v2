@@ -1,10 +1,9 @@
-// Messages/ActionMessage.h
 #pragma once
+
+
 #include <string>
 #include <vector>
 #include <cstdint>
-
-class IArchive;
 
 class ActionMessage
 {
@@ -28,7 +27,14 @@ public:
 	void setTick(uint32_t tick);
 
 private:
-	void process(IArchive& archive);
+	template<typename Archive>
+	void process(Archive& archive)
+	{
+		archive.process(networkComponentIdentity);
+		archive.process(networkGameObjectIdentity);
+		archive.process(actionKey);
+		archive.process(tick);
+	}
 
 	uint32_t networkComponentIdentity{0};
 	uint32_t networkGameObjectIdentity{0};
