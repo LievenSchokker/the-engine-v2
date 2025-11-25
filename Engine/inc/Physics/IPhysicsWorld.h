@@ -24,16 +24,13 @@ struct b2BodyId;
 class IPhysicsWorld
 {
 public:
-	/**
-	 * @brief Virtual destructor.
-	 */
 	virtual ~IPhysicsWorld() = default;
 
 	/**
 	 * @brief Initializes the physics world.
 	 *
 	 * Must be called before update() or creating any bodies.
-	 * Implementations should set up gravity, world bounds, and other necessary parameters.
+	 * Implementations should set up gravity.
 	 */
 	virtual void start() = 0;
 

@@ -17,7 +17,7 @@ void PhysicsSystem::start() const
 	world->start();
 }
 
-
+// TODO delta time is not used -- https://stackoverflow.com/questions/5466432/how-do-i-implement-better-time-step-fixed-or-semi-fixed-in-box2d
 void PhysicsSystem::update(float dt) const
 {
 	world->update();
@@ -35,13 +35,12 @@ void PhysicsSystem::registerBody(const GameObject* gameObject)
 }
 
 
-void PhysicsSystem::unregisterBody(GameObject* gameObject)
+void PhysicsSystem::unregisterBody(const GameObject* gameObject)
 {
 	if (!gameObject) return;
 
 	auto it = physicObjects.find(gameObject);
-	if (it != physicObjects.end())
-	{
+	if (it != physicObjects.end()) {
 		b2BodyId bodyId = it->second;
 		world->destroyBody(bodyId);
 
@@ -52,8 +51,7 @@ void PhysicsSystem::unregisterBody(GameObject* gameObject)
 
 void PhysicsSystem::syncData()
 {
-	for (auto& [gameObject, bodyId] : physicObjects)
-	{
+	for (auto& [gameObject, bodyId] : physicObjects) {
 		if (!gameObject) continue;
 
 		// Get position and rotation from Box2D
@@ -62,7 +60,19 @@ void PhysicsSystem::syncData()
 
 		// Update the GameObject transform
 		Transform* transform = gameObject->getTransform();
-		transform->setPosition({ pos.x, pos.y });
+		transform->setPosition({pos.x, pos.y});
 		transform->setRotationAngle(b2Rot_GetAngle(rot));
 	}
+}
+
+
+void PhysicsSystem::applyForce(const GameObject* gameObject, Vector2 force)
+{
+	if (!gameObject) return;
+
+	auto it = physicObjects.find(gameObject);
+	if (it == physicObjects.end()) return;
+
+	b2BodyId bodyId = it->second;
+	world->applyForce(bodyId, force);
 }

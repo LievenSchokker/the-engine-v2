@@ -2,66 +2,100 @@
 
 #include "IPhysicsWorld.h"
 #include "Box2D/Box2DPhysicsWorld.h"
+#include "GameObject/Vector2.h"
 
 #include <memory>
 #include <unordered_map>
 
 /**
  * @class PhysicsSystem
- * @brief Manages the physics world and all dynamic bodies within it.
+ * @brief High-level manager for the physics simulation.
  *
- * This system owns and updates a Box2D-based physics world. It allows external
- * objects to register/unregister dynamic bodies, steps the simulation forward
- * in time, and synchronizes simulated data back into the associated components.
+ * The PhysicsSystem owns a Box2D-based physics world and coordinates all
+ * physics-related operations.
+ *
+ * Responsibilities:
+ * - Creating and initializing the underlying physics world.
+ * - Registering and unregistering GameObjects that should participate in physics.
+ * - Stepping the physics simulation.
+ * - Synchronizing simulated transforms back to GameObjects.
+ * - Applying forces or impulses to registered bodies.
  */
 class PhysicsSystem
 {
 public:
 	/**
-	 * @brief Constructs the physics system and initializes the physics world.
+	 * @brief Constructs the physics system and creates the physics world.
+	 *
+	 * No bodies are registered at construction time; they must be added explicitly
+	 * using registerBody().
 	 */
 	PhysicsSystem();
 	~PhysicsSystem() = default;
 
+	/**
+	 * @brief Initializes the physics world.
+	 *
+	 * This must be called before any update() or physics interaction occurs.
+	 * Typically called once at application startup or scene load.
+	 */
 	void start() const;
 
 	/**
-	 * @brief Steps the physics simulation forward by a given delta time.
+	 * @brief Advances the physics simulation by one time step.
 	 *
-	 * @param deltaTime The time step (in seconds) used for advancing the simulation.
+	 * @param deltaTime Time in seconds since the last update.
+	 *        The underlying physics world may internally apply fixed-step logic.
 	 */
 	void update(float deltaTime) const;
 
 
 	/**
-	 * @brief Registers a dynamic body with the physics system.
+	 * @brief Registers a GameObject with the physics system.
 	 *
-	 * The body will be added to the internal list of dynamic bodies and
-	 * included in physics simulation steps.
+	 * The system will read its Collider and RigidBody components to create a
+	 * corresponding body inside the physics world.
 	 *
-	 * @param object Pointer to the dynamic body to register.
+	 * If registration succeeds, the body will be simulated automatically and
+	 * included in syncData() calls.
+	 *
+	 * @param gameObject The GameObject to register. Must not be null.
 	 */
-	void registerBody(const GameObject* object);
+	void registerBody(const GameObject* gameObject);
 
 
 	/**
-	 * @brief Unregisters a previously registered dynamic body.
+	 * @brief Removes a previously registered GameObject from physics simulation.
 	 *
-	 * The body will be removed from the internal list and will no longer
-	 * be updated by the physics simulation.
+	 * This destroys the associated body inside the physics world and removes it
+	 * from the internal tracking map.
 	 *
-	 * @param obj Pointer to the dynamic body to unregister.
+	 * @param gameObject The GameObject to unregister. Must not be null.
 	 */
-	void unregisterBody(GameObject* gameObject);
+	void unregisterBody(const GameObject* gameObject);
 
 
 	/**
-	 * @brief Synchronizes data from the physics world back into the game objects.
+	 * @brief Synchronizes simulated body transforms back to their GameObjects.
 	 *
-	 * This should be called after stepping the simulation to update the
-	 * corresponding transform or state of each DynamicBody.
+	 * After stepping the physics simulation, this method updates each registered
+	 * GameObject's Transform component with the latest position and rotation from
+	 * the physics world.
 	 */
 	void syncData();
+
+
+	/**
+	 * @brief Applies a continuous force to a registered GameObject's physics body.
+	 *
+	 * The force is applied at the body's center of mass.
+	 * If the GameObject is not registered or lacks a valid physics body,
+	 * this function has no effect.
+	 *
+	 * @param gameObject The target GameObject.
+	 * @param force The force vector to apply.
+	 */
+	void applyForce(const GameObject* gameObject, Vector2 force);
 
 private:
 	/**
@@ -70,7 +104,9 @@ private:
 	std::unique_ptr<Box2DPhysicsWorld> world;
 
 	/**
-	 * @brief List of all dynamic bodies currently registered with the physics system.
+	 * @brief Mapping of registered GameObjects to their corresponding Box2D body IDs.
+	 *
+	 * Only bodies that have been successfully created and registered will appear here.
 	 */
 	std::unordered_map<const GameObject*, b2BodyId> physicObjects;
 };
