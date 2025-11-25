@@ -1,20 +1,8 @@
-#include "Component/ShapeRenderer.h"
-#include "Component/Transform.h"
-#include "External/SdlContext.h"
-#include "GameObject/GameObject.h"
-#include "Input/InputManager.h"
-#include "Rendering/Color.h"
-#include "Rendering/SDL/SDLRenderer.h"
-#include "Rendering/Window/WindowOptions.h"
-#include "Scene/SceneManager.h"
-#include "Physics/IPhysicsWorld.h"
-#include "Physics/Box2D/Box2DPhysicsWorld.h"
-#include "Physics/Components/Collider.h"
-#include "Physics/Components/RigidBody.h"
-#include "GameObject/Vector2.h"
+//
+// Created by Lieven Schokker on 07/11/2025.
+//
 
 #include <iostream>
-#include <memory>
 
 #include "EntryPoint.h"
 
