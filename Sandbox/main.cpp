@@ -14,6 +14,7 @@
 #include <memory>
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"
+#include "GameObject/Vector2.h"
 
 
 void createCircle(std::unique_ptr<GameObject>& circle)
@@ -122,9 +123,16 @@ int main()
 		if (input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE)) {
 			running = false;
 		}
-		if (input->wasKeyPressed(KeyCode::SPACE)) {
+		if (input->wasKeyPressed(KeyCode::W)) {
 			physics->unregisterBody(rectangleNew);
 		}
+		if (input->wasKeyPressed(KeyCode::SPACE)) {
+			constexpr Vector2 force = Vector2(0, 100);
+			physics->applyForce(rectangleNew, force);
+		}
+
+		physics->syncData();
+
 
 		SDL_Delay(16);
 	}

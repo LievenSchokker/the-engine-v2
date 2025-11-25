@@ -16,11 +16,11 @@ class ShapeRenderer: public Component
 	ShapeRenderer() = default;
 
 	ShapeRenderer& setColor(const Color& newColor);
-	ShapeRenderer& setCircle(double newRadius);
+	ShapeRenderer& setCircle(float newRadius);
 	ShapeRenderer& setRectangle(Vector2 newSize);
 
 	Color getColor() const;
-	double getRadius() const;
+	float getRadius() const;
 	Vector2 getSize() const;
 	ShapeType getShapeType() const;
 
@@ -31,7 +31,7 @@ class ShapeRenderer: public Component
 
    private:
 	Color color = Color::white();
-	double radius = 25.0;
+	float radius = 25.0;
 	Vector2 size = {50.0, 50.0};
 	ShapeType type = ShapeType::None;
 };
