@@ -1,3 +1,6 @@
+#include "nuklear.h"
+#include "nuklear_sdl_renderer.h"
+
 #include <iostream>
 #include <ostream>
 
@@ -61,8 +64,9 @@ void SpelMotor::update()
             {
                 shutdown();
             }
+        	nk_sdl_handle_event(&event);
         }
-
+    	
         while (timer->shouldFixedUpdate())
         {
             InputManager::getInstance()->update();

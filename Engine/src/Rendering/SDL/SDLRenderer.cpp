@@ -1,6 +1,12 @@
-///
-/// Created by Lieven Schokker on 11/11/2025.
-///
+#define NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_STANDARD_IO
+#define NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
+#define NK_INCLUDE_FONT_BAKING
+#define NK_INCLUDE_DEFAULT_FONT
+#include "nuklear.h"
+#include "nuklear_sdl_renderer.h"
 
 #include "../../../inc/Rendering/SDL/SDLRenderer.h"
 
@@ -14,85 +20,155 @@
 #include <iostream>
 #include <math.h>
 
+
 namespace
 {
-constexpr double kRotationThresholdDegrees =
-	0.01;  // Threshold below which rotation is treated as zero
-constexpr int kMinWindowDimension = 1;	// Minimum window width/height
+constexpr double kRotationThresholdDegrees = 0.01;
+constexpr int kMinWindowDimension = 1;
+
+// Nuklear context
+struct nk_context* nkCtx = nullptr;
 }  // namespace
+
+// ... keep the constructor and destructor as-is ...
 
 SDLRenderer::SDLRenderer(SdlContext& context)
 {
-	assert(context.wasInit(SDL_INIT_VIDEO) &&
-		   "SDL video subsystem not initialized");
+    assert(context.wasInit(SDL_INIT_VIDEO) &&
+           "SDL video subsystem not initialized");
 }
 
 SDLRenderer::~SDLRenderer()
 {
-	close();
+    close();
 }
 
 void SDLRenderer::open(const WindowOptions& options)
 {
-	// Validate window dimensions
-	if ( options.width < kMinWindowDimension ||
-		 options.height < kMinWindowDimension ) {
-		std::cerr << "Invalid window dimensions: " << options.width << "x"
-				  << options.height << " (minimum: " << kMinWindowDimension
-				  << "x" << kMinWindowDimension << ")\n";
-		return;
-	}
+    // ... keep all your existing window/renderer creation code ...
 
-	Uint32 flags = SDL_WINDOW_SHOWN;
+    if ( options.width < kMinWindowDimension ||
+         options.height < kMinWindowDimension ) {
+        std::cerr << "Invalid window dimensions: " << options.width << "x"
+                  << options.height << " (minimum: " << kMinWindowDimension
+                  << "x" << kMinWindowDimension << ")\n";
+        return;
+    }
+
+    Uint32 flags = SDL_WINDOW_SHOWN;
 
 #if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
-	// Disable compositor bypass
-	if ( !SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0") ) {
-		std::cerr << "SDL can not disable compositor bypass!" << std::endl;
-		return;
-	}
+    if ( !SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0") ) {
+        std::cerr << "SDL can not disable compositor bypass!" << std::endl;
+        return;
+    }
 #endif
 
-	window = SDL_CreateWindow(options.title.c_str(), SDL_WINDOWPOS_UNDEFINED,
-							  SDL_WINDOWPOS_UNDEFINED, options.width,
-							  options.height, flags);
+    window = SDL_CreateWindow(options.title.c_str(), SDL_WINDOWPOS_UNDEFINED,
+                              SDL_WINDOWPOS_UNDEFINED, options.width,
+                              options.height, flags);
 
-	if ( window == nullptr ) {
-		std::cerr << "Window could not be created! SDL_Error: "
-				  << SDL_GetError() << "\n";
-		return;
-	}
+    if ( window == nullptr ) {
+        std::cerr << "Window could not be created! SDL_Error: "
+                  << SDL_GetError() << "\n";
+        return;
+    }
 
-	renderer = SDL_CreateRenderer(
-		window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    renderer = SDL_CreateRenderer(
+        window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-	if ( renderer == nullptr ) {
-		std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << "\n";
-		SDL_DestroyWindow(window);
-		window = nullptr;
-		return;
-	}
-	SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-}
+    if ( renderer == nullptr ) {
+        std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << "\n";
+        SDL_DestroyWindow(window);
+        window = nullptr;
+        return;
+    }
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-bool SDLRenderer::isOpen()
-{
-	return window != nullptr;
+    // Initialize Nuklear
+    nkCtx = nk_sdl_init(window, renderer);
+    if (nkCtx) {
+        struct nk_font_atlas* atlas;
+        nk_sdl_font_stash_begin(&atlas);
+        nk_sdl_font_stash_end();
+        std::cout << "Nuklear initialized successfully!" << std::endl;
+    }
 }
 
 void SDLRenderer::close()
 {
-	destroySolidQuadTexture();
+    // Shutdown Nuklear
+    if (nkCtx) {
+        nk_sdl_shutdown();
+        nkCtx = nullptr;
+    }
 
-	if ( renderer != nullptr ) {
-		SDL_DestroyRenderer(renderer);
-		renderer = nullptr;
-	}
+    destroySolidQuadTexture();
 
-	if ( window != nullptr ) {
-		SDL_DestroyWindow(window);
-		window = nullptr;
-	}
+    if ( renderer != nullptr ) {
+        SDL_DestroyRenderer(renderer);
+        renderer = nullptr;
+    }
+
+    if ( window != nullptr ) {
+        SDL_DestroyWindow(window);
+        window = nullptr;
+    }
+}
+
+void SDLRenderer::handleEvent(SDL_Event* event)
+{
+	nk_sdl_handle_event(event);
+}
+
+void SDLRenderer::beginFrame(const Color& clearColor)
+{
+    if ( renderer == nullptr ) {
+        return;
+    }
+
+    // Start Nuklear input
+    nk_input_begin(nkCtx);
+
+    SDL_SetRenderDrawColor(renderer, clearColor.r, clearColor.g, clearColor.b,
+                           clearColor.a);
+    SDL_RenderClear(renderer);
+}
+
+void SDLRenderer::presentFrame()
+{
+    if ( renderer == nullptr ) {
+        return;
+    }
+
+    // End Nuklear input
+    nk_input_end(nkCtx);
+
+    // Test Nuklear window
+    if (nk_begin(nkCtx, "Test Window", nk_rect(50, 50, 230, 250),
+        NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
+        NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+
+        nk_layout_row_static(nkCtx, 30, 80, 1);
+        if (nk_button_label(nkCtx, "Button")) {
+            std::cout << "Button pressed!" << std::endl;
+        }
+
+        nk_layout_row_dynamic(nkCtx, 30, 2);
+        static int option = 0;
+        if (nk_option_label(nkCtx, "Easy", option == 0)) option = 0;
+        if (nk_option_label(nkCtx, "Hard", option == 1)) option = 1;
+
+        nk_layout_row_dynamic(nkCtx, 25, 1);
+        static float value = 0.5f;
+        nk_slider_float(nkCtx, 0, &value, 1.0f, 0.1f);
+    }
+    nk_end(nkCtx);
+
+    // Render Nuklear
+    nk_sdl_render(NK_ANTI_ALIASING_ON);
+
+    SDL_RenderPresent(renderer);
 }
 
 void SDLRenderer::setTitle(const std::string& title)
@@ -102,24 +178,9 @@ void SDLRenderer::setTitle(const std::string& title)
 	}
 }
 
-void SDLRenderer::beginFrame(const Color& clearColor)
+bool SDLRenderer::isOpen()
 {
-	if ( renderer == nullptr ) {
-		return;
-	}
-
-	SDL_SetRenderDrawColor(renderer, clearColor.r, clearColor.g, clearColor.b,
-						   clearColor.a);
-	SDL_RenderClear(renderer);
-}
-
-void SDLRenderer::presentFrame()
-{
-	if ( renderer == nullptr ) {
-		return;
-	}
-
-	SDL_RenderPresent(renderer);
+	return window != nullptr;
 }
 
 void SDLRenderer::drawCircle(const Vector2& center, double radius,

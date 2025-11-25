@@ -92,6 +92,7 @@ class SDLRenderer: public IRenderer
 	 * Safe to call multiple times.
 	 */
 	void close() override;
+	static void handleEvent(SDL_Event* event);
 
 	/**
 	 * @brief Updates window title at runtime for dynamic feedback
