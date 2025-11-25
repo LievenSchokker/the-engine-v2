@@ -1,35 +1,37 @@
+// Messages/ActionMessage.h
 #pragma once
-#include "IMessage.h"
+#include <string>
+#include <vector>
+#include <cstdint>
 
-class ActionMessage final : IMessage
+class IArchive;
+
+class ActionMessage
 {
-	/**
-	 * @brief Constructs a ConnectionMessage with default status.
-	 */
-	ActionMessage();
+public:
+	ActionMessage() = default;
+	ActionMessage(uint32_t compId, uint32_t objId, std::string action, uint32_t tick);
 
-	/**
-	 * @brief Returns the message type identifier.
-	 * @return Always returns MessageTypes::ConnectionMessage.
-	 */
-	MessageTypes getMessageType() const override;
-	/**
-	 * @brief Serializes the message into a byte buffer.
-	 * @return A vector of bytes representing the serialized message.
-	 */
-	std::vector<std::byte> serialize() const override;
+	std::vector<uint8_t> serialize() const;
+	bool deserialize(const uint8_t* data, size_t length);
 
-	/**
-	 * @brief Deserializes a byte buffer into this message.
-	 * @param data Pointer to the raw byte data.
-	 * @param length Size of the data in bytes.
-	 * @return True if deserialization succeeded, false otherwise.
-	 */
-	bool deserialize(const std::byte* data, size_t length) override;
+	bool validate() const;
 
-	/**
-	 * @brief Validates that the message contains well-formed data.
-	 * @return True if the message is valid, false otherwise.
-	 */
-	bool validate() const override;
+	uint32_t getComponentIdentity() const;
+	uint32_t getGameObjectIdentity() const;
+	const std::string& getAction() const;
+	uint32_t getTick() const;
+
+	void setComponentIdentity(uint32_t id);
+	void setGameObjectIdentity(uint32_t id);
+	void setAction(std::string action);
+	void setTick(uint32_t tick);
+
+private:
+	void process(IArchive& archive);
+
+	uint32_t networkComponentIdentity{0};
+	uint32_t networkGameObjectIdentity{0};
+	std::string actionKey;
+	uint32_t tick{0};
 };
