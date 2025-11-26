@@ -16,6 +16,12 @@ Scene::Scene(std::string name) : name(std::move(name))
 {
 }
 
+Scene::~Scene()
+{
+    destroyAllGameObjects();
+}
+
+
 const std::string& Scene::getName() const
 {
 	return name;
@@ -295,4 +301,14 @@ void Scene::processDestroyQueue()
 
     /// Clear the queue when all queued objects have been deleted.
     destroyQueue.clear();
+}
+
+void Scene::destroyAllGameObjects()
+{
+    for ( auto& gameObject : gameObjects )
+    {
+        gameObject->onSceneDestroy();
+    }
+
+    gameObjects.clear();
 }

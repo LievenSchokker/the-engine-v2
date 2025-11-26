@@ -103,16 +103,10 @@ void ComponentManager::removeComponent(Component* comp)
 
 void ComponentManager::destroyAllComponents()
 {
-    for (auto& comp : components)
+    while (!components.empty())
     {
-        if (comp != nullptr)
-        {
-            comp->onDestroy();
-        }
+        removeComponent(components.back().get());
     }
-
-    /// clear() deletes the components internally, because they are stored as unique_ptr inside the components vector.
-    components.clear();
 }
 
 
