@@ -24,9 +24,6 @@ struct b2BodyId;
 class IPhysicsWorld
 {
 public:
-	/**
-	 * @brief Virtual destructor.
-	 */
 	virtual ~IPhysicsWorld() = default;
 
 	/**

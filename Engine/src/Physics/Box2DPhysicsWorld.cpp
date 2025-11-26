@@ -6,9 +6,10 @@
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"
 
-Box2DPhysicsWorld::Box2DPhysicsWorld()
-	: worldId(0)
-{}
+Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
+	: worldId(0),tickRate(newTickRate)
+{
+}
 
 
 void Box2DPhysicsWorld::start()
@@ -23,20 +24,20 @@ void Box2DPhysicsWorld::start()
 
 void Box2DPhysicsWorld::update()
 {
-	float timeStep = 1.0f / 60.0f;
+	float timeStep = 1.0f / tickRate;
 	int subStepCount = 4;
 
 	b2World_Step(worldId, timeStep, subStepCount);
 }
 
 
-void Box2DPhysicsWorld::createBody(const GameObject* go)
+void Box2DPhysicsWorld::createBody(const GameObject* gameObject)
 {
-	if (!go) return;
+	if (!gameObject) return;
 
-	Transform* transform = go->getTransform();
-	Collider* collider = go->getComponent<Collider>();
-	RigidBody* rigidBody = go->getComponent<RigidBody>();
+	const Transform* transform = gameObject->getTransform();
+	const Collider* collider = gameObject->getComponent<Collider>();
+	const RigidBody* rigidBody = gameObject->getComponent<RigidBody>();
 	if (!collider || !rigidBody) return;
 
 	// Body definition
@@ -68,7 +69,7 @@ void Box2DPhysicsWorld::createBody(const GameObject* go)
 			break;
 	}
 
-	bodies[go] = body;
+	bodies[gameObject] = body;
 }
 
 

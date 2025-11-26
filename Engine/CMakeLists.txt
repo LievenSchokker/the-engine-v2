@@ -24,8 +24,6 @@ target_include_directories(engine PUBLIC
         ${GAMENETWORKINGSOCKETS_INCLUDE_DIRS}
 )
 
-target_compile_definitions(engine PUBLIC SDL_MAIN_HANDLED)
-
 target_link_libraries(engine PUBLIC
         SDL2::SDL2
         SDL2_image::SDL2_image
