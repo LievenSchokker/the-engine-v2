@@ -92,6 +92,11 @@ void SDLRenderer::open(const WindowOptions& options)
         nk_sdl_font_stash_begin(&atlas);
         nk_sdl_font_stash_end();
         std::cout << "Nuklear initialized successfully!" << std::endl;
+        nkCtx->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+        nkCtx->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+        nkCtx->style.window.header.normal = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+        nkCtx->style.window.header.hover = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+        nkCtx->style.window.header.active = nk_style_item_color(nk_rgba(0, 0, 0, 0));
     }
 	SDL_RenderClear(renderer);
 }
@@ -129,7 +134,6 @@ void SDLRenderer::beginFrame(const Color& clearColor)
     }
 	SDL_RenderClear(renderer);
 
-    // Start Nuklear input
     nk_input_begin(nkCtx);
 
     SDL_SetRenderDrawColor(renderer, clearColor.r, clearColor.g, clearColor.b,
@@ -147,8 +151,7 @@ void SDLRenderer::presentFrame()
 
     // Test Nuklear window
     if (nk_begin(nkCtx, "Test Window", nk_rect(50, 50, 230, 250),
-        NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE |
-        NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
+     NK_WINDOW_NO_SCROLLBAR))  {
 
         nk_layout_row_static(nkCtx, 30, 80, 1);
         if (nk_button_label(nkCtx, "Button")) {
