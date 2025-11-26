@@ -1,17 +1,15 @@
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
-
-#include <iostream>
-#include <ostream>
-
-
+#include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
-#include "Core/ApplicationClock.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
+
+#include <iostream>
+#include <ostream>
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
@@ -29,9 +27,10 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
             return (SDL_GetTicks() / 1000.0);
         });
 
-		renderer = std::make_unique<SDLRenderer>(context);
-	}
+        renderer = std::make_unique<SDLRenderer>(context);
+    }
 }
+
 
 SpelMotor::~SpelMotor() = default;
 
@@ -47,6 +46,19 @@ void SpelMotor::run()
     InputManager::getInstance();
     update();
 }
+
+void SpelMotor::shutdown()
+{
+    running = false;
+
+    //TODO audioSystem->shutdown()
+    InputManager::shutdown();
+    renderer->close();
+    //TODO scenemanager->shutdown()
+    //TODO physicsWorld->shutdown()
+    //TODO server->shutdown() and client->shutdown()
+}
+
 
 void SpelMotor::update()
 {
@@ -64,9 +76,9 @@ void SpelMotor::update()
             {
                 shutdown();
             }
-        	nk_sdl_handle_event(&event);
+            nk_sdl_handle_event(&event);
         }
-    	
+
         while (timer->shouldFixedUpdate())
         {
             InputManager::getInstance()->update();
@@ -80,17 +92,4 @@ void SpelMotor::update()
         //TODO Audio->Update();
         renderer->presentFrame();
     }
-}
-
-
-void SpelMotor::shutdown()
-{
-    running = false;
-
-    //TODO audioSystem->shutdown()
-    InputManager::shutdown();
-    renderer->close();
-    //TODO scenemanager->shutdown()
-    //TODO physicsWorld->shutdown()
-    //TODO server->shutdown() and client->shutdown()
 }
