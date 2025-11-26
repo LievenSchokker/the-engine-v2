@@ -25,7 +25,11 @@
 #include "Rendering/IRenderer.h"
 
 
+#include <SDL.h>
+
+
 class SdlContext;
+
 
 class SDLRenderer: public IRenderer
 {

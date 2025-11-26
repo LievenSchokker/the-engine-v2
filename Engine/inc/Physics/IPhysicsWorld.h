@@ -21,9 +21,6 @@
 class IPhysicsWorld
 {
 public:
-	/**
-	 * @brief Virtual destructor.
-	 */
 	virtual ~IPhysicsWorld() = default;
 
 	/**

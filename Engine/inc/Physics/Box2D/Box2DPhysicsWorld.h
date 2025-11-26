@@ -24,7 +24,7 @@ public:
 	 *
 	 * The actual Box2D world is not created until start() is called.
 	 */
-	Box2DPhysicsWorld();
+	Box2DPhysicsWorld(float newTickRate = 60);
 
 	/**
 	 * @brief Destructor.
@@ -107,4 +107,9 @@ private:
 	 * This allows direct GameObject-based operations without needing a separate body ID map.
 	 */
 	std::unordered_map<const GameObject*, b2BodyId> bodies;
+
+	/**
+	 * @brief The amount of ticks to calculate
+	 */
+	float tickRate;
 };

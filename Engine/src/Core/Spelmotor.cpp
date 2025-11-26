@@ -7,14 +7,16 @@
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
 
+
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 	: running(false),
 	  specifications(applicationSpecifications),
 	  timer(nullptr),
 	  tickRate(applicationSpecifications.tickRate),
-	  physicsWorld(std::make_unique<Box2DPhysicsWorld>())
+	  physicsWorld(std::make_unique<Box2DPhysicsWorld>(applicationSpecifications.tickRate))
 {
-	if (applicationSpecifications.renderBackend == RenderBackend::SDL) {
+	if (applicationSpecifications.renderBackend == RenderBackend::SDL)
+	{
 		SdlContext context = SdlContext();
 		timer.reset();
 		timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []() {
@@ -25,6 +27,7 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 		renderer = std::make_unique<SDLRenderer>(context);
 	}
 }
+
 
 SpelMotor::~SpelMotor() = default;
 
@@ -47,7 +50,8 @@ void SpelMotor::update()
 {
 	running = true;
 
-	while (running) {
+	while (running)
+	{
 		timer->tick();
 
 		//TODO REPLACE THIS WITH EVENTMANAGER
