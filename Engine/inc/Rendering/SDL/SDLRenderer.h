@@ -129,8 +129,6 @@ class SDLRenderer: public IRenderer
 
     void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
-    IUIRenderHook* getUIRenderHook() override;
-
    private:
     std::unique_ptr<IUIRenderHook> userInterfaceHook;
 

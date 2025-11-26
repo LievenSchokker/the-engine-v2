@@ -258,8 +258,3 @@ void SDLRenderer::setUIRenderHook(std::unique_ptr<IUIRenderHook> hook)
 {
 	userInterfaceHook = std::move(hook);
 }
-
-IUIRenderHook* SDLRenderer::getUIRenderHook()
-{
-	return userInterfaceHook.get();
-}
