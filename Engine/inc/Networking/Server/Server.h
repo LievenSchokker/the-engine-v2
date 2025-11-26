@@ -1,0 +1,59 @@
+#pragma once
+#include <memory>
+#include <unordered_set>
+#include "ServerInformation.h"
+#include "Networking/SendMode.h"
+#include "Networking/ITransport.h"
+#include "Networking/Server/ServerStatus.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
+
+class TransportGNS;
+class IMessage;
+class ConnectionMessage;
+struct ServerConnectionInformation;
+struct IncomingRawMessage;
+struct Connection;
+class MessageDispatcher;
+
+enum class ConnectionStatus : uint8_t;
+
+class Server
+{
+    public:
+        Server(const ServerConnectionInformation &serverConnectionInformation,
+               std::unique_ptr<ITransport> injectedTransport);
+
+        ~Server();
+
+        ServerStatus start();
+
+        ServerStatus stop();
+
+        void update() const;
+
+        void kickClient(int clientId);
+
+        bool sendMessage(int clientId, const IMessage &message, const SendMode &mode) const;
+
+        bool sendMessage(int clientId, const IMessage &message) const;
+
+        bool broadcastMessage(const IMessage &message) const;
+
+        bool broadcastMessage(const IMessage &message, int excludeClientId) const;
+
+        void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
+
+    private:
+        void onMessage(const IncomingRawMessage &message);
+
+        void onConnectionChanged(const Connection &connection);
+
+        void handleConnectionMessage(int clientId, ConnectionMessage *message);
+
+        std::unique_ptr<ITransport> transport;
+        std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
+        std::unique_ptr<NetworkContext> networkContext;
+        ServerConnectionInformation setupInformation;
+        ServerStatus status;
+        std::unordered_set<int> connectedClients;
+};

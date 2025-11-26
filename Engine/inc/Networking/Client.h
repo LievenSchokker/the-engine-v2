@@ -1,98 +1,89 @@
-//
-// Created by thijs on 18-11-2025.
-//
-
 #pragma once
-#include "Transport.h"
-#include "TransportGNS.h"
 #include <memory>
-#include <thread>
+#include "Connection/Connection.h"
+#include "Server/Server.h"
+class NetworkContext;
 
+namespace spelmotor_networking
+{
+    class MessageDispatcher;
+}
+
+class ITransport;
+class TransportGNS;
+class IMessage;
+struct IncomingRawMessage;
 /**
- * @brief Represents a network client that communicates with a server using TransportGNS.
+ * @brief Network client for connecting to and communicating with a server.
  *
- * Provides functionality to connect to a server, send messages, and handle
- * connection or message callbacks.
+ * Manages a single server connection, handling message sending/receiving
+ * and connection state changes through the underlying transport layer.
  */
 class Client
 {
-public:
-    /**
-     * @brief Construct a new Client object
-     *
-     * @param transport Optional TransportGNS instance. If nullptr, a default transport will be created.
-     */
-    Client(std::unique_ptr<Transport> transport = nullptr);
+    public:
+        /**
+         * @brief Constructs a Client and initializes the transport layer.
+         */
+        explicit Client(std::unique_ptr<ITransport> transport);
 
-    /**
-     * @brief Destroy the Client object
-     *
-     * Stops the client, closes the connection, and joins any running threads.
-     */
-    ~Client();
+        /**
+         * @brief Destructor. Cleans up the transport and any active connection.
+         */
+        ~Client();
 
-    /**
-     * @brief Set a custom callback for connection state changes.
-     *
-     * @param newCallback The callback to invoke when connection changes.
-     */
-    void SetOnConnectionChanged(const OnConnectionChangedCallback& newCallback) const;
+        /**
+         * @brief Initiates a connection to a server.
+         * @param port The server port to connect to.
+         * @param serverIP The server IP address as a null-terminated string.
+         * @return True if the connection attempt was initiated successfully,
+         *         false otherwise.
+         */
+        bool connectToServer(uint16_t port, const char *serverIP) const;
 
-    /**
-     * @brief Sets the default connection changed callback.
-     *
-     * Updates the `connected` and `running` flags and prints connection status to stdout.
-     */
-    void SetDefaultOnConnectionChanged();
+        /**
+         * @brief Disconnects from the server.
+         */
+        void disconnect();
 
-    /**
-     * @brief Sets the default callback to handle incoming messages.
-     *
-     * The default behavior is to print received messages to stdout.
-     */
-    void setDefaultOnMessageReceived() const;
+        /**
+         * @brief Sends a message to the connected server.
+         * @param message The message to send.
+         * @return True if the message was queued successfully, false otherwise.
+         */
+        bool sendMessage(const IMessage &message) const;
 
-    /**
-     * @brief Sets a custom callback for incoming messages.
-     *
-     * @param newCallback The callback to invoke when a message is received.
-     */
-    void setOnMessageReceived(const OnMessageReceivedCallback& newCallback) const;
+        /**
+         * @brief Processes incoming network events.
+         *
+         * Should be called regularly (e.g., each frame) to handle incoming
+         * messages and connection state changes.
+         */
+        void poll() const;
 
-    /**
-     * @brief Connects to a server at the given IP and port.
-     *
-     * @param port Port number of the server.
-     * @param serverIP IP address of the server as a C-string.
-     * @return true if connection initiation succeeds.
-     * @return false if connection initiation fails.
-     */
-    bool connectToServer(uint16_t port, const char* serverIP);
+        /**
+         * @brief Checks if the client is currently connected to a server.
+         * @return True if connected, false otherwise.
+         */
+        bool isConnected() const;
 
-    /**
-     * @brief Sends a message to the server.
-     *
-     * @param text The message text to send.
-     * @return true if the client is connected and the message was sent.
-     * @return false if the client is not connected.
-     */
-    bool sendMessage(const std::string& text);
+        void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
 
-    bool isConnected() const { return connected; }
-    void setConnected(bool state) { connected = state; }
+    private:
+        /**
+         * @brief Callback invoked when a message is received from the server.
+         * @param rawMessage The incoming raw message data.
+         */
+        void onMessageReceived(const IncomingRawMessage &rawMessage);
 
-    bool isRunning() const { return running; }
-    void setRunning(bool state) { running = state; }
+        /**
+         * @brief Callback invoked when the connection state changes.
+         * @param connection The connection whose state changed.
+         */
+        void onConnectionChanged(const Connection &connection);
 
-private:
-    /**
-     * @brief Creates and starts the listen thread to poll the transport for messages.
-     */
-    void createListenThread();
-
-    std::unique_ptr<Transport> transport; /**< Transport layer used to communicate with the server. */
-    std::atomic<bool> connected = false; /**< Whether the client is currently connected. */
-    std::atomic<bool> running = false;   /**< Whether the client listen thread is running. */
-    int clientConnectionId = -1; /**< Assigned client connection ID by the server. */
-    std::thread listenThread;    /**< Thread for polling incoming messages from the server. */
+        std::unique_ptr<ITransport> transport; ///< The underlying network transport.
+        std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
+        std::unique_ptr<NetworkContext> networkContext;
+        Connection currentConnection{}; ///< The current server connection.
 };

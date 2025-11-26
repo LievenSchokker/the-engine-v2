@@ -2,6 +2,6 @@
 
 
 enum class TransportResult {
-    SUCCES,
+    SUCCESS,
     ERROR,
 };
