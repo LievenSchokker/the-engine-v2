@@ -98,9 +98,48 @@ void Scene::onStart()
 	}
 
 	active = true;
-	for ( auto& gameObject : gameObjects ) {
-		// TODO: call gameobject on start
+
+    std::vector<Behaviour*> allBehaviours;
+
+    /// Retrieve every behaviour on every GameObject in this scene object.
+	for ( auto& gameObject : gameObjects )
+	{
+        for (auto& behaviour : gameObject->getAllBehaviours())
+        {
+            if (behaviour == nullptr)
+                continue;
+
+            /// Store in local vector to iterate over more easily.
+            allBehaviours.emplace_back(behaviour);
+
+            /// Awake should only be called once per behaviour.
+            if (!behaviour->getHasAwakened())
+                behaviour->awake();
+        }
 	}
+
+    /// Use local vector to iterate over all behaviours in this scene object.
+    for ( auto& behaviour : allBehaviours )
+    {
+        /// Call onEnable only on enabled behaviours, and AFTER awake has been called on EVERY other behaviour
+        if (behaviour->getIsActiveAndEnabled())
+        {
+            behaviour->onEnable();
+        }
+    }
+
+    /// Call start on all behaviours, AFTER Awake and OnEnable have both been called on ALL other behaviours.
+    for ( auto& behaviour : allBehaviours )
+    {
+        /// Start should only be called if the gameobject of the behaviour is active, and the behaviour itself is enabled
+        if (behaviour->getIsActiveAndEnabled())
+        {
+            /// Start should only be called once per behaviour.
+            if (!behaviour->getHasStarted())
+                behaviour->start();
+        }
+    }
+
 }
 
 void Scene::onStop()
@@ -110,7 +149,8 @@ void Scene::onStop()
 	}
 
 	active = false;
-	for ( auto& gameObject : gameObjects ) {
+	for ( auto& gameObject : gameObjects )
+	{
 		// TODO: call gameobject on stop
 	}
 }
