@@ -30,8 +30,8 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
 	bool isGameObjectActive = gameObject->getIsActive();
 
-    gameObject->setScene(*this);
 	gameObjects.emplace_back(std::move(gameObject));
+    gameObject->setScene(*this);
 
     if (active)
 	{
