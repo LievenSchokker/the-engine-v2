@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../GameObject/GameObject.h"
-
+#include "GameObject/GameObject.h"
+#include "Behaviour/Behaviour.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -123,6 +123,7 @@ class Scene
 	 */
 	void collectRenderCommands(std::vector<ShapeRenderCommand>& out) const;
 
+    void initialiseBehaviours(const std::vector<Behaviour*>& behaviours);
    private:
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;

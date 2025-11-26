@@ -19,7 +19,7 @@ GameObject::GameObject()
     isDestroyed = false;
 
     /// TODO: Remove this line:
-    scenePlaceholder = nullptr;
+    scene = nullptr;
 }
 
 
@@ -74,8 +74,8 @@ void GameObject::destroy()
     setActive(false);
 
     /// TEMP if statement, remove when scene is implemented!
-    if (scenePlaceholder != nullptr)
-        scenePlaceholder->queueDestroy(this);
+    if (scene != nullptr)
+        scene->queueDestroy(this);
 }
 
 
@@ -169,7 +169,20 @@ void GameObject::setIsStatic(bool value)
 }
 
 
-void GameObject::setScene(ScenePlaceholder *newScene)
+void GameObject::setScene(Scene& newScene)
 {
-    scenePlaceholder = newScene;
+    scene = &newScene;
+}
+
+
+void GameObject::setBehavioursEnabled(const bool value) const
+{
+    if (value)
+    {
+        componentManager->enableAllBehaviours();
+    }
+    else
+    {
+        componentManager->disableAllBehaviours();
+    }
 }

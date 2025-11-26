@@ -3,8 +3,7 @@
 //
 
 #pragma once
-
-
+#include "Scene/Scene.h"
 class Transform;
 class Component;
 class Behaviour;
@@ -228,7 +227,9 @@ class GameObject
          * Used to queue up this object to be destroyed by the scene owner upon calling @c destroy()
          * @param newScene new owning scene of this GameObject
          */
-        void setScene(ScenePlaceholder* newScene);
+        void setScene(Scene& newScene);
+
+        void setBehavioursEnabled(bool value) const;
 
         /**
          * @brief Helper function to get the @c componentManager directly,
@@ -261,10 +262,11 @@ class GameObject
     private:
         std::unique_ptr<ComponentManager> componentManager;
         std::unique_ptr<Transform> transform;
-        ScenePlaceholder* scenePlaceholder;
+         Scene* scene;
         std::string name;
         int layer;
         std::string tag;
+
         bool isActive;
         bool isStatic;
         bool isDestroyed;
