@@ -8,14 +8,14 @@ ActionMessage::ActionMessage(uint32_t compId, uint32_t objId, std::string action
 	, tick(t)
 {}
 
-std::vector<uint8_t> ActionMessage::serialize() const
+std::vector<std::byte> ActionMessage::serialize() const
 {
 	WriteArchive archive;
 	const_cast<ActionMessage*>(this)->process(archive);
 	return archive.getBytes();
 }
 
-bool ActionMessage::deserialize(const uint8_t* data, size_t length)
+bool ActionMessage::deserialize(const std::byte* data, size_t length)
 {
 	if (!data || length == 0) return false;
 

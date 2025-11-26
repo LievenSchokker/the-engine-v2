@@ -5,14 +5,16 @@
 #include <vector>
 #include <cstdint>
 
+#include "Networking/Serialization/Serialization.h"
+
 class ActionMessage
 {
 public:
 	ActionMessage() = default;
 	ActionMessage(uint32_t compId, uint32_t objId, std::string action, uint32_t tick);
 
-	std::vector<uint8_t> serialize() const;
-	bool deserialize(const uint8_t* data, size_t length);
+    std::vector<std::byte> serialize() const;
+	bool deserialize(const std::byte* data, size_t length);
 
 	bool validate() const;
 
