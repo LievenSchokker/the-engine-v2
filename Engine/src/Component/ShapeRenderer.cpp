@@ -25,10 +25,14 @@ ShapeRenderer& ShapeRenderer::setCircle(double newRadius)
 
 ShapeRenderer& ShapeRenderer::setRectangle(Vector2 newSize)
 {
-	type = ShapeRenderType::Rectangle;
-	size.x = std::max(newSize.x, kEpsilon);
-	size.y = std::max(newSize.y, kEpsilon);
-	return *this;
+    type = ShapeRenderType::Rectangle;
+
+    constexpr float kEpsilon = 0.0001f;
+
+    size.x = std::max(newSize.x, kEpsilon);
+    size.y = std::max(newSize.y, kEpsilon);
+
+    return *this;
 }
 
 Color ShapeRenderer::getColor() const

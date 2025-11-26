@@ -95,7 +95,7 @@ class Component
         GameObject* gameObject;
 
         /// The @c Transform that is attached to the associated GameObject.
-        const Transform* transform = nullptr;
+        Transform* transform = nullptr;
 };
 
 /// Implementation of the template functions:
