@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GameObject/GameObject.h"
-#include "Behaviour/Behaviour.h"
+class GameObject;
+class Behaviour;
 #include <memory>
 #include <string>
 #include <vector>
@@ -114,7 +114,7 @@ class Scene
 	 *
 	 * @param deltaTime Seconds elapsed since the previous update.
 	 */
-	void update(float deltaTime) const;
+	void update(float deltaTime) ;
 
 	/**
 	 * @brief Collect render commands for active objects in this scene.
@@ -124,8 +124,13 @@ class Scene
 	void collectRenderCommands(std::vector<ShapeRenderCommand>& out) const;
 
     void initialiseBehaviours(const std::vector<Behaviour*>& behaviours);
+        void queueDestroy(GameObject* obj);
+
+        void processDestroyQueue() ;
+
    private:
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
+        std::vector<GameObject*> destroyQueue;
 	bool active = false;
 };

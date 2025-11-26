@@ -1,8 +1,10 @@
-#include "../../inc/Scene/Scene.h"
+#include "Scene/Scene.h"
 
-#include "../../inc/Component/ComponentManager.h"
-#include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Rendering/RenderQueue.h"
+#include "GameObject/GameObject.h"
+#include "Behaviour/Behaviour.h"
+#include "Component/ComponentManager.h"
+#include "Component/ShapeRenderer.h"
+#include "Rendering/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
@@ -28,7 +30,7 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
 	bool isGameObjectActive = gameObject->getIsActive();
 	gameObjects.emplace_back(std::move(gameObject));
-
+    gameObject->setScene(*this);
 	if (active)
 	{
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
@@ -169,7 +171,7 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(float deltaTime) const
+void Scene::update(float deltaTime)
 {
 	if ( !active ) {
 		return;
@@ -191,6 +193,8 @@ void Scene::update(float deltaTime) const
             behaviour->update();
         }
     }
+
+    processDestroyQueue();
 }
 
 void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
@@ -233,7 +237,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
         if (behaviour == nullptr)
             continue;
 
-        if (!behaviour->getIsActiveAndEnabled())
+        if (behaviour->getIsActiveAndEnabled())
             behaviour->onEnable();
     }
 
@@ -250,4 +254,43 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
         if (!behaviour->getHasStarted())
             behaviour->start();
     }
+}
+
+void Scene::queueDestroy(GameObject *obj)
+{
+    /// Check if the object is already in the destroyQueue.
+    for (auto* queued : destroyQueue)
+    {
+        if (queued == obj)
+            return;
+    }
+
+    destroyQueue.push_back(obj);
+}
+
+
+void Scene::processDestroyQueue()
+{
+    for (GameObject* gameObject : destroyQueue)
+    {
+
+        gameObject->onSceneDestroy();
+
+        /// Remove the GameObject from the stored gameObjects,
+        /// Destroys the GameObject stored in the unqiue ptr automatically.
+        gameObjects.erase(
+            std::remove_if(
+                gameObjects.begin(),
+                gameObjects.end(),
+                [gameObject](const std::unique_ptr<GameObject>& ptr) {
+                    return ptr.get() == gameObject;
+                }
+            ),
+
+            gameObjects.end()
+        );
+    }
+
+    /// Clear the queue when all queued objects have been deleted.
+    destroyQueue.clear();
 }
