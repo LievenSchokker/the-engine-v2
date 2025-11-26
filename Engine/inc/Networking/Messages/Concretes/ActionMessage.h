@@ -21,7 +21,7 @@ class ActionMessage {
 public:
 
     //Need default construction for deserialization.
-    ActionMessage() = default;
+    ActionMessage();
 
     /**
      * @brief Constructs a fully-specified action ready for transmission.
@@ -95,7 +95,7 @@ public:
     /// @}
 
 private:
-    uint32_t networkComponentIdentity;  ///< Routes to the handling component
+    uint32_t networkComponentIdentity; ///< Routes to the handling component
     uint32_t networkGameObjectIdentity; ///< Routes to the target entity
     std::string actionKey;              ///< Identifies the RPC to invoke
     uint32_t tick;                      ///< Simulation frame for temporal ordering

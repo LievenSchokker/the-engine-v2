@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Networking/Messages/ActionMessage.h"
+#include "../../../Engine/inc/Networking/Messages/Concretes/ActionMessage.h"
 
 class ActionMessageTest : public ::testing::Test
 {

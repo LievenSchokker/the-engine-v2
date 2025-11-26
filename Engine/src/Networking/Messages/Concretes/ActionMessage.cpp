@@ -1,5 +1,13 @@
-#include "Networking/Messages/ActionMessage.h"
+#include "Networking/Messages/Concretes/ActionMessage.h"
 #include "Networking/Serialization/Serialization.h"
+
+ActionMessage::ActionMessage()   : networkComponentIdentity(0)
+      , networkGameObjectIdentity(0)
+      , actionKey("")
+      , tick(0)
+{
+
+}
 
 ActionMessage::ActionMessage(uint32_t componentId, uint32_t objectId, std::string action, uint32_t tickRate)
     : networkComponentIdentity(componentId)

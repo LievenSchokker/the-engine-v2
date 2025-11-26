@@ -6,6 +6,8 @@
 #include "ServerInformation.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
+#include "Networking/Context/NetworkContext.h"
+#include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/Server/ServerStatus.h"
 
 class TransportGNS;
@@ -81,6 +83,7 @@ public:
      *          from treating kick as network error.
      */
     void kickClient(int clientId);
+    void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
 
     /**
      * @brief Sends message with explicit delivery guarantees

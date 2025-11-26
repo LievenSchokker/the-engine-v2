@@ -113,7 +113,7 @@ void Client::onConnectionChanged(const Connection& connection)
     }
 }
 
-void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
+void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
     const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
@@ -124,21 +124,6 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
     }
 
     messageDispatcher->processMessage(*message);
-
-
-    // switch (MessageTypes messageType = message->getMessageType())
-    // {
-    // case MessageTypes::ConnectionMessage:
-    //     {
-    //         if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
-    //         {
-    //             disconnect();
-    //         }
-    //         break;
-    //     }
-    // default:
-    //     break;
-    // }
 }
 
 void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)

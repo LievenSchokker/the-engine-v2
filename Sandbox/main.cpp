@@ -3,7 +3,7 @@
 //
 
 #include "EntryPoint.h"
-#include "Networking/Messages/ActionMessage.h"
+#include "../Engine/inc/Networking/Messages/Concretes/ActionMessage.h"
 
 #include <iostream>
 

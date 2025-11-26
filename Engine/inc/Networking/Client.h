@@ -34,12 +34,11 @@ class Client
 
         /**
          * @brief Initiates a connection to a server.
-         * @param port The server port to connect to.
-         * @param serverIP The server IP address as a null-terminated string.
+         * @param serverInformartion
          * @return True if the connection attempt was initiated successfully,
          *         false otherwise.
          */
-        bool connectToServer(uint16_t port, const char *serverIP) const;
+        bool connectToServer(const ServerConnectionInformation&  serverInformartion) const;
 
         /**
          * @brief Disconnects from the server.
@@ -74,7 +73,7 @@ class Client
          * @brief Callback invoked when a message is received from the server.
          * @param rawMessage The incoming raw message data.
          */
-        void onMessageReceived(const IncomingRawMessage &rawMessage);
+        void onMessageReceived(const IncomingRawMessage &rawMessage) const;
 
         /**
          * @brief Callback invoked when the connection state changes.
