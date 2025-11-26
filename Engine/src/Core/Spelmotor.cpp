@@ -14,23 +14,21 @@
 #include "Input/SDLInputAdapter.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
-    : running(false),
-      specifications(applicationSpecifications),
-      timer(nullptr),
-      tickRate(applicationSpecifications.tickRate)
+	: running(false),
+	  specifications(applicationSpecifications),
+	  timer(nullptr),
+	  tickRate(applicationSpecifications.tickRate)
 {
-    if (applicationSpecifications.renderBackend == RenderBackend::SDL)
-    {
-        SdlContext context = SdlContext();
-        timer.reset();
-        timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
-        {
-            //Get Ticks retuns ms we need seconds;
-            return (SDL_GetTicks() / 1000.0);
-        });
+	if (applicationSpecifications.renderBackend == RenderBackend::SDL) {
+		SdlContext context = SdlContext();
+		timer.reset();
+		timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []() {
+			//Get Ticks retuns ms we need seconds;
+			return (SDL_GetTicks() / 1000.0);
+		});
 
-        renderer = std::make_unique<SDLRenderer>(context);
-    }
+		renderer = std::make_unique<SDLRenderer>(context);
+	}
 }
 
 
@@ -39,49 +37,46 @@ SpelMotor::~SpelMotor() = default;
 
 void SpelMotor::run()
 {
-    timer->start();
+	timer->start();
 
-    //TODO Server or Client -> Start()
-    //TODO Physics -> Start()
-    //TODO SceneManager -> Start()
-    renderer->open(specifications.windowOptions);
-    InputManager::getInstance();
-    update();
+	//TODO Server or Client -> Start()
+	//TODO Physics -> Start()
+	//TODO SceneManager -> Start()
+	renderer->open(specifications.windowOptions);
+	InputManager::getInstance();
+	update();
 }
 
 void SpelMotor::shutdown()
 {
-    running = false;
+	running = false;
 
-    //TODO audioSystem->shutdown()
-    InputManager::shutdown();
-    renderer->close();
-    //TODO scenemanager->shutdown()
-    //TODO physicsWorld->shutdown()
-    //TODO server->shutdown() and client->shutdown()
+	//TODO audioSystem->shutdown()
+	InputManager::shutdown();
+	renderer->close();
+	//TODO scenemanager->shutdown()
+	//TODO physicsWorld->shutdown()
+	//TODO server->shutdown() and client->shutdown()
 }
 
 
 void SpelMotor::update()
 {
-    running = true;
+	running = true;
 
-    while (running)
-    {
-        timer->tick();
+	while (running) {
+		timer->tick();
 
-        //TODO REPLACE THIS WITH EVENTMANAGER
-        InputManager::getInstance()->update();
-        while (timer->shouldFixedUpdate())
-        {
-            //TODO Physics->Update();
+		//TODO REPLACE THIS WITH EVENTMANAGER
+		InputManager::getInstance()->update();
+		while (timer->shouldFixedUpdate()) {
+			//TODO Physics->Update();
 
-            timer->consumeFixedUpdate();
-        }
+			timer->consumeFixedUpdate();
+		}
 
-
-        //TODO Network->Update()
-        //TODO Audio->Update();
-        renderer->presentFrame();
-    }
+		//TODO Network->Update()
+		//TODO Audio->Update();
+		renderer->presentFrame();
+	}
 }

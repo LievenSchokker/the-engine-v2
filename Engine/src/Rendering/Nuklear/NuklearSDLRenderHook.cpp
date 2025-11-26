@@ -13,132 +13,149 @@
 //Need to expose some sort of thing that Nuklear can use to store its context.
 namespace
 {
-    struct nk_context ctx;
+struct nk_context ctx;
 }
 
 
-NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window, SDL_Renderer* renderer)
-    : inputManager(InputManager::getInstance()), sdlWindow(window), sdlRenderer(renderer), nkCtx(nullptr)
+NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
+                                           SDL_Renderer* renderer)
+	: inputManager(InputManager::getInstance()), sdlWindow(window),
+	  sdlRenderer(renderer), nkCtx(nullptr)
 {
 }
 
 void NuklearSDLRenderHook::initialize()
 {
+	std::cout << "Nuklear init..." << std::endl;
+	nkCtx = nk_sdl_init(sdlWindow, sdlRenderer);
+	if (nkCtx != nullptr) {
+		struct nk_font_atlas* atlas;
+		nk_sdl_font_stash_begin(&atlas);
+		nk_sdl_font_stash_end();
 
-    std::cout << "Nuklear init..." << std::endl;
-    nkCtx = nk_sdl_init(sdlWindow, sdlRenderer);
-    if (nkCtx != nullptr)
-    {
-        struct nk_font_atlas* atlas;
-        nk_sdl_font_stash_begin(&atlas);
-        nk_sdl_font_stash_end();
-
-        nkCtx->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.header.normal = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.header.hover = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.header.active = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-    }
+		nkCtx->style.window.fixed_background = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nkCtx->style.window.fixed_background = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nkCtx->style.window.header.normal = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nkCtx->style.window.header.hover = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nkCtx->style.window.header.active = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+	}
 }
 
 //Let me be  clear I DO NOT LIKE THIS.
 //TODO Propper EventHandling so this can be fixed.
 void NuklearSDLRenderHook::updateInput()
 {
-    if (!nkCtx) return;
-    if (!inputManager) return;
+	if (!nkCtx) return;
+	if (!inputManager) return;
 
-    nk_input_begin(nkCtx);
+	nk_input_begin(nkCtx);
 
-    const int mx = inputManager->mouseX();
-    const int my = inputManager->mouseY();
-    nk_input_motion(nkCtx, mx, my);
+	const int mx = inputManager->mouseX();
+	const int my = inputManager->mouseY();
+	nk_input_motion(nkCtx, mx, my);
 
-    if (inputManager->wasMousePressed(MouseButton::LEFT))
-        nk_input_button(nkCtx, NK_BUTTON_LEFT, mx, my, 1);
-    if (inputManager->wasMouseReleased(MouseButton::LEFT))
-        nk_input_button(nkCtx, NK_BUTTON_LEFT, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::LEFT)) nk_input_button(
+		nkCtx, NK_BUTTON_LEFT, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::LEFT)) nk_input_button(
+		nkCtx, NK_BUTTON_LEFT, mx, my, 0);
 
-    if (inputManager->wasMousePressed(MouseButton::MIDDLE))
-        nk_input_button(nkCtx, NK_BUTTON_MIDDLE, mx, my, 1);
-    if (inputManager->wasMouseReleased(MouseButton::MIDDLE))
-        nk_input_button(nkCtx, NK_BUTTON_MIDDLE, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::MIDDLE)) nk_input_button(
+		nkCtx, NK_BUTTON_MIDDLE, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::MIDDLE)) nk_input_button(
+		nkCtx, NK_BUTTON_MIDDLE, mx, my, 0);
 
-    if (inputManager->wasMousePressed(MouseButton::RIGHT))
-        nk_input_button(nkCtx, NK_BUTTON_RIGHT, mx, my, 1);
-    if (inputManager->wasMouseReleased(MouseButton::RIGHT))
-        nk_input_button(nkCtx, NK_BUTTON_RIGHT, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::RIGHT)) nk_input_button(
+		nkCtx, NK_BUTTON_RIGHT, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::RIGHT)) nk_input_button(
+		nkCtx, NK_BUTTON_RIGHT, mx, my, 0);
 
+	nk_input_scroll(nkCtx, nk_vec2(
+		                static_cast<float>(inputManager->wheelDeltaX()),
+		                static_cast<float>(inputManager->wheelDeltaY())
+		                ));
 
-    nk_input_scroll(nkCtx, nk_vec2(
-        static_cast<float>(inputManager->wheelDeltaX()),
-        static_cast<float>(inputManager->wheelDeltaY())
-    ));
+	nk_input_key(nkCtx, NK_KEY_SHIFT,
+	             inputManager->isKeyDown(KeyCode::LEFT_SHIFT) || inputManager->
+	             isKeyDown(KeyCode::RIGHT_SHIFT));
+	nk_input_key(nkCtx, NK_KEY_CTRL,
+	             inputManager->isKeyDown(KeyCode::LEFT_CONTROL) || inputManager
+	             ->isKeyDown(KeyCode::RIGHT_CONTROL));
+	nk_input_key(nkCtx, NK_KEY_DEL, inputManager->isKeyDown(KeyCode::DELETE));
+	nk_input_key(nkCtx, NK_KEY_ENTER, inputManager->isKeyDown(KeyCode::RETURN));
+	nk_input_key(nkCtx, NK_KEY_TAB, inputManager->isKeyDown(KeyCode::TAB));
+	nk_input_key(nkCtx, NK_KEY_BACKSPACE,
+	             inputManager->isKeyDown(KeyCode::BACKSPACE));
+	nk_input_key(nkCtx, NK_KEY_UP, inputManager->isKeyDown(KeyCode::UP_ARROW));
+	nk_input_key(nkCtx, NK_KEY_DOWN,
+	             inputManager->isKeyDown(KeyCode::DOWN_ARROW));
+	nk_input_key(nkCtx, NK_KEY_LEFT,
+	             inputManager->isKeyDown(KeyCode::LEFT_ARROW));
+	nk_input_key(nkCtx, NK_KEY_RIGHT,
+	             inputManager->isKeyDown(KeyCode::RIGHT_ARROW));
 
-    nk_input_key(nkCtx, NK_KEY_SHIFT,
-        inputManager->isKeyDown(KeyCode::LEFT_SHIFT) || inputManager->isKeyDown(KeyCode::RIGHT_SHIFT));
-    nk_input_key(nkCtx, NK_KEY_CTRL,
-        inputManager->isKeyDown(KeyCode::LEFT_CONTROL) || inputManager->isKeyDown(KeyCode::RIGHT_CONTROL));
-    nk_input_key(nkCtx, NK_KEY_DEL, inputManager->isKeyDown(KeyCode::DELETE));
-    nk_input_key(nkCtx, NK_KEY_ENTER, inputManager->isKeyDown(KeyCode::RETURN));
-    nk_input_key(nkCtx, NK_KEY_TAB, inputManager->isKeyDown(KeyCode::TAB));
-    nk_input_key(nkCtx, NK_KEY_BACKSPACE, inputManager->isKeyDown(KeyCode::BACKSPACE));
-    nk_input_key(nkCtx, NK_KEY_UP, inputManager->isKeyDown(KeyCode::UP_ARROW));
-    nk_input_key(nkCtx, NK_KEY_DOWN, inputManager->isKeyDown(KeyCode::DOWN_ARROW));
-    nk_input_key(nkCtx, NK_KEY_LEFT, inputManager->isKeyDown(KeyCode::LEFT_ARROW));
-    nk_input_key(nkCtx, NK_KEY_RIGHT, inputManager->isKeyDown(KeyCode::RIGHT_ARROW));
+	bool ctrl = inputManager->isKeyDown(KeyCode::LEFT_CONTROL) || inputManager->
+	            isKeyDown(KeyCode::RIGHT_CONTROL);
+	nk_input_key(nkCtx, NK_KEY_COPY,
+	             ctrl && inputManager->isKeyDown(KeyCode::C));
+	nk_input_key(nkCtx, NK_KEY_PASTE,
+	             ctrl && inputManager->isKeyDown(KeyCode::V));
+	nk_input_key(nkCtx, NK_KEY_CUT,
+	             ctrl && inputManager->isKeyDown(KeyCode::X));
+	nk_input_key(nkCtx, NK_KEY_TEXT_UNDO,
+	             ctrl && inputManager->isKeyDown(KeyCode::Z));
+	nk_input_key(nkCtx, NK_KEY_TEXT_REDO,
+	             ctrl && inputManager->isKeyDown(KeyCode::Y));
+	nk_input_key(nkCtx, NK_KEY_TEXT_SELECT_ALL,
+	             ctrl && inputManager->isKeyDown(KeyCode::A));
+	nk_input_key(nkCtx, NK_KEY_TEXT_LINE_START,
+	             inputManager->isKeyDown(KeyCode::HOME));
+	nk_input_key(nkCtx, NK_KEY_TEXT_LINE_END,
+	             inputManager->isKeyDown(KeyCode::END));
 
-    bool ctrl = inputManager->isKeyDown(KeyCode::LEFT_CONTROL) || inputManager->isKeyDown(KeyCode::RIGHT_CONTROL);
-    nk_input_key(nkCtx, NK_KEY_COPY, ctrl && inputManager->isKeyDown(KeyCode::C));
-    nk_input_key(nkCtx, NK_KEY_PASTE, ctrl && inputManager->isKeyDown(KeyCode::V));
-    nk_input_key(nkCtx, NK_KEY_CUT, ctrl && inputManager->isKeyDown(KeyCode::X));
-    nk_input_key(nkCtx, NK_KEY_TEXT_UNDO, ctrl && inputManager->isKeyDown(KeyCode::Z));
-    nk_input_key(nkCtx, NK_KEY_TEXT_REDO, ctrl && inputManager->isKeyDown(KeyCode::Y));
-    nk_input_key(nkCtx, NK_KEY_TEXT_SELECT_ALL, ctrl && inputManager->isKeyDown(KeyCode::A));
-    nk_input_key(nkCtx, NK_KEY_TEXT_LINE_START, inputManager->isKeyDown(KeyCode::HOME));
-    nk_input_key(nkCtx, NK_KEY_TEXT_LINE_END, inputManager->isKeyDown(KeyCode::END));
-
-    nk_input_end(nkCtx);
+	nk_input_end(nkCtx);
 }
 
 void NuklearSDLRenderHook::beginFrame()
 {
-    updateInput();
-    render();
+	updateInput();
+	render();
 }
 
 
 void NuklearSDLRenderHook::render() const
 {
-    //Small example of Nuklear working
-    //TODO Make this an actual canvas that can add and remove UIObjects.
-    if (nk_begin(nkCtx, "Test Window", nk_rect(50, 50, 230, 250),
-        NK_WINDOW_NO_SCROLLBAR))
-    {
-        nk_layout_row_dynamic(nkCtx, 30, 1);
+	//Small example of Nuklear working
+	//TODO Make this an actual canvas that can add and remove UIObjects.
+	if (nk_begin(nkCtx, "Test Window", nk_rect(50, 50, 230, 250),
+	             NK_WINDOW_NO_SCROLLBAR)) {
+		nk_layout_row_dynamic(nkCtx, 30, 1);
 
-        nk_layout_row_dynamic(nkCtx, 30, 2);
-        static int option = 0;
-        if (nk_option_label(nkCtx, "Easy", option == 0)) option = 0;
-        if (nk_option_label(nkCtx, "Hard", option == 1)) option = 1;
+		nk_layout_row_dynamic(nkCtx, 30, 2);
+		static int option = 0;
+		if (nk_option_label(nkCtx, "Easy", option == 0)) option = 0;
+		if (nk_option_label(nkCtx, "Hard", option == 1)) option = 1;
 
-        nk_layout_row_dynamic(nkCtx, 25, 1);
-        static float value = 0.5f;
-        nk_slider_float(nkCtx, 0, &value, 1.0f, 0.1f);
-    }
-    nk_end(nkCtx);
+		nk_layout_row_dynamic(nkCtx, 25, 1);
+		static float value = 0.5f;
+		nk_slider_float(nkCtx, 0, &value, 1.0f, 0.1f);
+	}
+	nk_end(nkCtx);
 }
+
 void NuklearSDLRenderHook::presentFrame()
 {
-    nk_sdl_render(NK_ANTI_ALIASING_ON);
+	nk_sdl_render(NK_ANTI_ALIASING_ON);
 }
 
 void NuklearSDLRenderHook::close()
 {
-    if (nkCtx)
-    {
-        nk_sdl_shutdown();
-        nkCtx = nullptr;
-    }
+	if (nkCtx) {
+		nk_sdl_shutdown();
+		nkCtx = nullptr;
+	}
 }
-
