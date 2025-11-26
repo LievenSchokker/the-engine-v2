@@ -71,7 +71,7 @@ void SpelMotor::update()
         timer->tick();
 
         //TODO REPLACE THIS WITH EVENTMANAGER
-        //InputManager::getInstance()->update();
+        InputManager::getInstance()->update();
         while (timer->shouldFixedUpdate())
         {
             //TODO Physics->Update();
