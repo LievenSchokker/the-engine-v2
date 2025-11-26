@@ -13,6 +13,7 @@ add_executable(engine_tests
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
+        Component/GridComponentTest.cpp
         GameObject/tests_game_object.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
