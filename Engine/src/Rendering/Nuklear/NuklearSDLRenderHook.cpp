@@ -9,7 +9,8 @@
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
 
-
+//This is a nuklear specefic thing.
+//Need to expose some sort of thing that Nuklear can use to store its context.
 namespace
 {
     struct nk_context ctx;
@@ -20,10 +21,6 @@ NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window, SDL_Renderer* ren
     : inputManager(InputManager::getInstance()), sdlWindow(window), sdlRenderer(renderer), nkCtx(nullptr)
 {
 }
-
-
-
-
 
 void NuklearSDLRenderHook::initialize()
 {
@@ -113,6 +110,8 @@ void NuklearSDLRenderHook::beginFrame()
 
 void NuklearSDLRenderHook::render() const
 {
+    //Small example of Nuklear working
+    //TODO Make this an actual canvas that can add and remove UIObjects.
     if (nk_begin(nkCtx, "Test Window", nk_rect(50, 50, 230, 250),
         NK_WINDOW_NO_SCROLLBAR))
     {

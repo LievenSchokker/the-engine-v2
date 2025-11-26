@@ -16,7 +16,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(box2d)
 
 add_library(engine STATIC
-        src/nuklearImplemntation.cpp
+        third-party/nuklearImplemntation.cpp
         ${ENGINE_SOURCES})
 
 target_include_directories(engine PUBLIC

@@ -19,6 +19,7 @@
 
 #pragma once
 
+
 class IUIRenderHook;
 class string;
 struct WindowOptions;

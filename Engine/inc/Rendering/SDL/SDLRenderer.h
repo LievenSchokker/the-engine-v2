@@ -19,15 +19,15 @@
  * @see IRenderer, SdlContext
  */
 
+
 #pragma once
 
-#include <memory>
-
-#include "../../../inc/Rendering/IRenderer.h"
-
-#include <SDL.h>
 
 #include "Rendering/IUIRenderHook.h"
+#include "Rendering/IRenderer.h"
+
+#include <SDL.h>
+#include <memory>
 
 class SdlContext;
 
