@@ -71,12 +71,31 @@ void ComponentManager::removeComponent(Component* comp)
     if (!comp || !hasComponent(comp))
         return;
 
+    /// If its a behaviour, we also need to remove it from the behaviours vectors:
+    if (auto* behaviour = dynamic_cast<Behaviour*>(comp))
+    {
+        behaviour->setEnabled(false);
+
+        behaviours.erase(
+            std::remove(behaviours.begin(), behaviours.end(), behaviour),
+            behaviours.end()
+        );
+
+        enabledBehaviours.erase(
+            std::remove(enabledBehaviours.begin(), enabledBehaviours.end(), behaviour),
+            enabledBehaviours.end()
+
+        );
+    }
+
+    /// Remove the component from the components vector.
     auto it = std::find_if(components.begin(), components.end(),
                            [&](const std::unique_ptr<Component>& component)
                            { return component.get() == comp; });
 
     if (it != components.end())
     {
+        it->get()->onDestroy();
         components.erase(it);
     }
 }
