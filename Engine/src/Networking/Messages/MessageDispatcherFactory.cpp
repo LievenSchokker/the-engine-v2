@@ -9,7 +9,7 @@
 
 namespace spelmotor_networking
 {
-    std::unique_ptr<MessageDispatcher> MessageDispatcherFactory::createMessageDispatcher(ConnectionMode mode, const INetworkContext& context)
+    std::unique_ptr<MessageDispatcher> MessageDispatcherFactory::createMessageDispatcher(ConnectionMode mode, INetworkContext& context)
     {
         std::unique_ptr<MessageDispatcher> dispatcher = std::make_unique<MessageDispatcher>();
         dispatcher->registerMessageHandler(MessageTypes::ConnectionMessage,std::make_unique<ConnectionMessageHandler>(mode, context));

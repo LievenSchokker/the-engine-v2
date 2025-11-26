@@ -20,6 +20,9 @@ class ServerNetworkContext : public INetworkContext
         bool sendRPC() override;
         bool sendCommand() override;
 
+        ISceneStrategy& getSceneStrategy() override;
+
     private:
         const SceneManager* sceneManager = nullptr;
+        ISceneStrategy* sceneStrategy = nullptr;
 };

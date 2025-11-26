@@ -16,4 +16,8 @@ class ClientNetworkContext : public INetworkContext
          bool destroyGameObject(uint32_t netId) override;
          bool sendRPC() override;
          bool sendCommand() override;
+
+        ISceneStrategy& getSceneStrategy() override;
+    private:
+        ISceneStrategy* sceneStrategy = nullptr;
 };

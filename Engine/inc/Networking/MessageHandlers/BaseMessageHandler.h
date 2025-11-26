@@ -21,7 +21,7 @@ class BaseMessageHandler : public IMessageHandler
                   "[BaseMessageHandler]: TMessage must derive from IMessage.");
 
     public:
-        explicit BaseMessageHandler(ConnectionMode mode, const INetworkContext& networkContext_) : connectionMode(mode), networkContext(networkContext_) {}
+        explicit BaseMessageHandler(ConnectionMode mode, INetworkContext& networkContext_) : connectionMode(mode), networkContext(networkContext_) {}
         ~BaseMessageHandler() override = default;
 
         void handleMessage(const IMessage &message) override
@@ -51,5 +51,5 @@ class BaseMessageHandler : public IMessageHandler
         virtual void handleMessageServer(const TMessage &message) = 0; /// A
 
         ConnectionMode connectionMode; /// A
-        const INetworkContext& networkContext; /// B
+        INetworkContext& networkContext; /// B
 };

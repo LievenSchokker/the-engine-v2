@@ -17,6 +17,6 @@ namespace spelmotor_networking
     class MessageDispatcherFactory
     {
         public:
-            static std::unique_ptr<MessageDispatcher> createMessageDispatcher(ConnectionMode connectionMode, const INetworkContext& context);
+            static std::unique_ptr<MessageDispatcher> createMessageDispatcher(ConnectionMode connectionMode, INetworkContext& context);
     };
 } // spelmotor_networking

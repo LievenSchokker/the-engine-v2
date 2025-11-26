@@ -4,6 +4,7 @@
 #include "../../../inc/Networking/Context/ClientNetworkContext.h"
 
 #include "GameObject/Vector2.h"
+#include "Networking/Context/ServerNetworkContext.h"
 
 ClientNetworkContext::~ClientNetworkContext() = default;
 
@@ -28,4 +29,9 @@ bool ClientNetworkContext::sendRPC()
 bool ClientNetworkContext::sendCommand()
 {
     return false;
+}
+
+ISceneStrategy& ClientNetworkContext::getSceneStrategy()
+{
+    return *sceneStrategy;
 }

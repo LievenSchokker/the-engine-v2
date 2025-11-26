@@ -40,6 +40,11 @@ bool ServerNetworkContext::sendCommand()
 
 }
 
+ISceneStrategy& ServerNetworkContext::getSceneStrategy()
+{
+    return *sceneStrategy;
+}
+
 
 
 

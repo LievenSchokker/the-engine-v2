@@ -11,7 +11,7 @@
 class SpawnGameObjectMessageHandler : public BaseMessageHandler<spelmotor_networking::SpawnGameObjectMessage>
 {
     public:
-        SpawnGameObjectMessageHandler(ConnectionMode mode,const INetworkContext& networkContext) : BaseMessageHandler(mode, networkContext) {};
+        SpawnGameObjectMessageHandler(ConnectionMode mode,INetworkContext& networkContext) : BaseMessageHandler(mode, networkContext) {};
         ~SpawnGameObjectMessageHandler() override;
 
     protected:

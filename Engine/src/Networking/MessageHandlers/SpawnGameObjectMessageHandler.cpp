@@ -3,12 +3,15 @@
 //
 #include "../../../inc/Networking/MessageHandlers/SpawnGameObjectMessageHandler.h"
 
+#include "Networking/Context/Strategies/ISceneStrategy.h"
+
 SpawnGameObjectMessageHandler::~SpawnGameObjectMessageHandler() = default;
 
 
 void SpawnGameObjectMessageHandler::handleMessageContextBased(const spelmotor_networking::SpawnGameObjectMessage &message)
 {
 
+    networkContext.getSceneStrategy().spawnGameObject();
 }
 
 void SpawnGameObjectMessageHandler::handleMessageServer(const spelmotor_networking::SpawnGameObjectMessage &message)
