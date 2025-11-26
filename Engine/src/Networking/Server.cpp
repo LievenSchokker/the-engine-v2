@@ -13,6 +13,7 @@
 #include "Networking/TransportResult.h"
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Networking/MessageHandlers/IMessageHandler.h"
+#include "Networking/Messages/MessageDispatcher.h"
 
 
 #include <iostream>
@@ -28,10 +29,8 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
     {
         throw std::runtime_error("Port is not set");
     }
-    setupInformation = serverConnectionInformation;
 
-    networkContext = std::make_unique<ServerNetworkContext>();
-    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Host, *networkContext);
+    setupInformation = serverConnectionInformation;
 }
 
 Server::~Server()
@@ -229,4 +228,9 @@ void Server::kickClient(const int clientId)
         transport->disconnectFromSocket(clientId);
         connectedClients.erase(clientId);
     }
+}
+
+void Server::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+{
+    messageDispatcher = std::move(dispatcher);
 }

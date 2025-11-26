@@ -7,20 +7,7 @@
 
 ConnectionMessageHandler::~ConnectionMessageHandler() = default;
 
-
-void ConnectionMessageHandler::handleMessageContextBased(const ConnectionMessage &message)
-{
-
-}
-
-
-void ConnectionMessageHandler::handleMessageClient(const ConnectionMessage &msg)
-{
-
-}
-
-
-void ConnectionMessageHandler::handleMessageServer(const ConnectionMessage &msg)
+void ConnectionMessageHandler::handleMessageInternal(const ConnectionMessage &message)
 {
 
 }

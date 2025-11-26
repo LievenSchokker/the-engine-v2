@@ -3,26 +3,19 @@
 //
 
 #pragma once
-#include <cstdint>
 
-#include "INetworkContext.h"
-struct Vector2;
 class SceneManager;
+struct Vector2;
 
-class ServerNetworkContext : public INetworkContext
+
+#include "NetworkContext.h"
+
+
+
+
+class ServerNetworkContext : public NetworkContext
 {
     public:
-        ServerNetworkContext() = default;
+        explicit ServerNetworkContext(SceneManager& sceneManager) : NetworkContext(sceneManager) {}
         ~ServerNetworkContext() override;
-
-        bool spawnGameObject(uint32_t netId, Vector2 position) override;
-        bool destroyGameObject(uint32_t netId) override;
-        bool sendRPC() override;
-        bool sendCommand() override;
-
-        ISceneStrategy& getSceneStrategy() override;
-
-    private:
-        const SceneManager* sceneManager = nullptr;
-        ISceneStrategy* sceneStrategy = nullptr;
 };

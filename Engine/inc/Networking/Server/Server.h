@@ -13,6 +13,8 @@ class ConnectionMessage;
 struct ServerConnectionInformation;
 struct IncomingRawMessage;
 struct Connection;
+class MessageDispatcher;
+
 enum class ConnectionStatus : uint8_t;
 
 class Server
@@ -39,6 +41,8 @@ class Server
 
         bool broadcastMessage(const IMessage &message, int excludeClientId) const;
 
+        void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
+
     private:
         void onMessage(const IncomingRawMessage &message);
 
@@ -48,7 +52,7 @@ class Server
 
         std::unique_ptr<ITransport> transport;
         std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
-        std::unique_ptr<INetworkContext> networkContext;
+        std::unique_ptr<NetworkContext> networkContext;
         ServerConnectionInformation setupInformation;
         ServerStatus status;
         std::unordered_set<int> connectedClients;

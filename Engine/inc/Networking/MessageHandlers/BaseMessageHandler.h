@@ -4,7 +4,7 @@
 #pragma once
 #include "IMessageHandler.h"
 #include "Networking/Connection/ConnectionMode.h"
-#include "Networking/Context/INetworkContext.h"
+#include "Networking/Context/NetworkContext.h"
 #include <type_traits>
 /**
  * Abstract base class for all concrete MessageHandlers.
@@ -21,35 +21,21 @@ class BaseMessageHandler : public IMessageHandler
                   "[BaseMessageHandler]: TMessage must derive from IMessage.");
 
     public:
-        explicit BaseMessageHandler(ConnectionMode mode, INetworkContext& networkContext_) : connectionMode(mode), networkContext(networkContext_) {}
+        explicit BaseMessageHandler(NetworkContext& networkContext_) : networkContext(networkContext_) {}
         ~BaseMessageHandler() override = default;
 
         void handleMessage(const IMessage &message) override
         {
-            const TMessage *concreteMessage = dynamic_cast<const TMessage *>(&message);
-            if (concreteMessage != nullptr)
+            auto* concrete = dynamic_cast<const TMessage*>(&message);
+
+            if (concrete != nullptr)
             {
-                /// A)
-                switch (connectionMode)
-                {
-                    case ConnectionMode::Client:
-                        handleMessageClient(*concreteMessage);
-                    case ConnectionMode::Host:
-                        handleMessageServer(*concreteMessage);
-                    default:
-                        break;
-                }
-
-                /// B)
-
+                handleMessageInternal(*concrete);
             }
         }
 
     protected:
-        virtual void handleMessageContextBased(const TMessage& message) = 0; /// B
-        virtual void handleMessageClient(const TMessage &message) = 0; /// A
-        virtual void handleMessageServer(const TMessage &message) = 0; /// A
+        virtual void handleMessageInternal(const TMessage& message) = 0;
 
-        ConnectionMode connectionMode; /// A
-        INetworkContext& networkContext; /// B
+        NetworkContext& networkContext;
 };

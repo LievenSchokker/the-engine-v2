@@ -4,24 +4,15 @@
 #include "../../../inc/Networking/MessageHandlers/SpawnGameObjectMessageHandler.h"
 
 #include "Networking/Context/Strategies/ISceneStrategy.h"
+#include "Scene/SceneManager.h"
 
 SpawnGameObjectMessageHandler::~SpawnGameObjectMessageHandler() = default;
 
 
-void SpawnGameObjectMessageHandler::handleMessageContextBased(const spelmotor_networking::SpawnGameObjectMessage &message)
+void SpawnGameObjectMessageHandler::handleMessage(const IMessage &message)
 {
-
-    networkContext.getSceneStrategy().spawnGameObject();
+    /// Use networkContext.getSceneManager() here to add a new object.
 }
 
-void SpawnGameObjectMessageHandler::handleMessageServer(const spelmotor_networking::SpawnGameObjectMessage &message)
-{
-
-}
-
-void SpawnGameObjectMessageHandler::handleMessageClient(const spelmotor_networking::SpawnGameObjectMessage &message)
-{
-
-}
 
 

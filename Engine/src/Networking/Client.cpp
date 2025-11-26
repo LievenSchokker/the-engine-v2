@@ -34,7 +34,6 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
         onConnectionChanged(connection);
     });
 
-    networkContext = std::make_unique<ClientNetworkContext>();
     messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *networkContext);
 }
 
@@ -142,3 +141,9 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
     //     break;
     // }
 }
+
+void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+{
+    messageDispatcher = std::move(dispatcher);
+}
+

@@ -4,19 +4,15 @@
 
 #pragma once
 #include "BaseMessageHandler.h"
-#include "Networking/Context/INetworkContext.h"
+#include "Networking/Context/NetworkContext.h"
 #include "Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/Concretes/SpawnGameObjectMessage.h"
 
 class SpawnGameObjectMessageHandler : public BaseMessageHandler<spelmotor_networking::SpawnGameObjectMessage>
 {
     public:
-        SpawnGameObjectMessageHandler(ConnectionMode mode,INetworkContext& networkContext) : BaseMessageHandler(mode, networkContext) {};
+        explicit SpawnGameObjectMessageHandler(NetworkContext& networkContext) : BaseMessageHandler(networkContext) {};
         ~SpawnGameObjectMessageHandler() override;
 
-    protected:
-        void handleMessageContextBased(const spelmotor_networking::SpawnGameObjectMessage& message) override;
-        void handleMessageClient(const spelmotor_networking::SpawnGameObjectMessage &message) override;
-        void handleMessageServer(const spelmotor_networking::SpawnGameObjectMessage &message) override;
-
+        void handleMessage(const IMessage &message) override;
 };

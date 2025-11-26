@@ -4,20 +4,13 @@
 
 
 #pragma once
-#include "INetworkContext.h"
 
-class ClientNetworkContext : public INetworkContext
+
+#include "NetworkContext.h"
+
+class ClientNetworkContext : public NetworkContext
 {
     public:
-        ClientNetworkContext() = default;
+        explicit ClientNetworkContext(SceneManager& sceneManager) : NetworkContext(sceneManager) {}
         ~ClientNetworkContext() override;
-
-         bool spawnGameObject(uint32_t netId, Vector2 position) override;
-         bool destroyGameObject(uint32_t netId) override;
-         bool sendRPC() override;
-         bool sendCommand() override;
-
-        ISceneStrategy& getSceneStrategy() override;
-    private:
-        ISceneStrategy* sceneStrategy = nullptr;
 };
