@@ -167,7 +167,6 @@ TEST(SceneManagerTest, AddGameObjectToActiveScene)
 	SceneManager sceneManager;
 	auto scene1 = std::make_unique<Scene>("Scene1");
 	auto obj1 = std::make_unique<MockGameObject>("Object1");
-	auto* obj1Ptr = obj1.get();
 	scene1->addGameObject(std::move(obj1));
 	bool sceneAdded = sceneManager.addScene(std::move(scene1));
 	ASSERT_TRUE(sceneAdded);

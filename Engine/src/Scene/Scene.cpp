@@ -1,12 +1,16 @@
-#include "../../inc/Scene/Scene.h"
+#include "Scene/Scene.h"
 
-#include "../../inc/Component/ComponentManager.h"
-#include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Rendering/RenderQueue.h"
+#include "GameObject/GameObject.h"
+#include "Behaviour/Behaviour.h"
+#include "Component/ComponentManager.h"
+#include "Component/ShapeRenderer.h"
+#include "Rendering/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
 #include <utility>
+
+#include "Behaviour/Behaviour.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -26,9 +30,11 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
 	bool isGameObjectActive = gameObject->getIsActive();
 	gameObjects.emplace_back(std::move(gameObject));
-
-	if ( active && isGameObjectActive ) {
-		// TODO: call gameobject on start
+    gameObject->setScene(*this);
+	if (active)
+	{
+	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
+	    initialiseBehaviours(gameObject->getAllBehaviours());
 	}
 
 	return true;
@@ -40,8 +46,12 @@ bool Scene::removeGameObject(const std::string& name)
 		std::remove_if(gameObjects.begin(), gameObjects.end(),
 					   [&](const std::unique_ptr<GameObject>& gameObject) {
 						   if ( gameObject->getName() == name ) {
-							   if ( active && gameObject->getIsActive() ) {
+							   if ( active && gameObject->getIsActive() )
+							       {
 								   // TODO: call gameobject on stop
+							       /// GO does not have (and shouldn't have) an onStop, but we can destroy the object:
+							       gameObject->destroy();
+							       gameObject->onSceneDestroy();
 							   }
 							   return true;
 						   }
@@ -79,8 +89,11 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 	}
 
 	// Call onStop if scene is active
-	if ( active && it->get()->getIsActive() ) {
+	if ( active && it->get()->getIsActive())
+	{
 		// TODO: call gameobject on stop
+	    /// GO does not have (and shouldn't have) an onStop, but we can deactivate all behaviours:
+	    it->get()->setBehavioursEnabled(false);
 	}
 
 	// Move ownership and remove from vector
@@ -96,9 +109,24 @@ void Scene::onStart()
 	}
 
 	active = true;
-	for ( auto& gameObject : gameObjects ) {
-		// TODO: call gameobject on start
+
+    /// Store all behaviours in this scene object:
+    std::vector<Behaviour*> allBehaviours;
+
+    /// Retrieve every behaviour on every GameObject in this scene object.
+	for ( auto& gameObject : gameObjects )
+	{
+        for (auto& behaviour : gameObject->getAllBehaviours())
+        {
+            if (behaviour == nullptr)
+                continue;
+
+            allBehaviours.emplace_back(behaviour);
+        }
 	}
+
+    /// Initialise all the behaviours by calling their lifetime functions in the correct order.
+    initialiseBehaviours(allBehaviours);
 }
 
 void Scene::onStop()
@@ -108,8 +136,11 @@ void Scene::onStop()
 	}
 
 	active = false;
-	for ( auto& gameObject : gameObjects ) {
+	for ( auto& gameObject : gameObjects )
+	{
 		// TODO: call gameobject on stop
+	    /// GO does not have (and shouldn't have) an onStop, but we can deactivate all behaviours:
+        gameObject->setBehavioursEnabled(false);
 	}
 }
 
@@ -121,6 +152,8 @@ void Scene::onPause()
 
 	for ( auto& gameObject : gameObjects ) {
 		// TODO: call gameobject on pause
+	    /// GO does not have (and shouldn't have) an onPause, but we can deactivate all behaviours:
+	    gameObject->setBehavioursEnabled(false);
 	}
 }
 
@@ -132,16 +165,36 @@ void Scene::onResume()
 
 	for ( auto& gameObject : gameObjects ) {
 		// TODO: call gameobject on resume
+	    /// GO does not have (and shouldn't have) an onResume, but we can reactivate all behaviours:
+	    gameObject->setBehavioursEnabled(true);
+
 	}
 }
 
-void Scene::update(float deltaTime) const
+void Scene::update(float deltaTime)
 {
 	if ( !active ) {
 		return;
 	}
 
-	// TODO: call gameobject update
+    /// Update all GameObject's behaviours:
+    for ( auto& gameObject : gameObjects )
+    {
+        /// Only behaviours on active GameObjects should be updated.
+        if (!gameObject->getIsActive())
+            continue;
+
+        /// Iterate over all enabled behaviours.
+        for (const auto& behaviour : gameObject->getEnabledBehaviours())
+        {
+            /// Only update
+            if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
+                continue;
+            behaviour->update();
+        }
+    }
+
+    processDestroyQueue();
 }
 
 void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
@@ -163,4 +216,81 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 			}
 		}
 	}
+}
+
+void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
+{
+    /// First call awake on all behaviours:
+    for (auto& behaviour : behaviours)
+    {
+        if (behaviour == nullptr)
+            continue;
+
+        /// Awake may only be called once per behaviour
+        if (!behaviour->getHasAwakened())
+            behaviour->awake();
+    }
+
+    /// Then call onEnable on all enabled behaviours on active GameObjects:
+    for (auto& behaviour : behaviours)
+    {
+        if (behaviour == nullptr)
+            continue;
+
+        if (behaviour->getIsActiveAndEnabled())
+            behaviour->onEnable();
+    }
+
+    /// Lastly call start on all enabled behaviours on Active GameObjects:
+    for (auto& behaviour : behaviours)
+    {
+        if (behaviour == nullptr)
+            continue;
+
+        if (!behaviour->getIsActiveAndEnabled())
+            continue;
+
+        /// Start may only be called once per behaviour
+        if (!behaviour->getHasStarted())
+            behaviour->start();
+    }
+}
+
+void Scene::queueDestroy(GameObject *obj)
+{
+    /// Check if the object is already in the destroyQueue.
+    for (auto* queued : destroyQueue)
+    {
+        if (queued == obj)
+            return;
+    }
+
+    destroyQueue.push_back(obj);
+}
+
+
+void Scene::processDestroyQueue()
+{
+    for (GameObject* gameObject : destroyQueue)
+    {
+
+        gameObject->onSceneDestroy();
+
+        /// Remove the GameObject from the stored gameObjects,
+        /// Destroys the GameObject stored in the unqiue ptr automatically.
+        gameObjects.erase(
+            std::remove_if(
+                gameObjects.begin(),
+                gameObjects.end(),
+                [gameObject](const std::unique_ptr<GameObject>& ptr) {
+                    return ptr.get() == gameObject;
+                }
+            ),
+
+            gameObjects.end()
+        );
+    }
+
+    /// Clear the queue when all queued objects have been deleted.
+    destroyQueue.clear();
 }

@@ -19,7 +19,7 @@ GameObject::GameObject()
     isDestroyed = false;
 
     /// TODO: Remove this line:
-    scenePlaceholder = nullptr;
+    scene = nullptr;
 }
 
 
@@ -48,20 +48,18 @@ void GameObject::removeComponent(Component *comp)
 }
 
 
-std::vector<Behaviour *> GameObject::getActiveBehaviours() const
+const std::vector<Behaviour*>& GameObject::getAllBehaviours() const
 {
-    std::vector<Behaviour *> activeBehaviours;
-    for (Behaviour *behaviour: componentManager->getAllBehaviours())
-    {
-        if (behaviour == nullptr)
-            continue;
-        if (behaviour->getIsEnabled())
-            activeBehaviours.push_back(behaviour);
-    }
-    return activeBehaviours;
+    return componentManager->getAllBehaviours();
 }
 
-ComponentManager *GameObject::getComponentManager() const
+
+const std::vector<Behaviour*>& GameObject::getEnabledBehaviours() const
+{
+    return componentManager->getEnabledBehaviours();
+}
+
+ComponentManager* GameObject::getComponentManager() const
 {
     return componentManager.get();
 }
@@ -76,8 +74,8 @@ void GameObject::destroy()
     setActive(false);
 
     /// TEMP if statement, remove when scene is implemented!
-    if (scenePlaceholder != nullptr)
-        scenePlaceholder->queueDestroy(this);
+    if (scene != nullptr)
+        scene->queueDestroy(this);
 }
 
 
@@ -171,7 +169,20 @@ void GameObject::setIsStatic(bool value)
 }
 
 
-void GameObject::setScene(ScenePlaceholder *newScene)
+void GameObject::setScene(Scene& newScene)
 {
-    scenePlaceholder = newScene;
+    scene = &newScene;
+}
+
+
+void GameObject::setBehavioursEnabled(const bool value) const
+{
+    if (value)
+    {
+        componentManager->enableAllBehaviours();
+    }
+    else
+    {
+        componentManager->disableAllBehaviours();
+    }
 }

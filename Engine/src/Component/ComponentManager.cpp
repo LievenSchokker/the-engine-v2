@@ -20,7 +20,21 @@ const std::vector<Behaviour*>& ComponentManager::getAllBehaviours() const
 }
 
 
-void ComponentManager::enableAllBehaviours()
+const std::vector<Behaviour*>& ComponentManager::getEnabledBehaviours()
+{
+    enabledBehaviours.clear();
+
+    for (Behaviour *behaviour: behaviours)
+    {
+        if (behaviour != nullptr && behaviour->getIsEnabled())
+            enabledBehaviours.push_back(behaviour);
+    }
+
+    return enabledBehaviours;
+}
+
+
+void ComponentManager::enableAllBehaviours() const
 {
     for (auto& behaviour : behaviours)
     {
@@ -29,7 +43,7 @@ void ComponentManager::enableAllBehaviours()
 }
 
 
-void ComponentManager::disableAllBehaviours()
+void ComponentManager::disableAllBehaviours() const
 {
     for (auto& behaviour : behaviours)
     {
@@ -38,7 +52,7 @@ void ComponentManager::disableAllBehaviours()
 }
 
 
-bool ComponentManager::hasComponent(Component* comp) const
+bool ComponentManager::hasComponent(const Component* comp) const
 {
     if (comp == nullptr)
         return false;
