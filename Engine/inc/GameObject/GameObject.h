@@ -131,12 +131,13 @@ class GameObject
         */
         bool compareTag(const std::string& other);
 
+        const std::vector<Behaviour*>& getAllBehaviours() const;
 
         /**
         * @brief Returns all active Behaviour components attached to this GameObject.
         * @return Vector of pointers to active Behaviour components
         */
-        std::vector<Behaviour*> getActiveBehaviours() const;
+        const std::vector<Behaviour*>& getEnabledBehaviours() const;
 
 
         /**

@@ -146,7 +146,7 @@ void Scene::update(float deltaTime) const
     /// Update all GameObject's behaviours:
     for ( auto& gameObject : gameObjects )
     {
-        for (const auto& behaviour : gameObject->getActiveBehaviours())
+        for (const auto& behaviour : gameObject->getEnabledBehaviours())
         {
             behaviour->update();
         }

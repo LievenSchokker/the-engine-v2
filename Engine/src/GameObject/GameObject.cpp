@@ -48,20 +48,18 @@ void GameObject::removeComponent(Component *comp)
 }
 
 
-std::vector<Behaviour *> GameObject::getActiveBehaviours() const
+const std::vector<Behaviour*>& GameObject::getAllBehaviours() const
 {
-    std::vector<Behaviour *> activeBehaviours;
-    for (Behaviour *behaviour: componentManager->getAllBehaviours())
-    {
-        if (behaviour == nullptr)
-            continue;
-        if (behaviour->getIsEnabled())
-            activeBehaviours.push_back(behaviour);
-    }
-    return activeBehaviours;
+    return componentManager->getAllBehaviours();
 }
 
-ComponentManager *GameObject::getComponentManager() const
+
+const std::vector<Behaviour*>& GameObject::getEnabledBehaviours() const
+{
+    return componentManager->getEnabledBehaviours();
+}
+
+ComponentManager* GameObject::getComponentManager() const
 {
     return componentManager.get();
 }
