@@ -41,6 +41,11 @@ struct FakeRenderer: public IRenderer {
 	{
 	}
 
+	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override
+	{
+
+	}
+
 	void drawCircle(const Vector2& center, double radius, const Color& color,
 					const Vector2& scale) override
 	{

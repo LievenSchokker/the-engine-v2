@@ -19,6 +19,8 @@
 
 #pragma once
 
+
+class IUIRenderHook;
 class string;
 struct WindowOptions;
 
@@ -26,6 +28,7 @@ struct WindowOptions;
 #include "Color.h"
 
 #include <string>
+#include <memory>
 
 class IRenderer
 {
@@ -102,4 +105,6 @@ class IRenderer
 	virtual void drawRectangle(const Vector2& center, const Vector2& size,
 							   double rotationDegrees, const Color& color,
 							   const Vector2& scale) = 0;
+
+    virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
 };
