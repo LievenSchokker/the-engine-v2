@@ -11,6 +11,8 @@
 #include <iostream>
 #include <ostream>
 
+#include "Input/SDLInputAdapter.h"
+
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
       specifications(applicationSpecifications),
@@ -69,19 +71,9 @@ void SpelMotor::update()
         timer->tick();
 
         //TODO REPLACE THIS WITH EVENTMANAGER
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                shutdown();
-            }
-            nk_sdl_handle_event(&event);
-        }
-
+        //InputManager::getInstance()->update();
         while (timer->shouldFixedUpdate())
         {
-            InputManager::getInstance()->update();
             //TODO Physics->Update();
 
             timer->consumeFixedUpdate();

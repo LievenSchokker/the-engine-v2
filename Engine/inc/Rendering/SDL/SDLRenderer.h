@@ -21,9 +21,13 @@
 
 #pragma once
 
+#include <memory>
+
 #include "../../../inc/Rendering/IRenderer.h"
 
 #include <SDL.h>
+
+#include "Rendering/IUIRenderHook.h"
 
 class SdlContext;
 
@@ -92,7 +96,6 @@ class SDLRenderer: public IRenderer
 	 * Safe to call multiple times.
 	 */
 	void close() override;
-	static void handleEvent(SDL_Event* event);
 
 	/**
 	 * @brief Updates window title at runtime for dynamic feedback
@@ -124,14 +127,20 @@ class SDLRenderer: public IRenderer
 					   double rotationDegrees, const Color& color,
 					   const Vector2& scale) override;
 
-   private:
-	bool ensureSolidQuadTexture();
-	void destroySolidQuadTexture();
+    void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
-	SDL_Window* window =
+    IUIRenderHook* getUIRenderHook() override;
+
+   private:
+    std::unique_ptr<IUIRenderHook> userInterfaceHook;
+
+    bool ensureSolidQuadTexture();
+	void destroySolidQuadTexture();
+    SDL_Window* window =
 		nullptr;  ///< Null indicates closed state; must outlive renderer
 	SDL_Renderer* renderer =
 		nullptr;  ///< Must be destroyed before window; null-checked for safety
 	SDL_Texture* solidQuadTexture =
 		nullptr;  ///< Texture for solid quad rendering
+
 };

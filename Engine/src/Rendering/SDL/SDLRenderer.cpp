@@ -1,38 +1,27 @@
-#define NK_INCLUDE_FIXED_TYPES
-#define NK_INCLUDE_STANDARD_IO
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
-#define NK_INCLUDE_FONT_BAKING
-#define NK_INCLUDE_DEFAULT_FONT
-#include "nuklear.h"
-#include "nuklear_sdl_renderer.h"
+#include "Rendering/SDL/SDLRenderer.h"
+#include "External/SdlContext.h"
+#include "GameObject/Vector2Utils.h"
+#include "Rendering/Window/WindowOptions.h"
+#include "Rendering/IUIRenderHook.h"
 
-#include "../../../inc/Rendering/SDL/SDLRenderer.h"
-
-#include "../../../inc/External/SdlContext.h"
-#include "../../../inc/GameObject/Vector2Utils.h"
-#include "../../../inc/Rendering/Window/WindowOptions.h"
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <iostream>
-#include <math.h>
+
+#include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 
 
 namespace
 {
 constexpr double kRotationThresholdDegrees = 0.01;
 constexpr int kMinWindowDimension = 1;
+}
 
-// Nuklear context
-struct nk_context* nkCtx = nullptr;
-}  // namespace
-
-// ... keep the constructor and destructor as-is ...
 
 SDLRenderer::SDLRenderer(SdlContext& context)
+    : userInterfaceHook(nullptr)
 {
     assert(context.wasInit(SDL_INIT_VIDEO) &&
            "SDL video subsystem not initialized");
@@ -40,13 +29,11 @@ SDLRenderer::SDLRenderer(SdlContext& context)
 
 SDLRenderer::~SDLRenderer()
 {
-    close();
+    SDLRenderer::close();
 }
 
 void SDLRenderer::open(const WindowOptions& options)
 {
-    // ... keep all your existing window/renderer creation code ...
-
     if ( options.width < kMinWindowDimension ||
          options.height < kMinWindowDimension ) {
         std::cerr << "Invalid window dimensions: " << options.width << "x"
@@ -85,28 +72,19 @@ void SDLRenderer::open(const WindowOptions& options)
     }
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
-    // Initialize Nuklear
-    nkCtx = nk_sdl_init(window, renderer);
-    if (nkCtx) {
-        struct nk_font_atlas* atlas;
-        nk_sdl_font_stash_begin(&atlas);
-        nk_sdl_font_stash_end();
-        std::cout << "Nuklear initialized successfully!" << std::endl;
-        nkCtx->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.header.normal = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.header.hover = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nkCtx->style.window.header.active = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+    SDLRenderer::setUIRenderHook(std::make_unique<NuklearSDLRenderHook>(window, renderer));
+    if (userInterfaceHook != nullptr)
+    {
+        userInterfaceHook->initialize();
     }
 	SDL_RenderClear(renderer);
 }
 
 void SDLRenderer::close()
 {
-    // Shutdown Nuklear
-    if (nkCtx) {
-        nk_sdl_shutdown();
-        nkCtx = nullptr;
+    if (userInterfaceHook != nullptr)
+    {
+        userInterfaceHook->close();
     }
 
     destroySolidQuadTexture();
@@ -122,55 +100,34 @@ void SDLRenderer::close()
     }
 }
 
-void SDLRenderer::handleEvent(SDL_Event* event)
-{
-	nk_sdl_handle_event(event);
-}
-
 void SDLRenderer::beginFrame(const Color& clearColor)
 {
     if ( renderer == nullptr ) {
         return;
     }
-	SDL_RenderClear(renderer);
-
-    nk_input_begin(nkCtx);
 
     SDL_SetRenderDrawColor(renderer, clearColor.r, clearColor.g, clearColor.b,
-                           clearColor.a);
+                       clearColor.a);
+
+    SDL_RenderClear(renderer);
+
+    if (userInterfaceHook != nullptr)
+    {
+        userInterfaceHook->beginFrame();
+    }
 }
 
 void SDLRenderer::presentFrame()
 {
+    beginFrame(Color::black());
     if ( renderer == nullptr ) {
         return;
     }
 
-    // End Nuklear input
-    nk_input_end(nkCtx);
-
-    // Test Nuklear window
-    if (nk_begin(nkCtx, "Test Window", nk_rect(50, 50, 230, 250),
-     NK_WINDOW_NO_SCROLLBAR))  {
-
-        nk_layout_row_static(nkCtx, 30, 80, 1);
-        if (nk_button_label(nkCtx, "Button")) {
-            std::cout << "Button pressed!" << std::endl;
-        }
-
-        nk_layout_row_dynamic(nkCtx, 30, 2);
-        static int option = 0;
-        if (nk_option_label(nkCtx, "Easy", option == 0)) option = 0;
-        if (nk_option_label(nkCtx, "Hard", option == 1)) option = 1;
-
-        nk_layout_row_dynamic(nkCtx, 25, 1);
-        static float value = 0.5f;
-        nk_slider_float(nkCtx, 0, &value, 1.0f, 0.1f);
+    if (userInterfaceHook != nullptr)
+    {
+        userInterfaceHook->presentFrame();
     }
-    nk_end(nkCtx);
-
-    // Render Nuklear
-    nk_sdl_render(NK_ANTI_ALIASING_ON);
 
     SDL_RenderPresent(renderer);
 	SDL_RenderClear(renderer);
@@ -297,4 +254,12 @@ void SDLRenderer::destroySolidQuadTexture()
 		SDL_DestroyTexture(solidQuadTexture);
 		solidQuadTexture = nullptr;
 	}
+}
+
+void SDLRenderer::setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) {
+    userInterfaceHook = std::move(hook);
+}
+
+IUIRenderHook* SDLRenderer::getUIRenderHook() {
+    return userInterfaceHook.get();
 }

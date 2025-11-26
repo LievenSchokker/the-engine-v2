@@ -5,6 +5,7 @@
 
 
 #include "ApplicationSpecifications.h"
+#include "Input/SDLInputAdapter.h"
 
 
 class ApplicationClock;
