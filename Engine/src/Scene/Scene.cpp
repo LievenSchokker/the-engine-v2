@@ -8,6 +8,8 @@
 #include <iostream>
 #include <utility>
 
+#include "Behaviour/Behaviour.h"
+
 Scene::Scene(std::string name) : name(std::move(name))
 {
 }
@@ -141,7 +143,14 @@ void Scene::update(float deltaTime) const
 		return;
 	}
 
-	// TODO: call gameobject update
+    /// Update all GameObject's behaviours:
+    for ( auto& gameObject : gameObjects )
+    {
+        for (const auto& behaviour : gameObject->getActiveBehaviours())
+        {
+            behaviour->update();
+        }
+    }
 }
 
 void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
