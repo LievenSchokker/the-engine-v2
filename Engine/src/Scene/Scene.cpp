@@ -29,9 +29,11 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 	}
 
 	bool isGameObjectActive = gameObject->getIsActive();
-	gameObjects.emplace_back(std::move(gameObject));
+
     gameObject->setScene(*this);
-	if (active)
+	gameObjects.emplace_back(std::move(gameObject));
+
+    if (active)
 	{
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
 	    initialiseBehaviours(gameObject->getAllBehaviours());
