@@ -93,6 +93,7 @@ void SDLRenderer::open(const WindowOptions& options)
         nk_sdl_font_stash_end();
         std::cout << "Nuklear initialized successfully!" << std::endl;
     }
+	SDL_RenderClear(renderer);
 }
 
 void SDLRenderer::close()
@@ -126,13 +127,13 @@ void SDLRenderer::beginFrame(const Color& clearColor)
     if ( renderer == nullptr ) {
         return;
     }
+	SDL_RenderClear(renderer);
 
     // Start Nuklear input
     nk_input_begin(nkCtx);
 
     SDL_SetRenderDrawColor(renderer, clearColor.r, clearColor.g, clearColor.b,
                            clearColor.a);
-    SDL_RenderClear(renderer);
 }
 
 void SDLRenderer::presentFrame()
@@ -169,6 +170,7 @@ void SDLRenderer::presentFrame()
     nk_sdl_render(NK_ANTI_ALIASING_ON);
 
     SDL_RenderPresent(renderer);
+	SDL_RenderClear(renderer);
 }
 
 void SDLRenderer::setTitle(const std::string& title)
