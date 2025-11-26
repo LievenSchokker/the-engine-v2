@@ -43,7 +43,6 @@ void SpelMotor::run()
 	//TODO Physics -> Start()
 	//TODO SceneManager -> Start()
 	renderer->open(specifications.windowOptions);
-	InputManager::getInstance();
 	update();
 }
 
@@ -78,5 +77,9 @@ void SpelMotor::update()
 		//TODO Network->Update()
 		//TODO Audio->Update();
 		renderer->presentFrame();
+
+		if (InputManager::getInstance()->quitRequested()) {
+			shutdown();
+		}
 	}
 }
