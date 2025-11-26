@@ -19,6 +19,8 @@
  */
 class ActionMessage {
 public:
+
+    //Need default construction for deserialization.
     ActionMessage() = default;
 
     /**
