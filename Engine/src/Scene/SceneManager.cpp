@@ -6,20 +6,19 @@
 
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
-	if ( scene == nullptr ) {
-		std::cerr << "[SceneManager] Error: Attempted to add a null scene\n";
-		return false;
-	}
+    if ( scene == nullptr ) {
+        return false;
+    }
 
-	const std::string name = scene->getName();
-	if ( scenes.contains(name) ) {
-		std::cerr << "[SceneManager] Error: Scene with name '" << name
-				  << "' already exists\n";
-		return false;
-	}
+    const std::string name = scene->getName();
+    if ( scenes.contains(name) ) {
 
-	scenes.emplace(name, std::move(scene));
-	return true;
+        return false;
+    }
+    scene->setWorld(gameWorld);
+
+    scenes.emplace(name, std::move(scene));
+    return true;
 }
 
 bool SceneManager::removeScene(const std::string& name)

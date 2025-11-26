@@ -118,7 +118,6 @@ void SDLRenderer::beginFrame(const Color& clearColor)
 
 void SDLRenderer::presentFrame()
 {
-	beginFrame(Color::black());
 	if (renderer == nullptr) {
 		return;
 	}
@@ -229,14 +228,12 @@ bool SDLRenderer::ensureSolidQuadTexture()
 	solidQuadTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
 	                                     SDL_TEXTUREACCESS_STATIC, 1, 1);
 	if (solidQuadTexture == nullptr) {
-		std::cerr << "SDL_CreateTexture Error: " << SDL_GetError() << "\n";
 		return false;
 	}
 
 	const Uint32 pixel = 0xFFFFFFFF;
 	if (SDL_UpdateTexture(solidQuadTexture, nullptr, &pixel, sizeof(pixel)) !=
 	    0) {
-		std::cerr << "SDL_UpdateTexture Error: " << SDL_GetError() << "\n";
 		SDL_DestroyTexture(solidQuadTexture);
 		solidQuadTexture = nullptr;
 		return false;
@@ -252,6 +249,29 @@ void SDLRenderer::destroySolidQuadTexture()
 		SDL_DestroyTexture(solidQuadTexture);
 		solidQuadTexture = nullptr;
 	}
+}
+
+void SDLRenderer::render(const RenderQueue& queue)
+{
+    beginFrame(queue.clearColor);
+
+    for (const auto& cmd : queue.shapes)
+    {
+        switch (cmd.type)
+        {
+        case ShapeRenderType::Circle:
+            drawCircle(cmd.position, cmd.radius, cmd.color, cmd.scale);
+            break;
+        case ShapeRenderType::Rectangle:
+            drawRectangle(cmd.position, cmd.size, cmd.rotationDegrees,
+                          cmd.color, cmd.scale);
+            break;
+        default:
+            break;
+        }
+    }
+
+    presentFrame();
 }
 
 void SDLRenderer::setUIRenderHook(std::unique_ptr<IUIRenderHook> hook)

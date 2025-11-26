@@ -4,6 +4,7 @@
 
 #pragma once
 
+class GameWorld;
 class Transform;
 class GameObject;
 
@@ -89,6 +90,8 @@ class Component
         * @return Pointer to the associated GameObject's Transform.
         */
         const Transform* getTransform() const;
+
+        GameWorld* getWorld() const;
 
     protected:
         /// The @c GameObject this component is attached to, a component is always attached to a GameObject

@@ -1,22 +1,23 @@
-//
-// Created by samle on 25/11/2025.
-//
-
-
 #pragma once
 
-#include "Networking/Messages/MessageDispatcher.h"
-#include "Networking/Connection/ConnectionMode.h"
-#include "Networking/Context/NetworkContext.h"
-class IMessage;
-class IMessageHandler;
+#include <memory>
 
+class GameWorld;
+class NetworkSpawnManager;
 
 namespace spelmotor_networking
 {
+    class MessageDispatcher;
+
     class MessageDispatcherFactory
     {
-        public:
-            static std::unique_ptr<MessageDispatcher> createMessageDispatcher(ConnectionMode connectionMode, NetworkContext& context);
+    public:
+        static std::unique_ptr<MessageDispatcher> createServerDispatcher(
+            GameWorld& world,
+            NetworkSpawnManager& spawnManager);
+
+        static std::unique_ptr<MessageDispatcher> createClientDispatcher(
+            GameWorld& world,
+            NetworkSpawnManager& spawnManager);
     };
-} // spelmotor_networking
+}

@@ -5,6 +5,7 @@ class Behaviour;
 #include <memory>
 #include <string>
 #include <vector>
+#include "Core/GameWorld.h"
 
 struct ShapeRenderCommand;
 
@@ -128,9 +129,21 @@ class Scene
 
         void processDestroyQueue() ;
 
+    /**
+    * @brief Sets the GameWorld reference for this scene.
+    * Called by SceneManager when scene is added.
+    */
+    void setWorld(GameWorld* world);
+
+    /**
+     * @brief Gets the GameWorld for accessing engine systems.
+     */
+    GameWorld* getWorld() const { return gameWorld; }
+
    private:
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
         std::vector<GameObject*> destroyQueue;
 	bool active = false;
+    GameWorld* gameWorld = nullptr;
 };

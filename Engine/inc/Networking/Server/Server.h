@@ -6,6 +6,7 @@
 #include "ServerInformation.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
+#include "Networking/NetworkSpawnManager.h"
 #include "Networking/Context/NetworkContext.h"
 #include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/Server/ServerStatus.h"
@@ -122,6 +123,12 @@ public:
      */
     bool broadcastMessage(const IMessage& message, int excludeClientId) const;
 
+    using ClientConnectedCallback = std::function<void(int clientId)>;
+    using ClientDisconnectedCallback = std::function<void(int clientId)>;
+
+    void setClientConnectedCallback(ClientConnectedCallback callback);
+    void setClientDisconnectedCallback(ClientDisconnectedCallback callback)
+
 private:
     /**
      * @brief Deserializes and routes incoming messages
@@ -167,5 +174,11 @@ private:
     std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
 
     std::unique_ptr<NetworkContext> networkContext;
+
+    NetworkSpawnManager* spawnManage;
+
+    ClientConnectedCallback onClientConnected;
+    ClientDisconnectedCallback onClientDisconnected;
+
 };
 

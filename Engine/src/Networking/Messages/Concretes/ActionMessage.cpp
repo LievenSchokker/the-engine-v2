@@ -90,3 +90,8 @@ void ActionMessage::setTick(uint32_t t)
 {
     tick = t;
 }
+
+MessageTypes ActionMessage::getMessageType() const
+{
+    return MessageTypes::ActionMessage;
+}

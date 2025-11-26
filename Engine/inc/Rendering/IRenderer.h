@@ -18,6 +18,7 @@
  */
 
 #pragma once
+#include "RenderQueue.h"
 
 
 class IUIRenderHook;
@@ -107,4 +108,6 @@ class IRenderer
 							   const Vector2& scale) = 0;
 
     virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
+
+    virtual void render(const RenderQueue& queue) = 0;
 };

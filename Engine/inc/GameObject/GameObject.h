@@ -259,6 +259,7 @@ class GameObject
          */
         bool getIsDestroyed() const;
 
+        Scene* getScene() const { return scene; }
     private:
         std::unique_ptr<ComponentManager> componentManager;
         std::unique_ptr<Transform> transform;

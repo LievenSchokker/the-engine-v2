@@ -131,6 +131,7 @@ class SDLRenderer: public IRenderer
 
     void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
+    void render(const RenderQueue& queue) override;
    private:
     std::unique_ptr<IUIRenderHook> userInterfaceHook;
 

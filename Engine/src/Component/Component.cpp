@@ -5,7 +5,7 @@
 #include "Component/Component.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
-
+#include "Scene/Scene.h"
 
 Component::~Component()
 {
@@ -30,4 +30,18 @@ GameObject* Component::getGameObject() const
 const Transform* Component::getTransform() const
 {
     return transform;
+}
+
+
+GameWorld* Component::getWorld() const
+{
+    if (gameObject)
+    {
+        Scene* scene = gameObject->getScene();
+        if (scene)
+        {
+            return scene->getWorld();
+        }
+    }
+    return nullptr;
 }

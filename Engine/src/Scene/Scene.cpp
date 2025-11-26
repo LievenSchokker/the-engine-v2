@@ -106,6 +106,7 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 
 void Scene::onStart()
 {
+    std::cout << "Scene::onStart called for " << name << std::endl;
 	if ( active ) {
 		return;
 	}
@@ -201,39 +202,34 @@ void Scene::update(float deltaTime)
 
 void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 {
-	if ( !active ) {
-		return;
-	}
+    if (!active) return;
+    for (const auto& gameObject : gameObjects)
+    {
+        if (!gameObject->getIsActive()) continue;
 
-	for ( const auto& gameObject : gameObjects ) {
-		if ( !gameObject->getIsActive() ) {
-			continue;
-		}
-
-		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
-		if ( shapeRenderer != nullptr ) {
-			const auto command = shapeRenderer->buildRenderCommand();
-			if ( command.has_value() ) {
-				out.emplace_back(*command);
-			}
-		}
-	}
+        auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
+        if (shapeRenderer)
+        {
+            auto cmd = shapeRenderer->buildRenderCommand();
+            if (cmd.has_value())
+            {
+                out.push_back(cmd.value());
+            }
+        }
+    }
 }
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
 {
-    /// First call awake on all behaviours:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
             continue;
 
-        /// Awake may only be called once per behaviour
         if (!behaviour->getHasAwakened())
             behaviour->awake();
     }
 
-    /// Then call onEnable on all enabled behaviours on active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
@@ -243,7 +239,6 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
             behaviour->onEnable();
     }
 
-    /// Lastly call start on all enabled behaviours on Active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
@@ -252,7 +247,6 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
         if (!behaviour->getIsActiveAndEnabled())
             continue;
 
-        /// Start may only be called once per behaviour
         if (!behaviour->getHasStarted())
             behaviour->start();
     }
@@ -260,7 +254,6 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
 
 void Scene::queueDestroy(GameObject *obj)
 {
-    /// Check if the object is already in the destroyQueue.
     for (auto* queued : destroyQueue)
     {
         if (queued == obj)
@@ -278,8 +271,7 @@ void Scene::processDestroyQueue()
 
         gameObject->onSceneDestroy();
 
-        /// Remove the GameObject from the stored gameObjects,
-        /// Destroys the GameObject stored in the unqiue ptr automatically.
+
         gameObjects.erase(
             std::remove_if(
                 gameObjects.begin(),
@@ -293,6 +285,10 @@ void Scene::processDestroyQueue()
         );
     }
 
-    /// Clear the queue when all queued objects have been deleted.
     destroyQueue.clear();
+}
+
+void Scene::setWorld(GameWorld* world)
+{
+    gameWorld = world;
 }

@@ -142,7 +142,10 @@ class SceneManager
 	 */
 	Color getClearColor() const;
 
+    void setWorld(GameWorld* world) { gameWorld = world; }
+
    private:
+    GameWorld* gameWorld = nullptr;
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;

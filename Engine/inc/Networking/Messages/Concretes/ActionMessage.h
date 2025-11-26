@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstdint>
 
+#include "Networking/Messages/IMessage.h"
 #include "Networking/Serialization/Serialization.h"
 
 /**
@@ -17,7 +18,7 @@
  *
  *
  */
-class ActionMessage {
+class ActionMessage : public IMessage {
 public:
 
     //Need default construction for deserialization.
@@ -39,7 +40,7 @@ public:
      *
      * Used by messageWriter to serialize into RawMessageFormat
      */
-    std::vector<std::byte> serialize() const;
+    std::vector<std::byte> serialize() const override;
 
     /**
      * @brief Reconstructs the message from received network data.
@@ -50,13 +51,13 @@ public:
      * gracefully without exception overhead in the hot path.
      *
      */
-    bool deserialize(const std::byte* data, size_t length);
+    bool deserialize(const std::byte* data, size_t length) override;
 
     /**
      * @brief Checks whether this message represents a coherent, executable action.
      *
      */
-    bool validate() const;
+    bool validate() const override;
 
     /**
      * @brief Identifies which component on the target object should handle this action.
@@ -82,6 +83,8 @@ public:
      */
     uint32_t getTick() const;
 
+
+    MessageTypes getMessageType() const override;
     /// @name Mutators
     /// @{
     /**
