@@ -20,6 +20,7 @@ add_executable(engine_tests
         Physics/PhysicsSystemTest.cpp
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp
+        Networking/Messages/ActionMessageTest.cpp
         Networking/ServerTest.cpp
 )
 

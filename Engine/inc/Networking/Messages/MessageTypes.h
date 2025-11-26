@@ -7,6 +7,7 @@
 enum class MessageTypes : uint8_t
 {
     ConnectionMessage = 0,
+	ActionMessage = 0,
     ClientStatusChangesMessage = 1,
     CommandMessage = 2,
     RpcMessage = 3,

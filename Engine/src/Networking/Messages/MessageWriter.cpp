@@ -1,6 +1,3 @@
-#pragma once
-
-
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/Concretes/ConnectionMessage.h"
