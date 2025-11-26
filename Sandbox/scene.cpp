@@ -28,7 +28,7 @@ int main()
 		return 1;
 	}
 
-	SceneManager sceneManager;
+
 	sceneManager.setClearColor(Color::black());
 
 	auto prototypeScene = std::make_unique<Scene>("PrototypeScene");

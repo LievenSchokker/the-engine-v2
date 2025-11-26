@@ -2,9 +2,12 @@
 
 
 #include <memory>
+#include <thread>
 
 
 #include "ApplicationSpecifications.h"
+#include "Networking/Client.h"
+#include "Networking/Server/Server.h"
 #include "Physics/IPhysicsWorld.h"
 
 
@@ -37,8 +40,12 @@ public:
 	 *
 	 */
 	void run();
+    void runClient();
 
-	/**
+    void runServer();
+    void startNetworkThread();
+    void stopNetworkThread();
+    /**
 	 * @brief Immediately shuts down all engine systems.
 	 *
 	 * Performs cleanup of all subsystems in the reverse order of their initialization
@@ -73,4 +80,10 @@ private:
 
 	/** @brief The world where physics are simulated */
 	std::unique_ptr<IPhysicsWorld> physicsWorld;
+
+    std::unique_ptr<Server> server;
+    std::unique_ptr<Client> client;
+    std::thread networkThread;
+
+    std::atomic<bool> networkRunning{false};
 };

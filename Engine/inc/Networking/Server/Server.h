@@ -83,6 +83,7 @@ public:
      *          from treating kick as network error.
      */
     void kickClient(int clientId);
+
     void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
 
     /**
@@ -162,10 +163,9 @@ private:
 
     /// @brief Fast lookup set for validating message sources and broadcast targets
     std::unordered_set<int> connectedClients;
+
+    std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
+
+    std::unique_ptr<NetworkContext> networkContext;
 };
-        void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
-        void handleConnectionMessage(int clientId, ConnectionMessage *message);
-        std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
-        std::unique_ptr<NetworkContext> networkContext;
-        void onConnectionChanged(const Connection &connection);
 
