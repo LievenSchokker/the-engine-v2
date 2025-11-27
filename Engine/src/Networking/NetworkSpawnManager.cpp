@@ -27,14 +27,16 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
                                              int ownerId)
 {
 	auto gameObject = NetworkPrefabRegistry::instance().create(assetId);
-	if (!gameObject) {
+	if (!gameObject)
+	{
 		return nullptr;
 	}
 
 	gameObject->getTransform()->setPosition(position);
 
 	auto* identity = gameObject->getComponent<NetworkIdentity>();
-	if (!identity) {
+	if (!identity)
+	{
 		identity = gameObject->addComponent<NetworkIdentity>();
 	}
 
@@ -42,7 +44,8 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 	identity->networkId = networkId;
 	identity->ownerId = ownerId;
 
-	if (identityRegistry && identity) {
+	if (identityRegistry && identity)
+	{
 		identityRegistry->registerIdentity(identity);
 	}
 
@@ -50,7 +53,8 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 	spawnedObjects[networkId] = rawPtr;
 	objectAssets[networkId] = assetId;
 
-	if (ownerId >= 0) {
+	if (ownerId >= 0)
+	{
 		clientOwnedObjects[ownerId].push_back(networkId);
 	}
 
@@ -58,7 +62,8 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 
 	identity->onNetworkSpawn();
 
-	if (server) {
+	if (server)
+	{
 		SpawnMessage msg = createSpawnMessage(identity, assetId);
 		bool sent = server->broadcastMessage(msg);
 	}
@@ -83,18 +88,21 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 	GameObject* object = it->second;
 
 	auto* identity = object->getComponent<NetworkIdentity>();
-	if (identity) {
+	if (identity)
+		{
 		identity->onNetworkDespawn();
 
 		int ownerId = identity->getOwnerId();
-		if (ownerId >= 0) {
+		if (ownerId >= 0)
+		{
 			auto& owned = clientOwnedObjects[ownerId];
 			owned.erase(std::remove(owned.begin(), owned.end(), netId),
 			            owned.end());
 		}
 	}
 
-	if (server) {
+	if (server)
+	{
 		ObjectDestroyMessage msg;
 		msg.netId = netId;
 		server->broadcastMessage(msg);
