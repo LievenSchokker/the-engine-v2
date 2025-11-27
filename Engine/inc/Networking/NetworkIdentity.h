@@ -28,7 +28,7 @@ public:
      *
      * Maps to ActionMessage::networkGameObjectIdentity for routing.
      */
-    uint32_t getNetId() const { return netId; }
+    uint32_t getNetId() const { return networkId; }
 
     /**
      * @brief Client ID of the owner, or -1 for server-owned objects.
@@ -71,7 +71,7 @@ public:
     void dispatchAction(uint32_t componentId, const std::string& action, const std::byte* payload, size_t payloadSize);
 
 private:
-    uint32_t netId = 0;
+    uint32_t networkId = 0;
     int ownerId = -1;
 
     /// Indexed by componentNetworkId for O(1) dispatch

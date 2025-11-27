@@ -20,7 +20,6 @@ namespace spelmotor_networking
     {
         auto dispatcher = std::make_unique<MessageDispatcher>();
 
-        // Server receives ActionMessages (commands) from clients
         dispatcher->registerMessageHandler(
             MessageTypes::ActionMessage,
             std::make_unique<ActionMessageHandler>(context, registry));
@@ -36,22 +35,22 @@ namespace spelmotor_networking
     {
         auto dispatcher = std::make_unique<MessageDispatcher>();
 
-        // Client needs to receive their ID first
+    	//Welcome Message
         dispatcher->registerMessageHandler(
             MessageTypes::WelcomeMessage,
             std::make_unique<WelcomeMessageHandler>(world));
 
-        // Client receives spawn messages
+    	//Spawn Message
         dispatcher->registerMessageHandler(
             MessageTypes::SpawnMessage,
             std::make_unique<SpawnMessageHandler>(spawnManager));
 
-        // Client receives destroy messages
+        //Object Destroy Message
         dispatcher->registerMessageHandler(
             MessageTypes::ObjectDestroyMessage,
             std::make_unique<ObjectDestroyMessageHandler>(spawnManager));
 
-        // Client receives RPCs from server
+        //Action Messag
         dispatcher->registerMessageHandler(
             MessageTypes::ActionMessage,
             std::make_unique<ActionMessageHandler>(context, registry));

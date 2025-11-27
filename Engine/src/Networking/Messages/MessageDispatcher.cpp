@@ -38,4 +38,4 @@ namespace spelmotor_networking
         auto it = messageHandlers.find(type);
         return it != messageHandlers.end() ? it->second.get() : nullptr;
     }
-} // spelmotor_networking
+}

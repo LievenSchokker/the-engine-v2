@@ -70,7 +70,7 @@ private:
 
     Server* server;
     Scene* scene;
-    uint32_t nextNetId = 1;
+    uint32_t nextNetworkId = 1;
 
     // netId -> GameObject mapping
     std::unordered_map<uint32_t, GameObject*> spawnedObjects;
