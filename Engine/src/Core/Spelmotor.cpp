@@ -38,7 +38,6 @@ SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
 
         client = std::make_unique<Client>(std::make_unique<TransportGNS>());
 
-        // Set AFTER creating objects
         gameWorld.renderer = renderer.get();
         gameWorld.client = client.get();
     }
@@ -54,11 +53,9 @@ SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
         serverInfo.port = netOpts.port;
         server = std::make_unique<Server>(serverInfo, std::make_unique<TransportGNS>());
 
-        // Set AFTER creating server
         gameWorld.server = server.get();
     }
 
-    // Common initialization - after all objects exist
     gameWorld.sceneManager = sceneManager.get();
     gameWorld.physics = physicsWorld.get();
     gameWorld.input = InputManager::getInstance();
@@ -135,7 +132,6 @@ void SpelMotor::initializeNetworking()
         return;
     }
 
-    // Create identity registry
     identityRegistry = std::make_unique<NetworkIdentityRegistry>();
 
     if (server)
@@ -160,7 +156,7 @@ void SpelMotor::initializeNetworking()
         auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createServerDispatcher(
             gameWorld,
             *spawnManager,
-            server->getNetworkContext(),  // Get context from server
+            server->getNetworkContext(),
             *identityRegistry);
         server->injectMessageDispatcher(std::move(dispatcher));
     }
@@ -172,7 +168,7 @@ void SpelMotor::initializeNetworking()
         auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createClientDispatcher(
             gameWorld,
             *spawnManager,
-            client->getNetworkContext(),  // Get context from client
+            client->getNetworkContext(),  
             *identityRegistry);
         client->injectMessageDispatcher(std::move(dispatcher));
     }
