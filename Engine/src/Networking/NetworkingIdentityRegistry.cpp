@@ -1,4 +1,7 @@
 #include "Networking/NetworkingIdentityRegistry.h"
+
+#include <iostream>
+
 #include "Networking/NetworkIdentity.h"
 #include "Scene/Scene.h"
 
@@ -21,20 +24,24 @@ void NetworkIdentityRegistry::registerIdentity(NetworkIdentity* identity)
 {
     if (!identity)
     {
+        std::cerr << "[Registry] registerIdentity called with null\n";
         return;
     }
 
     uint32_t netId = identity->getNetId();
+    std::cout << "[Registry] Registering identity netId=" << netId << std::endl;
 
-    // Prevent duplicate registration
-    if (identitiesByNetId.find(netId) != identitiesByNetId.end())
+    if (netId == 0)
     {
-        // Already registered - could log warning here
+        std::cerr << "[Registry] WARNING: Registering identity with netId=0!\n";
+        // Print stack trace or add breakpoint here
         return;
     }
 
     identitiesByNetId[netId] = identity;
     addToOwnerIndex(identity);
+
+    std::cout << "[Registry] SUCCESS: Now contains " << identitiesByNetId.size() << " identities\n";
 }
 
 void NetworkIdentityRegistry::unregisterIdentity(NetworkIdentity* identity)
@@ -56,11 +63,23 @@ void NetworkIdentityRegistry::unregisterIdentity(NetworkIdentity* identity)
 
 NetworkIdentity* NetworkIdentityRegistry::findByNetId(uint32_t netId) const
 {
+    std::cout << "[Registry] Looking for netId=" << netId
+              << ", registry has " << identitiesByNetId.size() << " entries\n";
+
     auto it = identitiesByNetId.find(netId);
     if (it != identitiesByNetId.end())
     {
+        std::cout << "[Registry] Found!\n";
         return it->second;
     }
+
+    std::cout << "[Registry] Not found. Registered netIds: ";
+    for (const auto& [id, ptr] : identitiesByNetId)
+    {
+        std::cout << id << " ";
+    }
+    std::cout << "\n";
+
     return nullptr;
 }
 

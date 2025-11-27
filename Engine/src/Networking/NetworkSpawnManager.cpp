@@ -46,17 +46,19 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
     }
 
     std::cout << "NetworkIdentity ready" << std::endl;
+
+    // Assign netId FIRST
     uint32_t netId = generateNetId();
     identity->netId = netId;
     identity->ownerId = ownerId;
 
-    // Register AFTER setting netId
+    std::cout << "Assigned netId=" << netId << std::endl;
+
+    // Register AFTER netId is set
     if (identityRegistry && identity)
     {
         identityRegistry->registerIdentity(identity);
     }
-
-    std::cout << "Assigned netId=" << netId << std::endl;
 
     GameObject* rawPtr = gameObject.get();
     spawnedObjects[netId] = rawPtr;
@@ -83,10 +85,6 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
         std::cout << "SpawnMessage created, sending..." << std::endl;
         bool sent = server->broadcastMessage(msg);
         std::cout << "Broadcast result: " << (sent ? "success" : "failed") << std::endl;
-    }
-    else
-    {
-        std::cout << "No server pointer, skipping broadcast" << std::endl;
     }
 
     std::cout << "Spawned object netId=" << netId
