@@ -4,7 +4,16 @@
 
 bool NetworkIdentity::hasAuthority() const
 {
-    return ownerId == -1;
+    auto* world = getWorld();
+    if (!world) return false;
+
+    if (world->isServer())
+    {
+        return true;  // Server has authority over everything
+    }
+
+    // Client has authority only over objects they own
+    return ownerId == world->localClientId;
 }
 
 void NetworkIdentity::onNetworkSpawn()
@@ -37,17 +46,21 @@ void NetworkIdentity::onNetworkDespawn()
     networkBehaviours.clear();
 }
 
-void NetworkIdentity::dispatchAction(uint32_t componentId, const std::string& action)
+void NetworkIdentity::dispatchAction(uint32_t componentId, const std::string& action,
+                                      const std::byte* payload, size_t payloadSize)
 {
     if (componentId >= networkBehaviours.size())
     {
+        std::cerr << "[NetworkIdentity] Invalid componentId=" << componentId << "\n";
         return;
     }
 
     NetworkBehaviour* behaviour = networkBehaviours[componentId];
     if (behaviour)
     {
-        // ActionMessage doesn't carry payload, so pass nullptr/0
-        behaviour->executeAction(action, nullptr, 0);
+        behaviour->executeAction(action, payload, payloadSize);
     }
 }
+
+
+

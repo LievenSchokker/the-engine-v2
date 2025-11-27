@@ -63,10 +63,12 @@ public:
      *
      * @param componentId The component index from ActionMessage
      * @param action The action key
+     * @param payload
+     * @param payloadSize
      * @param payload Serialized arguments
      * @param length Payload size
      */
-    void dispatchAction(uint32_t componentId, const std::string& action);
+    void dispatchAction(uint32_t componentId, const std::string& action, const std::byte* payload, size_t payloadSize);
 
 private:
     uint32_t netId = 0;

@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <unordered_set>
+#include <functional>
 
 #include "ServerInformation.h"
 #include "Networking/SendMode.h"
@@ -127,9 +128,8 @@ public:
     using ClientDisconnectedCallback = std::function<void(int clientId)>;
 
     void setClientConnectedCallback(ClientConnectedCallback callback);
-    void setClientDisconnectedCallback(ClientDisconnectedCallback callback)
+    void setClientDisconnectedCallback(ClientDisconnectedCallback callback);
 
-private:
     /**
      * @brief Deserializes and routes incoming messages
      *
@@ -158,7 +158,8 @@ private:
      *          or kicks, enabling appropriate cleanup logic for each scenario.
      */
     void handleConnectionMessage(int clientId, ConnectionMessage* message);
-
+    NetworkContext& getNetworkContext() { return *networkContext; }
+private:
     /// @brief Abstracted transport layer for testing and multi-backend support
     std::unique_ptr<ITransport> transport;
 

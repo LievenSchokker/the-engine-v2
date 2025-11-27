@@ -18,7 +18,7 @@ template<typename TMessage>
 class BaseMessageHandler : public IMessageHandler
 {
     static_assert(std::is_base_of<IMessage, TMessage>::value,
-                  "[BaseMessageHandler]: TMessage must derive from IMessage.");
+                  "TMessage must derive from IMessage.");
 
     public:
         explicit BaseMessageHandler(NetworkContext& networkContext_) : networkContext(networkContext_) {}

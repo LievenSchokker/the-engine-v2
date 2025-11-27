@@ -24,6 +24,12 @@ std::vector<std::byte> ActionMessage::serialize() const
     archive.process(networkGameObjectIdentity);
     archive.process(actionKey);
     archive.process(tick);
+    uint32_t payloadSize = static_cast<uint32_t>(payload.size());
+    archive.process(payloadSize);
+
+    auto bytes = archive.getBytes();
+    bytes.insert(bytes.end(), payload.begin(), payload.end());
+
     return archive.getBytes();
 }
 
@@ -38,12 +44,42 @@ bool ActionMessage::deserialize(const std::byte* data, const size_t length)
         archive.process(networkGameObjectIdentity);
         archive.process(actionKey);
         archive.process(tick);
+
+        uint32_t payloadSize;
+        archive.process(payloadSize);
+
+        // Read remaining bytes as payload
+        payload.clear();
+        if (payloadSize > 0)
+        {
+            size_t bytesRead = archive.getBytesRead();
+            if (bytesRead + payloadSize <= length)
+            {
+                payload.assign(data + bytesRead, data + bytesRead + payloadSize);
+            }
+        }
+
         return validate();
     }
     catch (...)
     {
         return false;
     }
+}
+
+const std::byte* ActionMessage::getPayloadData() const
+{
+    return payload.empty() ? nullptr : payload.data();
+}
+
+size_t ActionMessage::getPayloadSize() const
+{
+    return payload.size();
+}
+
+void ActionMessage::setPayload(std::vector<std::byte> data)
+{
+    payload = std::move(data);
 }
 
 bool ActionMessage::validate() const

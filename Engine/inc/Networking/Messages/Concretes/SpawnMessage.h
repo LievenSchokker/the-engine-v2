@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "GameObject/Vector2.h"
+
 /**
  * @brief Message sent when a networked object is spawned.
  *

@@ -175,11 +175,6 @@ private:
     friend class NetworkSpawnManager;
     friend class NetworkIdentity;
 };
-
-// ============================================================================
-// Template Implementations
-// ============================================================================
-
 template<typename... Args>
 void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
 {
@@ -188,20 +183,28 @@ void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
         return;
     }
 
-    // Serialize arguments
-    WriteArchive archive;
-    // Fold expression to serialize all args
-    (archive.process(args), ...);
+    auto* world = getWorld();
+    if (!world)
+    {
+        return;
+    }
 
-    // Create ActionMessage targeting this component on the server
     ActionMessage message(
         componentNetworkId,
         identity->getNetId(),
         name,
-        10 // Assumes access to simulation tick
+        0
     );
 
-    //sendToServer(message);
+    // Only serialize if we have args
+    if constexpr (sizeof...(args) > 0)
+    {
+        CerealWriteArchive archive;
+        (archive.process(args), ...);
+        message.setPayload(archive.getBytes());
+    }
+
+    world->sendToServer(message);
 }
 
 template<typename... Args>
@@ -212,18 +215,27 @@ void NetworkBehaviour::callRpc(const std::string& name, Args&&... args)
         return;
     }
 
-    WriteArchive archive;
-    (archive.process(args), ...);
+    auto* world = getWorld();
+    if (!world)
+    {
+        return;
+    }
 
     ActionMessage message(
         componentNetworkId,
         identity->getNetId(),
         name,
-        60
+        0
     );
 
-    // Broadcast to all clients
-    //broadcastToClients(message);
+    if constexpr (sizeof...(args) > 0)
+    {
+        CerealWriteArchive archive;
+        (archive.process(args), ...);
+        message.setPayload(archive.getBytes());
+    }
+
+    world->broadcastToClients(message);
 }
 
 template<typename... Args>
@@ -234,15 +246,25 @@ void NetworkBehaviour::callTargetRpc(const std::string& name, int targetClientId
         return;
     }
 
-    WriteArchive archive;
-    (archive.process(args), ...);
+    auto* world = getWorld();
+    if (!world)
+    {
+        return;
+    }
 
     ActionMessage message(
         componentNetworkId,
         identity->getNetId(),
         name,
-        60
+        0
     );
 
-    //sendToClient(targetClientId, message);
+    if constexpr (sizeof...(args) > 0)
+    {
+        CerealWriteArchive archive;
+        (archive.process(args), ...);
+        message.setPayload(archive.getBytes());
+    }
+
+    world->sendToClient(targetClientId, message);
 }

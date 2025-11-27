@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <unordered_map>
 #include <memory>
+
+#include "NetworkingIdentityRegistry.h"
 #include "GameObject/Vector2.h"
 
 class GameObject;
@@ -20,8 +22,7 @@ struct SpawnMessage;
 class NetworkSpawnManager
 {
 public:
-    explicit NetworkSpawnManager(Server* server, Scene* scene);
-
+    explicit NetworkSpawnManager(Server* server, Scene* scene, NetworkIdentityRegistry* registry);
     /**
      * @brief Spawns a networked object (server-side).
      *
@@ -61,6 +62,7 @@ public:
      * @brief Client-side: handles incoming SpawnMessage.
      */
     void handleSpawnMessage(const SpawnMessage& message);
+    GameObject* getObjectByNetId(uint32_t netId) const;
 
 private:
     uint32_t generateNetId();
@@ -78,4 +80,6 @@ private:
 
     // clientId -> list of owned netIds
     std::unordered_map<int, std::vector<uint32_t>> clientOwnedObjects;
+
+    NetworkIdentityRegistry* identityRegistry;
 };

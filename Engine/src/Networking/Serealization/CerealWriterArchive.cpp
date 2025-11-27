@@ -9,7 +9,13 @@ CerealWriteArchive::~CerealWriteArchive() = default;
 
 std::vector<std::byte> CerealWriteArchive::getBytes() const
 {
-    auto data = stream.str();
-    return {reinterpret_cast<const std::byte*>(data.data()),
-          reinterpret_cast<const std::byte*>(data.data() + data.size())};
+    std::string data = stream.str();
+
+    std::vector<std::byte> result;
+    result.reserve(data.size());
+    for (char c : data)
+    {
+        result.push_back(static_cast<std::byte>(c));
+    }
+    return result;
 }

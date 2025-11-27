@@ -1,34 +1,38 @@
 #include "Networking/MessageHandlers/ActionMessageHandler.h"
 #include "Networking/NetworkingIdentityRegistry.h"
 #include "Networking/NetworkIdentity.h"
-#include "Networking/Messages/Concretes/ActionMessage.h"
+#include "GameObject/GameObject.h"
+#include <iostream>
 
-ActionMessageHandler::ActionMessageHandler(NetworkContext& context,
-                                           NetworkIdentityRegistry& registry)
-    : BaseMessageHandler(context)
+ActionMessageHandler::ActionMessageHandler(NetworkContext& context, NetworkIdentityRegistry& registry)
+    : BaseMessageHandler<ActionMessage>(context)
     , identityRegistry(registry)
 {
 }
 
 void ActionMessageHandler::handleMessageInternal(const ActionMessage& message)
 {
-    // Validate message
     if (!message.validate())
     {
+        std::cerr << "[ActionMessageHandler] Invalid message\n";
         return;
     }
 
-    // Find the target NetworkIdentity
-    NetworkIdentity* identity = identityRegistry.findByNetId(message.getGameObjectIdentity());
+    uint32_t netId = message.getGameObjectIdentity();
+
+    // Find the NetworkIdentity by netId
+    NetworkIdentity* identity = identityRegistry.findByNetId(netId);
     if (!identity)
     {
-        // Object doesn't exist locally (may have been destroyed)
+        std::cerr << "[ActionMessageHandler] No object with netId=" << netId << "\n";
         return;
     }
 
-
+    // Dispatch to the correct NetworkBehaviour
     identity->dispatchAction(
         message.getComponentIdentity(),
-        message.getAction()
+        message.getAction(),
+        message.getPayloadData(),
+        message.getPayloadSize()
     );
 }

@@ -1,15 +1,12 @@
 #pragma once
-
 #include "IMessageHandler.h"
 
-class NetworkSpawnManager;
 
-class SpawnMessageHandler : public IMessageHandler
+class ObjectDestroyMessageHandler : public IMessageHandler
 {
 public:
-    explicit SpawnMessageHandler(NetworkSpawnManager& spawnManager);
+    ObjectDestroyMessageHandler(NetworkSpawnManager& spawnManager);
     void handleMessage(const IMessage& message) override;
-
 private:
     NetworkSpawnManager& spawnManager;
 };

@@ -4,7 +4,7 @@
 #include "Networking/MessageHandlers/SpawnMessageHandler.h"
 #include "Networking/MessageHandlers/ObjectDestroyMessageHandler.h"
 #include "Networking/MessageHandlers/ActionMessageHandler.h"
-#include "Networking/MessageHandlers/ConnectionMessageHandler.h"
+#include "Networking/MessageHandlers/WelcomeMessageHandler.h"
 #include "Networking/NetworkSpawnManager.h"
 #include "Networking/NetworkingIdentityRegistry.h"
 #include "Core/GameWorld.h"
@@ -14,25 +14,32 @@ namespace spelmotor_networking
 
     std::unique_ptr<MessageDispatcher> MessageDispatcherFactory::createServerDispatcher(
         GameWorld& world,
-        NetworkSpawnManager& spawnManager)
+        NetworkSpawnManager& spawnManager,
+        NetworkContext& context,
+        NetworkIdentityRegistry& registry)
     {
         auto dispatcher = std::make_unique<MessageDispatcher>();
 
-        // Server receives actions from clients
-        // Note: You'll need a NetworkIdentityRegistry - for now we can skip ActionMessageHandler
-        // or create a simple one
-
-        // Server doesn't receive spawn messages (it sends them)
-        // But it might receive connection messages
+        // Server receives ActionMessages (commands) from clients
+        dispatcher->registerMessageHandler(
+            MessageTypes::ActionMessage,
+            std::make_unique<ActionMessageHandler>(context, registry));
 
         return dispatcher;
     }
 
     std::unique_ptr<MessageDispatcher> MessageDispatcherFactory::createClientDispatcher(
         GameWorld& world,
-        NetworkSpawnManager& spawnManager)
+        NetworkSpawnManager& spawnManager,
+        NetworkContext& context,
+        NetworkIdentityRegistry& registry)
     {
         auto dispatcher = std::make_unique<MessageDispatcher>();
+
+        // Client needs to receive their ID first
+        dispatcher->registerMessageHandler(
+            MessageTypes::WelcomeMessage,
+            std::make_unique<WelcomeMessageHandler>(world));
 
         // Client receives spawn messages
         dispatcher->registerMessageHandler(
@@ -43,6 +50,11 @@ namespace spelmotor_networking
         dispatcher->registerMessageHandler(
             MessageTypes::ObjectDestroyMessage,
             std::make_unique<ObjectDestroyMessageHandler>(spawnManager));
+
+        // Client receives RPCs from server
+        dispatcher->registerMessageHandler(
+            MessageTypes::ActionMessage,
+            std::make_unique<ActionMessageHandler>(context, registry));
 
         return dispatcher;
     }

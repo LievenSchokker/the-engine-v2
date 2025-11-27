@@ -20,7 +20,6 @@ namespace SpelMotorEntry
     {
         auto& registry = NetworkPrefabRegistry::instance();
 
-        // Asset ID 1 = Player
         registry.registerPrefab(1, []() {
             auto player = std::make_unique<GameObject>();
             player->setName("NetworkPlayer");
@@ -33,8 +32,8 @@ namespace SpelMotorEntry
 
             return player;
         });
-    }
 
+    }
     inline std::unique_ptr<Scene> createWalkingScene()
     {
         auto scene = std::make_unique<Scene>("WalkingDemo");

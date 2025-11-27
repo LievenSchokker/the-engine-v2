@@ -23,23 +23,25 @@ const std::string& Scene::getName() const
 
 bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
-	if ( gameObject == nullptr ) {
-		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-		return false;
-	}
-
-	bool isGameObjectActive = gameObject->getIsActive();
+    if (gameObject == nullptr) {
+        std::cerr << "Error: Attempted to add a null game object\n";
+        return false;
+    }
 
     gameObject->setScene(*this);
-	gameObjects.emplace_back(std::move(gameObject));
+
+    // Get raw pointer BEFORE moving
+    GameObject* rawPtr = gameObject.get();
+
+    gameObjects.emplace_back(std::move(gameObject));
 
     if (active)
-	{
-	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
-	    initialiseBehaviours(gameObject->getAllBehaviours());
-	}
+    {
+        // Use rawPtr instead of the moved-from gameObject
+        initialiseBehaviours(rawPtr->getAllBehaviours());
+    }
 
-	return true;
+    return true;
 }
 
 bool Scene::removeGameObject(const std::string& name)

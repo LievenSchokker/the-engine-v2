@@ -10,4 +10,5 @@ enum class MessageTypes : uint8_t
     ActionMessage = 1,
     SpawnMessage = 2,
     ObjectDestroyMessage = 3,
+    WelcomeMessage = 4
 };

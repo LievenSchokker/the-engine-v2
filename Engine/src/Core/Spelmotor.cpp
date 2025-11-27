@@ -14,6 +14,7 @@
 
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Scene/SceneManager.h"
+#include "Networking/Messages/Concretes/WelcomeMessage.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
     : specifications(applicationSpecifications)
@@ -74,6 +75,8 @@ void SpelMotor::run()
 {
     timer->start();
     physicsWorld->start();
+
+    initializeNetworking();
     if (specifications.networkingOptions.mode == EngineMode::CLIENT)
     {
         runClient();
@@ -129,43 +132,48 @@ void SpelMotor::initializeNetworking()
     Scene* activeScene = sceneManager->getActiveScene();
     if (!activeScene)
     {
-        std::cerr << "[SpelMotor] No active scene for networking" << std::endl;
         return;
     }
 
+    // Create identity registry
+    identityRegistry = std::make_unique<NetworkIdentityRegistry>();
+
     if (server)
     {
-        spawnManager = std::make_unique<NetworkSpawnManager>(server.get(), activeScene);
+        spawnManager = std::make_unique<NetworkSpawnManager>(server.get(), activeScene, identityRegistry.get());
         gameWorld.spawnManager = spawnManager.get();
 
-        // Set up connection callbacks
         server->setClientConnectedCallback([this](int clientId) {
-            std::cout << "[SpelMotor] Spawning player for client " << clientId << std::endl;
 
-            // Sync existing objects to new client
+            WelcomeMessage welcome(clientId);
+            server->sendMessage(clientId, welcome);
+
             spawnManager->syncExistingObjects(clientId);
-
-            // Spawn player at offset position
             Vector2 spawnPos{350.0f + (clientId * 60.0f), 350.0f};
             spawnManager->spawnPlayer(clientId, spawnPos);
         });
 
         server->setClientDisconnectedCallback([this](int clientId) {
-            std::cout << "[SpelMotor] Removing objects for client " << clientId << std::endl;
             spawnManager->despawnClientObjects(clientId);
         });
 
         auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createServerDispatcher(
-            gameWorld, *spawnManager);
+            gameWorld,
+            *spawnManager,
+            server->getNetworkContext(),  // Get context from server
+            *identityRegistry);
         server->injectMessageDispatcher(std::move(dispatcher));
     }
     else if (client)
     {
-        spawnManager = std::make_unique<NetworkSpawnManager>(nullptr, activeScene);
+        spawnManager = std::make_unique<NetworkSpawnManager>(server.get(), activeScene, identityRegistry.get());
         gameWorld.spawnManager = spawnManager.get();
 
         auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createClientDispatcher(
-            gameWorld, *spawnManager);
+            gameWorld,
+            *spawnManager,
+            client->getNetworkContext(),  // Get context from client
+            *identityRegistry);
         client->injectMessageDispatcher(std::move(dispatcher));
     }
 }
@@ -246,10 +254,6 @@ void SpelMotor::shutdown()
     physicsWorld->shutdown();
 }
 
-void SpelMotor::setSceneManager(SceneManager sceneManager)
-{
-    this->sceneManager = std::make_unique<SceneManager>(std::move(sceneManager));
-}
 
 SceneManager* SpelMotor::getSceneManager()
 {

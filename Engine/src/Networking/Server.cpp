@@ -1,246 +1,79 @@
-#include "Core/SpelMotor.h"
-#include "Core/ApplicationClock.h"
-#include "Core/ApplicationSpecifications.h"
-#include "External/SdlContext.h"
-#include "Input/InputManager.h"
-#include "Physics/Box2D/Box2DPhysicsWorld.h"
-#include "Rendering/SDL/SDLRenderer.h"
 #include "Networking/Server/Server.h"
-#include "Networking/Client.h"
-#include "Networking/TransportGNS.h"
-#include "Networking/NetworkSpawnManager.h"
-#include "Networking/Messages/MessageDispatcherFactory.h"
-#include "Scene/SceneManager.h"
+#include "Networking/ITransport.h"
+#include "Networking/Connection/Connection.h"
+#include "Networking/Connection/ConnectionStatus.h"
+#include "Networking/Messages/IMessage.h"
+#include "Networking/Messages/MessageReader.h"
+#include "Networking/Messages/MessageWriter.h"
+#include "Networking/Messages/Concretes/ConnectionMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
+#include "Networking/Messages/OutgoingRawMessage.h"
+#include "Networking/Messages/MessageTypes.h"
+#include "Networking/SendMode.h"
+#include "Networking/TransportResult.h"
 
 #include <iostream>
-#include <chrono>
 
-SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
-    : specifications(applicationSpecifications)
-    , tickRate(applicationSpecifications.networkingOptions.tickRate)
-    , physicsWorld(std::make_unique<Box2DPhysicsWorld>(tickRate))
-    , sceneManager(std::make_unique<SceneManager>())
+Server::Server(const ServerConnectionInformation& serverConnectionInformation,
+               std::unique_ptr<ITransport> injectedTransport)
+    : transport(std::move(injectedTransport))
+    , status(ServerStatus::Stopping)
 {
-    const auto& netOpts = specifications.networkingOptions;
-
-    if (netOpts.mode == EngineMode::CLIENT)
+    if (serverConnectionInformation.port == 0)
     {
-        if (specifications.renderBackend == RenderBackend::SDL)
-        {
-            SdlContext context = SdlContext();
-            timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
-            {
-                return SDL_GetTicks() / 1000.0;
-            });
-            renderer = std::make_unique<SDLRenderer>(context);
-        }
-
-        client = std::make_unique<Client>(std::make_unique<TransportGNS>());
-
-        gameWorld.renderer = renderer.get();
-        gameWorld.client = client.get();
+        throw std::runtime_error("Port is not set");
     }
-    else
-    {
-        timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
-        {
-            using namespace std::chrono;
-            return duration<double>(steady_clock::now().time_since_epoch()).count();
-        });
-
-        ServerConnectionInformation serverInfo;
-        serverInfo.port = netOpts.port;
-        server = std::make_unique<Server>(serverInfo, std::make_unique<TransportGNS>());
-
-        gameWorld.server = server.get();
-    }
-
-    gameWorld.sceneManager = sceneManager.get();
-    gameWorld.physics = physicsWorld.get();
-    gameWorld.input = InputManager::getInstance();
-
-    sceneManager->setWorld(&gameWorld);
+    setupInformation = serverConnectionInformation;
 }
 
-SpelMotor::~SpelMotor()
+Server::~Server()
 {
-    shutdown();
+    stop();
 }
 
-void SpelMotor::initializeNetworking()
+ServerStatus Server::start()
 {
-    // Get active scene for spawn manager
-    Scene* activeScene = sceneManager->getActiveScene();
-    if (!activeScene)
+    transport->setOnMessageReceived([this](const IncomingRawMessage& message)
     {
-        std::cerr << "[SpelMotor] No active scene for networking" << std::endl;
-        return;
-    }
-
-    if (server)
-    {
-        // Server: create spawn manager
-        spawnManager = std::make_unique<NetworkSpawnManager>(server.get(), activeScene);
-        gameWorld.spawnManager = spawnManager.get();
-
-        // Create and inject message dispatcher
-        auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createServerDispatcher(
-            gameWorld, *spawnManager);
-        server->injectMessageDispatcher(std::move(dispatcher));
-    }
-    else if (client)
-    {
-        // Client: create spawn manager (no server pointer)
-        spawnManager = std::make_unique<NetworkSpawnManager>(nullptr, activeScene);
-        gameWorld.spawnManager = spawnManager.get();
-
-        // Create and inject message dispatcher
-        auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createClientDispatcher(
-            gameWorld, *spawnManager);
-        client->injectMessageDispatcher(std::move(dispatcher));
-    }
-}
-
-void SpelMotor::run()
-{
-    timer->start();
-    physicsWorld->start();
-
-    // Initialize networking after scene is set
-    initializeNetworking();
-
-    if (specifications.networkingOptions.mode == EngineMode::CLIENT)
-    {
-        runClient();
-    }
-    else
-    {
-        runServer();
-    }
-}
-
-void SpelMotor::runClient()
-{
-    renderer->open(specifications.windowOptions);
-
-    ServerConnectionInformation serverInfo;
-    serverInfo.ip = specifications.networkingOptions.serverIP;
-    serverInfo.port = specifications.networkingOptions.port;
-
-    if (!client->connectToServer(serverInfo))
-    {
-        std::cerr << "Failed to connect to server" << std::endl;
-        return;
-    }
-
-    startNetworkThread();
-    RenderQueue renderQueue;
-    running = true;
-
-    while (running)
-    {
-        timer->tick();
-        InputManager::getInstance()->update();
-
-        while (timer->shouldFixedUpdate())
-        {
-            if (sceneManager)
-            {
-                sceneManager->update(timer->getDeltaTime());
-            }
-            physicsWorld->update();
-            timer->consumeFixedUpdate();
-        }
-
-        sceneManager->buildRenderQueue(renderQueue);
-        renderer->render(renderQueue);
-
-        if (InputManager::getInstance()->quitRequested())
-        {
-            shutdown();
-        }
-    }
-}
-
-void SpelMotor::runServer()
-{
-    if (server->start() != ServerStatus::Running)
-    {
-        std::cerr << "Failed to start server" << std::endl;
-        return;
-    }
-
-    running = true;
-    while (running)
-    {
-        timer->tick();
-        server->update();
-
-        while (timer->shouldFixedUpdate())
-        {
-            if (sceneManager)
-            {
-                sceneManager->update(timer->getDeltaTime());
-            }
-            physicsWorld->update();
-            timer->consumeFixedUpdate();
-        }
-    }
-}
-
-void SpelMotor::startNetworkThread()
-{
-    networkRunning = true;
-    networkThread = std::thread([this]()
-    {
-        while (networkRunning)
-        {
-            client->poll();
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-        }
+        onMessage(message);
     });
+
+    transport->setOnConnectionChanged([this](const Connection& connection)
+    {
+        onConnectionChanged(connection);
+    });
+
+    TransportResult result = transport->setUpListenSocket(setupInformation.port);
+
+    if (result == TransportResult::SUCCESS)
+    {
+        status = ServerStatus::Running;
+        std::cout << "Started successfully on port " << setupInformation.port << std::endl;
+    }
+    else
+    {
+        status = ServerStatus::Error;
+        std::cerr << "Failed to start" << std::endl;
+    }
+
+    return status;
 }
 
-void SpelMotor::stopNetworkThread()
+void Server::update() const
 {
-    networkRunning = false;
-    if (networkThread.joinable())
-    {
-        networkThread.join();
-    }
+    transport->poll();
 }
 
-void SpelMotor::shutdown()
+ServerStatus Server::stop()
 {
-    if (!running.exchange(false))
+    if (status == ServerStatus::Running)
     {
-        return;
+        transport->closeOpenSocket();
+        connectedClients.clear();
+        status = ServerStatus::Stopping;
+        std::cout << "Stopped" << std::endl;
     }
-
-    stopNetworkThread();
-
-    if (client)
-    {
-        client->disconnect();
-    }
-
-    if (server)
-    {
-        server->stop();
-    }
-
-    if (renderer)
-    {
-        InputManager::shutdown();
-        renderer->close();
-    }
-
-    physicsWorld->shutdown();
-}
-
-SceneManager* SpelMotor::getSceneManager()
-{
-    return sceneManager.get();
+    return status;
 }
 
 void Server::setClientConnectedCallback(ClientConnectedCallback callback)
@@ -255,24 +88,170 @@ void Server::setClientDisconnectedCallback(ClientDisconnectedCallback callback)
 
 void Server::onConnectionChanged(const Connection& connection)
 {
-    if (connection.connectionStatus == ConnectionStatus::Connected)
-    {
-        connectedClients.insert(connection.transportConnectionId);
-        std::cout << "[Server] Client " << connection.transportConnectionId << " connected" << std::endl;
+    const int clientId = connection.transportConnectionId;
 
+    switch (connection.connectionStatus)
+    {
+    case ConnectionStatus::Connected:
+        connectedClients.insert(clientId);
+        std::cout << "Client " << clientId << " connected" << std::endl;
+
+        // NEW: Invoke callback for spawn manager
         if (onClientConnected)
         {
-            onClientConnected(connection.transportConnectionId);
+            onClientConnected(clientId);
         }
-    }
-    else if (connection.connectionStatus == ConnectionStatus::Disconnected)
-    {
-        connectedClients.erase(connection.transportConnectionId);
-        std::cout << "[Server] Client " << connection.transportConnectionId << " disconnected" << std::endl;
+        break;
 
+    case ConnectionStatus::Terminated:
+        break;
+
+    case ConnectionStatus::Disconnected:
+    case ConnectionStatus::Error:
+        connectedClients.erase(clientId);
+        std::cout << "Client " << clientId << " disconnected" << std::endl;
+
+        // NEW: Invoke callback for spawn manager
         if (onClientDisconnected)
         {
-            onClientDisconnected(connection.transportConnectionId);
+            onClientDisconnected(clientId);
         }
+        break;
+
+    default:
+        break;
+    }
+}
+
+void Server::onMessage(const IncomingRawMessage& rawMessage)
+{
+    if (!connectedClients.contains(rawMessage.connectionID))
+    {
+        std::cerr << "Message from unknown client " << rawMessage.connectionID << std::endl;
+        return;
+    }
+
+    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+
+    if (!message)
+    {
+        std::cerr << "Failed to parse message from client " << rawMessage.connectionID << std::endl;
+        return;
+    }
+
+    // Route through message dispatcher if available
+    if (messageDispatcher)
+    {
+        messageDispatcher->processMessage(*message);
+        return;
+    }
+
+    // Fallback to old switch-based handling
+    MessageTypes messageType = message->getMessageType();
+    const int clientId = rawMessage.connectionID;
+
+    switch (messageType)
+    {
+    case MessageTypes::ConnectionMessage:
+        if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
+        {
+            handleConnectionMessage(clientId, connMsg);
+        }
+        break;
+
+    default:
+        std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
+        break;
+    }
+}
+
+void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
+{
+    switch (message->getStatus())
+    {
+    case ConnectionStatus::Disconnected:
+        transport->disconnectFromSocket(clientId);
+        connectedClients.erase(clientId);
+        break;
+
+    default:
+        break;
+    }
+}
+
+void Server::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+{
+    messageDispatcher = std::move(dispatcher);
+}
+
+bool Server::sendMessage(const int clientId, const IMessage& message, const SendMode& mode) const
+{
+    if (!connectedClients.contains(clientId))
+    {
+        return false;
+    }
+
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+        message,
+        clientId,
+        mode
+    );
+
+    return transport->send(outgoing) == TransportResult::SUCCESS;
+}
+
+bool Server::sendMessage(const int clientId, const IMessage& message) const
+{
+    return sendMessage(clientId, message, SendMode::Unreliable);
+}
+
+bool Server::broadcastMessage(const IMessage& message) const
+{
+    bool allSucceeded = true;
+
+    for (const int clientId : connectedClients)
+    {
+        if (!sendMessage(clientId, message))
+        {
+            allSucceeded = false;
+        }
+    }
+
+    return allSucceeded;
+}
+
+bool Server::broadcastMessage(const IMessage& message, const int excludeClientId) const
+{
+    bool allSucceeded = true;
+
+    for (const int clientId : connectedClients)
+    {
+        if (clientId != excludeClientId)
+        {
+            if (!sendMessage(clientId, message))
+            {
+                allSucceeded = false;
+            }
+        }
+    }
+
+    return allSucceeded;
+}
+
+void Server::kickClient(const int clientId)
+{
+    ConnectionMessage disconnectMessage;
+    disconnectMessage.setStatus(ConnectionStatus::Disconnected);
+
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+        disconnectMessage,
+        clientId,
+        SendMode::ReliableOrdered
+    );
+
+    if (transport->send(outgoing) == TransportResult::SUCCESS)
+    {
+        transport->disconnectFromSocket(clientId);
+        connectedClients.erase(clientId);
     }
 }

@@ -67,6 +67,8 @@ class Client
         bool isConnected() const;
 
         void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
+
+        NetworkContext& getNetworkContext() { return *networkContext; }
     private:
         /**
          * @brief Callback invoked when a message is received from the server.

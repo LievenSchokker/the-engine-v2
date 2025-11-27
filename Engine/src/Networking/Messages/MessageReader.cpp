@@ -5,6 +5,11 @@
 #include <iostream>
 #include <cstring>
 
+#include "Networking/Messages/Concretes/ActionMessage.h"
+#include "Networking/Messages/Concretes/ObjectDestroyMessage.h"
+#include "Networking/Messages/Concretes/SpawnMessage.h"
+#include "Networking/Messages/Concretes/WelcomeMessage.h"
+
 
 std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage rawMessage)
 {
@@ -44,6 +49,19 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
     case MessageTypes::ConnectionMessage:
         message = std::make_unique<ConnectionMessage>();
         break;
+    case MessageTypes::ActionMessage:
+        message = std::make_unique<ActionMessage>();
+        break;
+    case MessageTypes::SpawnMessage:
+        message = std::make_unique<SpawnMessage>();
+        break;
+    case MessageTypes::ObjectDestroyMessage:
+        message = std::make_unique<ObjectDestroyMessage>();
+        break;
+    case MessageTypes::WelcomeMessage:
+        message = std::make_unique<WelcomeMessage>();
+        break;
+
     default:
         return nullptr;
     }

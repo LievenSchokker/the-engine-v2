@@ -8,6 +8,8 @@
 #include <memory>
 #include <thread>
 
+#include "Networking/NetworkingIdentityRegistry.h"
+
 // Forward declarations
 class ApplicationClock;
 class IPhysicsWorld;
@@ -50,6 +52,8 @@ private:
     std::unique_ptr<Server> server;
     std::unique_ptr<Client> client;
     std::unique_ptr<NetworkSpawnManager> spawnManager;
+    std::unique_ptr<NetworkIdentityRegistry> identityRegistry;
+
 
     std::thread networkThread;
     std::atomic<bool> networkRunning{false};

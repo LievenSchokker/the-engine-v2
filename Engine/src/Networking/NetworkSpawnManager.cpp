@@ -10,9 +10,10 @@
 
 #include <iostream>
 
-NetworkSpawnManager::NetworkSpawnManager(Server* server, Scene* scene)
+NetworkSpawnManager::NetworkSpawnManager(Server* server, Scene* scene, NetworkIdentityRegistry* registry)
     : server(server)
     , scene(scene)
+    , identityRegistry(registry)
 {
 }
 
@@ -23,30 +24,40 @@ uint32_t NetworkSpawnManager::generateNetId()
 
 GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position, int ownerId)
 {
-    // Create from prefab registry
+    std::cout << "spawnObject called, assetId=" << assetId << std::endl;
+
     auto gameObject = NetworkPrefabRegistry::instance().create(assetId);
     if (!gameObject)
     {
-        std::cerr << "[NetworkSpawnManager] Unknown assetId: " << assetId << std::endl;
+        std::cerr << "Unknown assetId: " << assetId << std::endl;
         return nullptr;
     }
 
-    // Set position
+    std::cout << "Prefab created" << std::endl;
+
     gameObject->getTransform()->setPosition(position);
 
-    // Add NetworkIdentity if not present
+    std::cout << "Position set" << std::endl;
+
     auto* identity = gameObject->getComponent<NetworkIdentity>();
     if (!identity)
     {
         identity = gameObject->addComponent<NetworkIdentity>();
     }
 
-    // Assign network ID and owner
+    std::cout << "NetworkIdentity ready" << std::endl;
     uint32_t netId = generateNetId();
     identity->netId = netId;
     identity->ownerId = ownerId;
 
-    // Track the object
+    // Register AFTER setting netId
+    if (identityRegistry && identity)
+    {
+        identityRegistry->registerIdentity(identity);
+    }
+
+    std::cout << "Assigned netId=" << netId << std::endl;
+
     GameObject* rawPtr = gameObject.get();
     spawnedObjects[netId] = rawPtr;
     objectAssets[netId] = assetId;
@@ -56,20 +67,29 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
         clientOwnedObjects[ownerId].push_back(netId);
     }
 
-    // Add to scene
+    std::cout << "Adding to scene..." << std::endl;
+
     scene->addGameObject(std::move(gameObject));
 
-    // Initialize network components
+    std::cout << "Added to scene, calling onNetworkSpawn..." << std::endl;
+
     identity->onNetworkSpawn();
 
-    // Broadcast spawn to all clients
+    std::cout << "onNetworkSpawn done, broadcasting..." << std::endl;
+
     if (server)
     {
         SpawnMessage msg = createSpawnMessage(identity, assetId);
-        server->broadcastMessage(msg);
+        std::cout << "SpawnMessage created, sending..." << std::endl;
+        bool sent = server->broadcastMessage(msg);
+        std::cout << "Broadcast result: " << (sent ? "success" : "failed") << std::endl;
+    }
+    else
+    {
+        std::cout << "No server pointer, skipping broadcast" << std::endl;
     }
 
-    std::cout << "[NetworkSpawnManager] Spawned object netId=" << netId
+    std::cout << "Spawned object netId=" << netId
               << " assetId=" << assetId << " owner=" << ownerId << std::endl;
 
     return rawPtr;
@@ -121,7 +141,7 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
     // Destroy the object
     obj->destroy();
 
-    std::cout << "[NetworkSpawnManager] Despawned object netId=" << netId << std::endl;
+    std::cout << "Despawned object netId=" << netId << std::endl;
 }
 
 void NetworkSpawnManager::despawnClientObjects(int clientId)
@@ -142,7 +162,7 @@ void NetworkSpawnManager::despawnClientObjects(int clientId)
 
     clientOwnedObjects.erase(clientId);
 
-    std::cout << "[NetworkSpawnManager] Despawned all objects for client " << clientId << std::endl;
+    std::cout << "Despawned all objects for client " << clientId << std::endl;
 }
 
 void NetworkSpawnManager::syncExistingObjects(int clientId)
@@ -159,7 +179,7 @@ void NetworkSpawnManager::syncExistingObjects(int clientId)
         server->sendMessage(clientId, msg);
     }
 
-    std::cout << "[NetworkSpawnManager] Synced " << spawnedObjects.size()
+    std::cout << "Synced " << spawnedObjects.size()
               << " objects to client " << clientId << std::endl;
 }
 
@@ -199,7 +219,7 @@ void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
     auto gameObject = NetworkPrefabRegistry::instance().create(message.assetId);
     if (!gameObject)
     {
-        std::cerr << "[NetworkSpawnManager] Client: Unknown assetId " << message.assetId << std::endl;
+        std::cerr << "Client: Unknown assetId " << message.assetId << std::endl;
         return;
     }
 
@@ -217,6 +237,12 @@ void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
     identity->netId = message.netId;
     identity->ownerId = message.ownerId;
 
+    // Register with identity registry
+    if (identityRegistry && identity)
+    {
+        identityRegistry->registerIdentity(identity);
+    }
+
     // Track
     GameObject* rawPtr = gameObject.get();
     spawnedObjects[message.netId] = rawPtr;
@@ -228,5 +254,15 @@ void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
     // Initialize
     identity->onNetworkSpawn();
 
-    std::cout << "[NetworkSpawnManager] Client spawned netId=" << message.netId << std::endl;
+    std::cout << "Client spawned netId=" << message.netId << std::endl;
+}
+
+GameObject* NetworkSpawnManager::getObjectByNetId(uint32_t netId) const
+{
+    auto it = spawnedObjects.find(netId);
+    if (it != spawnedObjects.end())
+    {
+        return it->second;
+    }
+    return nullptr;
 }

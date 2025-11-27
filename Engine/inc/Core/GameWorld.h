@@ -7,6 +7,7 @@ class InputManager;
 class Client;
 class Server;
 class NetworkSpawnManager;
+class IMessage;
 
 class GameWorld
 {
@@ -25,4 +26,10 @@ public:
 
     bool isServer() const { return server != nullptr; }
     bool isClient() const { return client != nullptr; }
+
+    bool sendToServer(const IMessage& message);
+    bool broadcastToClients(const IMessage& message);
+    bool sendToClient(int clientId, const IMessage& message);
+
+    int localClientId = -1;
 };
