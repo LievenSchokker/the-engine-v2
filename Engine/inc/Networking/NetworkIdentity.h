@@ -68,7 +68,7 @@ public:
      * @param payload Serialized arguments
      * @param length Payload size
      */
-    void dispatchAction(uint32_t componentId, const std::string& action, const std::byte* payload, size_t payloadSize);
+    void dispatchAction(uint32_t componentId, const std::string& action);
 
 private:
     uint32_t networkId = 0;

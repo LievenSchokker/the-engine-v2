@@ -43,9 +43,7 @@ void NetworkIdentity::onNetworkDespawn()
 }
 
 void NetworkIdentity::dispatchAction(uint32_t componentId,
-                                     const std::string& action,
-                                     const std::byte* payload,
-                                     size_t payloadSize)
+                                     const std::string& action)
 {
 	if (componentId >= networkBehaviours.size())
 	{
@@ -55,6 +53,6 @@ void NetworkIdentity::dispatchAction(uint32_t componentId,
 	NetworkBehaviour* behaviour = networkBehaviours[componentId];
 	if (behaviour)
 	{
-		behaviour->executeAction(action, payload, payloadSize);
+		behaviour->executeAction(action);
 	}
 }

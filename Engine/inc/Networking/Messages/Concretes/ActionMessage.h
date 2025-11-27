@@ -97,10 +97,6 @@ public:
     void setTick(uint32_t tick);
     /// @}
 
-    const std::byte* getPayloadData() const;
-    size_t getPayloadSize() const;
-
-    void setPayload(std::vector<std::byte> data);
 private:
     uint32_t networkComponentIdentity; ///< Routes to the handling component
     uint32_t networkGameObjectIdentity; ///< Routes to the target entity

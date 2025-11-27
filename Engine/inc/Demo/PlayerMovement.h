@@ -26,7 +26,7 @@ public:
 
 private:
     // Called on server when client sends movement input
-    void serverMove(float dirX, float dirY);
+    void serverMove();
 
     // Called on all clients to sync position
     void clientUpdatePosition(float x, float y);

@@ -103,7 +103,7 @@ public:
      * @param payload Serialized arguments from ActionMessage
      * @param payloadLength Size of payload in bytes
      */
-    void executeAction(const std::string& actionKey, const std::byte* payload, size_t payloadLength);
+    void executeAction(const std::string& actionKey);
 
 protected:
     /**
@@ -175,96 +175,5 @@ private:
     friend class NetworkSpawnManager;
     friend class NetworkIdentity;
 };
-template<typename... Args>
-void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
-{
-    if (!isClient() || !identity)
-    {
-        return;
-    }
 
-    auto* world = getWorld();
-    if (!world)
-    {
-        return;
-    }
-
-    ActionMessage message(
-        componentNetworkId,
-        identity->getNetId(),
-        name,
-        0
-    );
-
-    // Only serialize if we have args
-    if constexpr (sizeof...(args) > 0)
-    {
-        CerealWriteArchive archive;
-        (archive.process(args), ...);
-        message.setPayload(archive.getBytes());
-    }
-
-    world->sendToServer(message);
-}
-
-template<typename... Args>
-void NetworkBehaviour::callRpc(const std::string& name, Args&&... args)
-{
-    if (!isServer() || !identity)
-    {
-        return;
-    }
-
-    auto* world = getWorld();
-    if (!world)
-    {
-        return;
-    }
-
-    ActionMessage message(
-        componentNetworkId,
-        identity->getNetId(),
-        name,
-        0
-    );
-
-    if constexpr (sizeof...(args) > 0)
-    {
-        CerealWriteArchive archive;
-        (archive.process(args), ...);
-        message.setPayload(archive.getBytes());
-    }
-
-    world->broadcastToClients(message);
-}
-
-template<typename... Args>
-void NetworkBehaviour::callTargetRpc(const std::string& name, int targetClientId, Args&&... args)
-{
-    if (!isServer() || !identity)
-    {
-        return;
-    }
-
-    auto* world = getWorld();
-    if (!world)
-    {
-        return;
-    }
-
-    ActionMessage message(
-        componentNetworkId,
-        identity->getNetId(),
-        name,
-        0
-    );
-
-    if constexpr (sizeof...(args) > 0)
-    {
-        CerealWriteArchive archive;
-        (archive.process(args), ...);
-        message.setPayload(archive.getBytes());
-    }
-
-    world->sendToClient(targetClientId, message);
-}
+#include "NetworkBehaviour.hpp"

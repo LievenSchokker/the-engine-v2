@@ -133,8 +133,9 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
 			connectionID << std::endl;
 		return;
 	}
-	
-	if (messageDispatcher) {
+
+	if (messageDispatcher)
+	{
 		messageDispatcher->processMessage(*message);
 		return;
 	}

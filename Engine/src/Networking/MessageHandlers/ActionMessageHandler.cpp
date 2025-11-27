@@ -28,11 +28,8 @@ void ActionMessageHandler::handleMessageInternal(const ActionMessage& message)
         return;
     }
 
-    // Dispatch to the correct NetworkBehaviour
     identity->dispatchAction(
         message.getComponentIdentity(),
-        message.getAction(),
-        message.getPayloadData(),
-        message.getPayloadSize()
+        message.getAction()
     );
 }

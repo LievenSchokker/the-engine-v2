@@ -20,23 +20,7 @@ bool NetworkBehaviour::hasAuthority() const
     return identity->hasAuthority();
 }
 
-void NetworkBehaviour::executeAction(const std::string& actionKey, const std::byte* payload, size_t payloadLength)
+void NetworkBehaviour::executeAction(const std::string& actionKey)
 {
-    // Check commands first (client→server)
     auto cmdIt = commands.find(actionKey);
-    if (cmdIt != commands.end())
-    {
-        CerealReadArchive archive(payload, payloadLength);
-        cmdIt->second(archive);
-        return;
-    }
-
-    // Check RPCs (server→client)
-    auto rpcIt = rpcs.find(actionKey);
-    if (rpcIt != rpcs.end())
-    {
-        CerealReadArchive archive(payload, payloadLength);
-        rpcIt->second(archive);
-        return;
-    }
 }

@@ -16,24 +16,13 @@ void PlayerMovement::onStart()
 
 void PlayerMovement::onNetworkSpawn()
 {
-    // Network-specific init if needed
 }
 
 void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
 {
-    builder.command("Move", [this](CerealReadArchive& ar) {
-        float dirX, dirY;
-        ar.process(dirX);
-        ar.process(dirY);
-        serverMove(dirX, dirY);
+    builder.command("Move", [this](ReadArchive& ar) {
     });
 
-    builder.clientRpc("UpdatePos", [this](CerealReadArchive& ar) {
-        float x, y;
-        ar.process(x);
-        ar.process(y);
-        clientUpdatePosition(x, y);
-    });
 }
 
 void PlayerMovement::update()
@@ -41,8 +30,6 @@ void PlayerMovement::update()
     auto* world = getWorld();
     if (!world) return;
 
-    // For now, handle movement locally for testing
-    // Once networking is wired up, only the authoritative side moves
     if (world->isClient())
     {
         handleInput();
@@ -72,40 +59,34 @@ void PlayerMovement::handleInput()
         direction.x += 1.0f;
 
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
     if (length > 0.0f)
     {
         direction.x /= length;
         direction.y /= length;
 
-        // Move locally
         float dt = 1.0f / 60.0f;
         Vector2 pos = transform->getPosition();
         pos.x += direction.x * moveSpeed * dt;
         pos.y += direction.y * moveSpeed * dt;
         transform->setPosition(pos);
 
-        // Send to server (all clients will send for now)
-        callCommand("Move", direction.x, direction.y);
+        callCommand("Move");
     }
 }
 
-void PlayerMovement::serverMove(float dirX, float dirY)
+void PlayerMovement::serverMove()
 {
-    // For now, since we can't pass params, just sync current position
     Transform* transform = getGameObject()->getTransform();
     if (!transform) return;
 
     Vector2 pos = transform->getPosition();
-
-    // Broadcast - but we can't pass pos.x, pos.y without payload support
-    callRpc("UpdatePos");
 }
 
 void PlayerMovement::clientUpdatePosition(float x, float y)
 {
     if (!isClient()) return;
 
-    // Skip if we're the owner (we already moved locally)
     if (hasAuthority()) return;
 
     Transform* transform = getGameObject()->getTransform();
