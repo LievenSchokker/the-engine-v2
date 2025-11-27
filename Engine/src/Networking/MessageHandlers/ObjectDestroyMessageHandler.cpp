@@ -3,7 +3,7 @@
 
 #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/Messages/Concretes/ObjectDestroyMessage.h"
-#include "Networking/MessageHandlers/ObjectDestroyMessageHandler.h""
+#include "Networking/MessageHandlers/ObjectDestroyMessageHandler.h"
 
 ObjectDestroyMessageHandler::ObjectDestroyMessageHandler(NetworkSpawnManager& spawnManager)
     : spawnManager(spawnManager)

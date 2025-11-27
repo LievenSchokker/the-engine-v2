@@ -7,13 +7,14 @@
 #include "Physics/Components/RigidBody.h"
 
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
-	: worldId(0),tickRate(newTickRate)
+	: tickRate(newTickRate)
 {
 }
 
 
 void Box2DPhysicsWorld::start()
 {
+	worldId = {};
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = {0.0f, 30.0f};
 

@@ -5,6 +5,8 @@
 #pragma once
 
 
+#include "Networking/MessageHandlers/IMessageHandler.h"
+
 #include <cstdint>
 #include <memory>
 #include <unordered_map>
@@ -12,8 +14,6 @@
 
 enum class MessageTypes : uint8_t;
 class IMessage;
-class IMessageHandler;
-
 
 namespace spelmotor_networking
 {
