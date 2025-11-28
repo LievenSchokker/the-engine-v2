@@ -1,13 +1,15 @@
+
 #include "Networking/Messages/MessageDispatcherFactory.h"
-#include "Networking/Messages/MessageDispatcher.h"
-#include "Networking/Messages/MessageTypes.h"
-#include "Networking/MessageHandlers/SpawnMessageHandler.h"
-#include "Networking/MessageHandlers/ObjectDestroyMessageHandler.h"
+
 #include "Networking/MessageHandlers/ActionMessageHandler.h"
+#include "Networking/MessageHandlers/ObjectDestroyMessageHandler.h"
+#include "Networking/MessageHandlers/SpawnMessageHandler.h"
+#include "Networking/MessageHandlers/StateSyncHandler.h"
 #include "Networking/MessageHandlers/WelcomeMessageHandler.h"
-#include "Networking/NetworkSpawnManager.h"
-#include "Networking/NetworkingIdentityRegistry.h"
-#include "Core/GameWorld.h"
+#include "Networking/Messages/Concretes/ActionMessage.h"
+#include "Networking/Messages/MessageDispatcher.h"
+
+#include <memory>
 
 namespace spelmotor_networking
 {
@@ -21,8 +23,8 @@ MessageDispatcherFactory::createServerDispatcher(
 	auto dispatcher = std::make_unique<MessageDispatcher>();
 
 	dispatcher->registerMessageHandler(
-		MessageTypes::ActionMessage,
-		std::make_unique<ActionMessageHandler>(context, registry));
+	   MessageTypes::ActionMessage,
+	   std::make_unique<ActionMessageHandler>(context, registry));
 
 	return dispatcher;
 }
@@ -36,25 +38,26 @@ MessageDispatcherFactory::createClientDispatcher(
 {
 	auto dispatcher = std::make_unique<MessageDispatcher>();
 
-	//Welcome Message
 	dispatcher->registerMessageHandler(
-		MessageTypes::WelcomeMessage,
-		std::make_unique<WelcomeMessageHandler>(world));
+	   MessageTypes::WelcomeMessage,
+	   std::make_unique<WelcomeMessageHandler>(world));
 
-	//Spawn Message
 	dispatcher->registerMessageHandler(
-		MessageTypes::SpawnMessage,
-		std::make_unique<SpawnMessageHandler>(spawnManager));
+	   MessageTypes::SpawnMessage,
+	   std::make_unique<SpawnMessageHandler>(spawnManager));
 
-	//Object Destroy Message
 	dispatcher->registerMessageHandler(
-		MessageTypes::ObjectDestroyMessage,
-		std::make_unique<ObjectDestroyMessageHandler>(spawnManager));
+	   MessageTypes::ObjectDestroyMessage,
+	   std::make_unique<ObjectDestroyMessageHandler>(spawnManager));
 
-	//Action Message
 	dispatcher->registerMessageHandler(
-		MessageTypes::ActionMessage,
-		std::make_unique<ActionMessageHandler>(context, registry));
+	   MessageTypes::ActionMessage,
+	   std::make_unique<ActionMessageHandler>(context, registry));
+
+	// State sync handler
+	dispatcher->registerMessageHandler(
+	   MessageTypes::StateSyncMessage,
+	   std::make_unique<StateSyncMessageHandler>(context, registry));
 
 	return dispatcher;
 }

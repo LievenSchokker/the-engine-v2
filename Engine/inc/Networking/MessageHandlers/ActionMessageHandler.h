@@ -6,15 +6,16 @@
 class NetworkContext;
 class NetworkIdentityRegistry;
 
-class ActionMessageHandler : public BaseMessageHandler<ActionMessage>
+class ActionMessageHandler: public BaseMessageHandler<ActionMessage>
 {
 public:
-    ActionMessageHandler(NetworkContext& context, NetworkIdentityRegistry& registry);
-    ~ActionMessageHandler() override = default;
+	ActionMessageHandler(NetworkContext& context,
+	                     NetworkIdentityRegistry& registry);
+	~ActionMessageHandler() override = default;
 
 protected:
-    void handleMessageInternal(const ActionMessage& message) override;
+	void handleMessageInternal(const ActionMessage& message) override;
 
 private:
-    NetworkIdentityRegistry& identityRegistry;
+	NetworkIdentityRegistry& identityRegistry;
 };

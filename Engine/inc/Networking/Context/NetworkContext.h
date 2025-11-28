@@ -11,14 +11,21 @@ struct Vector2;
 
 /// NOTE: This struct can be used to inject Application dependencies to the MessageHandlers.
 /// Add more if neeced
-struct  NetworkContext
+struct NetworkContext
 {
-    public:
-        explicit NetworkContext(SceneManager& scenesManager) : sceneManager(&scenesManager) {}
-        virtual ~NetworkContext() = default;
+public:
+	explicit NetworkContext(SceneManager& scenesManager) : sceneManager(
+		&scenesManager)
+	{
+	}
 
-        SceneManager& getSceneManager() const {return  *sceneManager; }
+	virtual ~NetworkContext() = default;
 
-    protected:
-        SceneManager* sceneManager;
+	SceneManager& getSceneManager() const
+	{
+		return *sceneManager;
+	}
+
+protected:
+	SceneManager* sceneManager;
 };

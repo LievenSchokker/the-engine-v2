@@ -5,6 +5,7 @@
 #include "Networking/Messages/Concretes/ActionMessage.h"
 #include "Networking/Messages/Concretes/ObjectDestroyMessage.h"
 #include "Networking/Messages/Concretes/SpawnMessage.h"
+#include "Networking/Messages/Concretes/StateSyncMessage.h"
 #include "Networking/Messages/Concretes/WelcomeMessage.h"
 
 #include <iostream>
@@ -56,6 +57,9 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
 			break;
 		case MessageTypes::WelcomeMessage:
 			message = std::make_unique<WelcomeMessage>();
+			break;
+		case MessageTypes::StateSyncMessage:
+			message = std::make_unique<StateSyncMessage>();
 			break;
 
 		default:

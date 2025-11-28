@@ -2,11 +2,12 @@
 #include "IMessageHandler.h"
 
 
-class ObjectDestroyMessageHandler : public IMessageHandler
+class ObjectDestroyMessageHandler: public IMessageHandler
 {
 public:
-    ObjectDestroyMessageHandler(NetworkSpawnManager& spawnManager);
-    void handleMessage(const IMessage& message) override;
+	ObjectDestroyMessageHandler(NetworkSpawnManager& spawnManager);
+	void handle(const IMessage& message) override;
+
 private:
-    NetworkSpawnManager& spawnManager;
+	NetworkSpawnManager& spawnManager;
 };

@@ -24,8 +24,6 @@ std::vector<std::byte> ActionMessage::serialize() const
 	archive.process(networkGameObjectIdentity);
 	archive.process(actionKey);
 	archive.process(tick);
-	uint32_t payloadSize = static_cast<uint32_t>(payload.size());
-	archive.process(payloadSize);
 	return archive.getBytes();
 }
 

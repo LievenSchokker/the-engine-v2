@@ -22,5 +22,23 @@ bool NetworkBehaviour::hasAuthority() const
 
 void NetworkBehaviour::executeAction(const std::string& actionKey)
 {
-    auto cmdIt = commands.find(actionKey);
+	// Check commands map (client → server)
+	auto cmdIt = commands.find(actionKey);
+	if (cmdIt != commands.end())
+	{
+		ReadArchive emptyArchive(nullptr, 0);
+		cmdIt->second(emptyArchive);  // <-- Actually call the callback!
+		return;
+	}
+
+	// Check RPCs map (server → client)
+	auto rpcIt = rpcs.find(actionKey);
+	if (rpcIt != rpcs.end())
+	{
+		ReadArchive emptyArchive(nullptr, 0);
+		rpcIt->second(emptyArchive);
+		return;
+	}
+
+	std::cerr << "[NetworkBehaviour] Unknown action: " << actionKey << std::endl;
 }

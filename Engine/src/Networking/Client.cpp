@@ -18,11 +18,13 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
 {
 	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 
-	transport->setOnMessageReceived([this](const IncomingRawMessage& message) {
+	transport->setOnMessageReceived([this](const IncomingRawMessage& message)
+	{
 		onMessageReceived(message);
 	});
 
-	transport->setOnConnectionChanged([this](const Connection& connection) {
+	transport->setOnConnectionChanged([this](const Connection& connection)
+	{
 		onConnectionChanged(connection);
 	});
 }
@@ -37,7 +39,8 @@ bool Client::connectToServer(
 {
 	if (transport->connectByIPAdress(serverInformartion.ip.c_str(),
 	                                 serverInformartion.port) !=
-	    TransportResult::SUCCESS) {
+	    TransportResult::SUCCESS)
+	{
 		std::cerr << "Failed to connect to " << serverInformartion.ip << ":" <<
 			serverInformartion.port << std::endl;
 		return false;
@@ -47,7 +50,8 @@ bool Client::connectToServer(
 
 void Client::disconnect()
 {
-	if (currentConnection.connectionStatus == ConnectionStatus::Connected) {
+	if (currentConnection.connectionStatus == ConnectionStatus::Connected)
+	{
 		transport->
 			disconnectFromSocket(currentConnection.transportConnectionId);
 	}
@@ -57,7 +61,8 @@ void Client::disconnect()
 
 bool Client::sendMessage(const IMessage& message) const
 {
-	if (currentConnection.connectionStatus != ConnectionStatus::Connected) {
+	if (currentConnection.connectionStatus != ConnectionStatus::Connected)
+	{
 		return false;
 	}
 
@@ -85,7 +90,8 @@ void Client::onConnectionChanged(const Connection& connection)
 {
 	currentConnection = connection;
 
-	switch (connection.connectionStatus) {
+	switch (connection.connectionStatus)
+	{
 		case ConnectionStatus::Connected:
 			break;
 
@@ -106,7 +112,8 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 	const std::unique_ptr<IMessage> message = MessageReader::readMessage(
 		rawMessage);
 
-	if (!message) {
+	if (!message)
+	{
 		std::cerr << "Failed to parse message" << std::endl;
 		return;
 	}

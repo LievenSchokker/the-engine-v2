@@ -17,7 +17,7 @@ void MessageDispatcher::processMessage(const IMessage& message)
 	IMessageHandler* handler = getMessageHandler(message.getMessageType());
 
 	if (handler != nullptr) {
-		handler->handleMessage(message);
+		handler->handle(message);
 	}
 }
 

@@ -14,10 +14,6 @@ class Scene;
  * Maintains fast lookup tables for routing incoming network messages to their
  * target GameObjects. Corresponds to your diagram's NetworkIdentityRegistry class.
  *
- * Design rationale:
- * - Separate from Scene because networking concerns shouldn't pollute scene management
- * - Uses unordered_map for O(1) lookup by netId (critical for message routing performance)
- * - Tracks scene reference to query NetworkBehaviours when needed
  *
  * Lifecycle:
  * - Objects register on network spawn via NetworkSpawnManager

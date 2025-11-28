@@ -1,6 +1,6 @@
-#include "Networking/NetworkIdentity.h"
+
 #include "Behaviour/NetworkBehaviour.h"
-#include "GameObject/GameObject.h"
+#include "Networking/NetworkBuilder.h"
 
 bool NetworkIdentity::hasAuthority() const
 {
@@ -24,9 +24,13 @@ void NetworkIdentity::onNetworkSpawn()
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
 			netBehaviour->componentNetworkId = static_cast<uint32_t>(
-				networkBehaviours.size());
+			   networkBehaviours.size());
 			netBehaviour->identity = this;
 			networkBehaviours.push_back(netBehaviour);
+
+			NetworkBuilder builder(*netBehaviour);
+			netBehaviour->registerNetworkMethods(builder);
+
 			netBehaviour->onNetworkSpawn();
 		}
 	}
@@ -43,7 +47,7 @@ void NetworkIdentity::onNetworkDespawn()
 }
 
 void NetworkIdentity::dispatchAction(uint32_t componentId,
-                                     const std::string& action)
+									 const std::string& action)
 {
 	if (componentId >= networkBehaviours.size())
 	{

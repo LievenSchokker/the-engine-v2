@@ -8,11 +8,16 @@
 #include "Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/Concretes/SpawnGameObjectMessage.h"
 
-class SpawnGameObjectMessageHandler : public BaseMessageHandler<spelmotor_networking::SpawnGameObjectMessage>
+class SpawnGameObjectMessageHandler: public BaseMessageHandler<
+		spelmotor_networking::SpawnGameObjectMessage>
 {
-    public:
-        explicit SpawnGameObjectMessageHandler(NetworkContext& networkContext) : BaseMessageHandler(networkContext) {};
-        ~SpawnGameObjectMessageHandler() override;
+public:
+	explicit
+	SpawnGameObjectMessageHandler(NetworkContext& networkContext) :
+		BaseMessageHandler(networkContext)
+	{
+	};
+	~SpawnGameObjectMessageHandler() override;
 
-        void handleMessage(const IMessage &message) override;
+	void handle(const IMessage& message) override;
 };

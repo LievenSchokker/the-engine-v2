@@ -10,7 +10,7 @@ class WelcomeMessageHandler : public IMessageHandler
 public:
     explicit WelcomeMessageHandler(GameWorld& world) : gameWorld(world) {}
 
-    void handleMessage(const IMessage& message) override
+    void handle(const IMessage& message) override
     {
         const auto& welcome = static_cast<const WelcomeMessage&>(message);
         gameWorld.localClientId = welcome.getClientId();

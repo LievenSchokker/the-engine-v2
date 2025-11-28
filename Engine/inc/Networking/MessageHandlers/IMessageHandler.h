@@ -14,7 +14,7 @@ class IMessage;
  * */
 class IMessageHandler
 {
-    public:
-        virtual ~IMessageHandler() = default;
-        virtual void handleMessage(const IMessage& message) = 0;
+public:
+	virtual ~IMessageHandler() = default;
+	virtual void handle(const IMessage& message) = 0;
 };

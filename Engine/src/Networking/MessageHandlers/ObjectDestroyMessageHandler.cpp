@@ -10,7 +10,7 @@ ObjectDestroyMessageHandler::ObjectDestroyMessageHandler(NetworkSpawnManager& sp
 {
 }
 
-void ObjectDestroyMessageHandler::handleMessage(const IMessage& message)
+void ObjectDestroyMessageHandler::handle(const IMessage& message)
 {
     const auto& destroyMsg = static_cast<const ObjectDestroyMessage&>(message);
     // Client-side: just remove from tracking and destroy

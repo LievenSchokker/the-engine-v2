@@ -10,7 +10,7 @@ SpawnMessageHandler::SpawnMessageHandler(NetworkSpawnManager& spawnManager)
 {
 }
 
-void SpawnMessageHandler::handleMessage(const IMessage& message)
+void SpawnMessageHandler::handle(const IMessage& message)
 {
     std::cout << "Received spawn message" << std::endl;
     const auto& spawnMsg = static_cast<const SpawnMessage&>(message);

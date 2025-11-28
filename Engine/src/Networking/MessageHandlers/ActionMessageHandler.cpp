@@ -3,6 +3,7 @@
 #include "Networking/NetworkIdentity.h"
 #include "GameObject/GameObject.h"
 #include <iostream>
+#include <thread>
 
 ActionMessageHandler::ActionMessageHandler(NetworkContext& context, NetworkIdentityRegistry& registry)
     : BaseMessageHandler<ActionMessage>(context)
@@ -27,6 +28,7 @@ void ActionMessageHandler::handleMessageInternal(const ActionMessage& message)
         return;
     }
 
+	std::cout << "Handling action message from netId=" << netId << std::endl;
     identity->dispatchAction(
         message.getComponentIdentity(),
         message.getAction()

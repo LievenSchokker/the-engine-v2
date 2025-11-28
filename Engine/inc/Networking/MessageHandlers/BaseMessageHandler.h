@@ -14,28 +14,33 @@
  * Use this base class when implementing new IMessage types and requiring some behaviour to handle them.
  * @tparam TMessage the IMessage this handler works on.
  */
-template<typename TMessage>
-class BaseMessageHandler : public IMessageHandler
+template <typename TMessage>
+class BaseMessageHandler: public IMessageHandler
 {
-    static_assert(std::is_base_of<IMessage, TMessage>::value,
-                  "TMessage must derive from IMessage.");
+	static_assert(std::is_base_of<IMessage, TMessage>::value,
+	              "TMessage must derive from IMessage.");
 
-    public:
-        explicit BaseMessageHandler(NetworkContext& networkContext_) : networkContext(networkContext_) {}
-        ~BaseMessageHandler() override = default;
+public:
+	explicit
+	BaseMessageHandler(NetworkContext& networkContext_) : networkContext(
+		networkContext_)
+	{
+	}
 
-        void handleMessage(const IMessage &message) override
-        {
-            auto* concrete = dynamic_cast<const TMessage*>(&message);
+	~BaseMessageHandler() override = default;
 
-            if (concrete != nullptr)
-            {
-                handleMessageInternal(*concrete);
-            }
-        }
+	void handle(const IMessage& message) override
+	{
+		auto* concrete = dynamic_cast<const TMessage*>(&message);
 
-    protected:
-        virtual void handleMessageInternal(const TMessage& message) = 0;
+		if (concrete != nullptr)
+		{
+			handleMessageInternal(*concrete);
+		}
+	}
 
-        NetworkContext& networkContext;
+protected:
+	virtual void handleMessageInternal(const TMessage& message) = 0;
+
+	NetworkContext& networkContext;
 };

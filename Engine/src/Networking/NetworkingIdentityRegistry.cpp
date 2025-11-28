@@ -22,8 +22,7 @@ void NetworkIdentityRegistry::setCurrentScene(Scene* scene)
 
 void NetworkIdentityRegistry::registerIdentity(NetworkIdentity* identity)
 {
-	if (!identity)
-	{
+	if (!identity) {
 		return;
 	}
 
@@ -40,8 +39,7 @@ void NetworkIdentityRegistry::registerIdentity(NetworkIdentity* identity)
 
 void NetworkIdentityRegistry::unregisterIdentity(NetworkIdentity* identity)
 {
-	if (!identity)
-	{
+	if (!identity) {
 		return;
 	}
 
@@ -57,8 +55,7 @@ void NetworkIdentityRegistry::unregisterIdentity(NetworkIdentity* identity)
 NetworkIdentity* NetworkIdentityRegistry::findByNetId(uint32_t netId) const
 {
 	auto it = identitiesByNetId.find(netId);
-	if (it != identitiesByNetId.end())
-	{
+	if (it != identitiesByNetId.end()) {
 		return it->second;
 	}
 	return nullptr;
@@ -69,8 +66,7 @@ std::vector<NetworkIdentity*> NetworkIdentityRegistry::getAllIdentities() const
 	std::vector<NetworkIdentity*> result;
 	result.reserve(identitiesByNetId.size());
 
-	for (const auto& pair : identitiesByNetId)
-	{
+	for (const auto& pair : identitiesByNetId) {
 		result.push_back(pair.second);
 	}
 
@@ -81,8 +77,7 @@ std::vector<NetworkIdentity*> NetworkIdentityRegistry::getIdentitiesByOwner(
 	int ownerId) const
 {
 	auto it = identitiesByOwner.find(ownerId);
-	if (it != identitiesByOwner.end())
-	{
+	if (it != identitiesByOwner.end()) {
 		return it->second;
 	}
 	return {};
@@ -97,8 +92,7 @@ void NetworkIdentityRegistry::clear()
 void NetworkIdentityRegistry::forEach(
 	const std::function<void(NetworkIdentity*)>& callback) const
 {
-	for (const auto& pair : identitiesByNetId)
-	{
+	for (const auto& pair : identitiesByNetId) {
 		callback(pair.second);
 	}
 }
@@ -114,8 +108,7 @@ void NetworkIdentityRegistry::removeFromOwnerIndex(NetworkIdentity* identity)
 	int ownerId = identity->getOwnerId();
 
 	auto ownerIt = identitiesByOwner.find(ownerId);
-	if (ownerIt != identitiesByOwner.end())
-		{
+	if (ownerIt != identitiesByOwner.end()) {
 		auto& networkIdentitys = ownerIt->second;
 		networkIdentitys.erase(
 			std::remove(networkIdentitys.begin(), networkIdentitys.end(),

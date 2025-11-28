@@ -4,12 +4,12 @@
 
 class NetworkSpawnManager;
 
-class SpawnMessageHandler : public IMessageHandler
+class SpawnMessageHandler: public IMessageHandler
 {
 public:
-    explicit SpawnMessageHandler(NetworkSpawnManager& spawnManager);
-    void handleMessage(const IMessage& message) override;
+	explicit SpawnMessageHandler(NetworkSpawnManager& spawnManager);
+	void handle(const IMessage& message) override;
 
 private:
-    NetworkSpawnManager& spawnManager;
+	NetworkSpawnManager& spawnManager;
 };

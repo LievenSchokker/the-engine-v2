@@ -15,6 +15,7 @@
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Scene/SceneManager.h"
 #include "Networking/Messages/Concretes/WelcomeMessage.h"
+#include "Networking/Server/StateSyncSystem.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
 	: specifications(applicationSpecifications)
@@ -24,25 +25,26 @@ SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
 {
 	const auto& netOpts = specifications.networkingOptions;
 
-	if (netOpts.mode == EngineMode::CLIENT) {
-		if (specifications.renderBackend == RenderBackend::SDL) {
-
+	if (netOpts.mode == EngineMode::CLIENT)
+	{
+		if (specifications.renderBackend == RenderBackend::SDL)
+		{
 			SdlContext context = SdlContext();
-			timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []() {
+			timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
+			{
 				return SDL_GetTicks() / 1000.0;
 			});
 			renderer = std::make_unique<SDLRenderer>(context);
-
 		}
-
 
 		client = std::make_unique<Client>(std::make_unique<TransportGNS>());
 		gameWorld.renderer = renderer.get();
 		gameWorld.client = client.get();
-
-	} else {
-
-		timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []() {
+	}
+	else
+	{
+		timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
+		{
 			using namespace std::chrono;
 			return duration<double>(steady_clock::now().time_since_epoch()).
 				count();
@@ -75,13 +77,14 @@ void SpelMotor::run()
 
 	initializeNetworking();
 
-
-	if (specifications.networkingOptions.mode == EngineMode::CLIENT) {
+	if (specifications.networkingOptions.mode == EngineMode::CLIENT)
+	{
 		runClient();
-	} else {
+	}
+	else
+	{
 		runServer();
 	}
-
 }
 
 void SpelMotor::runClient()
@@ -92,7 +95,8 @@ void SpelMotor::runClient()
 	serverInfo.ip = specifications.networkingOptions.serverIP;
 	serverInfo.port = specifications.networkingOptions.port;
 
-	if (!client->connectToServer(serverInfo)) {
+	if (!client->connectToServer(serverInfo))
+	{
 		return;
 	}
 
@@ -100,12 +104,15 @@ void SpelMotor::runClient()
 	RenderQueue renderQueue;
 	running = true;
 
-	while (running) {
+	while (running)
+	{
 		timer->tick();
 		InputManager::getInstance()->update();
 
-		while (timer->shouldFixedUpdate()) {
-			if (sceneManager != nullptr) {
+		while (timer->shouldFixedUpdate())
+		{
+			if (sceneManager != nullptr)
+			{
 				sceneManager->update(timer->getDeltaTime());
 				physicsWorld->update();
 			}
@@ -114,7 +121,8 @@ void SpelMotor::runClient()
 		}
 		sceneManager->buildRenderQueue(renderQueue);
 		renderer->render(renderQueue);
-		if (InputManager::getInstance()->quitRequested()) {
+		if (InputManager::getInstance()->quitRequested())
+		{
 			shutdown();
 		}
 	}
@@ -123,18 +131,22 @@ void SpelMotor::runClient()
 void SpelMotor::initializeNetworking()
 {
 	Scene* activeScene = sceneManager->getActiveScene();
-	if (!activeScene) {
+	if (!activeScene)
+	{
 		return;
 	}
 
 	identityRegistry = std::make_unique<NetworkIdentityRegistry>();
 
-	if (server) {
+	if (server)
+	{
 		spawnManager = std::make_unique<NetworkSpawnManager>(
 			server.get(), activeScene, identityRegistry.get());
+
 		gameWorld.spawnManager = spawnManager.get();
 
-		server->setClientConnectedCallback([this](int clientId) {
+		server->setClientConnectedCallback([this](int clientId)
+		{
 			WelcomeMessage welcome(clientId);
 			server->sendMessage(clientId, welcome);
 
@@ -143,7 +155,8 @@ void SpelMotor::initializeNetworking()
 			spawnManager->spawnPlayer(clientId, spawnPos);
 		});
 
-		server->setClientDisconnectedCallback([this](int clientId) {
+		server->setClientDisconnectedCallback([this](int clientId)
+		{
 			spawnManager->despawnClientObjects(clientId);
 		});
 
@@ -154,7 +167,9 @@ void SpelMotor::initializeNetworking()
 				server->getNetworkContext(),
 				*identityRegistry);
 		server->injectMessageDispatcher(std::move(dispatcher));
-	} else if (client) {
+	}
+	else if (client)
+	{
 		spawnManager = std::make_unique<NetworkSpawnManager>(
 			server.get(), activeScene, identityRegistry.get());
 		gameWorld.spawnManager = spawnManager.get();
@@ -171,20 +186,31 @@ void SpelMotor::initializeNetworking()
 
 void SpelMotor::runServer()
 {
-	if (server->start() != ServerStatus::Running) {
+	if (server->start() != ServerStatus::Running)
+	{
 		return;
 	}
 
+	StateSyncSystem stateSync(server.get(), identityRegistry.get());
+
 	running = true;
-	while (running) {
+	uint32_t currentTick = 0;
+
+	while (running)
+	{
 		timer->tick();
 		server->update();
+		while (timer->shouldFixedUpdate())
+		{
+			currentTick++;
 
-		while (timer->shouldFixedUpdate()) {
-			if (sceneManager != nullptr) {
+			if (sceneManager != nullptr)
+			{
 				sceneManager->update(timer->getDeltaTime());
 			}
 
+
+			stateSync.tick(currentTick);
 			physicsWorld->update();
 			timer->consumeFixedUpdate();
 		}
@@ -194,8 +220,10 @@ void SpelMotor::runServer()
 void SpelMotor::startNetworkThread()
 {
 	networkRunning = true;
-	networkThread = std::thread([this]() {
-		while (networkRunning) {
+	networkThread = std::thread([this]()
+	{
+		while (networkRunning)
+		{
 			client->poll();
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
@@ -205,28 +233,33 @@ void SpelMotor::startNetworkThread()
 void SpelMotor::stopNetworkThread()
 {
 	networkRunning = false;
-	if (networkThread.joinable()) {
+	if (networkThread.joinable())
+	{
 		networkThread.join();
 	}
 }
 
 void SpelMotor::shutdown()
 {
-	if (!networkRunning.exchange(false)) {
+	if (!networkRunning.exchange(false))
+	{
 		return;
 	}
 
 	stopNetworkThread();
 
-	if (client) {
+	if (client)
+	{
 		client->disconnect();
 	}
 
-	if (server) {
+	if (server)
+	{
 		server->stop();
 	}
 
-	if (renderer) {
+	if (renderer)
+	{
 		InputManager::shutdown();
 		renderer->close();
 	}
@@ -240,4 +273,3 @@ SceneManager* SpelMotor::getSceneManager()
 	if (sceneManager) return sceneManager.get();
 	return nullptr;
 }
-
