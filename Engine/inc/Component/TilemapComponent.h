@@ -114,6 +114,6 @@ class TilemapComponent: public Component
 
    private:
 	TilemapAsset* tilemapAsset = nullptr;
-	Vector2 tileSize{32.0, 32.0};				// Default tile size
+	Vector2 tileSize;
 	std::unordered_map<int, Color> tileColors;	// Map tile ID to color
 };

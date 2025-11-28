@@ -1,9 +1,9 @@
 #pragma once
 
+#include "Component.h"
 #include "GameObject/Vector2.h"
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue.h"
-#include "Component.h"
 
 #include <unordered_map>
 #include <unordered_set>

@@ -9,6 +9,7 @@
 
 TilemapComponent::TilemapComponent()
 {
+	tileSize = {32.0, 32.0};  // Default tile size
 }
 
 void TilemapComponent::setTilemapAsset(TilemapAsset* asset)
@@ -36,9 +37,9 @@ Color TilemapComponent::getTileColor(int tileId) const
 	auto it = tileColors.find(tileId);
 	if ( it != tileColors.end() ) {
 		return it->second;
-	}
-	else {
-		std::cout << "[TilemapComponent] Tile color not set for tile ID: " << tileId << ", returning default white" << std::endl;
+	} else {
+		std::cout << "[TilemapComponent] Tile color not set for tile ID: "
+				  << tileId << ", returning default white" << std::endl;
 		return Color::white();
 	}
 }

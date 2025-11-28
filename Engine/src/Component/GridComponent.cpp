@@ -12,6 +12,16 @@ GridComponent::GridComponent()
 
 void GridComponent::setTilemapComponent(TilemapComponent* tilemap)
 {
+	// Validate that tilemap is on the same GameObject (if both exist)
+	if ( tilemap != nullptr && getGameObject() != nullptr &&
+		 tilemap->getGameObject() != nullptr &&
+		 tilemap->getGameObject() != getGameObject() ) {
+		// Warning: TilemapComponent is on a different GameObject
+		// This is allowed but may cause issues if the other GameObject is
+		// destroyed. For safety, prefer using a TilemapComponent on the same
+		// GameObject
+	}
+
 	tilemapComponent = tilemap;
 }
 
