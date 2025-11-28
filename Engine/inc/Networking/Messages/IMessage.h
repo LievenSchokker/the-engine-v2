@@ -1,10 +1,12 @@
 #pragma once
 
 
+#include "MessageTypes.h"
+
+
 #include <cstddef>
 #include <vector>
 #include <cstdint>
-#include "MessageTypes.h"
 
 
 class IMessage

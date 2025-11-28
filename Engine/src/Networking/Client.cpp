@@ -37,11 +37,11 @@ Client::~Client()
     disconnect();
 }
 
-bool Client::connectToServer(const ServerConnectionInformation&  serverInformartion) const
+bool Client::connectToServer(const ServerConnectionInformation&  serverInformation) const
 {
-    if (transport->connectByIPAdress(serverInformartion.ip.c_str(), serverInformartion.port) != TransportResult::SUCCESS)
+    if (transport->connectByIPAdress(serverInformation.ip.c_str(), serverInformation.port) != TransportResult::SUCCESS)
     {
-        std::cerr << "Failed to connect to " << serverInformartion.ip << ":" << serverInformartion.port << std::endl;
+        std::cerr << "Failed to connect to " << serverInformation.ip << ":" << serverInformation.port << std::endl;
         return false;
     }
     return true;

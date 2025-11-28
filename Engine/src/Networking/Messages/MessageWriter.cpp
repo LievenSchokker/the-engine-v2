@@ -16,7 +16,7 @@ OutgoingRawMessage MessageWriter::writeMessage(
     std::vector<std::byte> payload = message.serialize();
 
     std::vector<std::byte> buffer(sizeof(uint8_t) + payload.size());
-    auto typeValue = static_cast<uint8_t>(message.getMessageType());
+    const auto typeValue = static_cast<uint8_t>(message.getMessageType());
     std::memcpy(buffer.data(), &typeValue, sizeof(uint8_t));
     std::memcpy(buffer.data() + sizeof(uint8_t), payload.data(), payload.size());
 

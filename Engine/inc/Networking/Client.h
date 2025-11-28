@@ -36,12 +36,11 @@ public:
 
     /**
      * @brief Initiates a connection to a server.
-     * @param port The server port to connect to.
-     * @param serverIP The server IP address as a null-terminated string.
+     * @param serverInformation serverInformation the information of the server to connect to.
      * @return True if the connection attempt was initiated successfully,
      *         false otherwise.
      */
-    bool connectToServer(const ServerConnectionInformation&  serverInformartion) const;
+    bool connectToServer(const ServerConnectionInformation&  serverInformation) const;
 
     /**
      * @brief Disconnects from the server.
