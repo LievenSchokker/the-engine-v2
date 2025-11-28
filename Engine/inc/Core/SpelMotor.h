@@ -1,16 +1,5 @@
 #pragma once
 
-#include "Core/ApplicationSpecifications.h"
-#include "Core/GameWorld.h"
-#include "Rendering/RenderQueue.h"
-
-#include <atomic>
-#include <memory>
-#include <thread>
-
-#include "Networking/NetworkingIdentityRegistry.h"
-
-// Forward declarations
 class ApplicationClock;
 class IPhysicsWorld;
 class IRenderer;
@@ -18,6 +7,15 @@ class SceneManager;
 class Server;
 class Client;
 class NetworkSpawnManager;
+
+#include "Networking/NetworkingIdentityRegistry.h"
+#include "Core/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "Rendering/RenderQueue.h"
+
+#include <atomic>
+#include <memory>
+#include <thread>
 
 class SpelMotor
 {
@@ -33,14 +31,11 @@ public:
 private:
     void runClient();
     void runServer();
-    void startNetworkThread();
-    void stopNetworkThread();
     void shutdown();
 
     void initializeNetworking();
 
     int tickRate;
-    std::atomic<bool> running{false};
 
     const ApplicationSpecifications specifications;
 
@@ -53,10 +48,5 @@ private:
     std::unique_ptr<Client> client;
     std::unique_ptr<NetworkSpawnManager> spawnManager;
     std::unique_ptr<NetworkIdentityRegistry> identityRegistry;
-
-
-    std::thread networkThread;
-    std::atomic<bool> networkRunning{false};
-
     GameWorld gameWorld;
 };

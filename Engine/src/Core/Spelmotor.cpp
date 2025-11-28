@@ -107,6 +107,7 @@ void SpelMotor::runClient()
 	while (running)
 	{
 		timer->tick();
+		client->poll();
 		InputManager::getInstance()->update();
 
 		while (timer->shouldFixedUpdate())
@@ -217,27 +218,7 @@ void SpelMotor::runServer()
 	}
 }
 
-void SpelMotor::startNetworkThread()
-{
-	networkRunning = true;
-	networkThread = std::thread([this]()
-	{
-		while (networkRunning)
-		{
-			client->poll();
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}
-	});
-}
 
-void SpelMotor::stopNetworkThread()
-{
-	networkRunning = false;
-	if (networkThread.joinable())
-	{
-		networkThread.join();
-	}
-}
 
 void SpelMotor::shutdown()
 {
