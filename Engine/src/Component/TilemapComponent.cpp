@@ -1,8 +1,8 @@
-#include "../../inc/Component/TilemapComponent.h"
+#include "Component/TilemapComponent.h"
 
-#include "../../inc/Assets/TilemapAsset.h"
-#include "../../inc/Component/Transform.h"
-#include "../../inc/GameObject/Vector2Utils.h"
+#include "Assets/TilemapAsset.h"
+#include "Component/Transform.h"
+#include "GameObject/Vector2Utils.h"
 
 #include <cmath>
 #include <iostream>

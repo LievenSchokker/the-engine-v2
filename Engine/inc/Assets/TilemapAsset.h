@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Assets/Asset.h"
-#include "../GameObject/Vector2.h"
+#include "Asset.h"
+#include "GameObject/Vector2.h"
 
 #include <string>
 #include <vector>

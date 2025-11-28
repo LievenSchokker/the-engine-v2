@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../GameObject/Vector2.h"
-#include "../Rendering/Color.h"
-#include "../Rendering/RenderQueue.h"
+#include "GameObject/Vector2.h"
+#include "Rendering/Color.h"
+#include "Rendering/RenderQueue.h"
 #include "Component.h"
 
 #include <unordered_map>

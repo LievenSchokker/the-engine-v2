@@ -1,7 +1,7 @@
-#include "../../inc/Component/GridComponent.h"
+#include "Component/GridComponent.h"
 
-#include "../../inc/Component/TilemapComponent.h"
-#include "../../inc/Component/Transform.h"
+#include "Component/TilemapComponent.h"
+#include "Component/Transform.h"
 
 #include <algorithm>
 #include <cmath>
