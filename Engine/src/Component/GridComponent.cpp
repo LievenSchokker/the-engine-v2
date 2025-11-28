@@ -82,6 +82,30 @@ void GridComponent::clearBlockedCells()
 	blockedCells.clear();
 }
 
+void GridComponent::setTileWeight(int tileId, double weight)
+{
+	tileWeights[tileId] = weight;
+}
+
+double GridComponent::getTileWeight(int tileId) const
+{
+	auto it = tileWeights.find(tileId);
+	if ( it != tileWeights.end() ) {
+		return it->second;
+	}
+	return 1.0;	 // Default weight
+}
+
+double GridComponent::getCellWeight(Vector2 cell) const
+{
+	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() ) {
+		return 1.0;
+	}
+
+	int tileId = tilemapComponent->getTileAt(cell);
+	return getTileWeight(tileId);
+}
+
 std::vector<Vector2> GridComponent::getWalkableNeighbors(Vector2 cell) const
 {
 	std::vector<Vector2> neighbors = getNeighbors(cell, false);

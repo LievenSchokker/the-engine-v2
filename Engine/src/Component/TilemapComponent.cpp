@@ -5,14 +5,10 @@
 #include "../../inc/GameObject/Vector2Utils.h"
 
 #include <cmath>
+#include <iostream>
 
 TilemapComponent::TilemapComponent()
 {
-	// Set default colors for common tile IDs
-	tileColors[0] = Color(0, 0, 0, 0);	 // Empty/air (transparent)
-	tileColors[1] = Color::gray();		 // Default solid tile
-	tileColors[2] = Color::darkGreen();	 // Example: grass
-	tileColors[3] = Color::darkBlue();	 // Example: water
 }
 
 void TilemapComponent::setTilemapAsset(TilemapAsset* asset)
@@ -41,7 +37,10 @@ Color TilemapComponent::getTileColor(int tileId) const
 	if ( it != tileColors.end() ) {
 		return it->second;
 	}
-	return Color::white();
+	else {
+		std::cout << "[TilemapComponent] Tile color not set for tile ID: " << tileId << ", returning default white" << std::endl;
+		return Color::white();
+	}
 }
 
 std::vector<ShapeRenderCommand> TilemapComponent::buildRenderCommands() const

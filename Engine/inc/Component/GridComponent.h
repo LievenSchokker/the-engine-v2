@@ -5,11 +5,19 @@
 #include "../Rendering/RenderQueue.h"
 #include "Component.h"
 
+#include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 class TilemapComponent;
 
+/**
+ * @brief Hash function for cell coordinates (x, y) stored as std::pair<int,
+ * int>.
+ *
+ * Needed because std::unordered_set doesn't know how to hash pairs by default.
+ * This allows us to use cell coordinates as keys in the blockedCells set.
+ */
 struct CellKeyHash {
 	size_t operator()(const std::pair<int, int>& key) const noexcept
 	{
@@ -90,6 +98,28 @@ class GridComponent: public Component
 	 * @brief Clear all dynamic blockers.
 	 */
 	void clearBlockedCells();
+
+	/**
+	 * @brief Set the movement cost/weight for a specific tile ID.
+	 * @param tileId The tile ID to set weight for
+	 * @param weight Movement cost (1.0 = normal, higher = slower, lower =
+	 * faster)
+	 */
+	void setTileWeight(int tileId, double weight);
+
+	/**
+	 * @brief Get the movement cost/weight for a specific tile ID.
+	 * @param tileId The tile ID
+	 * @return Movement cost, or 1.0 if not set
+	 */
+	double getTileWeight(int tileId) const;
+
+	/**
+	 * @brief Get the movement cost/weight for a cell.
+	 * @param cell Grid coordinates {x, y}
+	 * @return Movement cost for the tile at this cell, or 1.0 if not set
+	 */
+	double getCellWeight(Vector2 cell) const;
 
 	/**
 	 * @brief Get all walkable neighboring cells (4-directional: up, down, left,
@@ -198,6 +228,8 @@ class GridComponent: public Component
 	bool debugShowDiagonalLinks = false;
 	std::unordered_set<int> walkableTileIds{0};
 	std::unordered_set<std::pair<int, int>, CellKeyHash> blockedCells;
+	std::unordered_map<int, double>
+		tileWeights;  // Map tile ID to movement cost
 
 	static std::pair<int, int> cellKey(Vector2 cell);
 };

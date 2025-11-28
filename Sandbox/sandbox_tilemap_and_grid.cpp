@@ -1,14 +1,3 @@
-/**
- * @file tilemap_example.cpp
- * @brief Example demonstrating how to use the Tilemap system
- *
- * This example shows:
- * - Loading a tilemap from a CSV file
- * - Creating a GameObject with TilemapComponent
- * - Setting tile colors
- * - Using grid query functions
- */
-
 #include "../Engine/inc/Assets/AssetManager.h"
 #include "../Engine/inc/Assets/TilemapAsset.h"
 #include "../Engine/inc/Component/GridComponent.h"
@@ -99,6 +88,11 @@ int main()
 		gridComponent->setTilemapComponent(tilemapComponent);
 		gridComponent->setWalkableTileIds({0, 2});
 
+		// Set movement costs/weights for pathfinding
+		// 1.0 = normal speed, higher = slower, lower = faster
+		gridComponent->setTileWeight(0, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(2, 2.0);  // High grass: 2x slower
+
 		// Mark a sample blocked cell dynamically and visualize it with a
 		// boulder
 		Vector2 blockedCell{10.0, 7.0};
@@ -146,6 +140,17 @@ int main()
 	GameObject* tilemapObj = activeScene->getGameObject("LevelTilemap");
 	GridComponent* gridComp =
 		tilemapObj ? tilemapObj->getComponent<GridComponent>() : nullptr;
+
+	// Test weight queries after retrieving grid component from scene
+	if ( gridComp != nullptr ) {
+		std::cout << "\nTile weights:\n";
+		std::cout << "  Tile 0 (grass): " << gridComp->getTileWeight(0) << "\n";
+		std::cout << "  Tile 2 (high grass): " << gridComp->getTileWeight(2)
+				  << "\n";
+		std::cout << "  Tile 3 (water): " << gridComp->getTileWeight(3) << "\n";
+		std::cout << "  Cell (3,3) weight: "
+				  << gridComp->getCellWeight({3.0, 3.0}) << "\n";
+	}
 	Vector2 sampleBlockedCell{10.0, 7.0};
 	bool sampleCellBlocked = true;
 

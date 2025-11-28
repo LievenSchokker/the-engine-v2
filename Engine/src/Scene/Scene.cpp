@@ -186,5 +186,6 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 		}
 	}
 
+	// Append deferred debug overlays after regular render commands.
 	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
 }
