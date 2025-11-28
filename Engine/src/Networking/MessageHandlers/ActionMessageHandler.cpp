@@ -20,7 +20,6 @@ void ActionMessageHandler::handleMessageInternal(const ActionMessage& message)
 
     uint32_t netId = message.getGameObjectIdentity();
 
-    // Find the NetworkIdentity by netId
     NetworkIdentity* identity = identityRegistry.findByNetId(netId);
     if (!identity)
     {

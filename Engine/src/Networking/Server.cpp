@@ -91,7 +91,6 @@ void Server::onConnectionChanged(const Connection& connection)
 			connectedClients.insert(clientId);
 			std::cout << "Client " << clientId << " connected" << std::endl;
 
-			// NEW: Invoke callback for spawn manager
 			if (onClientConnected) {
 				onClientConnected(clientId);
 			}
@@ -105,7 +104,6 @@ void Server::onConnectionChanged(const Connection& connection)
 			connectedClients.erase(clientId);
 			std::cout << "Client " << clientId << " disconnected" << std::endl;
 
-			// NEW: Invoke callback for spawn manager
 			if (onClientDisconnected) {
 				onClientDisconnected(clientId);
 			}

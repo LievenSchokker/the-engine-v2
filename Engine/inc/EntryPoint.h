@@ -38,7 +38,6 @@ namespace SpelMotorEntry
     {
         auto scene = std::make_unique<Scene>("WalkingDemo");
 
-        // Just obstacles - players are spawned by NetworkSpawnManager
         auto addObstacle = [&](const std::string& name, Vector2 pos, Vector2 size, Color color) {
             auto obj = std::make_unique<GameObject>();
             obj->setName(name);
@@ -58,7 +57,6 @@ namespace SpelMotorEntry
 
     inline int main(int argc, char** argv)
     {
-        // Register prefabs FIRST
         registerNetworkPrefabs();
 
         ApplicationSpecifications specifications{};
