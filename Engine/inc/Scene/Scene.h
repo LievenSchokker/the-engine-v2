@@ -123,7 +123,7 @@ class Scene
 
         void initialiseBehaviours(const std::vector<Behaviour *> &behaviours);
 
-        void queueDestroy(GameObject *obj);
+        void queueDestroy(GameObject* obj);
 
         void processDestroyQueue();
 

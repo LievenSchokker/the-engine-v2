@@ -41,8 +41,10 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
     if (active)
 	{
+        GameObject* added = gameObjects.back().get();
+
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
-	    initialiseBehaviours(gameObject->getAllBehaviours());
+	    initialiseBehaviours(added->getAllBehaviours());
 	}
 
 	return true;
