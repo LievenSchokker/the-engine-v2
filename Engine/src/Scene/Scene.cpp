@@ -148,7 +148,6 @@ void Scene::onStop()
 	for ( auto& gameObject : gameObjects )
 	{
 		// TODO: call gameobject on stop
-
 	    /// GO does not have (and shouldn't have) an onStop, but we can deactivate all behaviours:
         gameObject->setBehavioursEnabled(false);
 	}
