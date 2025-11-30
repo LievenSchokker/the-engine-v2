@@ -36,13 +36,14 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
 	bool isGameObjectActive = gameObject->getIsActive();
 
-    gameObject->setScene(*this);
 	gameObjects.emplace_back(std::move(gameObject));
+    GameObject* addedObject = gameObjects.back().get();
+    addedObject->setScene(*this);
 
     if (active)
 	{
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
-	    initialiseBehaviours(gameObject->getAllBehaviours());
+	    initialiseBehaviours(addedObject->getAllBehaviours());
 	}
 
 	return true;
@@ -147,6 +148,7 @@ void Scene::onStop()
 	for ( auto& gameObject : gameObjects )
 	{
 		// TODO: call gameobject on stop
+
 	    /// GO does not have (and shouldn't have) an onStop, but we can deactivate all behaviours:
         gameObject->setBehavioursEnabled(false);
 	}
