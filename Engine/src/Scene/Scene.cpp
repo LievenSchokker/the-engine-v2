@@ -186,6 +186,7 @@ void Scene::update(float deltaTime)
 		return;
 	}
 
+
     /// Update all GameObject's behaviours:
     for ( auto& gameObject : gameObjects )
     {
@@ -204,6 +205,7 @@ void Scene::update(float deltaTime)
     }
 
     processDestroyQueue();
+
 }
 
 void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
@@ -303,6 +305,16 @@ void Scene::processDestroyQueue()
     /// Clear the queue when all queued objects have been deleted.
     destroyQueue.clear();
 }
+
+bool Scene::isInDestroyQueue(GameObject *obj)
+{
+    if (obj == nullptr)
+        return false;
+
+    return std::find(destroyQueue.begin(), destroyQueue.end(), obj)
+            != destroyQueue.end();
+}
+
 
 void Scene::destroyAllGameObjects()
 {

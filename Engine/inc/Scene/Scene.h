@@ -126,6 +126,7 @@ class Scene
         void queueDestroy(GameObject* obj);
 
         void processDestroyQueue();
+        bool isInDestroyQueue(GameObject* obj);
 
         void destroyAllGameObjects();
     private:

@@ -73,7 +73,8 @@ void GameObject::destroy()
     isDestroyed = true;
     setActive(false);
 
-    /// TEMP if statement, remove when scene is implemented!
+    componentManager->disableAllBehaviours();
+
     if (scene != nullptr)
         scene->queueDestroy(this);
 }

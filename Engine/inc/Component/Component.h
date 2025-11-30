@@ -92,7 +92,7 @@ class Component
 
     protected:
         /// The @c GameObject this component is attached to, a component is always attached to a GameObject
-        GameObject* gameObject;
+        GameObject* gameObject = nullptr;
 
         /// The @c Transform that is attached to the associated GameObject.
         Transform* transform = nullptr;
