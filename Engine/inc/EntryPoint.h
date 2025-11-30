@@ -15,7 +15,7 @@ namespace SpelMotorEntry
 		specifications.renderBackend = RenderBackend::SDL;
 		specifications.tickRate = 60;
 		SpelMotor engine(specifications);
-		engine.run();
+		engine.start();
 		return 0;
 	}
 }

@@ -96,8 +96,9 @@ int main()
 	physicsWorld->start();
 
 	// Register GameObjects directly
-	physicsWorld->createBody(circleGO);
-	physicsWorld->createBody(rectangleGO);
+    physicsWorld->createBody(circleGO->getComponent<RigidBody>());
+    physicsWorld->createBody(rectangleGO->getComponent<RigidBody>());
+
 
 	bool running = true;
 	Uint32 lastTicks = SDL_GetTicks();
@@ -106,10 +107,7 @@ int main()
 		input->update();
 
 		// --- Physics update ---
-		physicsWorld->update();
-
-		// Sync transforms
-		physicsWorld->syncTransforms();
+		physicsWorld->fixedUpdate();
 
 		// Clock
 		Uint32 currentTicks = SDL_GetTicks();
@@ -134,12 +132,12 @@ int main()
 		}
 
 		if (input->wasKeyPressed(KeyCode::W)) {
-			physicsWorld->destroyBody(rectangleGO);
+			physicsWorld->destroyBody(rectangleGO->getComponent<RigidBody>());
 		}
 
 		if (input->wasKeyPressed(KeyCode::SPACE)) {
 			constexpr Vector2 force = {0, 100};
-			physicsWorld->applyForce(rectangleGO, force);
+			physicsWorld->applyForce(rectangleGO->getComponent<RigidBody>(), force);
 		}
 
 		SDL_Delay(16);

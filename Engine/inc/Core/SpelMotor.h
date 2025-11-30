@@ -38,7 +38,7 @@ public:
 	 * It only returns when the engine has been shut down.
 	 *
 	 */
-	void run();
+	void start();
 
 	/**
 	 * @brief Immediately shuts down all engine systems.
@@ -57,7 +57,7 @@ private:
 	 * entered through run(), preventing accidental re-entry or misuse.
 	 *
 	 */
-	void update();
+	void run();
 
 	int tickRate;
 	/** @brief Tracks whether the game loop is active. */
@@ -72,7 +72,4 @@ private:
 
 	/** @brief timeStep calculation for engine */
 	std::unique_ptr<ApplicationClock> timer;
-
-	/** @brief The world where physics are simulated */
-	std::unique_ptr<IPhysicsWorld> physicsWorld;
 };
