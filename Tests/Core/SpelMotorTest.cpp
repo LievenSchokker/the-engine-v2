@@ -59,7 +59,7 @@ TEST_F(SpelMotorTest, CleanSubsystemShutdownViaQuitEvent)
     quitThread.detach();
 
     //Act - Run on main thread
-    engine->run();
+    engine->start();
 
 
     //Assert

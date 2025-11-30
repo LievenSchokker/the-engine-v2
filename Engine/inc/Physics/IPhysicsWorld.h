@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "Components/RigidBody.h"
 #include "GameObject/GameObject.h"
 #include "GameObject/Vector2.h"
 
@@ -37,7 +38,7 @@ public:
 	 * The concrete implementation decides the timestep size (fixed, variable, etc.)
 	 * and should update all physics bodies accordingly.
 	 */
-	virtual void update() = 0;
+	virtual void fixedUpdate() = 0;
 
 	/**
 	 * @brief Cleans up and shuts down the physics world.
@@ -48,31 +49,31 @@ public:
 	virtual void shutdown() = 0;
 
 	/**
-	 * @brief Creates a physics body for the given GameObject.
+	 * @brief Creates a physics body for the given RigidBody.
 	 *
 	 * Implementations typically inspect the GameObject’s Collider and RigidBody
 	 * components to determine shape, mass, and body type.
 	 *
-	 * @param gameObject Pointer to a GameObject with Collider + RigidBody components.
+	 * @param rigidBody Pointer to a RigidBody with Collider + RigidBody components.
 	 */
-	virtual void createBody(const GameObject* gameObject) = 0;
+	virtual void createBody(const RigidBody* rigidBody) = 0;
 
 	/**
 	 * @brief Destroys a previously created physics body.
 	 *
 	 * Removes the body from the physics simulation and cleans up any associated resources.
 	 *
-	 * @param body Pointer to the GameObject whose physics body should be destroyed.
+	 * @param rigidBody Pointer to the RigidBody whose physics body should be destroyed.
 	 */
-	virtual void destroyBody(const GameObject* body) = 0;
+	virtual void destroyBody(const RigidBody* rigidBody) = 0;
 
 	/**
 	 * @brief Applies a force to the center of mass of a physics body.
 	 *
-	 * @param body Pointer to the GameObject whose body will receive the force.
+	 * @param rigidBody Pointer to the RigidBody whose body will receive the force.
 	 * @param force Force vector in world units.
 	 */
-	virtual void applyForce(const GameObject* body, Vector2 force) = 0;
+	virtual void applyForce(const RigidBody* rigidBody, Vector2 force) = 0;
 
 	/**
 	 * @brief Synchronizes all registered GameObject transforms with the physics world.

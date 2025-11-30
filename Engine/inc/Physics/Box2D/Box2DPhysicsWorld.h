@@ -2,6 +2,7 @@
 
 #include "box2d/id.h"
 #include "Physics/IPhysicsWorld.h"
+#include "Physics/Components/RigidBody.h"
 
 #include <unordered_map>
 
@@ -48,7 +49,7 @@ public:
 	 * The timestep and substep count are typically configured internally.
 	 * This method is called by PhysicsSystem::update().
 	 */
-	void update() override;
+	void fixedUpdate() override;
 
 	/**
 	 * @brief Shuts down the physics world.
@@ -61,34 +62,34 @@ public:
 	/**
 	 * @brief Creates a physics body for the given GameObject.
 	 *
-	 * The method inspects the GameObject's Collider and RigidBody components
+	 * The method inspects the RigidBody's Collider and RigidBody components
 	 * to configure and create the appropriate Box2D body.
 	 *
-	 * @param gameObject Pointer to the GameObject containing physics components.
+	 * @param rigidBody Pointer to the RigidBody containing physics components.
 	 */
-	void createBody(const GameObject* gameObject) override;
+	void createBody(const RigidBody* rigidBody) override;
 
 	/**
 	 * @brief Destroys a previously created physics body.
 	 *
 	 * Removes the body from the physics world and internal mappings.
 	 *
-	 * @param gameObject Pointer to the GameObject whose body should be destroyed.
+	 * @param rigidBody Pointer to the RigidBody whose body should be destroyed.
 	 */
-	void destroyBody(const GameObject* gameObject) override;
+	void destroyBody(const RigidBody* rigidBody) override;
 
 	/**
 	 * @brief Applies a force to the center of mass of a physics body.
 	 *
-	 * @param gameObject Pointer to the GameObject whose body will receive the force.
+	 * @param rigitBody Pointer to the RigidBody whose body will receive the force.
 	 * @param force Force vector in world units.
 	 */
-	void applyForce(const GameObject* gameObject, Vector2 force) override;
+	void applyForce(const RigidBody* rigitBody, Vector2 force) override;
 
 	/**
-	 * @brief Synchronizes all registered GameObject transforms with the physics world.
+	 * @brief Synchronizes all registered RigidBody transforms with the physics world.
 	 *
-	 * After stepping the simulation, this function updates each GameObject's
+	 * After stepping the simulation, this function updates each RigidBody's
 	 * Transform component to match the corresponding Box2D body's position and rotation.
 	 */
 	void syncTransforms() override;
@@ -102,11 +103,12 @@ private:
 	b2WorldId worldId;
 
 	/**
-	 * @brief Mapping from GameObject pointers to their corresponding Box2D bodies.
+	 * @brief Mapping from RigidBody pointers to their corresponding Box2D bodies.
 	 *
-	 * This allows direct GameObject-based operations without needing a separate body ID map.
+	 * This allows direct RigidBody-based operations without needing a separate body ID map.
 	 */
-	std::unordered_map<const GameObject*, b2BodyId> bodies;
+	std::unordered_map<const RigidBody*, b2BodyId> bodies;
+
 
 	/**
 	 * @brief The amount of ticks to calculate

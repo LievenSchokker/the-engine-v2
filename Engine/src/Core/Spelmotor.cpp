@@ -12,9 +12,7 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
     : running(false),
       specifications(applicationSpecifications),
       timer(nullptr),
-      tickRate(applicationSpecifications.tickRate),
-      physicsWorld(std::make_unique<Box2DPhysicsWorld>(
-          applicationSpecifications.tickRate))
+      tickRate(applicationSpecifications.tickRate)
 {
     if (applicationSpecifications.renderBackend == RenderBackend::SDL)
     {
@@ -32,22 +30,20 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 
 SpelMotor::~SpelMotor() = default;
 
-void SpelMotor::run()
+void SpelMotor::start()
 {
     timer->start();
 
     // TODO Server or Client -> Start()
-    physicsWorld->start();
     // TODO SceneManager -> Start()
 
     renderer->open(specifications.windowOptions);
 
-    InputManager::getInstance();
-    update();
+    run();
 }
 
 
-void SpelMotor::update()
+void SpelMotor::run()
 {
     running = true;
 
@@ -65,7 +61,6 @@ void SpelMotor::update()
         while (timer->shouldFixedUpdate())
         {
             input->update();
-            physicsWorld->update();
             timer->consumeFixedUpdate();
         }
 
@@ -84,6 +79,5 @@ void SpelMotor::shutdown()
     InputManager::shutdown();
     renderer->close();
     // TODO scenemanager->shutdown()
-    physicsWorld->shutdown();
     // TODO server->shutdown() and client->shutdown()
 }
