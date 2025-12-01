@@ -1,4 +1,4 @@
-    #include "Core/EngineLoops/ClientLoop.h"
+#include "Core/EngineLoops/ClientLoop.h"
 #include "Core/ApplicationClock.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
@@ -11,71 +11,84 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
+#include <iostream>
+#include <ostream>
+
 
 //TODO Create proper factory for each system that needs to be created
-ClientLoop::ClientLoop(const ApplicationSpecifications& applicationSpecifications)
-    : sceneManager(std::make_unique<SceneManager>()),
-        gameWorld(std::make_unique<GameWorld>()),
-    client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
+ClientLoop::ClientLoop(
+	const ApplicationSpecifications& applicationSpecifications)
+	: sceneManager(std::make_unique<SceneManager>()),
+	  gameWorld(std::make_unique<GameWorld>()),
+	  applicationSpecifications(applicationSpecifications),
+	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
 {
-    clockFunction = []() {return 1.0;};
-    if (applicationSpecifications.renderBackend == RenderBackend::SDL)
-    {
-        SdlContext context = SdlContext();
-        //TODO SDL Injection layer
-        clockFunction = []() { return SDL_GetTicks() / 1000.0; };
-        renderer = std::make_unique<SDLRenderer>(context);
-    }
+	clockFunction = []()
+	{
+		return 1.0;
+	};
+	if (applicationSpecifications.renderBackend == RenderBackend::SDL)
+	{
+		sdlContext = std::make_unique<SdlContext>();
+		//TODO SDL Injection layer
+		clockFunction = []()
+		{
+			return SDL_GetTicks() / 1000.0;
+		};
+		renderer = std::make_unique<SDLRenderer>(*sdlContext);
+	}
+
+	inputManager = InputManager::getInstance();
 }
 
 void ClientLoop::start()
 {
-    renderer->open(applicationSpecifications.windowOptions);
+	renderer->open(applicationSpecifications.windowOptions);
 	initializeNetworking();
 }
 
 void ClientLoop::update()
 {
+	inputManager->update();
 	RenderQueue renderQueue;
-    sceneManager->buildRenderQueue(renderQueue);
-    renderer->presentFrame();
-    client->poll();
+	sceneManager->buildRenderQueue(renderQueue);
+	renderer->presentFrame();
+	client->poll();
 }
 
 void ClientLoop::fixedUpdate(double deltaTime)
 {
-    client->poll();
-    InputManager::getInstance()->update();
-    sceneManager->update(deltaTime);
-    if (InputManager::getInstance()->quitRequested())
-    {
-        shutdown();
-    }
+	client->poll();
+	sceneManager->update(deltaTime);
+	if (inputManager->quitRequested())
+	{
+		shutdown();
+	}
 }
 
 void ClientLoop::initializeNetworking()
 {
-    ServerConnectionInformation serverInfo;
-    serverInfo.ip = applicationSpecifications.networkingOptions.serverIP;
-    serverInfo.port = applicationSpecifications.networkingOptions.port;
-    client->connectToServer(serverInfo);
+	ServerConnectionInformation serverInfo;
+	serverInfo.ip = applicationSpecifications.networkingOptions.serverIP;
+	serverInfo.port = applicationSpecifications.networkingOptions.port;
+	client->connectToServer(serverInfo);
 }
 
 void ClientLoop::shutdown()
 {
 	InputManager::shutdown();
 	renderer->close();
-    client->disconnect();
+	client->disconnect();
 }
 
 GameWorld* ClientLoop::getGameWorld()
 {
-    return gameWorld.get();
+	return gameWorld.get();
 }
 
 ClientLoop::ClockFunction ClientLoop::getClock()
 {
-    return clockFunction;
+	return clockFunction;
 }
 
 SceneManager* ClientLoop::getSceneManager()

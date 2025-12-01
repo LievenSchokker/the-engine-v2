@@ -1,5 +1,4 @@
 #include "Core/EngineLoopFactory.h"
-
 #include "Core/EngineLoops/ClientLoop.h"
 #include "Core/EngineLoops/ServerLoop.h"
 

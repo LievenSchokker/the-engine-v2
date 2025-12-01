@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../Rendering/Color.h"
-#include "../Rendering/RenderQueue.h"
+#include "Rendering/Color.h"
+#include "Rendering/RenderQueue.h"
 #include "Scene.h"
+
+class GameWorld;
 
 #include <memory>
 #include <string>
 #include <unordered_map>
-
-#include "Core/GameWorld.h"
 
 /**
  * @brief Coordinates ownership and activation of scenes.

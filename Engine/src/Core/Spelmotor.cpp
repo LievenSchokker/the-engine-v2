@@ -37,6 +37,7 @@ SpelMotor::~SpelMotor()
 void SpelMotor::start()
 {
     coreClock->start();
+	coreSystemLoop->start();
     run();
 }
 
