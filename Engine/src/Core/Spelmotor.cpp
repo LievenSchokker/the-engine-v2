@@ -9,10 +9,10 @@
 
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
-    : running(false),
-      specifications(applicationSpecifications),
-      timer(nullptr),
-      tickRate(applicationSpecifications.tickRate)
+	: running(false),
+	  specifications(applicationSpecifications),
+	  timer(nullptr),
+	  tickRate(applicationSpecifications.tickRate)
 {
     if (applicationSpecifications.renderBackend == RenderBackend::SDL)
     {
@@ -37,54 +37,54 @@ SpelMotor::~SpelMotor() = default;
 
 void SpelMotor::start()
 {
-    timer->start();
+	timer->start();
 
-    // TODO Server or Client -> Start()
+	// TODO Server or Client -> Start()
 	physicsWorld->start();
-    // TODO SceneManager -> Start()
+	// TODO SceneManager -> Start()
 
-    renderer->open(specifications.windowOptions);
+	renderer->open(specifications.windowOptions);
 
-    run();
+	run();
 }
 
 
 void SpelMotor::run()
 {
-    running = true;
+	running = true;
 
-    InputManager* input = InputManager::getInstance();
+	InputManager* input = InputManager::getInstance();
 
-    while (running)
-    {
-        timer->tick();
+	while (running)
+	{
+		timer->tick();
 
-        if (input->quitRequested())
-        {
-            running = false;
-        }
+		if (input->quitRequested())
+		{
+			running = false;
+		}
 
-        while (timer->shouldFixedUpdate())
-        {
-            input->update();
+		while (timer->shouldFixedUpdate())
+		{
+			input->update();
 			physicsWorld->fixedUpdate();
-            timer->consumeFixedUpdate();
-        }
+			timer->consumeFixedUpdate();
+		}
 
-        // TODO Network->Update()
-        // TODO Audio->Update();
-        renderer->presentFrame();
-    }
+		// TODO Network->Update()
+		// TODO Audio->Update();
+		renderer->presentFrame();
+	}
 }
 
 
 void SpelMotor::shutdown()
 {
-    running = false;
+	running = false;
 
-    // TODO audioSystem->shutdown()
-    InputManager::shutdown();
-    renderer->close();
-    // TODO scenemanager->shutdown()
-    // TODO server->shutdown() and client->shutdown()
+	// TODO audioSystem->shutdown()
+	InputManager::shutdown();
+	renderer->close();
+	// TODO scenemanager->shutdown()
+	// TODO server->shutdown() and client->shutdown()
 }

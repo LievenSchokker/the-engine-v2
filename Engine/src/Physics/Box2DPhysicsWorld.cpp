@@ -7,7 +7,7 @@
 #include "Physics/Components/RigidBody.h"
 
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
-    : worldId(0), tickRate(newTickRate)
+    : worldId{}, tickRate(newTickRate)
 {
 }
 
