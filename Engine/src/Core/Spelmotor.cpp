@@ -85,6 +85,7 @@ void SpelMotor::shutdown()
 	// TODO audioSystem->shutdown()
 	InputManager::shutdown();
 	renderer->close();
+	physicsWorld->shutdown();
 	// TODO scenemanager->shutdown()
 	// TODO server->shutdown() and client->shutdown()
 }
