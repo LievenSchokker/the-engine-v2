@@ -1,13 +1,14 @@
+#pragma once
+
+
 #include "ApplicationSpecifications.h"
 #include "GameWorld.h"
-
-
 
 class EngineLoop
 {
     using ClockFunction = std::function<double()>;
 public:
-    EngineLoop(ApplicationSpecifications applicationSpecifications);
+    explicit EngineLoop(ApplicationSpecifications applicationSpecifications);
 
     virtual ~EngineLoop() = default;
 
