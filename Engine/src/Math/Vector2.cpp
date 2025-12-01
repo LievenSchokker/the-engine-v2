@@ -7,6 +7,8 @@
 #include <cmath>
 #include <algorithm>
 
+constexpr float EPSILON = 1e-5f;
+
 
 float Vector2::x() const
 {
@@ -202,4 +204,16 @@ Vector2 &Vector2::operator/=(float scalar)
 Vector2 Vector2::operator-() const
 {
     return {-_x, -_y};
+}
+
+
+bool Vector2::operator==(const Vector2& other) const
+{
+    return std::fabs(_x - other._x) < EPSILON && std::fabs(_y - other._y) < EPSILON;
+}
+
+
+bool Vector2::operator!=(const Vector2& other) const
+{
+    return !(*this == other);
 }

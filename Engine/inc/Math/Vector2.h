@@ -92,7 +92,14 @@ struct Vector2
     /// Divides this vector's component by a scalar value (v1.x / scalar, v1.y / scalar)
     Vector2 &operator/=(float scalar);
 
+    /// Flips the components of this vector (1 -> -1, -2 -> 2)
     Vector2 operator-() const;
+
+    /// Returns wheter this and the other are equal (using float epsilon)
+    bool operator==(const Vector2& other) const;
+
+    /// Returns whether this and the other vector are not equal
+    bool operator!=(const Vector2& other) const;
 
     private:
         float _x = 0;
