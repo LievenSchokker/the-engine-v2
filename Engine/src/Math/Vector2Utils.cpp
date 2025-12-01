@@ -1,4 +1,4 @@
-#include "../../inc/GameObject/Vector2Utils.h"
+#include "../../inc/Math/Vector2Utils.h"
 
 #include <cmath>
 

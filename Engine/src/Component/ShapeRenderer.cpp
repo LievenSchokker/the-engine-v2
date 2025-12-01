@@ -1,7 +1,7 @@
 #include "Component/ShapeRenderer.h"
 
 #include "Component/Transform.h"
-#include "GameObject/Vector2Utils.h"
+#include "../../inc/Math/Vector2Utils.h"
 
 #include <algorithm>
 

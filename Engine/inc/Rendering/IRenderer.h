@@ -22,7 +22,7 @@
 class string;
 struct WindowOptions;
 
-#include "../GameObject/Vector2.h"
+#include "../Math/Vector2.h"
 #include "Color.h"
 
 #include <string>

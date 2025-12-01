@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GameObject/Vector2.h"
+#include "../Math/Vector2.h"
 #include "../Rendering/Color.h"
 #include "../Rendering/RenderQueue.h"
 #include "Component.h"
