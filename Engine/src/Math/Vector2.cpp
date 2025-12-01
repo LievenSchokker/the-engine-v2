@@ -5,29 +5,30 @@
 
 #include "Math/Vector2.h"
 #include <cmath>
+#include <algorithm>
 
 
-float Vector2::X() const
+float Vector2::x() const
 {
-    return x;
+    return _x;
 }
 
 
-float Vector2::Y() const
+float Vector2::y() const
 {
-    return y;
+    return _y;
 }
 
 
 void Vector2::setX(float value)
 {
-    x = value;
+    _x = value;
 }
 
 
 void Vector2::setY(float value)
 {
-    y = value;
+    _y = value;
 }
 
 
@@ -69,8 +70,8 @@ Vector2 Vector2::left()
 
 float Vector2::distance(const Vector2 &from, const Vector2 &to)
 {
-    float dx = to.X() - from.X();
-    float dy = to.Y() - from.Y();
+    float dx = to.x() - from.x();
+    float dy = to.y() - from.y();
 
     return std::sqrt(dx*dx + dy*dy);
 }
@@ -78,7 +79,7 @@ float Vector2::distance(const Vector2 &from, const Vector2 &to)
 
 float Vector2::dot(const Vector2 &a, const Vector2 &b)
 {
-    return a.X() * b.X() + a.Y() * b.Y();
+    return a.x() * b.x() + a.y() * b.y();
 
 }
 
@@ -92,101 +93,108 @@ float Vector2::angle(const Vector2 &from, const Vector2 &to)
 }
 
 
+Vector2 Vector2::lerp(const Vector2 &from, const Vector2 &to, float t)
+{
+    t = std::clamp(t, 0.0f, 1.0f);
+    return from + (to - from) * t;
+}
+
+
 void Vector2::normalize()
 {
     float mag = magnitude();
     if (mag == 0.0f) return;
 
-    x /= mag;
-    y /= mag;
+    _x /= mag;
+    _y /= mag;
 }
 
 
 float Vector2::magnitude() const
 {
-    return std::sqrt(x * x + y * y);
+    return std::sqrt(_x * _x + _y * _y);
 }
 
 
 Vector2 Vector2::operator+(const Vector2 &other) const
 {
-    return {x + other.x, y + other.y};
+    return {_x + other._x, _y + other._y};
 }
 
 
 Vector2 Vector2::operator-(const Vector2 &other) const
 {
-    return {x - other.x, y - other.y};
+    return {_x - other._x, _y - other._y};
 }
 
 
 Vector2 Vector2::operator*(const Vector2 &other) const
 {
-    return {x * other.x, y * other.Y()};
+    return {_x * other._x, _y * other._y};
 }
 
 
 Vector2 Vector2::operator/(const Vector2 &other) const
 {
-    return {x / other.x, y / other.y};
+    return {_x / other._x, _y / other._y};
 }
 
 
 Vector2 Vector2::operator*(float scalar) const
 {
-    return {x * scalar, y * scalar};
+    return {_x * scalar, _y * scalar};
 }
 
 
 Vector2 Vector2::operator/(float scalar) const
 {
-    return {x / scalar, y / scalar};
+    return {_x / scalar, _y / scalar};
 }
 
 
 Vector2 &Vector2::operator+=(const Vector2 &other)
 {
-    x += other.x;
-    y += other.y;
+    _x += other._x;
+    _y += other._y;
     return *this;
 }
 
 
 Vector2 &Vector2::operator-=(const Vector2 &other)
 {
-    x -= other.x;
-    y -= other.y;
+    _x -= other._x;
+    _y -= other._y;
     return *this;
 }
 
 
 Vector2 &Vector2::operator*=(const Vector2 &other)
 {
-    x *= other.x;
-    y *= other.y;
+    _x *= other._x;
+    _y *= other._y;
     return *this;
 }
 
 
 Vector2 &Vector2::operator/=(const Vector2 &other)
 {
-    x /= other.x;
-    y /= other.y;
+    _x /= other._x;
+    _y /= other._y;
     return *this;
 }
 
 
 Vector2 &Vector2::operator*=(float scalar)
 {
-    x *= scalar;
-    y *= scalar;
+    _x *= scalar;
+    _y *= scalar;
     return *this;
 }
 
 
 Vector2 &Vector2::operator/=(float scalar)
 {
-    x /= scalar;
-    y /= scalar;
+    _x /= scalar;
+    _y /= scalar;
     return *this;
 }

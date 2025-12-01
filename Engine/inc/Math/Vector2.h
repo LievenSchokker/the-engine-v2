@@ -5,7 +5,7 @@
  */
 struct Vector2
 {
-    Vector2(const float x_, const float y_) : x(x_), y(y_) {}
+    Vector2(const float x_, const float y_) : _x(x_), _y(y_) {}
 
     /// Shorthand for writing Vector2{1.0, 1.0}
     static Vector2 one();
@@ -35,11 +35,14 @@ struct Vector2
     /// Returns the angle between two vectors (in radians)
     [[nodiscard]] static float angle(const Vector2 &from, const Vector2 &to);
 
+    /// Linearly interpolates between @c from and @c to by @c t (t will be normalised between 0 and 1).
+    static Vector2 lerp(const Vector2& from, const Vector2& to, float t);
+
     /// Gets the value of the x component of this vector
-    [[nodiscard]] float X() const;
+    [[nodiscard]] float x() const;
 
     /// Gets the value of the y component of this vector
-    [[nodiscard]] float Y() const;
+    [[nodiscard]] float y() const;
 
     /// Sets the value of this vector's x component
     void setX(float value);
@@ -90,6 +93,6 @@ struct Vector2
     Vector2 &operator/=(float scalar);
 
     private:
-        float x = 0;
-        float y = 0;
+        float _x = 0;
+        float _y = 0;
 };
