@@ -1,77 +1,50 @@
 #pragma once
 
-
-#include <memory>
-
-
-#include "ApplicationSpecifications.h"
-
-#include <functional>
-
-
 class ApplicationClock;
+class IPhysicsWorld;
 class IRenderer;
+class SceneManager;
+class Server;
+class Client;
+class NetworkSpawnManager;
 
-/**
- * @class SpelMotor
- * @brief Core engine class that manages the game loop and system lifecycle.
- *
- * SpelMotor acts as the orchestrator for the entire engine managing
- * the lifetime cycle of all engine systems.
- *
- */
+#include "Core/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "Rendering/RenderQueue.h"
 
+#include <atomic>
+#include <memory>
+#include <thread>
 
 class SpelMotor
 {
 public:
-	SpelMotor(ApplicationSpecifications applicationSpecifications);
+    SpelMotor(ApplicationSpecifications applicationSpecifications);
+    ~SpelMotor();
 
-	~SpelMotor();
+    void run();
 
-	/**
-	 * @brief Starts the engine and enters the main game loop.
-	 *
-	 * This method performs all system initialization (rendering, input, etc.) and then
-	 * enters the BLOCKING update loop.
-	 * It only returns when the engine has been shut down.
-	 *
-	 */
-	void run();
-
-	/**
-	 * @brief Immediately shuts down all engine systems.
-	 *
-	 * Performs cleanup of all subsystems in the reverse order of their initialization
-	 * to prevent dependency issues.
-	 *
-	 */
-	void shutdown();
+    SceneManager* getSceneManager();
+    GameWorld* getGameWorld() { return &gameWorld; }
 
 private:
-	/**
-	 * @brief The main game loop that runs until shutdown is requested.
-	 *
-	 * Encapsulated as a private method to enforce that the game loop can only be
-	 * entered through run(), preventing accidental re-entry or misuse.
-	 *
-	 */
-	void update();
+    void runClient();
+    void runServer();
+    void shutdown();
 
-	int tickRate;
-	/** @brief Tracks whether the game loop is active. */
-	bool running;
+    void initializeNetworking();
 
-	/** @brief Immutable configuration set at construction.
-	 * Const ensures runtime modifications don't destabilize systems. */
-	const ApplicationSpecifications specifications;
+    int tickRate;
 
-	/** @brief renderer handle. */
-	std::unique_ptr<IRenderer> renderer;
+    const ApplicationSpecifications specifications;
 
-	/** @brief timeStep calculation for engine */
-	std::unique_ptr<ApplicationClock> timer;
-	
-	/** @brief A functions that retusn, the time the applicationhas beenrunning in second */
-	std::function<double()> clockFunction;
+    std::unique_ptr<IRenderer> renderer;
+    std::unique_ptr<ApplicationClock> timer;
+    std::unique_ptr<IPhysicsWorld> physicsWorld;
+    std::unique_ptr<SceneManager> sceneManager;
+
+    std::unique_ptr<Server> server;
+    std::unique_ptr<Client> client;
+    std::unique_ptr<NetworkSpawnManager> spawnManager;
+    GameWorld gameWorld;
 };

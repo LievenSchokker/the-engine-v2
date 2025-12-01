@@ -1,91 +1,256 @@
-#include <iostream>
-#include <ostream>
-
-
-#include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
 #include "Core/ApplicationClock.h"
+#include "Core/ApplicationSpecifications.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
-#include "Rendering/IRenderer.h"
+#include "Physics/Box2D/Box2DPhysicsWorld.h"
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Networking/Server/Server.h"
+#include "Networking/Client.h"
+#include "Networking/TransportGNS.h"
 
-SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
-    : running(false),
-      specifications(applicationSpecifications),
-      timer(nullptr),
-      tickRate(applicationSpecifications.tickRate)
+#include <iostream>
+#include <chrono>
+
+#include "Networking/Messages/MessageDispatcherFactory.h"
+#include "Scene/SceneManager.h"
+#include "Networking/Messages/Concretes/WelcomeMessage.h"
+#include "Networking/Server/StateSyncSystem.h"
+
+SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
+	: specifications(applicationSpecifications)
+	  , tickRate(applicationSpecifications.networkingOptions.tickRate)
+	  , physicsWorld(std::make_unique<Box2DPhysicsWorld>(tickRate))
+	  , sceneManager(std::make_unique<SceneManager>())
 {
-    if (applicationSpecifications.renderBackend == RenderBackend::SDL)
-    {
-        SdlContext context = SdlContext();
-        timer.reset();
+	const auto& netOpts = specifications.networkingOptions;
 
-		//TODO SDL Injection layer
-    	clockFunction = []() { return SDL_GetTicks() / 1000.0; };
-    	timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
+	if (netOpts.mode == EngineMode::CLIENT)
+	{
+		if (specifications.renderBackend == RenderBackend::SDL)
+		{
+			SdlContext context = SdlContext();
+			timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
+			{
+				return SDL_GetTicks() / 1000.0;
+			});
+			renderer = std::make_unique<SDLRenderer>(context);
+		}
 
-    	renderer = std::make_unique<SDLRenderer>(context);
+		client = std::make_unique<Client>(std::make_unique<TransportGNS>());
+		gameWorld.renderer = renderer.get();
+		gameWorld.client = client.get();
 	}
+	else
+	{
+		timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []()
+		{
+			using namespace std::chrono;
+			return duration<double>(steady_clock::now().time_since_epoch()).
+				count();
+		});
+
+		ServerConnectionInformation serverInfo;
+		serverInfo.port = netOpts.port;
+		server = std::make_unique<Server>(serverInfo,
+		                                  std::make_unique<TransportGNS>());
+
+		gameWorld.server = server.get();
+	}
+
+	gameWorld.sceneManager = sceneManager.get();
+	gameWorld.physics = physicsWorld.get();
+	gameWorld.input = InputManager::getInstance();
+
+	sceneManager->setWorld(&gameWorld);
 }
 
-SpelMotor::~SpelMotor() = default;
-
+SpelMotor::~SpelMotor()
+{
+	shutdown();
+}
 
 void SpelMotor::run()
 {
-    timer->start();
+	timer->start();
+	physicsWorld->start();
 
-    //TODO Server or Client -> Start()
-    //TODO Physics -> Start()
-    //TODO SceneManager -> Start()
-    renderer->open(specifications.windowOptions);
-    InputManager::getInstance();
-    update();
+	initializeNetworking();
+
+	if (specifications.networkingOptions.mode == EngineMode::CLIENT)
+	{
+		runClient();
+	}
+	else
+	{
+		runServer();
+	}
 }
 
-void SpelMotor::update()
+void SpelMotor::runClient()
 {
-    running = true;
+	renderer->open(specifications.windowOptions);
 
-    while (running)
-    {
-        timer->tick();
+	ServerConnectionInformation serverInfo;
+	serverInfo.ip = specifications.networkingOptions.serverIP;
+	serverInfo.port = specifications.networkingOptions.port;
 
-        //TODO REPLACE THIS WITH EVENTMANAGER
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-        {
-            if (event.type == SDL_QUIT)
-            {
-                shutdown();
-            }
-        }
+	if (!client->connectToServer(serverInfo))
+	{
+		return;
+	}
 
-        while (timer->shouldFixedUpdate())
-        {
-            InputManager::getInstance()->update();
-            //TODO Physics->Update();
+	startNetworkThread();
+	RenderQueue renderQueue;
+	running = true;
 
-            timer->consumeFixedUpdate();
-        }
+	while (running)
+	{
+		timer->tick();
+		client->poll();
+		InputManager::getInstance()->update();
 
+		while (timer->shouldFixedUpdate())
+		{
+			if (sceneManager != nullptr)
+			{
+				sceneManager->update(timer->getDeltaTime());
+				physicsWorld->update();
+			}
 
-        //TODO Network->Update()
-        //TODO Audio->Update();
-        renderer->presentFrame();
-    }
+			timer->consumeFixedUpdate();
+		}
+		sceneManager->buildRenderQueue(renderQueue);
+		renderer->render(renderQueue);
+		if (InputManager::getInstance()->quitRequested())
+		{
+			shutdown();
+		}
+	}
 }
+
+void SpelMotor::initializeNetworking()
+{
+	Scene* activeScene = sceneManager->getActiveScene();
+	if (!activeScene)
+	{
+		return;
+	}
+
+	identityRegistry = std::make_unique<NetworkIdentityRegistry>();
+
+	if (server)
+	{
+		spawnManager = std::make_unique<NetworkSpawnManager>(
+			server.get(), activeScene, identityRegistry.get());
+
+		gameWorld.spawnManager = spawnManager.get();
+
+		server->setClientConnectedCallback([this](int clientId)
+		{
+			WelcomeMessage welcome(clientId);
+			server->sendMessage(clientId, welcome);
+
+			spawnManager->syncExistingObjects(clientId);
+			Vector2 spawnPos{350.0f + (clientId * 60.0f), 350.0f};
+			spawnManager->spawnPlayer(clientId, spawnPos);
+		});
+
+		server->setClientDisconnectedCallback([this](int clientId)
+		{
+			spawnManager->despawnClientObjects(clientId);
+		});
+
+		auto dispatcher =
+			spelmotor_networking::MessageDispatcherFactory::createServerDispatcher(
+				gameWorld,
+				*spawnManager,
+				server->getNetworkContext(),
+				*identityRegistry);
+		server->injectMessageDispatcher(std::move(dispatcher));
+	}
+	else if (client)
+	{
+		spawnManager = std::make_unique<NetworkSpawnManager>(
+			server.get(), activeScene, identityRegistry.get());
+		gameWorld.spawnManager = spawnManager.get();
+
+		auto dispatcher =
+			spelmotor_networking::MessageDispatcherFactory::createClientDispatcher(
+				gameWorld,
+				*spawnManager,
+				client->getNetworkContext(),
+				*identityRegistry);
+		client->injectMessageDispatcher(std::move(dispatcher));
+	}
+}
+
+void SpelMotor::runServer()
+{
+	if (server->start() != ServerStatus::Running)
+	{
+		return;
+	}
+
+	StateSyncSystem stateSync(server.get(), identityRegistry.get());
+
+	running = true;
+	uint32_t currentTick = 0;
+
+	while (running)
+	{
+		timer->tick();
+		server->update();
+		while (timer->shouldFixedUpdate())
+		{
+			currentTick++;
+
+			if (sceneManager != nullptr)
+			{
+				sceneManager->update(timer->getDeltaTime());
+			}
+
+
+			stateSync.tick(currentTick);
+			physicsWorld->update();
+			timer->consumeFixedUpdate();
+		}
+	}
+}
+
 
 
 void SpelMotor::shutdown()
 {
-    running = false;
+	if (!networkRunning.exchange(false))
+	{
+		return;
+	}
 
-    //TODO audioSystem->shutdown()
-    InputManager::shutdown();
-    renderer->close();
-    //TODO scenemanager->shutdown()
-    //TODO physicsWorld->shutdown()
-    //TODO server->shutdown() and client->shutdown()
+	stopNetworkThread();
+
+	if (client)
+	{
+		client->disconnect();
+	}
+
+	if (server)
+	{
+		server->stop();
+	}
+
+	if (renderer)
+	{
+		InputManager::shutdown();
+		renderer->close();
+	}
+
+	physicsWorld->shutdown();
+}
+
+
+SceneManager* SpelMotor::getSceneManager()
+{
+	if (sceneManager) return sceneManager.get();
+	return nullptr;
 }
