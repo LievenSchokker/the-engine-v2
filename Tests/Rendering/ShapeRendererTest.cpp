@@ -69,15 +69,15 @@ struct FakeRenderer: public IRenderer {
 	int circleCalls = 0;
 	int rectangleCalls = 0;
 	Color lastClearColor = Color::black();
-	Vector2 lastCircleCenter{};
+	Vector2 lastCircleCenter = Vector2::zero();
 	double lastCircleRadius = 0.0;
 	Color lastCircleColor = Color::black();
-	Vector2 lastCircleScale{};
-	Vector2 lastRectCenter{};
-	Vector2 lastRectSize{};
+	Vector2 lastCircleScale= Vector2::zero();
+	Vector2 lastRectCenter = Vector2::zero();
+	Vector2 lastRectSize = Vector2::zero();
 	double lastRectRotation = 0.0;
 	Color lastRectColor = Color::black();
-	Vector2 lastRectScale{};
+	Vector2 lastRectScale = Vector2::zero();
 };
 }  // namespace
 
