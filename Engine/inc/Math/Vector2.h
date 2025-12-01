@@ -7,6 +7,9 @@
  */
 struct Vector2
 {
+    Vector2() = default;
+    Vector2(const float x, const float y) : x(x), y(y) {}
+
     /// Adds each element of the other Vector to this Vector's respective element (v1.x + v2.x, v1.y + v2.y)
     Vector2 operator+(const Vector2& other) const;
 
