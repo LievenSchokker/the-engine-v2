@@ -3,6 +3,7 @@
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
+#include "Networking/TransportGNS.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/RenderQueue.h"
@@ -14,7 +15,8 @@
 //TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(const ApplicationSpecifications& applicationSpecifications)
     : sceneManager(std::make_unique<SceneManager>()),
-        gameWorld(std::make_unique<GameWorld>())
+        gameWorld(std::make_unique<GameWorld>()),
+    client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
 {
     clockFunction = []() {return 1.0;};
     if (applicationSpecifications.renderBackend == RenderBackend::SDL)
@@ -35,10 +37,9 @@ void ClientLoop::start()
 void ClientLoop::update()
 {
 	RenderQueue renderQueue;
-
-		sceneManager->buildRenderQueue(renderQueue);
-		renderer->presentFrame();
-        client->poll();
+    sceneManager->buildRenderQueue(renderQueue);
+    renderer->presentFrame();
+    client->poll();
 }
 
 void ClientLoop::fixedUpdate(double deltaTime)
