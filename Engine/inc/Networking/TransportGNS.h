@@ -1,13 +1,26 @@
-///
-/// Created by thijs on 12-11-2025.
-///
-
-
 #pragma once
+
+
+#include <functional>
 #include <map>
 #include <mutex>
-#include <steam/steamnetworkingsockets.h>
-#include "Transport.h"
+#include <vector>
+#include <steam/steamnetworkingtypes.h>
+#include <steam/steamtypes.h>
+
+
+#include "ITransport.h"
+#include "TransportResult.h"
+
+
+class OutgoingRawMessage;
+struct IncomingRawMessage;
+enum class SendMode;
+class ISteamNetworkingSockets;
+struct SteamNetConnectionStatusChangedCallback_t;
+typedef uint32 HSteamNetConnection;
+typedef uint32 HSteamListenSocket;
+typedef uint32 HSteamNetPollGroup;
 
 
 /**
@@ -21,27 +34,18 @@
  * mode behaves similarly to reliable ordered, but with reduced latency due to
  * disabled message coalescing.
  */
-class TransportGNS : public Transport {
+class TransportGNS : public ITransport
+{
 public:
-    /**
-     * Constructs a new TransportGNS object and initializes GameNetworkingSockets.
-     */
     TransportGNS();
-
-
-    /**
-     * @brief Destroys the TransportGNS object and shuts down the GNS system.
-     */
     ~TransportGNS() override;
-
 
     /**
      * @brief Starts a GNS socket listening on the given port.
      * @param port The port to listen on.
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult setUpListenSocket(uint16_t port) override;
-
+    TransportResult setUpListenSocket(const uint16_t& port) override;
 
     /**
      * @brief Connects to a remote GNS socket.
@@ -49,18 +53,15 @@ public:
      * @param port The socket's port.
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult connectByIPAdress(const char *socketAddress, uint16_t port) override;
+    TransportResult connectByIPAdress(const char* socketAddress, const uint16_t& port) override;
 
     /**
      * @brief Sends a message over the network.
      *
-     * @param connectionId The logical connection ID (for clients, usually 0).
-     * @param data Pointer to the message buffer.
-     * @param length Length of the message buffer in bytes.
-     * @param send_mode The desired transmission mode.
+     * @param message OutGoingRawMessage which contains everything needed for transport
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult send(const RawMessage& raw_message) override;
+    TransportResult send(const OutgoingRawMessage& message) override;
 
 
     /**
@@ -71,63 +72,79 @@ public:
      * - ReliableUnordered: Reliable but sent with minimal delay (order not guaranteed).
      * - Unreliable: May be dropped or arrive out of order.
      *
-     * @param data Pointer to the message buffer.
-     * @param length Length of the message buffer in bytes.
-     * @param send_mode The desired transmission mode.
+     * @param message OutGoingRawMessage which contains everything needed for transport
      * @return A TransportResult indicating success or failure.
      */
-    TransportResult sendToAll(const RawMessage& raw_message) override;
-
-
-    /**
-     * @brief Closes connection to a remote socket.
-     * @param connectionId The ID of the connection to close.
-     * @return True if successfully disconnected, false otherwise.
-     */
-    bool disconnectFromSocket(int connectionId) override;
-
-
-    /**
-     * @brief Polls for incoming messages and connection state changes.
-     */
-    void poll() override;
+    TransportResult sendToAll(OutgoingRawMessage& message) override;
 
 
     /**
      * @brief Shuts down the socket and closes all active connections.
     */
     bool closeOpenSocket() override;
+
+    /**
+     * @brief Closes connection to a remote socket.
+     * @param connectionId The ID of the connection to close.
+     * @return True if successfully disconnected, false otherwise.
+     */
+    bool disconnectFromSocket(const int& connectionId) override;
+
+    /**
+     * @brief Polls for incoming messages and connection state changes.
+     */
+    void poll() override;
+
 private:
-    void chooseSendFlags(const SendMode sendMode, int& sendFlags);
-    /// @name Server Members
-    /// @{
-    HSteamListenSocket listenSocket;                   /// Listening socket for server mode.
-    HSteamNetPollGroup pollGroup;                      /// Poll group for managing multiple connections.
-    std::map<HSteamNetConnection, int> mapConnections; /// Maps Steam connections to internal connection IDs.
-    std::mutex mapMutex;                               /// Thread-safe access to mapConnections
-    std::vector<int> getActiveConnectionIds();         /// Get all connection ids which are active
-    /// @}
+    /// Processes all queued incoming connection state changes.
+    void pollConnectionStateChanges() const;
 
-    /// @name Common
-    /// @{
-    ISteamNetworkingSockets *steamNetworkingSockets;    /// Pointer to the main GNS interface.
-    int nextConnectionId;                               /// Incremental ID for new incoming connections.
-    /// @}
+    /// Processes all queued incoming messages.
+    void pollIncomingMessages();
+    void processMessage(const ISteamNetworkingMessage* steamMessage);
 
+    /// OnconnectionChangedCallback router method
+    void onSteamNetConnectionStatusChanged(
+        const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
-    /// @name Callbacks
-    /// @{
-    static TransportGNS *pCallbackInstance;      /// Static instance pointer for static callbacks.
-    static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t *pInfo);
-    void onSteamNetConnectionStatusChanged(SteamNetConnectionStatusChangedCallback_t *pInfo);
-    /// @}
+    /// static wrapper method for steam OnConnectionChangedCallback
+    static void steamNetConnectionStatusChangedCallback(SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
 
+    /// Retrieves internal ID for a connection handle.
+    int getConnectionId(HSteamNetConnection steamConn);
 
-    /// @name Helper Methods
-    /// @{
-    void pollIncomingMessages();                 /// Processes all queued incoming messages.
-    void pollConnectionStateChanges();           /// Handles connection state change events.
-    int getConnectionId(HSteamNetConnection hConn); /// Retrieves internal ID for a connection handle.
-    HSteamNetConnection getSteamConnection(int connectionId) const; /// Retrieves connection handle from ID.
-    /// @}
+    /// Retrieves connection handle from ID.
+    HSteamNetConnection getSteamConnection(int connectionId);
+
+    /// Get all connection ids which are active
+    std::vector<int> getActiveConnectionIds() const;
+
+    /// Get steamSend specefic sendflag via sendmode
+    static int getSendFlags(SendMode sendMode);
+
+    /// nullptr check to global callback
+    void safeOnConnectionChanged(const Connection& connection);
+
+    /// Adds a new connection to transportLayer map and call's onConnnectionChanged with that
+    /// new connections
+    void addNewConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+
+    /// Removes a new connection to transportLayer map and call's onConnnectionChanged with that
+    /// removed connections
+    void removeDeathConnection(const SteamNetConnectionStatusChangedCallback_t* pointerConnectionStatusInformation);
+
+    /// static helper method for debug output of GNS
+    static void debugOutput(ESteamNetworkingSocketsDebugOutputType eType, const char* message);
+
+    /// GNS provides global C style callback which doesn't support usage of the type callback,
+    /// Creates a static reference to the currently active callback
+    static TransportGNS* transportGNSCallbackInstance;
+
+    HSteamListenSocket listenSocket;
+    HSteamNetPollGroup pollGroup;
+    ISteamNetworkingSockets* steamNetworkingSockets;
+    std::map<HSteamNetConnection, int> mapConnections;
+    std::mutex mapMutex;
+    int nextConnectionId;
+    static TransportGNS* callbackInstance;
 };

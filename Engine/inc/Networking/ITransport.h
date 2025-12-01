@@ -1,9 +1,15 @@
 #pragma once
+
+
 #include <functional>
-#include "RawMessage.h"
+
+
 #include "TransportResult.h"
+#include "Messages/IncomingRawMessage.h"
 
 
+struct Connection;
+class OutgoingRawMessage;
 /**
  * @typedef OnMessageReceivedCallback
  * @brief Callback invoked when a message is received.
@@ -11,7 +17,7 @@
  * @param data Pointer to the received message data.
  * @param length Length of the received message in bytes.
  */
-using OnMessageReceivedCallback = std::function<void(const RawMessage)>;
+using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage&)>;
 
 /**
  * @typedef OnConnectionChangedCallback
@@ -19,20 +25,20 @@ using OnMessageReceivedCallback = std::function<void(const RawMessage)>;
  * @param connectionId ID of the connection.
  * @param connected True if connection is now active, false if disconnected.
  */
-using OnConnectionChangedCallback = std::function<void(int connectionId, bool connected)>;
+using OnConnectionChangedCallback = std::function<void(Connection connection)>;
 
 /**
- * @class Transport
+ * @class ITransport
  * @brief Abstract base class for network transport layers.
  *
  * Provides an interface for server/client networking, sending messages,
  * and managing connections. Derived classes implement specific networking
  * APIs such as GameNetworkingSockets, ENet, or custom protocols.
  */
-class Transport
+class ITransport
 {
 public:
-    virtual ~Transport() = default;
+    virtual ~ITransport() = default;
 
 
     /**
@@ -40,7 +46,7 @@ public:
      * @param port The port to bind and listen on.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult setUpListenSocket(uint16_t port) = 0;
+    virtual TransportResult setUpListenSocket(const uint16_t& port) = 0;
 
 
     /**
@@ -49,7 +55,7 @@ public:
      * @param port Server port.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult connectByIPAdress(const char* serverAddress, uint16_t port) = 0;
+    virtual TransportResult connectByIPAdress(const char* serverAddress, const uint16_t& port) = 0;
 
 
     /**
@@ -57,7 +63,7 @@ public:
      * @param RawMessage The message to send over the network.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult send(const RawMessage& msg) = 0;
+    virtual TransportResult send(const OutgoingRawMessage& message) = 0;
 
 
     /**
@@ -65,7 +71,7 @@ public:
      * @param RawMessage The message to send over the network to all connections.
      * @return A TransportResult indicating success or failure.
      */
-    virtual TransportResult sendToAll(const RawMessage& msg) = 0;
+    virtual TransportResult sendToAll(OutgoingRawMessage& message) = 0;
 
 
     /**
@@ -73,7 +79,7 @@ public:
      * @param connectionId The connection ID to disconnect.
      * @return True if successful, false otherwise.
      */
-    virtual bool disconnectFromSocket(int connectionId) = 0;
+    virtual bool disconnectFromSocket(const int& connectionId) = 0;
 
 
     /**
@@ -92,14 +98,14 @@ public:
      * @brief Sets the callback for message reception.
      * @param callback A callable to invoke when a message is received.
      */
-    void setOnMessageReceived(OnMessageReceivedCallback callback) { onMessageReceived = callback; }
+    void setOnMessageReceived(const OnMessageReceivedCallback& callback) { onMessageReceived = callback; }
 
 
     /**
      * @brief Sets the callback for connection state changes.
      * @param callback A callable to invoke when a connection is established or closed.
      */
-    void setOnConnectionChanged(OnConnectionChangedCallback callback) { onConnectionChanged = callback; }
+    void setOnConnectionChanged(const OnConnectionChangedCallback& callback) { onConnectionChanged = callback; }
 
 protected:
     OnMessageReceivedCallback onMessageReceived; ///< Callback for received messages.

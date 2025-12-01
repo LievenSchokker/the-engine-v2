@@ -1,115 +1,134 @@
-//
-// Created by thijs on 18-11-2025.
-//
+#include "Networking/Client.h"
+#include "Networking/TransportGNS.h"
+#include "Networking/Connection/Connection.h"
+#include "Networking/Connection/ConnectionStatus.h"
+#include "Networking/Messages/IMessage.h"
+#include "Networking/Messages/MessageReader.h"
+#include "Networking/Messages/MessageWriter.h"
+#include "Networking/Messages/ConnectionMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
+#include "Networking/Messages/OutgoingRawMessage.h"
+#include "Networking/Messages/MessageTypes.h"
+#include "Networking/SendMode.h"
+#include "Networking/TransportResult.h"
 
 
-#include "../../inc/Networking/Client.h"
 #include <iostream>
 
 
-Client::Client(std::unique_ptr<Transport> newTransport)
+Client::Client(std::unique_ptr<ITransport> injectedTransport)
+    : transport(std::move(injectedTransport))
 {
-    if (newTransport == nullptr)
-    {
-        transport = std::make_unique<TransportGNS>();
-    }
-    else
-    {
-        transport = std::move(newTransport);
-    }
-    setDefaultOnMessageReceived();
-    SetDefaultOnConnectionChanged();
-}
+    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 
+    transport->setOnMessageReceived([this](const IncomingRawMessage& message)
+    {
+        onMessageReceived(message);
+    });
+
+    transport->setOnConnectionChanged([this](const Connection& connection)
+    {
+        onConnectionChanged(connection);
+    });
+}
 
 Client::~Client()
 {
-    running = false;
+    disconnect();
+}
+
+bool Client::connectToServer(const ServerConnectionInformation&  serverInformartion) const
+{
+    if (transport->connectByIPAdress(serverInformartion.ip.c_str(), serverInformartion.port) != TransportResult::SUCCESS)
+    {
+        std::cerr << "Failed to connect to " << serverInformartion.ip << ":" << serverInformartion.port << std::endl;
+        return false;
+    }
+    return true;
+}
+
+void Client::disconnect()
+{
+    if (currentConnection.connectionStatus == ConnectionStatus::Connected)
+    {
+        transport->disconnectFromSocket(currentConnection.transportConnectionId);
+    }
     transport->closeOpenSocket();
-
-    if (listenThread.joinable()) listenThread.join();
+    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
 
-
-void Client::SetOnConnectionChanged(const OnConnectionChangedCallback& newCallBack) const
+bool Client::sendMessage(const IMessage& message) const
 {
-    transport->setOnConnectionChanged(newCallBack);
-}
-
-
-void Client::SetDefaultOnConnectionChanged()
-{
-    transport->setOnConnectionChanged([&](int assignedId, bool isConnected)
+    if (currentConnection.connectionStatus != ConnectionStatus::Connected)
     {
-        if (isConnected)
-        {
-            connected = true;
-            clientConnectionId = assignedId;
-
-            std::cout << "[Client] Connected. Assigned ID: "
-                << clientConnectionId << "\n";
-            std::cout << "Type messages. /quit to disconnect.\n";
-        }
-        else
-        {
-            connected = false;
-            running = false;
-            std::cout << "[Client] Disconnected.\n";
-        }
-    });
-}
-
-
-void Client::setOnMessageReceived(const OnMessageReceivedCallback& newCallback) const
-{
-    transport->setOnMessageReceived(newCallback);
-}
-
-
-void Client::setDefaultOnMessageReceived() const
-{
-    transport->setOnMessageReceived([&](const RawMessage& message)
-    {
-        std::cout << "[Server]: " << message.toString() << std::endl;
-    });
-}
-
-
-bool Client::connectToServer(const uint16_t port, const char* serverIP)
-{
-    TransportResult transportResult = transport->connectByIPAdress(serverIP, port);
-    if (transportResult == TransportResult::ERROR)
-    {
-        std::cerr << "[Client] Failed to initiate connection.\n";
         return false;
     }
 
-    running = true;
-    createListenThread();
+    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+        message,
+        currentConnection.transportConnectionId,
+        SendMode::ReliableOrdered
+    );
 
-    return true;
+    TransportResult result = transport->send(outgoing);
+    return result == TransportResult::SUCCESS;
 }
 
-bool Client::sendMessage(const std::string& text)
+void Client::poll() const
 {
-    if (!connected) return false;
-
-    RawMessage message(1, text);
-    transport->send(message);
-
-    return true;
+    transport->poll();
 }
 
-
-// #TODO New thread created
-void Client::createListenThread()
+bool Client::isConnected() const
 {
-    listenThread = std::thread([this]()
+    return currentConnection.connectionStatus == ConnectionStatus::Connected;
+}
+
+void Client::onConnectionChanged(const Connection& connection)
+{
+    currentConnection = connection;
+
+    switch (connection.connectionStatus)
     {
-        while (running)
+    case ConnectionStatus::Connected:
+        std::cout << "Connected to server" << std::endl;
+        break;
+
+    case ConnectionStatus::Connecting:
+        std::cout << "Connecting..." << std::endl;
+        break;
+
+    case ConnectionStatus::Error:
+        disconnect();
+        std::cout << "Disconnected from server" << std::endl;
+        break;
+
+    default:
+        break;
+    }
+}
+
+void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
+{
+    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+
+    if (!message)
+    {
+        std::cerr << "Failed to parse message" << std::endl;
+        return;
+    }
+
+    switch (MessageTypes messageType = message->getMessageType())
+    {
+    case MessageTypes::ConnectionMessage:
         {
-            transport->poll();
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
+            {
+                disconnect();
+            }
+            break;
         }
-    });
+    default:
+        break;
+    }
 }
