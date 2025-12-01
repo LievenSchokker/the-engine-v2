@@ -11,41 +11,18 @@
 #include <iostream>
 #include <chrono>
 
+#include "Core/EngineLoop.h"
+#include "Core/EngineLoopFactory.h"
 #include "Scene/SceneManager.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
-	: specifications(applicationSpecifications)
-	  , sceneManager(std::make_unique<SceneManager>())
+	: specifications(applicationSpecifications),
+coreSystemLoop(EngineLoopFactory::createEngineLoop(applicationSpecifications.networkingOptions.mode))
 {
-	const auto& netOpts = specifications.networkingOptions;
-
-	if (netOpts.mode == EngineMode::CLIENT)
-	{
-		if (specifications.renderBackend == RenderBackend::SDL)
-		{
-			SdlContext context = SdlContext();
-			renderer = std::make_unique<SDLRenderer>(context);
-		}
-
-		client = std::make_unique<Client>(std::make_unique<TransportGNS>());
-		gameWorld.renderer = renderer.get();
-		gameWorld.client = client.get();
-	}
-	else
-	{
-		ServerConnectionInformation serverInfo;
-		serverInfo.port = netOpts.port;
-		server = std::make_unique<Server>(serverInfo,
-		                                  std::make_unique<TransportGNS>());
-
-		gameWorld.server = server.get();
-	}
-
-	gameWorld.sceneManager = sceneManager.get();
-	gameWorld.physics = physicsWorld.get();
-	gameWorld.input = InputManager::getInstance();
-
-	sceneManager->setWorld(gameWorld);
+    if (coreSystemLoop == nullptr)
+    {
+        throw std::runtime_error("Core System Loop is null double check your applicationSpecifications.");
+    }
 }
 
 SpelMotor::~SpelMotor()
@@ -53,35 +30,19 @@ SpelMotor::~SpelMotor()
 	shutdown();
 }
 
+void SpelMotor::start()
+{
+
+}
+
+
 void SpelMotor::run()
 {
-	timer->start();
-
+    coreSystemLoop->update();
 
 }
 
 void SpelMotor::shutdown()
 {
-	if (client)
-	{
-		client->disconnect();
-	}
-
-	if (server)
-	{
-		server->stop();
-	}
-
-	if (renderer)
-	{
-		InputManager::shutdown();
-		renderer->close();
-	}
-}
-
-
-SceneManager* SpelMotor::getSceneManager()
-{
-	if (sceneManager) return sceneManager.get();
-	return nullptr;
+    coreSystemLoop->shutdown();
 }
