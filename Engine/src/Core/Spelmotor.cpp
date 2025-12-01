@@ -17,7 +17,11 @@
 
 SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
 	: specifications(applicationSpecifications),
-coreSystemLoop(EngineLoopFactory::createEngineLoop(applicationSpecifications.networkingOptions.mode))
+    running(false),
+    coreSystemLoop(EngineLoopFactory::createEngineLoop(applicationSpecifications.networkingOptions.mode)),
+    coreClock(std::make_unique<ApplicationClock>(coreSystemLoop->getClock(),
+        applicationSpecifications.networkingOptions.tickRate,
+        applicationSpecifications.maxFrameTime))
 {
     if (coreSystemLoop == nullptr)
     {
@@ -32,17 +36,28 @@ SpelMotor::~SpelMotor()
 
 void SpelMotor::start()
 {
-
+    coreClock->start();
+    run();
 }
-
 
 void SpelMotor::run()
 {
-    coreSystemLoop->update();
+    running = true;
 
+    while (running)
+    {
+        coreClock->tick();
+
+        while (coreClock->shouldFixedUpdate())
+        {
+            coreSystemLoop->fixedUpdate();
+            coreClock->consumeFixedUpdate();
+        }
+        coreSystemLoop->update();
+    }
 }
 
-void SpelMotor::shutdown()
+void SpelMotor::shutdown() const
 {
     coreSystemLoop->shutdown();
 }
