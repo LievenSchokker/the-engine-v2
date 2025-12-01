@@ -92,6 +92,8 @@ struct Vector2
     /// Divides this vector's component by a scalar value (v1.x / scalar, v1.y / scalar)
     Vector2 &operator/=(float scalar);
 
+    Vector2 operator-() const;
+
     private:
         float _x = 0;
         float _y = 0;

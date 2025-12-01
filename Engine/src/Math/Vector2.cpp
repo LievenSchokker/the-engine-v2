@@ -198,3 +198,8 @@ Vector2 &Vector2::operator/=(float scalar)
     _y /= scalar;
     return *this;
 }
+
+Vector2 Vector2::operator-() const
+{
+    return {-_x, -_y};
+}

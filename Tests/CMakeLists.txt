@@ -20,6 +20,7 @@ add_executable(engine_tests
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
+        Math/TestsVector2.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
