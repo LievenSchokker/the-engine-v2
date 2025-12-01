@@ -1,8 +1,33 @@
-//
-// Created by Lieven on 01/12/2025.
-//
+#pragma once
 
-#ifndef PROGRAM_SERVERLOOP_H
-#define PROGRAM_SERVERLOOP_H
+#include "Core/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "Core/iEngineLoop.h"
+#include <functional>
+#include <memory>
 
-#endif //PROGRAM_SERVERLOOP_H
+class SceneManager;
+
+class ServerLoop : public IEngineLoop {
+    using ClockFunction = std::function<double()>;
+
+public:
+    explicit ServerLoop(const ApplicationSpecifications& applicationSpecifications);
+    ~ServerLoop() override = default;
+
+    GameWorld* getGameWorld() override;
+    SceneManager* getSceneManager() override;
+    ClockFunction getClock() override;
+    void start() override;
+    void update() override;
+    void fixedUpdate(double deltaTime) override;
+    void shutdown() override;
+
+private:
+    ApplicationSpecifications applicationSpecifications;
+    std::unique_ptr<SceneManager> sceneManager;
+    std::unique_ptr<Server> server;
+    std::unique_ptr<GameWorld> gameWorld;
+    ClockFunction clockFunction;
+    uint32_t currentTick = 0;
+};

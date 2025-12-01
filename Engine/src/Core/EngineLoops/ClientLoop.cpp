@@ -12,23 +12,18 @@
 
 
 //TODO Create proper factory for each system that needs to be created
-ClientLoop::ClientLoop(ApplicationSpecifications applicationSpecifications, GameWorld* gameWorld)
+ClientLoop::ClientLoop(const ApplicationSpecifications& applicationSpecifications)
     : sceneManager(std::make_unique<SceneManager>()),
-        gameWorld(std::move(gameWorld))
+        gameWorld(std::make_unique<GameWorld>())
 {
-    ClockFunction clockFunction = []() {return 1.0;};
+    clockFunction = []() {return 1.0;};
     if (applicationSpecifications.renderBackend == RenderBackend::SDL)
     {
         SdlContext context = SdlContext();
         //TODO SDL Injection layer
-        ClockFunction clockFunction = []() { return SDL_GetTicks() / 1000.0; };
+        clockFunction = []() { return SDL_GetTicks() / 1000.0; };
         renderer = std::make_unique<SDLRenderer>(context);
     }
-}
-
-ClientLoop::~SpelMotor()
-{
-	shutdown();
 }
 
 void ClientLoop::start()
@@ -46,11 +41,11 @@ void ClientLoop::update()
         client->poll();
 }
 
-void ClientLoop::fixedUpdate()
+void ClientLoop::fixedUpdate(double deltaTime)
 {
     client->poll();
     InputManager::getInstance()->update();
-    sceneManager->update();
+    sceneManager->update(deltaTime);
     if (InputManager::getInstance()->quitRequested())
     {
         shutdown();
@@ -65,9 +60,6 @@ void ClientLoop::initializeNetworking()
     client->connectToServer(serverInfo);
 }
 
-
-
-
 void ClientLoop::shutdown()
 {
 	InputManager::shutdown();
@@ -75,6 +67,15 @@ void ClientLoop::shutdown()
     client->disconnect();
 }
 
+GameWorld* ClientLoop::getGameWorld()
+{
+    return gameWorld.get();
+}
+
+ClientLoop::ClockFunction ClientLoop::getClock()
+{
+    return clockFunction;
+}
 
 SceneManager* ClientLoop::getSceneManager()
 {

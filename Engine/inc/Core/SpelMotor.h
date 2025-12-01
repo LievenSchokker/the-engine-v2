@@ -5,7 +5,7 @@
 #include "Core/GameWorld.h"
 #include "Rendering/RenderQueue.h"
 
-class EngineLoop;
+class IEngineLoop;
 class ApplicationClock;
 
 #include <atomic>
@@ -24,8 +24,7 @@ private:
     void shutdown() const;
     bool running;
 
+    std::unique_ptr<IEngineLoop> coreSystemLoop;
     const ApplicationSpecifications specifications;
-    std::unique_ptr<EngineLoop> coreSystemLoop;
     std::unique_ptr<ApplicationClock> coreClock;
-    GameWorld gameWorld;
 };

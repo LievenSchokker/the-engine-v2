@@ -13,7 +13,7 @@ class IMessage;
 class GameWorld
 {
 public:
-    GameWorld(ApplicationClock clock);
+    GameWorld() = default;
 
     SceneManager* sceneManager = nullptr;
     IPhysicsWorld* physics = nullptr;

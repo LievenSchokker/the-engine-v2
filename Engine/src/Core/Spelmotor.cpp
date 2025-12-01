@@ -11,15 +11,14 @@
 #include <iostream>
 #include <chrono>
 
-#include "Core/EngineLoop.h"
+#include "Core/IEngineLoop.h"
 #include "Core/EngineLoopFactory.h"
 #include "Scene/SceneManager.h"
 
 SpelMotor::SpelMotor(const ApplicationSpecifications& applicationSpecifications)
 	: specifications(applicationSpecifications),
     running(false),
-    gameWorld(GameWorld(coreClock)),
-    coreSystemLoop(EngineLoopFactory::createEngineLoop(applicationSpecifications, &gameWorld)),
+    coreSystemLoop(EngineLoopFactory::createEngineLoop(applicationSpecifications)),
     coreClock(std::make_unique<ApplicationClock>(coreSystemLoop->getClock(),
         applicationSpecifications.networkingOptions.tickRate,
         applicationSpecifications.maxFrameTime))
@@ -51,9 +50,10 @@ void SpelMotor::run()
 
         while (coreClock->shouldFixedUpdate())
         {
-            coreSystemLoop->fixedUpdate();
+            coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
             coreClock->consumeFixedUpdate();
         }
+
         coreSystemLoop->update();
     }
 }
