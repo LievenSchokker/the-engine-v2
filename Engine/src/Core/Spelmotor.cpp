@@ -1,37 +1,33 @@
+#include "Core/SpelMotor.h"
+
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
-#include "Core/SpelMotor.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
 
-
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 	: running(false),
 	  specifications(applicationSpecifications),
 	  timer(nullptr),
-	  tickRate(applicationSpecifications.tickRate)
+	  tickRate(applicationSpecifications.tickRate),
+	  physicsWorld(std::make_unique<Box2DPhysicsWorld>(
+		  applicationSpecifications.tickRate))
 {
-    if (applicationSpecifications.renderBackend == RenderBackend::SDL)
-    {
-        SdlContext context = SdlContext();
-        timer.reset();
-        timer = std::make_unique<ApplicationClock>(1.0f / tickRate, []() {
-            // Get Ticks returns ms we need seconds;
-            return (SDL_GetTicks() / 1000.0);
-        });
+	if ( applicationSpecifications.renderBackend == RenderBackend::SDL )
+	{
+		SdlContext context = SdlContext();
+		timer.reset();
 
-		//TODO SDL Injection layer
-    	clockFunction = []() { return SDL_GetTicks() / 1000.0; };
-    	timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
+		// TODO SDL Injection layer
+		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
+		timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
 
-
-        renderer = std::make_unique<SDLRenderer>(context);
-    }
+		renderer = std::make_unique<SDLRenderer>(context);
+	}
 }
-
 
 SpelMotor::~SpelMotor() = default;
 
@@ -48,23 +44,22 @@ void SpelMotor::start()
 	run();
 }
 
-
 void SpelMotor::run()
 {
 	running = true;
 
 	InputManager* input = InputManager::getInstance();
 
-	while (running)
+	while ( running )
 	{
 		timer->tick();
 
-		if (input->quitRequested())
+		if ( input->quitRequested() )
 		{
 			running = false;
 		}
 
-		while (timer->shouldFixedUpdate())
+		while ( timer->shouldFixedUpdate() )
 		{
 			input->update();
 			physicsWorld->fixedUpdate();
@@ -76,7 +71,6 @@ void SpelMotor::run()
 		renderer->presentFrame();
 	}
 }
-
 
 void SpelMotor::shutdown()
 {

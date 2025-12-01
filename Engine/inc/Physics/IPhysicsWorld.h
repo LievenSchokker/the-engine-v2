@@ -3,8 +3,7 @@
 
 struct b2BodyId;
 
-#include "GameObject/GameObject.h"
-#include "GameObject/GameObject.h"
+#include "Components/RigidBody.h"
 #include "GameObject/Vector2.h"
 
 
