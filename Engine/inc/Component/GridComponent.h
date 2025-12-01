@@ -43,6 +43,9 @@ class GridComponent: public Component
 	GridComponent();
 	~GridComponent() override = default;
 
+	GridComponent(const GridComponent&) = delete;
+	GridComponent& operator=(const GridComponent&) = delete;
+
 	/**
 	 * @brief Set the tilemap component to use for grid queries.
 	 * @param tilemap Pointer to a TilemapComponent
