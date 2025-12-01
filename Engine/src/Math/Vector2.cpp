@@ -86,3 +86,29 @@ Vector2 &Vector2::operator/=(float scalar)
     y /= scalar;
     return *this;
 }
+
+float Vector2::X() const
+{
+    return x;
+}
+
+float Vector2::Y() const
+{
+    return y;
+}
+
+void Vector2::setX(float value)
+{
+    x = value;
+}
+
+void Vector2::setY(float value)
+{
+    y = value;
+}
+
+void Vector2::normalize()
+{
+
+}
+
