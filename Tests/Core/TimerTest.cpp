@@ -24,11 +24,12 @@ TEST_F(TimerTest, OneSecondEqualsTickRate) {
     const int targetTickRate = 60;
     const double fixedDeltaTime = 1.0 / targetTickRate;
 
-    ApplicationClock timer(fixedDeltaTime, []() {
-        return SDL_GetTicks() / 1000.0;
-    });
 
-    timer.start();
+
+	std::function<double()>  clockFunction = []() { return SDL_GetTicks() / 1000.0; };
+    std::__unique_if<ApplicationClock>::__unique_single timer = std::make_unique
+	    <ApplicationClock>(clockFunction, 60, 0.25);
+    timer->start();
 
     // Give the timer a moment to initialize
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -40,10 +41,10 @@ TEST_F(TimerTest, OneSecondEqualsTickRate) {
 
     //Act
     while (std::chrono::steady_clock::now() < endTime) {
-        timer.tick();
+        timer->tick();
 
-        while (timer.shouldFixedUpdate()) {
-            timer.consumeFixedUpdate();
+        while (timer->shouldFixedUpdate()) {
+            timer->consumeFixedUpdate();
             tickCount++;
         }
 
@@ -52,7 +53,7 @@ TEST_F(TimerTest, OneSecondEqualsTickRate) {
     }
 
     // Also check the timer's internal tick counter
-    int actualTicks = timer.getTickRate();
+    int actualTicks = timer->getTotalTicks();
 
     //Assert
     // Use tickCount if getTickRate() isn't working
@@ -70,7 +71,7 @@ TEST_F(TimerTest, OneSecondEqualsTickRate) {
 
     // Only check simulation time if we got ticks
     if (ticksToCheck > 0) {
-        EXPECT_NEAR(timer.getTime(), 1.0, 0.1)
+        EXPECT_NEAR(timer->getTime(), 1.0, 0.1)
             << "Simulation time should be approximately 1 second";
     }
 }
@@ -82,24 +83,26 @@ TEST_F(TimerTest, SpiralOfDeathPrevention) {
     const double fixedDeltaTime = 1.0 / targetTickRate;
     const double maxFrameTime = 0.25;
 
-    ApplicationClock timer(fixedDeltaTime, []() {
-        return SDL_GetTicks() / 1000.0;
-    });
+	std::function<double()>  clockFunction = []() { return SDL_GetTicks() / 1000.0; };
+	std::__unique_if<ApplicationClock>::__unique_single timer = std::make_unique
+		<ApplicationClock>(clockFunction, 60, 0.25);
+	timer->start();
+
 
     //Act
-    timer.start();
+    timer->start();
 
     // Initial tick to establish baseline
-    timer.tick();
+    timer->tick();
 
     // Simulate a huge frame time
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    timer.tick();
+    timer->tick();
 
     int ticksProcessed = 0;
-    while (timer.shouldFixedUpdate()) {
-        timer.consumeFixedUpdate();
+    while (timer->shouldFixedUpdate()) {
+        timer->consumeFixedUpdate();
         ticksProcessed++;
 
         if (ticksProcessed > 100) {

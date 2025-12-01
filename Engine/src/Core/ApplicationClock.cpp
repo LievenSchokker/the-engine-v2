@@ -1,77 +1,75 @@
-
-
 #include "Core/ApplicationClock.h"
 
-
-#include <algorithm>
-
-
-ApplicationClock::ApplicationClock(double fixedDeltaTime, ClockFunction clockFunc)
-    : getClock(clockFunc),
-      fixedDeltaTime(fixedDeltaTime),
-      currentTime(0.0),
-      accumulatedTime(0.0),
-      simulationTime(0.0),
-      tickRate(0)
+ApplicationClock::ApplicationClock(const ClockFunction& clockFunction,
+                                   int tickrate,
+                                   double maxAccumulatedTime)
+	: getClock(clockFunction),
+	  currentTime(0.0),
+	  accumulatedTime(0.0),
+	  simulationTime(0.0),
+	  totalTicks(0),
+	  tickRate(tickrate),
+	  fixedDeltaTime(1.0 / tickrate),
+	  maxAccumulatedTime(maxAccumulatedTime)
 {
 }
 
 void ApplicationClock::start()
 {
-    currentTime = getClock();
-    accumulatedTime = 0.0;
-    simulationTime = 0.0;
-    tickRate = 0;
+	currentTime = getClock();
+	accumulatedTime = 0.0;
+	simulationTime = 0.0;
+	totalTicks = 0;
 }
 
 void ApplicationClock::tick()
 {
-    double newTime = getClock();
-    double frameTime = newTime - currentTime;
+	double newTime = getClock();
+	double frameTime = newTime - currentTime;
 
-    // This is to prevent spiral of death.
-    if (frameTime > 0.25)
-    {
-        frameTime = 0.25;
-    }
+	// This is to prevent spiral of death.
+	if (frameTime > maxAccumulatedTime)
+	{
+		frameTime = maxAccumulatedTime;
+	}
 
-    currentTime = newTime;
-    accumulatedTime += frameTime;
+	currentTime = newTime;
+	accumulatedTime += frameTime;
 }
 
-bool ApplicationClock::shouldFixedUpdate()
+bool ApplicationClock::shouldFixedUpdate() const
 {
-    return accumulatedTime >= fixedDeltaTime;
+	return accumulatedTime >= fixedDeltaTime;
 }
 
 void ApplicationClock::consumeFixedUpdate()
 {
-    accumulatedTime -= fixedDeltaTime;
-    simulationTime += fixedDeltaTime;
-    tickRate++;
+	accumulatedTime -= fixedDeltaTime;
+	simulationTime += fixedDeltaTime;
+	totalTicks++;
 }
 
 double ApplicationClock::getAlpha() const
 {
-    return accumulatedTime / fixedDeltaTime;
+	return accumulatedTime / fixedDeltaTime;
 }
 
 double ApplicationClock::getTime() const
 {
-    return simulationTime;
+	return simulationTime;
 }
 
 double ApplicationClock::getDeltaTime() const
 {
-    return fixedDeltaTime;
+	return fixedDeltaTime;
 }
 
 double ApplicationClock::getAccumulatedTime() const
 {
-    return accumulatedTime;
+	return accumulatedTime;
 }
 
-int ApplicationClock::getTickRate() const
+int ApplicationClock::getTotalTicks() const
 {
-    return tickRate;
+	return totalTicks;
 }
