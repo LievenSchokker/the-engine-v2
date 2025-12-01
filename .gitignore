@@ -5,3 +5,5 @@ build
 .clangd
 /vcpkg_installed
 .cache
+tests/test_main.cpp
+Tests/test_main.cpp

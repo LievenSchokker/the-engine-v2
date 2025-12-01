@@ -21,11 +21,15 @@
 
 #pragma once
 
-#include "../../../inc/Rendering/IRenderer.h"
+
+#include "Rendering/IRenderer.h"
+
 
 #include <SDL.h>
 
+
 class SdlContext;
+
 
 class SDLRenderer: public IRenderer
 {
