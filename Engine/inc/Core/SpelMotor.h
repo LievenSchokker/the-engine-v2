@@ -72,4 +72,7 @@ private:
 
 	/** @brief timeStep calculation for engine */
 	std::unique_ptr<ApplicationClock> timer;
+
+	/** @brief the physics world where physics are simulated */
+	std::unique_ptr<IPhysicsWorld> physicsWorld;
 };

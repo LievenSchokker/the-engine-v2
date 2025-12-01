@@ -40,6 +40,7 @@ void SpelMotor::start()
     timer->start();
 
     // TODO Server or Client -> Start()
+	physicsWorld->start();
     // TODO SceneManager -> Start()
 
     renderer->open(specifications.windowOptions);
@@ -66,6 +67,7 @@ void SpelMotor::run()
         while (timer->shouldFixedUpdate())
         {
             input->update();
+			physicsWorld->fixedUpdate();
             timer->consumeFixedUpdate();
         }
 
