@@ -21,7 +21,7 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
         SdlContext context = SdlContext();
         timer.reset();
 
-
+		//TODO SDL Injection layer
     	clockFunction = []() { return SDL_GetTicks() / 1000.0; };
     	timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
 

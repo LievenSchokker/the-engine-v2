@@ -100,6 +100,7 @@ public:
 	int getTotalTicks() const;
 
 private:
+	/** @brief A functions that retusn, the time the applicationhas beenrunning in second */
 	ClockFunction getClock;
 	double fixedDeltaTime;
 	double currentTime;
