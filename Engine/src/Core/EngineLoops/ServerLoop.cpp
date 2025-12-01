@@ -1,5 +1,6 @@
 #include "Core/EngineLoops/ServerLoop.h"
 #include "Core/ApplicationClock.h"
+#include "Core/EngineLoops/ClientLoop.h"
 #include "Scene/SceneManager.h"
 
 #include <chrono>

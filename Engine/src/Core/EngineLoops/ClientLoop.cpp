@@ -1,5 +1,6 @@
 #include "Core/EngineLoops/ClientLoop.h"
 #include "Core/ApplicationClock.h"
+#include "Core/EngineLoops/ServerLoop.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
