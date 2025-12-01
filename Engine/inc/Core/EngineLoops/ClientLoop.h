@@ -21,7 +21,7 @@ public:
 	ClockFunction getClock() override;
 	void start() override;
 	void initializeNetworking();
-	void update() override;
+	void update(double deltaTime) override;
 	void fixedUpdate(double deltaTime) override;
 	void shutdown() override;
 

@@ -15,7 +15,7 @@ namespace SpelMotorEntry
 		specifications.windowOptions = {"SpelMotor", 700, 700};
 		specifications.renderBackend = RenderBackend::SDL;
 		specifications.networkingOptions.tickRate = 60;
-	    specifications.networkingOptions.mode = EngineMode::CLIENT;
+	    specifications.networkingOptions.mode = EngineMode::SERVER;
 	    specifications.networkingOptions.port = 8080;
 	    specifications.networkingOptions.serverIP = "127.0.0.1";
 		SpelMotor engine(specifications);

@@ -21,7 +21,7 @@ public:
 	SceneManager* getSceneManager() override;
 	ClockFunction getClock() override;
 	void start() override;
-	void update() override;
+	void update(double deltaTime) override;
 	void fixedUpdate(double deltaTime) override;
 	void shutdown() override;
 

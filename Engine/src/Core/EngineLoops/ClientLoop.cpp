@@ -47,7 +47,7 @@ void ClientLoop::start()
 	initializeNetworking();
 }
 
-void ClientLoop::update()
+void ClientLoop::update(double deltaTime)
 {
 	inputManager->update();
 	RenderQueue renderQueue;

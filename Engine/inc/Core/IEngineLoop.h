@@ -15,7 +15,7 @@ public:
 	virtual SceneManager* getSceneManager() = 0;
 	virtual ApplicationClock::ClockFunction getClock() = 0;
 	virtual void start() = 0;
-	virtual void update() = 0;
+	virtual void update(double fixedDeltaTime) = 0;
 	virtual void fixedUpdate(double fixedDeltaTime) = 0;
 	virtual void shutdown() = 0;
 };

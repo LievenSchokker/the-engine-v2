@@ -43,19 +43,15 @@ void ServerLoop::start()
 	server->start();
 }
 
-void ServerLoop::update()
+void ServerLoop::update(double deltaTime)
 {
-	server->update();
 }
 
 void ServerLoop::fixedUpdate(double deltaTime)
 {
+	server->update();
+	sceneManager->update(deltaTime);
 	currentTick++;
-
-	if (sceneManager)
-	{
-		sceneManager->update(deltaTime);
-	}
 }
 
 void ServerLoop::shutdown()

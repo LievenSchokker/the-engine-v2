@@ -55,7 +55,7 @@ void SpelMotor::run()
             coreClock->consumeFixedUpdate();
         }
 
-        coreSystemLoop->update();
+        coreSystemLoop->update(coreClock->getDeltaTime());
     }
 }
 
