@@ -9,5 +9,5 @@
 class EngineLoopFactory
 {
 public:
-    static std::unique_ptr<EngineLoop> createEngineLoop(EngineMode mode);
+    static std::unique_ptr<EngineLoop> createEngineLoop(ApplicationSpecifications specifications, GameWorld* gameWorld);
 };

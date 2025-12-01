@@ -15,7 +15,7 @@ class ApplicationClock;
 class SpelMotor
 {
 public:
-    explicit SpelMotor(ApplicationSpecifications applicationSpecifications);
+    explicit SpelMotor(const ApplicationSpecifications& applicationSpecifications);
     ~SpelMotor();
 
     void start();

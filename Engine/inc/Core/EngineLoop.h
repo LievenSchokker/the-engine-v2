@@ -8,7 +8,7 @@ class EngineLoop
 {
     using ClockFunction = std::function<double()>;
 public:
-    explicit EngineLoop(ApplicationSpecifications applicationSpecifications);
+    explicit EngineLoop(ApplicationSpecifications applicationSpecifications, GameWorld* gameWorld);
 
     virtual ~EngineLoop() = default;
 

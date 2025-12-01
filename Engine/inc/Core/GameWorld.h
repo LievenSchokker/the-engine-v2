@@ -1,4 +1,5 @@
 #pragma once
+#include "ApplicationClock.h"
 
 class SceneManager;
 class IPhysicsWorld;
@@ -12,7 +13,7 @@ class IMessage;
 class GameWorld
 {
 public:
-    GameWorld() = default;
+    GameWorld(ApplicationClock clock);
 
     SceneManager* sceneManager = nullptr;
     IPhysicsWorld* physics = nullptr;

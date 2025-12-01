@@ -15,10 +15,11 @@
 #include "Core/EngineLoopFactory.h"
 #include "Scene/SceneManager.h"
 
-SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
+SpelMotor::SpelMotor(const ApplicationSpecifications& applicationSpecifications)
 	: specifications(applicationSpecifications),
     running(false),
-    coreSystemLoop(EngineLoopFactory::createEngineLoop(applicationSpecifications.networkingOptions.mode)),
+    gameWorld(GameWorld(coreClock)),
+    coreSystemLoop(EngineLoopFactory::createEngineLoop(applicationSpecifications, &gameWorld)),
     coreClock(std::make_unique<ApplicationClock>(coreSystemLoop->getClock(),
         applicationSpecifications.networkingOptions.tickRate,
         applicationSpecifications.maxFrameTime))
