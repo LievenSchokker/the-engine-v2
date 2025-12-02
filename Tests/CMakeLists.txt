@@ -13,9 +13,16 @@ add_executable(engine_tests
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
+        Component/GridComponentTest.cpp
         GameObject/tests_game_object.cpp
+        Scene/SceneManagerTest.cpp
+        Networking/Messages/MessageReaderTest.cpp
+        Networking/Messages/MessageWriterTest.cpp
+        Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
+        Scene/SceneManagerTest.cpp
+        Physics/PhysicsSystemTest.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE

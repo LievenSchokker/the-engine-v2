@@ -29,7 +29,9 @@
 #include <SDL.h>
 #include <memory>
 
+
 class SdlContext;
+
 
 class SDLRenderer: public IRenderer
 {
