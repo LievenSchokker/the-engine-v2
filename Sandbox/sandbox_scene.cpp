@@ -9,7 +9,6 @@
 #include "../Engine/inc/Rendering/Window/WindowOptions.h"
 #include "../Engine/inc/Scene/SceneManager.h"
 
-#include <SDL2/SDL.h>
 #include <iostream>
 #include <memory>
 
@@ -23,7 +22,8 @@ int main()
 
 	WindowOptions options{"Shape Sandbox", SCREEN_WIDTH, SCREEN_HEIGHT};
 	renderer.open(options);
-	if ( !renderer.isOpen() ) {
+	if ( !renderer.isOpen() )
+	{
 		std::cout << "Failed to open SDL window\n";
 		return 1;
 	}
@@ -38,7 +38,8 @@ int main()
 	circle->getTransform()->setPosition({150.0, 140.0});
 	circle->getTransform()->setScale({1.0, 1.0});
 	auto* circleRenderer = circle->addComponent<ShapeRenderer>();
-	if ( circleRenderer == nullptr ) {
+	if ( circleRenderer == nullptr )
+	{
 		std::cerr << "[Sandbox] Failed to add ShapeRenderer to BlueCircle\n";
 		return 1;
 	}
@@ -50,7 +51,8 @@ int main()
 	rectangle->getTransform()->setRotationAngle(25.0);
 	rectangle->getTransform()->setScale({1.0, 1.0});
 	auto* rectangleRenderer = rectangle->addComponent<ShapeRenderer>();
-	if ( rectangleRenderer == nullptr ) {
+	if ( rectangleRenderer == nullptr )
+	{
 		std::cerr
 			<< "[Sandbox] Failed to add ShapeRenderer to YellowRectangle\n";
 		return 1;
@@ -71,23 +73,27 @@ int main()
 	InputManager* input = InputManager::getInstance();
 	Scene* activeScene = sceneManager.getActiveScene();
 
-	while ( running && renderer.isOpen() ) {
+	while ( running && renderer.isOpen() )
+	{
 		input->update();
 
 		// ================================ GAME CODE CHECK
 		// ================================
 
-		if ( input->wasKeyPressed(KeyCode::SPACE) ) {
+		if ( input->wasKeyPressed(KeyCode::SPACE) )
+		{
 			clearColor = (clearColor == Color::darkGreen())
 							 ? Color::darkPurple()
 							 : Color::darkGreen();
 			sceneManager.setClearColor(clearColor);
 		}
 
-		if ( input->wheelDeltaY() != 0 ) {
+		if ( input->wheelDeltaY() != 0 )
+		{
 			GameObject* rectangle =
 				activeScene->getGameObject("YellowRectangle");
-			if ( rectangle != nullptr ) {
+			if ( rectangle != nullptr )
+			{
 				double currentRotation =
 					rectangle->getTransform()->getRotationAngle();
 				rectangle->getTransform()->setRotationAngle(
@@ -95,17 +101,19 @@ int main()
 			}
 		}
 
-		if ( input->wheelDeltaX() != 0 ) {
+		if ( input->wheelDeltaX() != 0 )
+		{
 			GameObject* circle = activeScene->getGameObject("BlueCircle");
-			if ( circle != nullptr ) {
+			if ( circle != nullptr )
+			{
 				Vector2 currentPosition = circle->getTransform()->getPosition();
 				circle->getTransform()->setPosition(
 					{currentPosition.x + input->wheelDeltaX() * 10,
 					 currentPosition.y});
 				Vector2 currentScale = circle->getTransform()->getScale();
 				circle->getTransform()->setScale(
-					{currentScale.x + input->wheelDeltaX() * 0.1,
-					 currentScale.y + input->wheelDeltaX() * 0.1});
+					{currentScale.x + input->wheelDeltaX() * 0.1f,
+					 currentScale.y + input->wheelDeltaX() * 0.1f});
 			}
 		}
 
@@ -118,7 +126,8 @@ int main()
 		sceneManager.buildRenderQueue(renderQueue);
 		executeRenderQueue(renderer, renderQueue);
 
-		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) ) {
+		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) )
+		{
 			running = false;
 		}
 

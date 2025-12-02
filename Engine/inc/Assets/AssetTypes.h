@@ -4,12 +4,10 @@
 
 #pragma once
 
-
 #include <cstdint>
 
-
-enum class AssetType : uint16_t
-{
+enum class AssetType : uint16_t {
 	None = 0,
 	Sprite,
+	Tilemap,
 };

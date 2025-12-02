@@ -1,5 +1,10 @@
 #include "Scene/Scene.h"
 
+#include "../../inc/Component/ComponentManager.h"
+#include "../../inc/Component/GridComponent.h"
+#include "../../inc/Component/ShapeRenderer.h"
+#include "../../inc/Component/TilemapComponent.h"
+#include "../../inc/Rendering/RenderQueue.h"
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
@@ -214,11 +219,13 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 		return;
 	}
 
+	std::vector<ShapeRenderCommand> debugCommands;
 	for ( const auto& gameObject : gameObjects ) {
 		if ( !gameObject->getIsActive() ) {
 			continue;
 		}
 
+		// Collect ShapeRenderer commands
 		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
 		if ( shapeRenderer != nullptr ) {
 			const auto command = shapeRenderer->buildRenderCommand();
@@ -226,7 +233,28 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 				out.emplace_back(*command);
 			}
 		}
+
+		// Collect TilemapComponent commands
+		auto* tilemapComponent = gameObject->getComponent<TilemapComponent>();
+		if ( tilemapComponent != nullptr ) {
+			const auto tilemapCommands =
+				tilemapComponent->buildRenderCommands();
+			out.insert(out.end(), tilemapCommands.begin(),
+					   tilemapCommands.end());
+		}
+
+		// Collect GridComponent debug render commands
+		auto* gridComponent = gameObject->getComponent<GridComponent>();
+		if ( gridComponent != nullptr &&
+			 gridComponent->isDebugRenderEnabled() ) {
+			const auto gridCommands = gridComponent->buildDebugRenderCommands();
+			debugCommands.insert(debugCommands.end(), gridCommands.begin(),
+								 gridCommands.end());
+		}
 	}
+
+	// Append deferred debug overlays after regular render commands.
+	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
 }
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
