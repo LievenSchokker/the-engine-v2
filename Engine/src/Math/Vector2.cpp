@@ -105,11 +105,24 @@ Vector2 Vector2::lerp(const Vector2 &from, const Vector2 &to, float t)
 void Vector2::normalize()
 {
     float mag = magnitude();
-    if (mag == 0.0f) return;
+
+    if (mag == 0.0f)
+        return;
 
     _x /= mag;
     _y /= mag;
 }
+
+Vector2 Vector2::normalised() const
+{
+    float mag = magnitude();
+
+    if (mag == 0.0f)
+        return Vector2::zero();
+
+    return Vector2{_x / mag, _y / mag};
+}
+
 
 
 float Vector2::magnitude() const

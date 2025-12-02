@@ -50,8 +50,13 @@ struct Vector2
     /// Sets the value of this vector's y component
     void setY(float value);
 
-    /// Makes this vector have a magnitude of 1, keeping the same directions.
+    /// Normalises this vector, making it have a magnitude of 1 in the same directions.
+    /// Returns Vector2::zero() if magnitude == 0.0f
     void normalize();
+
+    /// Returns a normalised copy of this vector, with a magnitude of 1 in the same directions
+    /// Returns Vector2::zero() if magnitude == 0.0f
+    Vector2 normalised() const;
 
     /// Returns the length of this vector
     [[nodiscard]] float magnitude() const;

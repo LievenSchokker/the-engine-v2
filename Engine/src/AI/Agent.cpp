@@ -21,7 +21,7 @@ void Agent::update()
 {
     Vector2 velocity = computeDesiredVelocity();
 
-    // transform->setPosition(transform->getPosition() + velocity);
+    transform->setPosition(transform->getPosition() + velocity);
 }
 
 Vector2 Agent::computeDesiredVelocity()
@@ -31,7 +31,25 @@ Vector2 Agent::computeDesiredVelocity()
 
 Vector2 Agent::computeModuleForce()
 {
-    return Vector2{0,0};
+    Vector2 totalForce = Vector2::zero();
+    Vector2 accumulatedForce = Vector2::zero();
+
+    for (std::unique_ptr<BaseAgentModule>& modulePtr : modules)
+    {
+        BaseAgentModule* module = modulePtr.get();
+        float weight = moduleWeights[module->getModuleType()];
+        Vector2 force = module->compute();
+
+        accumulatedForce += force * weight;
+    }
+
+    if (accumulatedForce.magnitude() > maxModuleForceMagnitude)
+    {
+        accumulatedForce.normalize();
+        accumulatedForce *= maxModuleForceMagnitude;
+    }
+
+    return totalForce;
 }
 
 float Agent::getMaxModuleForceMagnitude() const
