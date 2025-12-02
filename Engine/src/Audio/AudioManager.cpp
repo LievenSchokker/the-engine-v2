@@ -3,12 +3,12 @@
 #include "Audio/IAudioBackend.h"
 #include "Audio/MusicSource.h"
 
-bool AudioManager::initialize(IAudioBackend* backendPtr)
+bool AudioManager::initialize(std::unique_ptr<IAudioBackend> backendPtr)
 {
-	if ( !backendPtr ) return false;
-
-	backend = backendPtr;
-	return backend->initialize();
+	backend = std::move(backendPtr);
+	if ( !backend->initialize() ) return false;
+	assetManager = std::make_unique<AudioAssetManager>(backend.get());
+	return true;
 }
 
 void AudioManager::shutdown()
@@ -39,6 +39,13 @@ void AudioManager::unregisterAudioSource(AudioSource* source)
 		}
 	}
 }
+
+
+bool AudioManager::loadMusic(const std::string& path) const
+{
+	return backend->loadMusic(path);;
+}
+
 
 bool AudioManager::setMusicSource(MusicSource* source)
 {
@@ -82,14 +89,28 @@ void AudioManager::setMusicVolume(float volume)
 	backend->setMusicVolume(volume);
 }
 
-void AudioManager::playMusic(MusicHandle handle, bool loop)
+void AudioManager::playMusic(MusicHandle handle, bool loop) const
 {
 	if ( !backend ) return;
-	backend->playMusic(handle, loop ? -1 : 0);
+	loop = loop ? -1 : 0;
+	backend->playMusic(handle, loop);
 }
 
-void AudioManager::stopMusic()
+void AudioManager::pauseMusic() const
+{
+	if ( !backend ) return;
+	backend->pauseMusic();
+}
+
+void AudioManager::stopMusic() const
 {
 	if ( !backend ) return;
 	backend->stopMusic();
+}
+
+
+void AudioManager::resumeMusic() const
+{
+	if ( !backend ) return;
+	backend->resumeMusic();
 }

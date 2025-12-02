@@ -29,26 +29,21 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 
 		renderer = std::make_unique<SDLRenderer>(context);
 
-		// #TODO no raw pointers
-		IAudioBackend* audioBackend = new AudioBackendSDL();
-		audioBackend->setMusicVolume(100);
+		// Audio
+		auto audioBackend = std::make_unique<AudioBackendSDL>();
 		audioManager = std::make_unique<AudioManager>();
-		audioManager->initialize(audioBackend);
+		audioManager->initialize(std::move(audioBackend));
 
-
-		MusicSource* music = new MusicSource();
+		// Play music
+		auto music = std::make_unique<MusicSource>();
 		music->audioManager = audioManager.get();
-		music->audioAssetManager = new AudioAssetManager(audioBackend);
-		music->loop = true;
-
-		// music->loadMusic(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_epic.wav)");
-		music->loadMusic(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
-
+		music->setLoop(true);
+		music->loadMusic(
+			R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
 		music->play();
 
-		while (true)
+		while ( true )
 		{
-
 		}
 	}
 }
@@ -62,8 +57,6 @@ void SpelMotor::start()
 	// TODO Server or Client -> Start()
 	physicsWorld->start();
 	// TODO SceneManager -> Start()
-
-
 
 	renderer->open(specifications.windowOptions);
 

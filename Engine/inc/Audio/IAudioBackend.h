@@ -20,6 +20,8 @@ class IAudioBackend
 
 	virtual void playSound(SoundHandle handle, int channel, int loops) = 0;
 	virtual bool playMusic(MusicHandle handle, int loops) = 0;
+	virtual void pauseMusic() = 0;
+	virtual void resumeMusic() = 0;
 
 	virtual void stopChannel(int channel) = 0;
 	virtual void stopMusic() = 0;

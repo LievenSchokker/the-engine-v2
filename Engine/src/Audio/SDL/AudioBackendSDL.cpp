@@ -118,6 +118,17 @@ bool AudioBackendSDL::playMusic(MusicHandle handle, int loops)
     return Mix_PlayMusic(it->second, loops) == 0;
 }
 
+
+void AudioBackendSDL::pauseMusic()
+{
+	Mix_PauseMusic();
+}
+
+void AudioBackendSDL::resumeMusic()
+{
+	Mix_ResumeMusic();
+}
+
 void AudioBackendSDL::stopChannel(int channel)
 {
     Mix_HaltChannel(channel);
