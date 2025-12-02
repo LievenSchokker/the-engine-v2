@@ -123,14 +123,25 @@ void NuklearSDLRenderHook::updateInput()
 void NuklearSDLRenderHook::beginFrame()
 {
 	updateInput();
+
+	TextRenderCommand cmd;
+	cmd.text = "Hello World";
+	cmd.x = 100;
+	cmd.y = 100;
+	cmd.width = 200;
+	cmd.height = 30;
+	submit(cmd);
+
 	render();
 }
 
 
-void NuklearSDLRenderHook::render() const
+void NuklearSDLRenderHook::render()
 {
 	//Small example of Nuklear working
 	//TODO Make this an actual canvas that can add and remove UIObjects.
+
+
 	if (nk_begin(nuklearkContext, "Test Window", nk_rect(50, 50, 230, 250),
 	             NK_WINDOW_NO_SCROLLBAR)) {
 		nk_layout_row_dynamic(nuklearkContext, 30, 1);
@@ -145,6 +156,7 @@ void NuklearSDLRenderHook::render() const
 		nk_slider_float(nuklearkContext, 0, &value, 1.0f, 0.1f);
 	}
 	nk_end(nuklearkContext);
+	flushCommands();
 }
 
 void NuklearSDLRenderHook::flushCommands() {

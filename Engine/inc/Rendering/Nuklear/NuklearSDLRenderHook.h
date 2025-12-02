@@ -64,7 +64,7 @@ public:
 	 * Currently it contains some hard coded UI examples but after UIobject has been added
 	 * This will render the whole canvas layer.
 	 */
-	void render() const;
+	void render();
 
 	/**
 	 * @brief Submits Nuklear draw commands to SDL.
