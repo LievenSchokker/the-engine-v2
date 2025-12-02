@@ -4,8 +4,8 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
 
-// This has been added because sometimes SDL causes main to be redefined.
-// Which then causes linking error's
+/// This has been added because sometimes SDL causes main to be redefined.
+/// Which then causes linking error's
 #undef main
 
 namespace SpelMotorEntry

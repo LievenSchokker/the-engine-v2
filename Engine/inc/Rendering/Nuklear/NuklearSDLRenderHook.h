@@ -94,5 +94,5 @@ private:
 	SDL_Renderer* sdlRenderer;
 
 	/// Nuklear's core state. Null until initialize() succeeds.
-	struct nk_context* nkCtx;
+	struct nk_context* nuklearkContext;
 };
