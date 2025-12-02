@@ -5,15 +5,14 @@
 
 #include "BaseAgentModule.h"
 
-#include "ModuleData.h"
 #include "ModuleState.h"
+#include "ModuleType.h"
 
-namespace spelmotor_ai
-{
     bool BaseAgentModule::isActive() const
     {
         return (moduleState == ModuleState::ACTIVE);
     }
+
 
     ModuleState BaseAgentModule::getModuleState() const
     {
@@ -24,4 +23,15 @@ namespace spelmotor_ai
     {
         moduleState = state;
     }
-}
+
+    ModuleType BaseAgentModule::getModuleType() const
+    {
+        return moduleType;
+    }
+
+    void BaseAgentModule::setModuleType(ModuleType type)
+    {
+        moduleType = type;
+    }
+
+

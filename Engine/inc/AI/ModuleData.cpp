@@ -3,6 +3,3 @@
 //
 #include "ModuleData.h"
 
-namespace spelmotor_ai
-{
-} // spelmotor_ai

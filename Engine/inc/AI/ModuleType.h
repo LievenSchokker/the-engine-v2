@@ -4,10 +4,6 @@
 #pragma once
 
 
-namespace spelmotor_ai
+enum class ModuleType
 {
-    enum class ModuleType
-    {
-
-    };
-}
+};
