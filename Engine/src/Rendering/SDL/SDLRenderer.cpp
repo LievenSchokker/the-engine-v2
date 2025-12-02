@@ -8,7 +8,7 @@
 #include "Math/Vector2Utils.h"
 #include "../../../inc/Rendering/Window/WindowOptions.h"
 #include "External/SdlContext.h"
-#include "GameObject/Vector2Utils.h"
+#include "Math/Vector2Utils.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Rendering/SDL/SDLRenderer.h"
 
@@ -16,7 +16,6 @@
 #include <cassert>
 #include <cmath>
 #include <iostream>
-#include <math.h>
 
 namespace
 {

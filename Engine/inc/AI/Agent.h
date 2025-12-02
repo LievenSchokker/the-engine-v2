@@ -5,11 +5,10 @@
 #include "Behaviour/Behaviour.h"
 #include <map>
 #include <unordered_map>
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 enum class ModuleState;
 enum class ModuleType;
-class BaseAgentModule;
-struct Vector2;
+#include "AI/BaseAgentModule.h"
 
 class Agent final : public Behaviour
 {

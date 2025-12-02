@@ -26,7 +26,7 @@ void Agent::update()
 
 Vector2 Agent::computeDesiredVelocity()
 {
-
+    return Vector2::zero();
 }
 
 Vector2 Agent::computeModuleForce()
