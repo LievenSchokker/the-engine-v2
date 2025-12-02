@@ -83,7 +83,14 @@ public:
 	 */
 	void close() override;
 
+	void submit(UIRenderCommand command) override;
 private:
+	std::vector<UIRenderCommand> commandQueue;
+	int commandCounter = 0;
+
+	void flushCommands();
+	void execute(const TextRenderCommand& cmd);
+	void execute(const ButtonRenderCommand& cmd);
 	/// Cached to avoid repeated singleton lookups each frame.
 	InputManager* inputManager;
 

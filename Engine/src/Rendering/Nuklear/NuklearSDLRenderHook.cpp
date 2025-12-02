@@ -5,6 +5,7 @@
 
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
+#include "Component/UIObject/Alignment.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
@@ -146,6 +147,13 @@ void NuklearSDLRenderHook::render() const
 	nk_end(nuklearkContext);
 }
 
+void NuklearSDLRenderHook::flushCommands() {
+	for (const auto& cmd : commandQueue) {
+		std::visit([this](const auto& c) { execute(c); }, cmd);
+	}
+	commandQueue.clear();
+}
+
 void NuklearSDLRenderHook::presentFrame()
 {
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
@@ -157,4 +165,46 @@ void NuklearSDLRenderHook::close()
 		nk_sdl_shutdown();
 		nuklearkContext = nullptr;
 	}
+}
+
+void NuklearSDLRenderHook::execute(const TextRenderCommand& cmd) {
+	char windowId[32];
+	snprintf(windowId, sizeof(windowId), "##text_%d", commandCounter++);
+
+	nk_flags flags = NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_NO_INPUT | NK_WINDOW_BACKGROUND;
+
+	if (nk_begin(nuklearkContext, windowId,
+				 nk_rect(cmd.x, cmd.y, cmd.width, cmd.height), flags)) {
+		nk_layout_row_dynamic(nuklearkContext, cmd.height, 1);
+
+		nk_flags align = NK_TEXT_LEFT;
+		if (cmd.alignment == TextAlignment::Center) align = NK_TEXT_CENTERED;
+		else if (cmd.alignment == TextAlignment::Right) align = NK_TEXT_RIGHT;
+
+		nk_label(nuklearkContext, cmd.text.c_str(), align);
+				 }
+	nk_end(nuklearkContext);
+}
+
+void NuklearSDLRenderHook::submit(UIRenderCommand command) {
+	commandQueue.push_back(std::move(command));
+}
+
+void NuklearSDLRenderHook::execute(const ButtonRenderCommand& cmd) {
+	char windowId[32];
+	snprintf(windowId, sizeof(windowId), "##btn_%d", commandCounter++);
+
+	nk_flags flags = NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_BACKGROUND;
+
+	if (nk_begin(nuklearkContext, windowId,
+				 nk_rect(cmd.x, cmd.y, cmd.width, cmd.height), flags)) {
+		nk_layout_row_dynamic(nuklearkContext, cmd.height - 8, 1);
+
+		if (nk_button_label(nuklearkContext, cmd.label.c_str())) {
+			if (cmd.enabled && cmd.wasClicked) {
+				*cmd.wasClicked = true;
+			}
+		}
+				 }
+	nk_end(nuklearkContext);
 }

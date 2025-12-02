@@ -3,11 +3,11 @@
 #include "Component/UIObject/UIObject.h"
 
 
-class Text: public UIObject
+class UITextObject: public UIObject
 {
    public:
-	explicit Text(int width = 0, int height = 0, const std::string& text = "",
-		 const std::string& font = "Arial", int textSize = 12,
+	explicit UITextObject(int width = 0, int height = 0, std::string  text = "",
+		 std::string  font = "default", int textSize = 12,
 		 Alignment alignment = Alignment::Left);
 
 	std::string getText() const;
@@ -25,5 +25,4 @@ class Text: public UIObject
 	std::string font;
 	int textSize;
 	Alignment alignment;
-	// QQToDo: Color depends on rendering
 };
