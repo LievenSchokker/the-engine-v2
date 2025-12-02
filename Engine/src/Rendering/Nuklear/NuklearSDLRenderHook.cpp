@@ -154,21 +154,10 @@ void NuklearSDLRenderHook::beginFrame()
     floatingText.text = "Floating text (auto-panel)";
     floatingText.color = Color::purple();
     submit(floatingText);
-	// Transparent backgrounds
-	if (frames % 10 == 0)
-	{
-		nuklearContext->style.window.fixed_background = nk_style_item_color(
-			nk_rgba(0, 0, 244, 255));
-	}else
-	{
-		nuklearContext->style.window.fixed_background = nk_style_item_color(
-		nk_rgba(0, 0, 0, 0));
-	}
 }
 
 void NuklearSDLRenderHook::presentFrame()
 {
-	frames++;
 	flushCommands();
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
 }

@@ -104,8 +104,7 @@ private:
 	void renderPanel(uint32_t panelId);
 	void renderElement(const UIRenderCommand& command);
 	void renderText(const UIRenderCommand& command);
-
-	uint32_t frames = 0;
+	
 	InputManager* inputManager;
 	SDL_Window* sdlWindow;
 	SDL_Renderer* sdlRenderer;
