@@ -15,21 +15,18 @@ class MusicSource: public Component
 
 	bool loadMusic(const std::string& path);
 	void play();
-	void stop() const;
+	void stop();
 	void pause();
 	void resume();
 	void setVolume(float volume);
+	void setLoop(bool shouldLoop);
 
-	// Fields (could be made private + getters/setters)
 	std::string musicAssetTag;
 	AudioManager* audioManager = nullptr;
-	// std::unique_ptr<AudioManager> audioManager = nullptr;
-	AudioAssetManager* audioAssetManager = nullptr;
-
-	float volume = 0.9f;
-	bool loop = false;
-	bool playOnAwake = false;
 
 private:
+	bool playing = false;
+	bool loop = false;
+	float volume = 0.9f;
 	MusicHandle handle = -1;
 };

@@ -24,6 +24,8 @@ public:
 
 	void playSound(SoundHandle handle, int channel, int loops) override;
 	bool playMusic(MusicHandle handle, int loops) override;
+	void pauseMusic() override;
+	void resumeMusic() override;
 
 	void stopChannel(int channel) override;
 	void stopMusic() override;
