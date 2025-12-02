@@ -1,17 +1,15 @@
 #pragma once
 
-
-#include <memory>
-
+class ApplicationClock;
+class IRenderer;
 
 #include "ApplicationSpecifications.h"
 #include "Physics/IPhysicsWorld.h"
+#include "Audio/AudioManager.h"
 
+#include <memory>
 #include <functional>
 
-
-class ApplicationClock;
-class IRenderer;
 
 /**
  * @class SpelMotor
@@ -78,4 +76,7 @@ private:
 
 	/** @brief the physics world where physics are simulated */
 	std::unique_ptr<IPhysicsWorld> physicsWorld;
+
+	/** @brief An audio manager to play and control audio */
+	std::unique_ptr<AudioManager> audioManager;
 };

@@ -1,5 +1,7 @@
 #include "Core/SpelMotor.h"
 
+#include "Audio/MusicSource.h"
+#include "Audio/SDL/AudioBackendSDL.h"
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
 #include "External/SdlContext.h"
@@ -26,6 +28,28 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 		timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
 
 		renderer = std::make_unique<SDLRenderer>(context);
+
+		// #TODO no raw pointers
+		IAudioBackend* audioBackend = new AudioBackendSDL();
+		audioBackend->setMusicVolume(100);
+		audioManager = std::make_unique<AudioManager>();
+		audioManager->initialize(audioBackend);
+
+
+		MusicSource* music = new MusicSource();
+		music->audioManager = audioManager.get();
+		music->audioAssetManager = new AudioAssetManager(audioBackend);
+		music->loop = true;
+
+		// music->loadMusic(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_epic.wav)");
+		music->loadMusic(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
+
+		music->play();
+
+		while (true)
+		{
+
+		}
 	}
 }
 
@@ -38,6 +62,8 @@ void SpelMotor::start()
 	// TODO Server or Client -> Start()
 	physicsWorld->start();
 	// TODO SceneManager -> Start()
+
+
 
 	renderer->open(specifications.windowOptions);
 

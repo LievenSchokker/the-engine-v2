@@ -27,6 +27,7 @@ target_include_directories(engine PUBLIC
 target_link_libraries(engine PUBLIC
         SDL2::SDL2
         SDL2_image::SDL2_image
+        SDL2_mixer::SDL2_mixer
         GameNetworkingSockets::GameNetworkingSockets
         box2d
 )
