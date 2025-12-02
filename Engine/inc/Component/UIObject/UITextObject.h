@@ -5,7 +5,7 @@
 
 class UITextObject: public UIObject
 {
-   public:
+public:
 	explicit UITextObject(int width = 0, int height = 0, std::string  text = "",
 		 std::string  font = "default", int textSize = 12,
 		 Alignment alignment = Alignment::Left);
@@ -20,7 +20,7 @@ class UITextObject: public UIObject
 	void setTextSize(int newTextSize);
 	void setAlignment(Alignment newAlignment);
 
-   private:
+private:
 	std::string text;
 	std::string font;
 	int textSize;

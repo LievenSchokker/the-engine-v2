@@ -1,10 +1,14 @@
 #pragma once
 
+#include "nuklear.h"
+
 #include <SDL_video.h>
 
 #include "Input/InputManager.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/SDL/SDLRenderer.h"
+
+#include <queue>
 
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.
@@ -82,24 +86,20 @@ public:
 	 * holds references to SDL textures.
 	 */
 	void close() override;
-
 	void submit(UIRenderCommand command) override;
+
 private:
-	std::vector<UIRenderCommand> commandQueue;
-	int commandCounter = 0;
-
 	void flushCommands();
-	void execute(const TextRenderCommand& cmd);
-	void execute(const ButtonRenderCommand& cmd);
-	/// Cached to avoid repeated singleton lookups each frame.
+	void renderPanel(uint32_t panelId);
+	void renderElement(const UIRenderCommand& cmd);
+
 	InputManager* inputManager;
-
-	/// Needed by Nuklear for window size queries and event context.
 	SDL_Window* sdlWindow;
-
-	/// Needed by Nuklear for texture and draw call submission.
 	SDL_Renderer* sdlRenderer;
+	nk_context* nuklearContext;
 
-	/// Nuklear's core state. Null until initialize() succeeds.
-	struct nk_context* nuklearContext;
+	std::vector<UIRenderCommand> commandQueue;
+	std::unordered_map<uint32_t, size_t> panelIndices;
+	std::unordered_map<uint32_t, std::vector<size_t>> panelElementIndices;
+	std::vector<uint32_t> rootPanels;
 };

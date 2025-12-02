@@ -7,7 +7,7 @@
 
 
 #pragma once
-#include "Component/UIObject/UIRenderCommand.h"
+#include "UIRenderCommand.h"
 
 struct UserInterfaceSettings;
 
