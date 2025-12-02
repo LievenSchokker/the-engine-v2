@@ -10,26 +10,25 @@ constexpr uint32_t NO_PARENT = 0;
 enum class UICommandType {
 	Panel,
 	Text,
-	Button,
-	Slider,
-	Checkbox
 };
 
 struct UIRenderCommand {
-	UICommandType type;
-	uint32_t panelId;
-	uint32_t parentId;
+	UICommandType type = UICommandType::Panel;
+	uint32_t panelId = NO_PARENT;
+	uint32_t parentId = 0;
 
 	float x = 0, y = 0, width = 100, height = 30;
-	std::string title;
+	std::string title{};
 	bool hasTitle = false;
 	bool hasBorder = false;
 	float rowHeight = 30.0f;
 	int columns = 1;
 
 	// Text
-	std::string text;
+	std::string text{};
 	Alignment alignment = Alignment::Left;
 	Color color = Color::white();
 	int fontSize = 14;
+
+	UIRenderCommand() = default;
 };

@@ -100,17 +100,25 @@ public:
 
 private:
 	void flushCommands();
+	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
 	void renderElement(const UIRenderCommand& command);
 	void renderText(const UIRenderCommand& command);
 
+	uint32_t frames = 0;
 	InputManager* inputManager;
 	SDL_Window* sdlWindow;
 	SDL_Renderer* sdlRenderer;
 	nk_context* nuklearContext;
 
 	std::vector<UIRenderCommand> commandQueue;
+
+	/// @brief Maps panel ID → index in commandQueue where that panel's data lives.
 	std::unordered_map<uint32_t, size_t> panelIndices;
+
+	/// @brief Maps panel ID → list of indices of elements that belong to that panel.
 	std::unordered_map<uint32_t, std::vector<size_t>> panelElementIndices;
+
+	/// @brief list of index's that have no panel
 	std::vector<uint32_t> rootPanels;
 };
