@@ -1,39 +1,50 @@
 //
 // Created by samle on 02/12/2025.
 //
-
-
 #pragma once
-
-
 #include "Behaviour/Behaviour.h"
 #include <map>
 #include <unordered_map>
-
 #include "GameObject/Vector2.h"
+enum class ModuleState;
+
+namespace spelmotor_ai
+{
+    enum class ModuleType;
+}
+
+namespace spelmotor_ai
+{
+    class BaseAgentModule;
+}
+
 struct Vector2;
 
-class Agent final : public Behaviour
+namespace spelmotor_ai
 {
-    public:
-        Agent() :
-            currentVelocity(Vector2{0,0}), maxMotionMagnitude(0), maxSpeed(0) {};
-        ~Agent() override = default;
+    class Agent final : public Behaviour
+    {
+        public:
+            Agent() : currentVelocity(Vector2{0, 0}), maxMotionMagnitude(0), maxSpeed(0)
+            {
+            };
 
-        void update() override;
-        Vector2 computeModuleForce();
-        Vector2 computeDesiredVelocity();
+            ~Agent() override = default;
+            void update() override;
 
-        bool addAgentModule(); /// Todo: add module param
-        bool removeAgentModule(); /// Todo: add module param
-        bool setModuleWeight(float desiredWeight); // Todo: add module param
-        bool setModuleStatus(); /// Todo: add module param, add moduleStatus param
+            Vector2 computeModuleForce();
+            Vector2 computeDesiredVelocity();
 
-    private:
-        std::vector<int> modulePositions; /// Todo: replace int with ModuleData
-        std::unordered_map<int, float> moduleWeights; /// Todo: Replace int with moduleType
-        Vector2 currentVelocity;
-        float maxMotionMagnitude;
-        float maxSpeed;
-};
+            bool addAgentModule(ModuleType moduleType);
+            bool removeAgentModule(ModuleType moduleType);
+            bool setModuleWeight(ModuleType moduleType, float desiredWeight);
+            bool setModuleStatus(ModuleType module, ModuleState status);
 
+        private:
+            std::vector<std::unique_ptr<BaseAgentModule>> modules;
+            std::unordered_map<ModuleType, float> moduleWeights;
+            Vector2 currentVelocity;
+            float maxModuleMagnitude;
+            float maxVelocity;
+    };
+}
