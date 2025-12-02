@@ -1,8 +1,8 @@
 //
 // Created by samle on 02/12/2025.
 //
+
 #pragma once
-#include "ModuleState.h"
 
 namespace spelmotor_ai
 {
@@ -34,7 +34,7 @@ namespace spelmotor_ai
              * Sets the current ModuleState of this module
              * @param state the new state
              */
-            void setModuleState(ModuleState state);
+            void setModuleState(const ModuleState state);
 
             /**
              * Uses the module state to determine if this module is active
