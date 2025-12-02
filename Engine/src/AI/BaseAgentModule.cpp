@@ -3,12 +3,12 @@
 //
 
 
-#include "BaseAgentModule.h"
+#include "../../inc/AI/BaseAgentModule.h"
 
-#include "ModuleState.h"
-#include "ModuleType.h"
+#include "../../inc/AI/ModuleState.h"
+#include "../../inc/AI/ModuleType.h"
 
-    bool BaseAgentModule::isActive() const
+bool BaseAgentModule::isActive() const
     {
         return (moduleState == ModuleState::ACTIVE);
     }
