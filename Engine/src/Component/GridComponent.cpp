@@ -15,7 +15,8 @@ void GridComponent::setTilemapComponent(TilemapComponent* tilemap)
 	// Validate that tilemap is on the same GameObject (if both exist)
 	if ( tilemap != nullptr && getGameObject() != nullptr &&
 		 tilemap->getGameObject() != nullptr &&
-		 tilemap->getGameObject() != getGameObject() ) {
+		 tilemap->getGameObject() != getGameObject() )
+	{
 		// Warning: TilemapComponent is on a different GameObject
 		// This is allowed but may cause issues if the other GameObject is
 		// destroyed. For safety, prefer using a TilemapComponent on the same
@@ -27,15 +28,18 @@ void GridComponent::setTilemapComponent(TilemapComponent* tilemap)
 
 bool GridComponent::isWalkable(Vector2 cell) const
 {
-	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() ) {
+	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() )
+	{
 		return false;
 	}
 
-	if ( !isValidCell(cell) ) {
+	if ( !isValidCell(cell) )
+	{
 		return false;
 	}
 
-	if ( isCellBlocked(cell) ) {
+	if ( isCellBlocked(cell) )
+	{
 		return false;
 	}
 
@@ -46,7 +50,8 @@ bool GridComponent::isWalkable(Vector2 cell) const
 
 bool GridComponent::isWalkableAtWorld(Vector2 worldPos) const
 {
-	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() ) {
+	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() )
+	{
 		return false;
 	}
 
@@ -57,7 +62,8 @@ bool GridComponent::isWalkableAtWorld(Vector2 worldPos) const
 void GridComponent::setWalkableTileIds(const std::vector<int>& tileIds)
 {
 	walkableTileIds.clear();
-	for ( int id : tileIds ) {
+	for ( int id : tileIds )
+	{
 		walkableTileIds.insert(id);
 	}
 }
@@ -100,7 +106,8 @@ void GridComponent::setTileWeight(int tileId, double weight)
 double GridComponent::getTileWeight(int tileId) const
 {
 	auto it = tileWeights.find(tileId);
-	if ( it != tileWeights.end() ) {
+	if ( it != tileWeights.end() )
+	{
 		return it->second;
 	}
 	return 1.0;	 // Default weight
@@ -108,7 +115,8 @@ double GridComponent::getTileWeight(int tileId) const
 
 double GridComponent::getCellWeight(Vector2 cell) const
 {
-	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() ) {
+	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() )
+	{
 		return 1.0;
 	}
 
@@ -122,8 +130,10 @@ std::vector<Vector2> GridComponent::getWalkableNeighbors(Vector2 cell) const
 
 	// Filter to only walkable neighbors
 	std::vector<Vector2> walkableNeighbors;
-	for ( const auto& neighbor : neighbors ) {
-		if ( isWalkable(neighbor) ) {
+	for ( const auto& neighbor : neighbors )
+	{
+		if ( isWalkable(neighbor) )
+		{
 			walkableNeighbors.push_back(neighbor);
 		}
 	}
@@ -143,7 +153,8 @@ std::vector<Vector2> GridComponent::getNeighbors(Vector2 cell,
 	neighbors.push_back({cell.x + 1, cell.y});	// Right
 
 	// 8-directional neighbors (including diagonals)
-	if ( includeDiagonals ) {
+	if ( includeDiagonals )
+	{
 		neighbors.push_back({cell.x - 1, cell.y - 1});	// Up-Left
 		neighbors.push_back({cell.x + 1, cell.y - 1});	// Up-Right
 		neighbors.push_back({cell.x - 1, cell.y + 1});	// Down-Left
@@ -152,8 +163,10 @@ std::vector<Vector2> GridComponent::getNeighbors(Vector2 cell,
 
 	// Filter out invalid cells
 	std::vector<Vector2> validNeighbors;
-	for ( const auto& neighbor : neighbors ) {
-		if ( isValidCell(neighbor) ) {
+	for ( const auto& neighbor : neighbors )
+	{
+		if ( isValidCell(neighbor) )
+		{
 			validNeighbors.push_back(neighbor);
 		}
 	}
@@ -175,7 +188,8 @@ double GridComponent::euclideanDistance(Vector2 from, Vector2 to)
 
 bool GridComponent::isValidCell(Vector2 cell) const
 {
-	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() ) {
+	if ( tilemapComponent == nullptr || !tilemapComponent->isReady() )
+	{
 		return false;
 	}
 
@@ -199,7 +213,8 @@ std::pair<int, int> GridComponent::cellKey(Vector2 cell)
 
 int GridComponent::getGridWidth() const
 {
-	if ( tilemapComponent == nullptr ) {
+	if ( tilemapComponent == nullptr )
+	{
 		return 0;
 	}
 	return tilemapComponent->getGridWidth();
@@ -207,7 +222,8 @@ int GridComponent::getGridWidth() const
 
 int GridComponent::getGridHeight() const
 {
-	if ( tilemapComponent == nullptr ) {
+	if ( tilemapComponent == nullptr )
+	{
 		return 0;
 	}
 	return tilemapComponent->getGridHeight();
@@ -253,17 +269,21 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 	std::vector<ShapeRenderCommand> commands;
 
 	if ( !debugRenderEnabled || tilemapComponent == nullptr ||
-		 !tilemapComponent->isReady() ) {
+		 !tilemapComponent->isReady() )
+	{
 		return commands;
 	}
 
 	const Transform* transform = getTransform();
-	if ( transform == nullptr ) {
+	if ( transform == nullptr )
+	{
 		// Try to get transform from tilemap's GameObject
-		if ( tilemapComponent->getGameObject() != nullptr ) {
+		if ( tilemapComponent->getGameObject() != nullptr )
+		{
 			transform = tilemapComponent->getGameObject()->getTransform();
 		}
-		if ( transform == nullptr ) {
+		if ( transform == nullptr )
+		{
 			return commands;
 		}
 	}
@@ -285,19 +305,24 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 	std::vector<std::pair<Vector2, Vector2>>
 		walkableCenters;  // (cell, worldCenter)
 
-	for ( int y = 0; y < height; ++y ) {
-		for ( int x = 0; x < width; ++x ) {
-			Vector2 cell{static_cast<double>(x), static_cast<double>(y)};
+	for ( int y = 0; y < height; ++y )
+	{
+		for ( int x = 0; x < width; ++x )
+		{
+			Vector2 cell{static_cast<float>(x), static_cast<float>(y)};
 
 			// Only render on walkable tiles (tile ID == 0)
-			if ( !isWalkable(cell) ) {
+			if ( !isWalkable(cell) )
+			{
 				continue;
 			}
 
 			// Calculate tile center position
 			Vector2 tileCenter{};
-			tileCenter.x = origin.x + (x * tileSize.x) + (tileSize.x / 2.0);
-			tileCenter.y = origin.y + (y * tileSize.y) + (tileSize.y / 2.0);
+			tileCenter.x = origin.x + (static_cast<float>(x) * tileSize.x) +
+						   (tileSize.x / 2.0f);
+			tileCenter.y = origin.y + (static_cast<float>(y) * tileSize.y) +
+						   (tileSize.y / 2.0f);
 
 			// Store center for line and dot drawing
 			walkableCenters.push_back({cell, tileCenter});
@@ -307,25 +332,28 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 	// Second pass: Draw lines FIRST (so they appear below dots)
 	// Lines connecting walkable tiles to their walkable neighbors
 	// Includes diagonals for visualization purposes
-	for ( const auto& [cell, center] : walkableCenters ) {
+	for ( const auto& [cell, center] : walkableCenters )
+	{
 		// Use diagonals for debug visualization when requested while
 		// pathfinding logic elsewhere can still choose 4-directional neighbors
 		// if needed
 		std::vector<Vector2> neighbors =
 			getNeighbors(cell, debugShowDiagonalLinks);
 
-		for ( const auto& neighborCell : neighbors ) {
+		for ( const auto& neighborCell : neighbors )
+		{
 			// Only draw line if neighbor is also walkable
-			if ( !isWalkable(neighborCell) ) {
+			if ( !isWalkable(neighborCell) )
+			{
 				continue;
 			}
 
 			// Find the world center of the neighbor
 			Vector2 neighborCenter{};
 			neighborCenter.x =
-				origin.x + (neighborCell.x * tileSize.x) + (tileSize.x / 2.0);
+				origin.x + (neighborCell.x * tileSize.x) + (tileSize.x / 2.0f);
 			neighborCenter.y =
-				origin.y + (neighborCell.y * tileSize.y) + (tileSize.y / 2.0);
+				origin.y + (neighborCell.y * tileSize.y) + (tileSize.y / 2.0f);
 
 			// Calculate line properties
 			Vector2 lineVector{};
@@ -340,14 +368,15 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 
 			// Calculate line center position
 			Vector2 lineCenter{};
-			lineCenter.x = center.x + (lineVector.x / 2.0);
-			lineCenter.y = center.y + (lineVector.y / 2.0);
+			lineCenter.x = center.x + (lineVector.x / 2.0f);
+			lineCenter.y = center.y + (lineVector.y / 2.0f);
 
 			// Create a thin rectangle to represent the line
 			ShapeRenderCommand line;
 			line.type = ShapeRenderType::Rectangle;
 			line.position = lineCenter;
-			line.size = {lineLength, lineThickness};
+			line.size = {static_cast<float>(lineLength),
+						 static_cast<float>(lineThickness)};
 			line.rotationDegrees = angle;
 			line.scale = {1.0, 1.0};
 			line.color = debugGridLineColor;
@@ -356,7 +385,8 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 	}
 
 	// Third pass: Draw dots LAST (so they appear on top of lines)
-	for ( const auto& [cell, center] : walkableCenters ) {
+	for ( const auto& [cell, center] : walkableCenters )
+	{
 		// Draw a dot (small circle) at the center
 		ShapeRenderCommand dot;
 		dot.type = ShapeRenderType::Circle;
@@ -368,16 +398,18 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 		commands.push_back(dot);
 	}
 
-	for ( const auto& key : blockedCells ) {
-		Vector2 cell{static_cast<double>(key.first),
-					 static_cast<double>(key.second)};
-		if ( !isValidCell(cell) ) {
+	for ( const auto& key : blockedCells )
+	{
+		Vector2 cell{static_cast<float>(key.first),
+					 static_cast<float>(key.second)};
+		if ( !isValidCell(cell) )
+		{
 			continue;
 		}
 
 		Vector2 tileCenter{};
-		tileCenter.x = origin.x + (cell.x * tileSize.x) + (tileSize.x / 2.0);
-		tileCenter.y = origin.y + (cell.y * tileSize.y) + (tileSize.y / 2.0);
+		tileCenter.x = origin.x + (cell.x * tileSize.x) + (tileSize.x / 2.0f);
+		tileCenter.y = origin.y + (cell.y * tileSize.y) + (tileSize.y / 2.0f);
 
 		ShapeRenderCommand dot;
 		dot.type = ShapeRenderType::Circle;
