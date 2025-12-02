@@ -1,7 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
 project(engineSandbox)
 
-add_executable(engineSandbox main.cpp)
+add_executable(engineSandbox
+        main.cpp
+        SimpleMoveBehaviour.cpp
+)
 
 target_link_libraries(
         engineSandbox

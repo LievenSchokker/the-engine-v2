@@ -1,13 +1,14 @@
 //
 // Created by samle on 26/11/2025.
 //
+
+
 #include "SimpleMoveBehaviour.h"
 
 #include <iostream>
 #include <ostream>
 
 #include "Component/Transform.h"
-#include "GameObject/Vector2.h"
 #include "Input/InputManager.h"
 
 SimpleMoveBehaviour::SimpleMoveBehaviour()
@@ -77,7 +78,6 @@ void SimpleMoveBehaviour::pollInput()
         currentDirection.x /= length;
         currentDirection.y /= length;
     }}
-
 
 
 

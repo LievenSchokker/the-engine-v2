@@ -2,10 +2,15 @@
 // Created by samle on 26/11/2025.
 //
 
+
+
 #pragma once
-#include "Behaviour.h"
-#include "Input/InputManager.h"
-struct Vector2;
+
+
+#include "../Engine/inc/Input/InputManager.h"
+#include "../Engine/inc/Behaviour/Behaviour.h"
+#include "GameObject/Vector2.h"
+
 
 class SimpleMoveBehaviour : public Behaviour
 {
@@ -25,7 +30,7 @@ class SimpleMoveBehaviour : public Behaviour
     private:
         bool canMove = false;
         float currentSpeed = 0.0f;
-        float maxSpeed = 10f;
+        float maxSpeed = 10.0f;
         float speedMultiplier = 1.5f;
         Vector2 currentDirection;
 
