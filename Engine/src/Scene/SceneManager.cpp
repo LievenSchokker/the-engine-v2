@@ -1,4 +1,5 @@
-#include "../../inc/Scene/SceneManager.h"
+#include "Scene/SceneManager.h"
+#include "GameObject/GameObject.h"
 
 #include <iostream>
 #include <utility>

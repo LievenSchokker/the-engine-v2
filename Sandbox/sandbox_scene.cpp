@@ -12,7 +12,7 @@
 #include <iostream>
 #include <memory>
 
-#define SCREEN_WIDTH 640
+#define SCREEN_WIDTH 1000
 #define SCREEN_HEIGHT 480
 
 int main()
