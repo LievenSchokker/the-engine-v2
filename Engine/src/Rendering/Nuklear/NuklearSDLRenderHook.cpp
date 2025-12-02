@@ -7,26 +7,34 @@
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
 
-NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window, SDL_Renderer* renderer)
-    : inputManager(InputManager::getInstance())
-    , sdlWindow(window)
-    , sdlRenderer(renderer)
-    , nuklearContext(nullptr) {
+NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
+                                           SDL_Renderer* renderer)
+	: inputManager(InputManager::getInstance())
+	  , sdlWindow(window)
+	  , sdlRenderer(renderer)
+	  , nuklearContext(nullptr)
+{
 }
 
-void NuklearSDLRenderHook::initialize() {
-    nuklearContext = nk_sdl_init(sdlWindow, sdlRenderer);
-    if (nuklearContext) {
-        struct nk_font_atlas* atlas;
-        nk_sdl_font_stash_begin(&atlas);
-        nk_sdl_font_stash_end();
+void NuklearSDLRenderHook::initialize()
+{
+	nuklearContext = nk_sdl_init(sdlWindow, sdlRenderer);
+	if (nuklearContext)
+	{
+		struct nk_font_atlas* atlas;
+		nk_sdl_font_stash_begin(&atlas);
+		nk_sdl_font_stash_end();
 
-        // Transparent backgrounds
-        nuklearContext->style.window.fixed_background = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nuklearContext->style.window.header.normal = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nuklearContext->style.window.header.hover = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-        nuklearContext->style.window.header.active = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-    }
+		// Transparent backgrounds
+		nuklearContext->style.window.fixed_background = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nuklearContext->style.window.header.normal = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nuklearContext->style.window.header.hover = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nuklearContext->style.window.header.active = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+	}
 
 	//This basicly prevents constant reallocation for small UI's
 	//We might need to discuss if we care about custom memory solutions but for now this is fine
@@ -34,55 +42,57 @@ void NuklearSDLRenderHook::initialize() {
 	rootPanels.reserve(16);
 	panelIndices.reserve(32);
 	panelElementIndices.reserve(32);
-
 }
 
-void NuklearSDLRenderHook::updateInput() {
-    if (!nuklearContext || !inputManager) return;
+void NuklearSDLRenderHook::updateInput()
+{
+	if (!nuklearContext || !inputManager) return;
 
-    nk_input_begin(nuklearContext);
+	nk_input_begin(nuklearContext);
 
-    const int mx = inputManager->mouseX();
-    const int my = inputManager->mouseY();
-    nk_input_motion(nuklearContext, mx, my);
+	const int mx = inputManager->mouseX();
+	const int my = inputManager->mouseY();
+	nk_input_motion(nuklearContext, mx, my);
 
-    if (inputManager->wasMousePressed(MouseButton::LEFT))
-        nk_input_button(nuklearContext, NK_BUTTON_LEFT, mx, my, 1);
-    if (inputManager->wasMouseReleased(MouseButton::LEFT))
-        nk_input_button(nuklearContext, NK_BUTTON_LEFT, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::LEFT)) nk_input_button(
+		nuklearContext, NK_BUTTON_LEFT, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::LEFT)) nk_input_button(
+		nuklearContext, NK_BUTTON_LEFT, mx, my, 0);
 
-    if (inputManager->wasMousePressed(MouseButton::MIDDLE))
-        nk_input_button(nuklearContext, NK_BUTTON_MIDDLE, mx, my, 1);
-    if (inputManager->wasMouseReleased(MouseButton::MIDDLE))
-        nk_input_button(nuklearContext, NK_BUTTON_MIDDLE, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::MIDDLE)) nk_input_button(
+		nuklearContext, NK_BUTTON_MIDDLE, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::MIDDLE)) nk_input_button(
+		nuklearContext, NK_BUTTON_MIDDLE, mx, my, 0);
 
-    if (inputManager->wasMousePressed(MouseButton::RIGHT))
-        nk_input_button(nuklearContext, NK_BUTTON_RIGHT, mx, my, 1);
-    if (inputManager->wasMouseReleased(MouseButton::RIGHT))
-        nk_input_button(nuklearContext, NK_BUTTON_RIGHT, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::RIGHT)) nk_input_button(
+		nuklearContext, NK_BUTTON_RIGHT, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::RIGHT)) nk_input_button(
+		nuklearContext, NK_BUTTON_RIGHT, mx, my, 0);
 
-    nk_input_scroll(nuklearContext, nk_vec2(
-        static_cast<float>(inputManager->wheelDeltaX()),
-        static_cast<float>(inputManager->wheelDeltaY())
-    ));
+	nk_input_scroll(nuklearContext, nk_vec2(
+		                static_cast<float>(inputManager->wheelDeltaX()),
+		                static_cast<float>(inputManager->wheelDeltaY())
+		                ));
 
-    nk_input_end(nuklearContext);
+	nk_input_end(nuklearContext);
 }
 
-void NuklearSDLRenderHook::beginFrame() {
-    updateInput();
+void NuklearSDLRenderHook::beginFrame()
+{
+	updateInput();
 	commandQueue.clear();
 	panelIndices.clear();
 	panelElementIndices.clear();
 	rootPanels.clear();
 
-
 	//TODO Remove hardcoded example
 	UIRenderCommand panel;
 	panel.type = UICommandType::Panel;
 	panel.panelId = 1;
-	panel.x = 50; panel.y = 50;
-	panel.width = 200; panel.height = 150;
+	panel.x = 50;
+	panel.y = 50;
+	panel.width = 200;
+	panel.height = 150;
 	panel.hasBorder = true;
 	submit(panel);
 
@@ -94,57 +104,95 @@ void NuklearSDLRenderHook::beginFrame() {
 	submit(text);
 }
 
-void NuklearSDLRenderHook::presentFrame() {
-    flushCommands();
-    nk_sdl_render(NK_ANTI_ALIASING_ON);
+void NuklearSDLRenderHook::presentFrame()
+{
+	flushCommands();
+	nk_sdl_render(NK_ANTI_ALIASING_ON);
 }
 
-void NuklearSDLRenderHook::submit(UIRenderCommand command) {
-	size_t index = commandQueue.size();
+void NuklearSDLRenderHook::submit(UIRenderCommand command)
+{
 	commandQueue.push_back(std::move(command));
 
 	const auto& cmd = commandQueue.back();
+	size_t index = commandQueue.size() - 1;
 
-	if (cmd.type == UICommandType::Panel) {
+	if (cmd.type == UICommandType::Panel)
+	{
 		panelIndices[cmd.panelId] = index;
-		if (cmd.parentId == NO_PARENT) {
+		if (cmd.parentId == NO_PARENT)
+		{
 			rootPanels.push_back(cmd.panelId);
-		} else {
-			panelElementIndices[cmd.parentId].push_back(index);
+			return;
 		}
-	} else {
-		panelElementIndices[cmd.panelId].push_back(index);
 	}
+	uint32_t parentId = (cmd.type == UICommandType::Panel)
+		                    ? cmd.parentId
+		                    : cmd.panelId;
+	panelElementIndices[parentId].push_back(index);
 }
 
-void NuklearSDLRenderHook::flushCommands() {
-	for (const auto& id : rootPanels) {
+void NuklearSDLRenderHook::flushCommands()
+{
+	for (const auto& id : rootPanels)
+	{
 		renderPanel(id);
 	}
 }
 
-void NuklearSDLRenderHook::renderElement(const UIRenderCommand& cmd) {
-	switch (cmd.type) {
+void NuklearSDLRenderHook::renderElement(const UIRenderCommand& command)
+{
+	switch (command.type)
+	{
 		case UICommandType::Panel:
-			renderPanel(cmd.panelId);
+			renderPanel(command.panelId);
 			break;
 
-		case UICommandType::Text: {
-			nk_flags align = NK_TEXT_LEFT;
-			if (cmd.alignment == Alignment::Center) align = NK_TEXT_CENTERED;
-			else if (cmd.alignment == Alignment::Right) align = NK_TEXT_RIGHT;
-
-			nk_color color = nk_rgba(cmd.color.r, cmd.color.g, cmd.color.b, cmd.color.a);
-			nk_label_colored(nuklearContext, cmd.text.c_str(), align, color);
+		case UICommandType::Text:
+		{
+			renderText(command);
 			break;
 		}
-
 		default:
 			break;
 	}
 }
 
-void NuklearSDLRenderHook::renderPanel(uint32_t panelId) {
+void NuklearSDLRenderHook::renderText(const UIRenderCommand& command)
+{
+	nk_flags align = {};
+
+	//set the alignment flag.
+	if (command.alignment == Alignment::Center)
+	{
+		align = NK_TEXT_CENTERED;
+	}
+	else if (command.alignment == Alignment::Right)
+	{
+		align = NK_TEXT_RIGHT;
+	}
+	else
+	{
+		align = NK_TEXT_LEFT;
+	}
+
+	//convert our color to nuklear color
+	nk_color color = nk_rgba(
+		command.color.r,
+		command.color.g,
+		command.color.b,
+		command.color.a);
+
+	//Label is the nuklear equivalent of text.
+	nk_label_colored(
+		nuklearContext,
+		command.text.c_str(),
+		align,
+		color);
+}
+
+void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
+{
 	auto it = panelIndices.find(panelId);
 	if (it == panelIndices.end()) return;
 
@@ -155,30 +203,35 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId) {
 	if (panel.hasTitle) flags |= NK_WINDOW_TITLE;
 
 	char windowId[32];
-	if (panel.title.empty()) {
+	if (panel.title.empty())
+	{
 		snprintf(windowId, sizeof(windowId), "##%u", panelId);
 	}
 
 	const char* name = panel.title.empty() ? windowId : panel.title.c_str();
 
 	if (nk_begin(nuklearContext, name,
-				 nk_rect(panel.x, panel.y, panel.width, panel.height), flags)) {
-
+	             nk_rect(panel.x, panel.y, panel.width, panel.height), flags))
+	{
 		nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
 
 		auto elemIt = panelElementIndices.find(panelId);
-		if (elemIt != panelElementIndices.end()) {
-			for (size_t idx : elemIt->second) {
+		if (elemIt != panelElementIndices.end())
+		{
+			for (size_t idx : elemIt->second)
+			{
 				renderElement(commandQueue[idx]);
 			}
 		}
-				 }
+	}
 	nk_end(nuklearContext);
 }
 
-void NuklearSDLRenderHook::close() {
-    if (nuklearContext) {
-        nk_sdl_shutdown();
-        nuklearContext = nullptr;
-    }
+void NuklearSDLRenderHook::close()
+{
+	if (nuklearContext)
+	{
+		nk_sdl_shutdown();
+		nuklearContext = nullptr;
+	}
 }

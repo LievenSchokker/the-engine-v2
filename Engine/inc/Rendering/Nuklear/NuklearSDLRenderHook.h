@@ -86,12 +86,23 @@ public:
 	 * holds references to SDL textures.
 	 */
 	void close() override;
+
+	/**
+	* @brief submits a render command to the internal queue.
+	*
+	* Adds another command to the internal queue of the UIrenderer.
+	* The whole queue will be flushed each frame. Expected usages is about 250 UI elements
+	* More then that could slow down the engine since the internal queue has a
+	* reserved size of 250 elements.
+	*
+	*/
 	void submit(UIRenderCommand command) override;
 
 private:
 	void flushCommands();
 	void renderPanel(uint32_t panelId);
-	void renderElement(const UIRenderCommand& cmd);
+	void renderElement(const UIRenderCommand& command);
+	void renderText(const UIRenderCommand& command);
 
 	InputManager* inputManager;
 	SDL_Window* sdlWindow;
