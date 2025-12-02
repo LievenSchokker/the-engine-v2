@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include "Rendering/Color.h"
+
 #include <string>
 #include <variant>
 
@@ -15,6 +17,7 @@ struct TextRenderCommand {
 	std::string text;
 	TextAlignment alignment = TextAlignment::Left;
 	int fontSize = 14;
+	Color color = Color::white();
 };
 
 struct ButtonRenderCommand {
