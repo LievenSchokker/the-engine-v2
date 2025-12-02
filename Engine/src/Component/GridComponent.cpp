@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <corecrt_math_defines.h>
 
 GridComponent::GridComponent()
 {
