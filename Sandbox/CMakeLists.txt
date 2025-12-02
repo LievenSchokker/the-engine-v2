@@ -3,4 +3,7 @@ project(engineSandbox)
 
 add_executable(engineSandbox main.cpp)
 
-target_link_libraries(engineSandbox PRIVATE Engine::Core)
+target_link_libraries(
+        engineSandbox
+        PRIVATE
+        Engine::Core)

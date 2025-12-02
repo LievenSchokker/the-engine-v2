@@ -2,7 +2,6 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Rendering/Window/WindowOptions.h"
 
-#include <SDL.h>
 #include <gtest/gtest.h>
 
 class SDLRendererTest: public ::testing::Test

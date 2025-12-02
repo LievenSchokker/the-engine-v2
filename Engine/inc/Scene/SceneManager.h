@@ -146,5 +146,6 @@ class SceneManager
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;
+	IRenderer* renderer = nullptr;
 	Color clearColor = Color::black();
 };

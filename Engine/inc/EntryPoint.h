@@ -1,8 +1,9 @@
 #pragma once
-#include "Component/ShapeRenderer.h"
+
+
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
-#include "GameObject/GameObject.h"
+
 
 namespace SpelMotorEntry
 {
@@ -14,11 +15,7 @@ namespace SpelMotorEntry
 		specifications.renderBackend = RenderBackend::SDL;
 		specifications.tickRate = 60;
 		SpelMotor engine(specifications);
-
-	    std::unique_ptr<GameObject> go = std::make_unique<GameObject>();
-	    go->addComponent<ShapeRenderer>();
-
-		engine.run();
+		engine.start();
 		return 0;
 	}
 }
