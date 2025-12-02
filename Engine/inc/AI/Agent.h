@@ -14,7 +14,7 @@ struct Vector2;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : currentVelocity(Vector2{0, 0}), maxModuleMagnitude(0), maxVelocity(0)
+        Agent() : currentVelocity(Vector2{0, 0}), maxModuleForceMagnitude(0), maxVelocityMagnitude(0)
         {
         };
 
@@ -40,6 +40,11 @@ class Agent final : public Behaviour
         template<typename t>
         [[nodiscard]] bool hasAgentModule() const;
 
+        float getMaxModuleForceMagnitude();
+        void setMaxModuleForceMagnitude(float max);
+        float getMaxVelocityMagnitude();
+        void setMaxVelocityMagnitude(float max);
+
     private:
         template<typename T>
         [[nodiscard]] BaseAgentModule* getAgentModule() const;
@@ -47,6 +52,6 @@ class Agent final : public Behaviour
         std::vector<std::unique_ptr<BaseAgentModule> > modules;
         std::unordered_map<ModuleType, float> moduleWeights;
         Vector2 currentVelocity;
-        float maxModuleMagnitude;
-        float maxVelocity;
+        float maxModuleForceMagnitude;
+        float maxVelocityMagnitude;
 };
