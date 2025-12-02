@@ -1,3 +1,12 @@
+///
+/// Created by Lieven Schokker on 11/11/2025.
+///
+
+#include "Rendering/SDL/SDLRenderer.h"
+
+#include "External/SdlContext.h"
+#include "Math/Vector2Utils.h"
+#include "../../../inc/Rendering/Window/WindowOptions.h"
 #include "External/SdlContext.h"
 #include "GameObject/Vector2Utils.h"
 #include "Rendering/Window/WindowOptions.h"
@@ -11,10 +20,10 @@
 
 namespace
 {
-constexpr double kPi = 3.14159265358979323846;
-constexpr double kRotationThresholdDegrees = 0.01;
-constexpr int kMinWindowDimension = 1;
-}
+constexpr double kRotationThresholdDegrees =
+	0.01;  // Threshold below which rotation is treated as zero
+constexpr int kMinWindowDimension = 1;	// Minimum window width/height
+}  // namespace
 
 SDLRenderer::SDLRenderer(SdlContext& context)
 {
@@ -125,8 +134,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 	}
 
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
-	const double scaledRadiusX = std::abs(radius * finalScale.x);
-	const double scaledRadiusY = std::abs(radius * finalScale.y);
+	const double scaledRadiusX = std::abs(radius * finalScale.x());
+	const double scaledRadiusY = std::abs(radius * finalScale.y());
 
 	if ( scaledRadiusX <= 0.0 || scaledRadiusY <= 0.0 ) {
 		return;
@@ -134,8 +143,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-	const int centerX = static_cast<int>(std::round(center.x));
-	const int centerY = static_cast<int>(std::round(center.y));
+	const int centerX = static_cast<int>(std::round(center.x()));
+	const int centerY = static_cast<int>(std::round(center.y()));
 	const int rx = std::max(1, static_cast<int>(std::round(scaledRadiusX)));
 	const int ry = std::max(1, static_cast<int>(std::round(scaledRadiusY)));
 
@@ -161,8 +170,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 	}
 
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
-	const double width = std::abs(size.x * finalScale.x);
-	const double height = std::abs(size.y * finalScale.y);
+	const double width = std::abs(size.x() * finalScale.x());
+	const double height = std::abs(size.y() * finalScale.y());
 
 	if ( width <= 0.0 || height <= 0.0 ) {
 		return;
@@ -177,8 +186,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 
 	const double halfWidth = width * 0.5;
 	const double halfHeight = height * 0.5;
-	SDL_FRect rect{static_cast<float>(center.x - halfWidth),
-				   static_cast<float>(center.y - halfHeight),
+	SDL_FRect rect{static_cast<float>(center.x() - halfWidth),
+				   static_cast<float>(center.y() - halfHeight),
 				   static_cast<float>(width), static_cast<float>(height)};
 
 	if ( std::abs(rotationDegrees) < kRotationThresholdDegrees ) {

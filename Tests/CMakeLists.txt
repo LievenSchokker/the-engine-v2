@@ -22,6 +22,7 @@ add_executable(engine_tests
         Behaviour/tests_behaviour.cpp
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
+        Math/TestsVector2.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
