@@ -4,7 +4,7 @@
 
 
 Button::Button(const int width, const int height, const bool interactable)
-	: UIObject(width, height), interactable(interactable)
+	: UIObject(0, 0, width, height), interactable(interactable)
 {
 }
 
