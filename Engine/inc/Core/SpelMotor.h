@@ -14,6 +14,14 @@ class ApplicationClock;
 #include <thread>
 
 
+#include "ApplicationSpecifications.h"
+#include "Physics/IPhysicsWorld.h"
+#include "Audio/AudioManager.h"
+
+#include <memory>
+#include <functional>
+
+
 /**
  * @class SpelMotor
  * @brief Core engine class that manages the game loop and system lifecycle.
