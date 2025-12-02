@@ -19,7 +19,7 @@ class GameObject;
 class Component
 {
     public:
-        Component() = default;
+        Component() :gameObject(nullptr), transform(nullptr) {};
         virtual ~Component() = 0;
 
       /**
@@ -92,10 +92,10 @@ class Component
 
     protected:
         /// The @c GameObject this component is attached to, a component is always attached to a GameObject
-        GameObject* gameObject = nullptr;
+        GameObject* gameObject;
 
         /// The @c Transform that is attached to the associated GameObject.
-        Transform* transform = nullptr;
+        Transform* transform;
 };
 
 /// Implementation of the template functions:
