@@ -9,7 +9,6 @@
 #include "../Engine/inc/Rendering/Window/WindowOptions.h"
 #include "../Engine/inc/Scene/SceneManager.h"
 
-#include <SDL2/SDL.h>
 #include <iostream>
 #include <memory>
 
