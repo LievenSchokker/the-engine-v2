@@ -30,8 +30,8 @@ class Agent final : public Behaviour
         bool setModuleStatus(); /// Todo: add module param, add moduleStatus param
 
     private:
-        std::vector<Vector2> modulePositions; /// Todo: replace vector2 with ModuleData
-        std::unordered_map<Vector2, float> moduleWeights; /// Todo: Replace vector2 with moduleType
+        std::vector<int> modulePositions; /// Todo: replace int with ModuleData
+        std::unordered_map<int, float> moduleWeights; /// Todo: Replace int with moduleType
         Vector2 currentVelocity;
         float maxMotionMagnitude;
         float maxSpeed;
