@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Animation/AnimationCurve.h"
+#include "Animation/AnimationEnums.h"
 #include "GameObject/Vector2.h"
 
 #include <variant>
