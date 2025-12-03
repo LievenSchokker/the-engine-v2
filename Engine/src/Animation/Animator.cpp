@@ -200,7 +200,7 @@ void Animator::update(float deltaTime)
 				std::clamp(trackLocalTime / trackDuration, 0.0f, 1.0f);
 
 			// Apply the track
-			track.apply(gameObject, normalizedTime);
+			track.apply(this, normalizedTime);
 			propertyApplied[prop] = true;
 		}
 	}

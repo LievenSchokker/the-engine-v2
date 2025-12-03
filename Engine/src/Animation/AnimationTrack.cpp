@@ -1,10 +1,10 @@
 #include "Animation/AnimationTrack.h"
 
+#include "Animation/Animator.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 
 #include <algorithm>
-#include <cmath>
 
 AnimationTrack::AnimationTrack(TargetType target, PropertyType property,
 							   float duration, bool relative,
@@ -56,14 +56,20 @@ std::variant<Vector2, float> AnimationTrack::sample(float t) const
 	return fromValue;
 }
 
-void AnimationTrack::apply(GameObject* go, float normalizedTime) const
+void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 {
-	if ( go == nullptr )
+	if ( animator == nullptr )
 	{
 		return;
 	}
 
-	Transform* transform = go->getTransform();
+	GameObject* gameObject = animator->getGameObject();
+	if ( gameObject == nullptr )
+	{
+		return;
+	}
+
+	Transform* transform = gameObject->getTransform();
 	if ( transform == nullptr )
 	{
 		return;

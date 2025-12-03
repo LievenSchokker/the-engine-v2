@@ -5,7 +5,7 @@
 
 #include <variant>
 
-class GameObject;
+class Animator;
 class Transform;
 
 /**
@@ -44,14 +44,15 @@ class AnimationTrack
 	std::variant<Vector2, float> sample(float t) const;
 
 	/**
-	 * @brief Applies the sampled value to the GameObject's Transform at the
-	 * given normalized time.
+	 * @brief Applies the sampled value to the Animator's GameObject's Transform
+	 * at the given normalized time.
 	 *
-	 * @param go The GameObject whose Transform will be modified
+	 * @param animator The Animator component whose GameObject's Transform will
+	 * be modified
 	 * @param normalizedTime Normalized time [0, 1] for this track (currentTime
 	 * / duration)
 	 */
-	void apply(GameObject* go, float normalizedTime) const;
+	void apply(Animator* animator, float normalizedTime) const;
 
 	/**
 	 * @brief Gets the target type.
