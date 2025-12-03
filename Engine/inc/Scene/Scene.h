@@ -159,9 +159,15 @@ class Scene
          * Calls GameObject::onSceneDestroy() on each GameObject inside @c gameObjects, then clears the entire vector to remove the GameObjects from memory.
          */
         void destroyAllGameObjects();
+
+        template <class T>
+        std::vector<T*> getAllComponentsOfType() const;
+
     private:
         std::string name;
         std::vector<std::unique_ptr<GameObject> > gameObjects;
         std::vector<GameObject *> destroyQueue;
         bool active = false;
 };
+
+#include "Scene.inl"
