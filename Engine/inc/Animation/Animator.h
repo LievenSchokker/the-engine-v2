@@ -97,12 +97,6 @@ class Animator: public Component
 	float getCurrentTime() const;
 
 	/**
-	 * @brief Gets the owner GameObject.
-	 * @return Pointer to the GameObject this Animator is attached to
-	 */
-	GameObject* getGameObject() const;
-
-	/**
 	 * @brief Sets the AnimationSystem this Animator should register with.
 	 *
 	 * This should be called by the AnimationSystem or SceneManager when the

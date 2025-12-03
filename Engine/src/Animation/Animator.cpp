@@ -95,11 +95,6 @@ float Animator::getCurrentTime() const
 	return currentTime;
 }
 
-GameObject* Animator::getGameObject() const
-{
-	return Component::getGameObject();
-}
-
 void Animator::setAnimationSystem(AnimationSystem* system)
 {
 	if ( animationSystem != system )
