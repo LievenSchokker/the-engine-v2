@@ -1,7 +1,7 @@
 #include "Component/ShapeRenderer.h"
 
 #include "Component/Transform.h"
-#include "../../inc/Math/Vector2Utils.h"
+#include "Math/Vector2Utils.h"
 
 #include <algorithm>
 
@@ -25,10 +25,14 @@ ShapeRenderer& ShapeRenderer::setCircle(float newRadius)
 
 ShapeRenderer& ShapeRenderer::setRectangle(Vector2 newSize)
 {
-	type = ShapeRenderType::Rectangle;
-	size.setX(std::max(newSize.x(), float(kEpsilon)));
-	size.setY(std::max(newSize.y(), float(kEpsilon)));
-	return *this;
+    type = ShapeRenderType::Rectangle;
+
+    constexpr float kEpsilon = 0.0001f;
+
+    size.setX(std::max(newSize.x(), kEpsilon));
+    size.setY(std::max(newSize.y(), kEpsilon));
+
+    return *this;
 }
 
 Color ShapeRenderer::getColor() const

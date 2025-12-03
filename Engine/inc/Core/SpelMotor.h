@@ -26,7 +26,7 @@ class IRenderer;
 class SpelMotor
 {
 public:
-	SpelMotor(ApplicationSpecifications applicationSpecifications);
+	SpelMotor(const ApplicationSpecifications& applicationSpecifications);
 
 	~SpelMotor();
 

@@ -13,6 +13,8 @@ add_executable(engine_tests
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
+        Component/GridComponentTest.cpp
+        Component/UIObject/tests_uiobjects.cpp
         GameObject/tests_game_object.cpp
         Scene/SceneManagerTest.cpp
         Networking/Messages/MessageReaderTest.cpp
@@ -25,6 +27,7 @@ add_executable(engine_tests
         Math/TestsVector2.cpp
         AI/tests_agent.cpp
         AI/TestAgentModule.cpp
+        Scene/SceneBehavioursTests.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE

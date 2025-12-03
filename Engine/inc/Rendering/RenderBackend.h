@@ -2,5 +2,5 @@
 
 enum class RenderBackend
 {
-    SDL
+	SDL
 };
