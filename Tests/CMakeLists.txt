@@ -23,6 +23,11 @@ add_executable(engine_tests
         Behaviour/tests_behaviour.cpp
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
+        Animation/AnimationCurveTest.cpp
+        Animation/AnimationTrackTest.cpp
+        Animation/AnimationClipTest.cpp
+        Animation/AnimatorTest.cpp
+        Animation/AnimationSystemTest.cpp
         Scene/SceneBehavioursTests.cpp
 )
 
