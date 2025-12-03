@@ -72,7 +72,7 @@ private:
 	/** @brief timeStep calculation for engine */
 	std::unique_ptr<ApplicationClock> timer;
 
-	/** @brief A functions that retusn, the time the applicationhas beenrunning in second */
+	/** @brief A functions that returns, the time the application has been running in second */
 	std::function<double()> clockFunction;
 
 	/** @brief the physics world where physics are simulated */

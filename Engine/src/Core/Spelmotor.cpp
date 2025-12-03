@@ -1,13 +1,15 @@
 #include "Core/SpelMotor.h"
+
 #include "Audio/MusicSource.h"
 #include "Audio/SDL/AudioBackendSDL.h"
+#include "Audio/SoundSource.h"
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
+#include "External/SDLBackendContext.h"
 #include "Input/InputManager.h"
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
-#include "External/SDLBackendContext.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 	: running(false),
@@ -56,12 +58,27 @@ void SpelMotor::run()
 	InputManager* input = InputManager::getInstance();
 
 	// --- Create background music source ---
-	auto music = std::make_unique<MusicSource>();
-	music->audioManager = audioManager.get();
-	music->setLoop(true);
-	music->loadMusic(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
-	music->play();
+	// auto music = std::make_unique<MusicSource>();
+	// music->audioManager = audioManager.get();
+	// music->setLoop(true);
+	// music->loadMusic(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
+	// music->play();
+
+	auto explosion = std::make_unique<SoundSource>();
+	explosion->audioManager = audioManager.get();
+
+	// Load
+	explosion->loadSound(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_voice.wav)");
+
+	// Play once
+	explosion->play();
+
+	// Loop sound 3 times
+	explosion->play(3);
+
+	// Stereo panning
+	// explosion->setPanning(1.0f, 0.0f);
+
 
 	while ( running )
 	{
