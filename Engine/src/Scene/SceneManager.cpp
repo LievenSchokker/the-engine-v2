@@ -175,7 +175,7 @@ void SceneManager::update(float deltaTime)
 	if ( activeScene != nullptr && !paused )
 	{
 		activeScene->update(deltaTime);
-		animationSystem->step(deltaTime);
+		animationSystem->update(deltaTime);
 	}
 }
 

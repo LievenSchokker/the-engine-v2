@@ -51,7 +51,7 @@ void AnimationSystem::unregisterAnimator(Animator* animator)
 	}
 }
 
-void AnimationSystem::step(float deltaTime)
+void AnimationSystem::update(float deltaTime)
 {
 	// Clean up destroyed animators first
 	cleanupDestroyedAnimators();

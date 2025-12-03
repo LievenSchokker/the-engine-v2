@@ -47,7 +47,7 @@ class AnimationSystem
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	void step(float deltaTime);
+	void update(float deltaTime);
 
 	/**
 	 * @brief Gets the number of registered animators.
