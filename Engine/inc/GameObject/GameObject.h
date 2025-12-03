@@ -3,7 +3,8 @@
 //
 
 #pragma once
-#include "Scene/Scene.h"
+
+class Scene;
 class Transform;
 class Component;
 class Behaviour;

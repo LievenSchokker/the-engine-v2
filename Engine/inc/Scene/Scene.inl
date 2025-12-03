@@ -1,6 +1,8 @@
+#pragma once
+
+
 #include "Scene.h"
 #include "GameObject/GameObject.h"
-
 #include <typeindex>
 
 template <typename T>
