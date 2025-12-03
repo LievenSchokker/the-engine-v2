@@ -2,15 +2,11 @@
 
 #include "Assets/TilemapAsset.h"
 #include "Component/Transform.h"
-#include "GameObject/Vector2Utils.h"
+#include "Math/Vector2Utils.h"
 
 #include <cmath>
 #include <iostream>
 
-TilemapComponent::TilemapComponent()
-{
-	tileSize = {32.0, 32.0};  // Default tile size
-}
 
 void TilemapComponent::setTilemapAsset(TilemapAsset* asset)
 {
@@ -67,14 +63,14 @@ std::vector<ShapeRenderCommand> TilemapComponent::buildRenderCommands() const
 			int tileId = tilemapAsset->getTile(x, y);
 
 			// Calculate world position of this tile (top-left corner)
-			Vector2 tileWorldPos{};
-			tileWorldPos.x = origin.x + (x * tileSize.x);
-			tileWorldPos.y = origin.y + (y * tileSize.y);
+			Vector2 tileWorldPos{0,0};
+			tileWorldPos.setX(origin.x() + (x * tileSize.x()));
+			tileWorldPos.setY(origin.y() + (y * tileSize.y()));
 
 			// Center the rectangle at the tile position
-			Vector2 tileCenter{};
-			tileCenter.x = tileWorldPos.x + (tileSize.x / 2.0);
-			tileCenter.y = tileWorldPos.y + (tileSize.y / 2.0);
+			Vector2 tileCenter{0,0};
+			tileCenter.setX(tileWorldPos.x() + (tileSize.x() / 2.0));
+			tileCenter.setY(tileWorldPos.y() + (tileSize.y() / 2.0));
 
 			ShapeRenderCommand command;
 			command.type = ShapeRenderType::Rectangle;
@@ -105,13 +101,13 @@ Vector2 TilemapComponent::worldToCell(Vector2 worldPos) const
 	const Vector2 origin = transform->getPosition();
 
 	// Convert world position to grid coordinates
-	Vector2 relativePos{};
-	relativePos.x = worldPos.x - origin.x;
-	relativePos.y = worldPos.y - origin.y;
+	Vector2 relativePos{0,0};
+	relativePos.setX(worldPos.x() - origin.x());
+	relativePos.setY( worldPos.y() - origin.y());
 
-	Vector2 cell{};
-	cell.x = std::floor(relativePos.x / tileSize.x);
-	cell.y = std::floor(relativePos.y / tileSize.y);
+	Vector2 cell{0,0};
+	cell.setX(std::floor(relativePos.x() / tileSize.x()));
+	cell.setY(std::floor(relativePos.y() / tileSize.y()));
 
 	return cell;
 }
@@ -130,9 +126,9 @@ Vector2 TilemapComponent::cellToWorld(Vector2 cell) const
 	const Vector2 origin = transform->getPosition();
 
 	// Convert grid coordinates to world position (center of tile)
-	Vector2 worldPos{};
-	worldPos.x = origin.x + (cell.x * tileSize.x) + (tileSize.x / 2.0);
-	worldPos.y = origin.y + (cell.y * tileSize.y) + (tileSize.y / 2.0);
+	Vector2 worldPos{0,0};
+	worldPos.setX(origin.x() + (cell.x() * tileSize.x()) + (tileSize.x() / 2.0));
+	worldPos.setY(origin.y() + (cell.y() * tileSize.y() + (tileSize.y() / 2.0)));
 
 	return worldPos;
 }
@@ -143,8 +139,8 @@ int TilemapComponent::getTileAt(Vector2 cell) const
 		return 0;
 	}
 
-	return tilemapAsset->getTile(static_cast<int>(cell.x),
-								 static_cast<int>(cell.y));
+	return tilemapAsset->getTile(static_cast<int>(cell.x()),
+								 static_cast<int>(cell.y()));
 }
 
 int TilemapComponent::getTileAtWorld(Vector2 worldPos) const

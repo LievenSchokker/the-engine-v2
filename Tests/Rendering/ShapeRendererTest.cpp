@@ -6,6 +6,7 @@
 #include "Rendering/RenderQueue.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
+#include "Rendering/IUIRenderHook.h"
 
 #include <gtest/gtest.h>
 

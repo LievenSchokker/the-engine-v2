@@ -148,18 +148,18 @@ std::vector<Vector2> GridComponent::getNeighbors(Vector2 cell,
 	std::vector<Vector2> neighbors;
 
 	// 4-directional neighbors (cardinal directions)
-	neighbors.push_back({cell.x, cell.y - 1});	// Up
-	neighbors.push_back({cell.x, cell.y + 1});	// Down
-	neighbors.push_back({cell.x - 1, cell.y});	// Left
-	neighbors.push_back({cell.x + 1, cell.y});	// Right
+	neighbors.push_back({Vector2::up()});	// Up
+	neighbors.push_back({Vector2::down()});	// Down
+	neighbors.push_back({Vector2::left()});	// Left
+	neighbors.push_back({Vector2::right()});	// Right
 
 	// 8-directional neighbors (including diagonals)
 	if ( includeDiagonals )
 	{
-		neighbors.push_back({cell.x - 1, cell.y - 1});	// Up-Left
-		neighbors.push_back({cell.x + 1, cell.y - 1});	// Up-Right
-		neighbors.push_back({cell.x - 1, cell.y + 1});	// Down-Left
-		neighbors.push_back({cell.x + 1, cell.y + 1});	// Down-Right
+		neighbors.push_back({cell.x() - 1, cell.y() - 1});	// Up-Left
+		neighbors.push_back({cell.x() + 1, cell.y() - 1});	// Up-Right
+		neighbors.push_back({cell.x() - 1, cell.y() + 1});	// Down-Left
+		neighbors.push_back({cell.x() + 1, cell.y() + 1});	// Down-Right
 	}
 
 	// Filter out invalid cells
@@ -177,13 +177,13 @@ std::vector<Vector2> GridComponent::getNeighbors(Vector2 cell,
 
 double GridComponent::manhattanDistance(Vector2 from, Vector2 to)
 {
-	return std::abs(to.x - from.x) + std::abs(to.y - from.y);
+	return std::abs(to.x() - from.x()) + std::abs(to.y() - from.y());
 }
 
 double GridComponent::euclideanDistance(Vector2 from, Vector2 to)
 {
-	double dx = to.x - from.x;
-	double dy = to.y - from.y;
+	double dx = to.x() - from.x();
+	double dy = to.y() - from.y();
 	return std::sqrt(dx * dx + dy * dy);
 }
 
@@ -194,8 +194,8 @@ bool GridComponent::isValidCell(Vector2 cell) const
 		return false;
 	}
 
-	int x = static_cast<int>(cell.x);
-	int y = static_cast<int>(cell.y);
+	int x = static_cast<int>(cell.x());
+	int y = static_cast<int>(cell.y());
 
 	return x >= 0 && x < tilemapComponent->getGridWidth() && y >= 0 &&
 		   y < tilemapComponent->getGridHeight();
@@ -208,8 +208,8 @@ bool GridComponent::isTileWalkable(int tileId) const
 
 std::pair<int, int> GridComponent::cellKey(Vector2 cell)
 {
-	return {static_cast<int>(std::floor(cell.x)),
-			static_cast<int>(std::floor(cell.y))};
+	return {static_cast<int>(std::floor(cell.x())),
+			static_cast<int>(std::floor(cell.y()))};
 }
 
 int GridComponent::getGridWidth() const
@@ -296,11 +296,11 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 
 	// Calculate dot size (small circle at center of walkable tiles)
 	const double dotRadius =
-		std::min(tileSize.x, tileSize.y) * 0.1;	 // 10% of tile size
+		std::min(tileSize.x(), tileSize.y()) * 0.1;	 // 10% of tile size
 
 	// Calculate line thickness (for connections between walkable tiles)
 	const double lineThickness =
-		std::min(tileSize.x, tileSize.y) * 0.05;  // 5% of tile size
+		std::min(tileSize.x(), tileSize.y()) * 0.05;  // 5% of tile size
 
 	// First pass: Collect walkable tile centers (don't draw yet)
 	std::vector<std::pair<Vector2, Vector2>>
@@ -319,11 +319,11 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 			}
 
 			// Calculate tile center position
-			Vector2 tileCenter{};
-			tileCenter.x = origin.x + (static_cast<float>(x) * tileSize.x) +
-						   (tileSize.x / 2.0f);
-			tileCenter.y = origin.y + (static_cast<float>(y) * tileSize.y) +
-						   (tileSize.y / 2.0f);
+			Vector2 tileCenter{0,0};
+			tileCenter.setX(origin.x() + (static_cast<float>(x) * tileSize.x()) +
+						   (tileSize.x() / 2.0f));
+			tileCenter.setY(origin.y() + (static_cast<float>(y) * tileSize.y()) +
+						   (tileSize.y() / 2.0f));
 
 			// Store center for line and dot drawing
 			walkableCenters.push_back({cell, tileCenter});
@@ -350,27 +350,27 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 			}
 
 			// Find the world center of the neighbor
-			Vector2 neighborCenter{};
-			neighborCenter.x =
-				origin.x + (neighborCell.x * tileSize.x) + (tileSize.x / 2.0f);
-			neighborCenter.y =
-				origin.y + (neighborCell.y * tileSize.y) + (tileSize.y / 2.0f);
+			Vector2 neighborCenter{0,0};
+			neighborCenter.setX(
+				origin.x() + (neighborCell.x() * tileSize.x()) + (tileSize.x() / 2.0f));
+			neighborCenter.setY(
+				origin.y() + (neighborCell.y() * tileSize.y()) + (tileSize.y() / 2.0f));
 
 			// Calculate line properties
-			Vector2 lineVector{};
-			lineVector.x = neighborCenter.x - center.x;
-			lineVector.y = neighborCenter.y - center.y;
+			Vector2 lineVector{0,0};
+			lineVector.setX(neighborCenter.x() - center.x());
+			lineVector.setY(neighborCenter.y() - center.y());
 
 			// Calculate line length and angle
-			double lineLength = std::sqrt(lineVector.x * lineVector.x +
-										  lineVector.y * lineVector.y);
+			double lineLength = std::sqrt(lineVector.x() * lineVector.x() +
+										  lineVector.y() * lineVector.y());
 			double angle =
-				std::atan2(lineVector.y, lineVector.x) * 180.0 / M_PI;
+				std::atan2(lineVector.y(), lineVector.x()) * 180.0 / M_PI;
 
 			// Calculate line center position
-			Vector2 lineCenter{};
-			lineCenter.x = center.x + (lineVector.x / 2.0f);
-			lineCenter.y = center.y + (lineVector.y / 2.0f);
+			Vector2 lineCenter{0,0};
+			lineCenter.setX(center.x() + (lineVector.x() / 2.0f));
+			lineCenter.setY(center.y() + (lineVector.y() / 2.0f));
 
 			// Create a thin rectangle to represent the line
 			ShapeRenderCommand line;
@@ -408,9 +408,9 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 			continue;
 		}
 
-		Vector2 tileCenter{};
-		tileCenter.x = origin.x + (cell.x * tileSize.x) + (tileSize.x / 2.0f);
-		tileCenter.y = origin.y + (cell.y * tileSize.y) + (tileSize.y / 2.0f);
+		Vector2 tileCenter{0,0};
+		tileCenter.setX(origin.x() + (cell.x() * tileSize.x()) + (tileSize.x() / 2.0f));
+		tileCenter.setY(origin.y() + (cell.y() * tileSize.y()) + (tileSize.y() / 2.0f));
 
 		ShapeRenderCommand dot;
 		dot.type = ShapeRenderType::Circle;

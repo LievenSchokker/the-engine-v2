@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue.h"
 #include "Component.h"
@@ -24,7 +24,10 @@ class TilemapAsset;
 class TilemapComponent: public Component
 {
    public:
-	TilemapComponent();
+	TilemapComponent() :tileSize{32.0, 32.0}
+	{
+
+	};
 	~TilemapComponent() override = default;
 
 	/**

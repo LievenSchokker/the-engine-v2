@@ -11,12 +11,6 @@
 #include "Component/Transform.h"
 #include "Input/InputManager.h"
 
-SimpleMoveBehaviour::SimpleMoveBehaviour()
-{
-    inputManager = nullptr;
-
-}
-
 
 void SimpleMoveBehaviour::onAwake()
 {
@@ -64,19 +58,19 @@ void SimpleMoveBehaviour::pollInput()
     currentDirection = {0.0f, 0.0f};
 
     if (inputManager->isKeyDown(KeyCode::W))
-        currentDirection.y -= 1.0f;
+        currentDirection.setY(- 1.0f);
     if (inputManager->isKeyDown(KeyCode::S))
-        currentDirection.y += 1.0f;
+        currentDirection.setY(  1.0f);
     if (inputManager->isKeyDown(KeyCode::A))
-        currentDirection.x -= 1.0f;
+        currentDirection.setX( - 1.0f);
     if (inputManager->isKeyDown(KeyCode::D))
-        currentDirection.x += 1.0f;
+        currentDirection.setX(1.0f);
 
-    float length = std::sqrt(currentDirection.x * currentDirection.x + currentDirection.y * currentDirection.y);
+    float length = std::sqrt(currentDirection.x() * currentDirection.x() + currentDirection.y() * currentDirection.y());
     if (length > 0.0f)
     {
-        currentDirection.x /= length;
-        currentDirection.y /= length;
+        // currentDirection.setX(currentDirection.x() /= length);
+        // currentDirection.y()/= length;
     }}
 
 

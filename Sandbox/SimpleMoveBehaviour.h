@@ -9,13 +9,13 @@
 
 #include "../Engine/inc/Input/InputManager.h"
 #include "../Engine/inc/Behaviour/Behaviour.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 
 class SimpleMoveBehaviour : public Behaviour
 {
     public:
-        SimpleMoveBehaviour();
+        SimpleMoveBehaviour():inputManager(nullptr), currentDirection(Vector2::zero()) {}
         ~SimpleMoveBehaviour() override = default;
 
         void onAwake() override;
