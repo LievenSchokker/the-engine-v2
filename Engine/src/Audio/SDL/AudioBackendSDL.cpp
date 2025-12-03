@@ -32,7 +32,7 @@ bool AudioBackendSDL::initialize()
         return false;
     }
 
-	int flags = MIX_INIT_MP3 | MIX_INIT_OGG | MIX_INIT_FLAC;
+	int flags = MIX_INIT_OGG;
 	int initted = Mix_Init(flags);
 	if ((initted & flags) != flags)
 	{

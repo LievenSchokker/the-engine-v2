@@ -23,12 +23,9 @@
 
 
 #include "Rendering/IRenderer.h"
-
+#include "External/SDLBackendContext.h"
 
 #include <SDL.h>
-
-
-class SdlContext;
 
 
 class SDLRenderer: public IRenderer
@@ -48,7 +45,7 @@ class SDLRenderer: public IRenderer
 	 * @throws assertion failure if video subsystem not initialized (debug
 	 * builds)
 	 */
-	explicit SDLRenderer(SdlContext& context);
+	explicit SDLRenderer(IBackendContext& context);
 
 	/**
 	 * @brief Ensures proper cleanup of SDL resources in correct order

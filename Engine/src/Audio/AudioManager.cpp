@@ -7,7 +7,7 @@ bool AudioManager::initialize(std::unique_ptr<IAudioBackend> backendPtr)
 {
 	backend = std::move(backendPtr);
 	if ( !backend->initialize() ) return false;
-	assetManager = std::make_unique<AudioAssetManager>(backend.get());
+	// assetManager = std::make_unique<AudioAssetManager>(backend.get());
 	return true;
 }
 

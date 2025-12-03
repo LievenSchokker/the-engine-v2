@@ -1,4 +1,5 @@
 #pragma once
+#include "External/IBackendContext.h"
 
 class ApplicationClock;
 class IRenderer;
@@ -79,4 +80,7 @@ private:
 
 	/** @brief An audio manager to play and control audio */
 	std::unique_ptr<AudioManager> audioManager;
+
+	/** @brief The onderling backend */
+	std::unique_ptr<IBackendContext> backendContext;
 };
