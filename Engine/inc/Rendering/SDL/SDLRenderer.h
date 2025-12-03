@@ -30,9 +30,6 @@
 #include <memory>
 
 
-class SdlContext;
-
-
 class SDLRenderer: public IRenderer
 {
    public:
@@ -50,7 +47,7 @@ class SDLRenderer: public IRenderer
 	 * @throws assertion failure if video subsystem not initialized (debug
 	 * builds)
 	 */
-	explicit SDLRenderer(SdlContext& context);
+	explicit SDLRenderer(IBackendContext& context);
 
 	/**
 	 * @brief Ensures proper cleanup of SDL resources in correct order
