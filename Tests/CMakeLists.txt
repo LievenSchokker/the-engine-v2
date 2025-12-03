@@ -27,6 +27,10 @@ add_executable(engine_tests
         Math/TestsVector2.cpp
         AI/tests_agent.cpp
         AI/TestAgentModule.cpp
+        Animation/AnimationCurveTest.cpp
+        Animation/AnimationTrackTest.cpp
+        Animation/AnimationClipTest.cpp
+        Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
 )
 

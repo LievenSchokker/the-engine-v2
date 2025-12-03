@@ -30,12 +30,12 @@ void SimpleMoveBehaviour::onStart()
     std::cout << "SimpleMoveBehaviour is now started" << std::endl;
 }
 
-void SimpleMoveBehaviour::update()
+void SimpleMoveBehaviour::update(float deltaTime)
 {
-    pollInput();
+	(void)deltaTime;  // Not used in this behaviour
+	pollInput();
 
-    if (canMove)
-        move();
+	if ( canMove ) move();
 }
 
 void SimpleMoveBehaviour::onDisable()
