@@ -33,7 +33,7 @@ class Agent final : public Behaviour
         bool removeAgentModule();
 
         template<typename T>
-        bool setModuleWeight(float desiredWeight);
+        bool setModuleWeight(float desiredWeight) const;
 
         template<typename T>
         [[nodiscard]] bool setModuleStatus(ModuleState status) const;
@@ -48,12 +48,13 @@ class Agent final : public Behaviour
 
     private:
         template<typename T>
-        [[nodiscard]] BaseAgentModule* getAgentModule() const;
+        bool tryGetAgentModule(ModuleData*& out) const;
+
+        template<typename T>
+        bool tryGetAgentModule(ModuleData*& out, size_t& index) const;
 
         Transform* transform;
-        std::vector<std::unique_ptr<BaseAgentModule> > modules;
         std::vector<std::unique_ptr<ModuleData>> moduleDatas;
-        std::unordered_map<ModuleType, float> moduleWeights;
         Vector2 currentVelocity;
         float maxModuleForceMagnitude;
         float maxVelocityMagnitude;

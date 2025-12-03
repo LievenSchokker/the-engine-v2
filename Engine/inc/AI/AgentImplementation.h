@@ -5,8 +5,6 @@
 #pragma once
 
 
-
-
 #include "AI/BaseAgentModule.h"
 #include "AI/ModuleData.h"
 
@@ -18,8 +16,13 @@ bool Agent::addAgentModule(float desiredWeight, Args&&... args)
     if (hasAgentModule<T>())
         return false;
 
-    auto module = modules.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
-    moduleWeights[module->getModuleType()] = desiredWeight;
+    moduleDatas.emplace_back(
+          std::make_unique<ModuleData>(
+              desiredWeight,
+              ModuleState::ACTIVE,
+              std::forward<Args>(args)...
+          )
+      );
 
     return true;
 }
@@ -29,20 +32,12 @@ bool Agent::removeAgentModule()
 {
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::removeAgentModule] T must derive from BaseAgentModule");
 
-    if (!hasAgentModule<T>())
-        return false;
+    ModuleData* moduleData = nullptr;
+    size_t index = 0;
 
-    auto it = std::find_if(modules.begin(),
-                   modules.end(),
-                   [](const std::unique_ptr<BaseAgentModule> &module)
-                   {
-                       return dynamic_cast<T*>(module.get()) != nullptr;
-                   });
-
-    if (it != modules.end())
+    if (tryGetAgentModule<T>(moduleData, index))
     {
-        modules.erase(it);
-        moduleWeights.erase(it->get()->getModuleType());
+        moduleDatas.erase(moduleDatas.begin() + index);
         return true;
     }
 
@@ -55,59 +50,78 @@ bool Agent::hasAgentModule() const
 {
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::hasAgentModule] T must derive from BaseAgentModule");
 
-    const BaseAgentModule* module = getAgentModule<T>();
-
-    return (module != nullptr);
+    ModuleData* temp = nullptr;
+    return tryGetAgentModule<T>(temp);
 }
 
 template<typename T>
-bool Agent::setModuleWeight(float desiredWeight)
+bool Agent::setModuleWeight(float desiredWeight) const
 {
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::setModuleWeight] T must derive from BaseAgentModule");
 
-    if (!hasAgentModule<T>())
-        return false;
+    ModuleData* moduleData = nullptr;
 
-    BaseAgentModule* module = getAgentModule<T>();
+    if (tryGetAgentModule<T>(moduleData))
+    {
+        moduleData->setWeight(desiredWeight);
+        return true;
+    }
 
-    if (module == nullptr)
-        return false;
+    return false;
 
-
-    moduleWeights[module->getModuleType()] = desiredWeight;
-    return true;
 }
 
 template<typename T>
 bool Agent::setModuleStatus(ModuleState status) const
 {
-    BaseAgentModule* module = getAgentModule<T>();
+    static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::setModuleStatus] T must derive from BaseAgentModule");
 
-    if (module == nullptr)
-        return false;
+    ModuleData* moduleData = nullptr;
 
-    module->setModuleState(status);
-    return true;
+    if (tryGetAgentModule<T>(moduleData))
+    {
+        moduleData->setModuleStatus(status);
+        return true;
+    }
+
+    return false;
 }
 
 
 template<typename T>
-BaseAgentModule* Agent::getAgentModule() const
+bool Agent::tryGetAgentModule(ModuleData*& out) const
 {
-    static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::hasAgentModule] T must derive from BaseAgentModule");
+    static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::tryGetAgentModule] T must derive from BaseAgentModule");
 
-    auto it = std::find_if(modules.begin(),
-                   modules.end(),
-                   [](const std::unique_ptr<BaseAgentModule> &module)
-                   {
-                       return dynamic_cast<T*>(module.get()) != nullptr;
-                   }
-       );
-
-        if (it != modules.end())
+    for (const std::unique_ptr<ModuleData>& moduleData : moduleDatas)
+    {
+        if (dynamic_cast<T*>(moduleData->getModule()))
         {
-            return it->get();
+            out = moduleData.get();
+            return true;
         }
+    }
 
-    return nullptr;
+    out = nullptr;
+    return false;
+}
+
+
+template<typename T>
+bool Agent::tryGetAgentModule(ModuleData*& out, size_t& index) const
+{
+    static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::tryGetAgentModule] T must derive from BaseAgentModule");
+
+    for (size_t i = 0; i < moduleDatas.size(); ++i)
+    {
+        if (dynamic_cast<T*>(moduleDatas[i]->getModule()))
+        {
+            out = moduleDatas[i].get();
+            index = i;
+            return true;
+        }
+    }
+
+    out = nullptr;
+    return false;
 }
