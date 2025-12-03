@@ -34,7 +34,7 @@ TEST(Box2DPhysicsWorldTest, PhysicsSimulationUpdatesTransform)
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_NE(initialPos.y, newPos.y);
+    EXPECT_NE(initialPos.y(), newPos.y());
 }
 
 
@@ -64,7 +64,7 @@ TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
     Vector2 newPos = obj.getTransform()->getPosition();
 
     // Box2D default gravity pushes DOWN in +Y direction
-    EXPECT_GT(newPos.y, initialPos.y);
+    EXPECT_GT(newPos.y(), initialPos.y());
 }
 
 
@@ -91,7 +91,7 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_EQ(initialPos.y, newPos.y);
+    EXPECT_EQ(initialPos.y(), newPos.y());
 }
 
 
@@ -117,7 +117,7 @@ TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_GT(newPos.x, initialPos.x); // Object moved horizontally
+    EXPECT_GT(newPos.x(), initialPos.x()); // Object moved horizontally
 }
 
 
@@ -148,7 +148,7 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
     }
 
     Vector2 ballPos = ball.getTransform()->getPosition();
-    EXPECT_LE(ballPos.y, 100 - 10); // Ball rests on floor (radius 10)
+    EXPECT_LE(ballPos.y(), 100 - 10); // Ball rests on floor (radius 10)
 }
 
 
@@ -174,8 +174,8 @@ TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
     world.syncTransforms();
 
     Vector2 pos = obj.getTransform()->getPosition();
-    EXPECT_GT(pos.x, 0);
-    EXPECT_GT(pos.y, 0);
+    EXPECT_GT(pos.x(), 0);
+    EXPECT_GT(pos.y(), 0);
 }
 
 
@@ -205,7 +205,7 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_EQ(newPos.y, initialPos.y); // Object no longer simulated
+    EXPECT_EQ(newPos.y(), initialPos.y()); // Object no longer simulated
 }
 
 
@@ -237,6 +237,6 @@ TEST(Box2DPhysicsWorldTest, DestroyDynamicObject)
     }
 
 	Vector2 newPos = obj.getTransform()->getPosition();
-	EXPECT_EQ(newPos.x, initialPos.x);
-	EXPECT_EQ(newPos.y, initialPos.y); // No movement after destruction
+	EXPECT_EQ(newPos.x(), initialPos.x());
+	EXPECT_EQ(newPos.y(), initialPos.y()); // No movement after destruction
 }

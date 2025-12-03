@@ -23,6 +23,7 @@ add_executable(engine_tests
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
         Math/TestsVector2.cpp
+        AI/tests_agent.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
