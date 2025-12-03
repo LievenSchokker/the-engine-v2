@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Component.h"
+#include "BaseComponentTypes/Component.h"
+#include "BaseComponentTypes/RenderComponent.h"
 #include "GameObject/Vector2.h"
 #include "Rendering/Color.h"
-#include "Rendering/RenderQueue.h"
+#include "../Rendering/RenderQueue/RenderQueue.h"
 
 #include <unordered_map>
 #include <unordered_set>
@@ -37,7 +38,7 @@ struct CellKeyHash {
  *
  * Designed for future AI pathfinding algorithms (A*, Dijkstra, etc.)
  */
-class GridComponent: public Component
+class GridComponent: public RenderComponent
 {
    public:
 	GridComponent();
@@ -214,7 +215,7 @@ class GridComponent: public Component
 	 * @brief Build render commands for debug visualization.
 	 * @return Vector of render commands for grid visualization
 	 */
-	std::vector<ShapeRenderCommand> buildDebugRenderCommands() const;
+	void fillRenderQueue(IRenderQueueWriter& queue) const override;
 
 	/**
 	 * @brief Check if the grid is ready for queries.

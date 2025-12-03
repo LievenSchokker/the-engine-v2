@@ -18,6 +18,8 @@
  */
 
 #pragma once
+#include "RenderCommand.h"
+#include "Scene/Scene.h"
 
 
 class IUIRenderHook;
@@ -32,7 +34,7 @@ struct WindowOptions;
 
 class IRenderer
 {
-   public:
+public:
 	virtual ~IRenderer() = default;
 
 	/**
@@ -54,6 +56,9 @@ class IRenderer
 	 */
 	virtual void beginFrame(const Color& clearColor) = 0;
 
+
+	virtual void execute(const RenderCommand& command) = 0;
+
 	/**
 	 * @brief Presents the current frame to the screen
 	 *
@@ -61,7 +66,7 @@ class IRenderer
 	 * @pre Window must be open
 	 * @see open()
 	 */
-	virtual void presentFrame() = 0;
+	virtual void endFrame() = 0;
 
 	/**
 	 * @brief Closes the rendering window and releases associated resources
@@ -93,18 +98,6 @@ class IRenderer
 	 */
 	virtual void setTitle(const std::string& title) = 0;
 
-	/**
-	 * @brief Draw a filled circle with the given configuration.
-	 */
-	virtual void drawCircle(const Vector2& center, double radius,
-							const Color& color, const Vector2& scale) = 0;
 
-	/**
-	 * @brief Draw a filled rectangle with the given configuration.
-	 */
-	virtual void drawRectangle(const Vector2& center, const Vector2& size,
-							   double rotationDegrees, const Color& color,
-							   const Vector2& scale) = 0;
-
-    virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
+	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
 };

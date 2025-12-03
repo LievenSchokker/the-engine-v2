@@ -25,6 +25,7 @@
 
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/IRenderer.h"
+#include "Rendering/RenderCommand.h"
 
 #include <SDL.h>
 #include <memory>
@@ -99,6 +100,8 @@ class SDLRenderer: public IRenderer
 	 */
 	void close() override;
 
+	void execute(const RenderCommand& command) override;
+
 	/**
 	 * @brief Updates window title at runtime for dynamic feedback
 	 *
@@ -114,24 +117,25 @@ class SDLRenderer: public IRenderer
 	 *
 	 * @note Returns early if renderer is invalid to prevent crashes
 	 */
-	void presentFrame() override;
+	void endFrame() override;
 
+    void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
+
+   private:
 	/**
 	 * @brief Draw a filled circle in window space.
 	 */
 	void drawCircle(const Vector2& center, double radius, const Color& color,
-					const Vector2& scale) override;
+					const Vector2& scale);
 
 	/**
 	 * @brief Draw a filled rectangle in window space.
 	 */
 	void drawRectangle(const Vector2& center, const Vector2& size,
 					   double rotationDegrees, const Color& color,
-					   const Vector2& scale) override;
+					   const Vector2& scale);
 
-    void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
-   private:
     std::unique_ptr<IUIRenderHook> userInterfaceHook;
 
     bool ensureSolidQuadTexture();

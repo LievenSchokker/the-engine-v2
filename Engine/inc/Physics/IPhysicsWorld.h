@@ -1,6 +1,5 @@
 #pragma once
 
-
 struct b2BodyId;
 
 #include "Components/RigidBody.h"

@@ -157,5 +157,5 @@ private:
 };
 
 /// Template implementations:
-#include "Component/Component.h"
+#include "BaseComponentTypes/Component.h"
 #include "ComponentManagerImplementation.inl"

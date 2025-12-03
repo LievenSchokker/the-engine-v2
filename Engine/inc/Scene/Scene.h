@@ -1,13 +1,13 @@
 #pragma once
 
+class GameObject;
+class Behaviour;
+struct ShapeRenderCommand;
 
 #include <memory>
 #include <string>
 #include <vector>
 
-class GameObject;
-class Behaviour;
-struct ShapeRenderCommand;
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.
  *
@@ -115,7 +115,7 @@ class Scene
          *
          * @param deltaTime Seconds elapsed since the previous update.
          */
-        void update(float deltaTime);
+        void update(double deltaTime);
 
         /**
          * @brief Collect render commands for active objects in this scene.

@@ -1,5 +1,5 @@
 #pragma once
-#include "Component/Component.h"
+#include "../BaseComponentTypes/Component.h"
 
 
 class UIObject: public Component

@@ -44,17 +44,15 @@ Color TilemapComponent::getTileColor(int tileId) const
 	}
 }
 
-std::vector<ShapeRenderCommand> TilemapComponent::buildRenderCommands() const
+void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 {
-	std::vector<ShapeRenderCommand> commands;
-
 	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() ) {
-		return commands;
+		return;
 	}
 
 	const Transform* transform = getTransform();
 	if ( transform == nullptr ) {
-		return commands;
+		return;
 	}
 
 	const Vector2 origin = transform->getPosition();
@@ -76,19 +74,17 @@ std::vector<ShapeRenderCommand> TilemapComponent::buildRenderCommands() const
 			tileCenter.x = tileWorldPos.x + (tileSize.x / 2.0);
 			tileCenter.y = tileWorldPos.y + (tileSize.y / 2.0);
 
-			ShapeRenderCommand command;
-			command.type = ShapeRenderType::Rectangle;
+			RenderCommand command;
+			command.type = RenderCommandType::Rectangle;
 			command.position = tileCenter;
 			command.size = tileSize;
 			command.rotationDegrees = 0.0;
 			command.scale = Vector2Utils::sanitizeScale(transform->getScale());
 			command.color = getTileColor(tileId);
 
-			commands.push_back(command);
+			queue.push(command);
 		}
 	}
-
-	return commands;
 }
 
 Vector2 TilemapComponent::worldToCell(Vector2 worldPos) const

@@ -3,7 +3,7 @@
 
 #include "GameObject/GameObject.h"
 #include "GameObject/Vector2.h"
-#include "Component.h"
+#include "BaseComponentTypes/Component.h"
 
 /**
  * @brief Transform holds the position, rotation and scale.

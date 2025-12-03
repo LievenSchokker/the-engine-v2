@@ -1,9 +1,11 @@
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
 #include "External/SdlContext.h"
 #include "GameObject/Vector2Utils.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
+#include "Rendering/RenderCommand.h"
 
 #include <algorithm>
 #include <cassert>
@@ -107,7 +109,7 @@ void SDLRenderer::beginFrame(const Color& clearColor)
 	}
 
 	SDL_SetRenderDrawColor(renderer, clearColor.r, clearColor.g, clearColor.b,
-	                       clearColor.a);
+						   clearColor.a);
 
 	SDL_RenderClear(renderer);
 
@@ -116,9 +118,9 @@ void SDLRenderer::beginFrame(const Color& clearColor)
 	}
 }
 
-void SDLRenderer::presentFrame()
+
+void SDLRenderer::endFrame()
 {
-	beginFrame(Color::black());
 	if (renderer == nullptr) {
 		return;
 	}
@@ -128,7 +130,30 @@ void SDLRenderer::presentFrame()
 	}
 
 	SDL_RenderPresent(renderer);
-	SDL_RenderClear(renderer);
+}
+
+void SDLRenderer::execute(const RenderCommand& command)
+{
+	if (renderer == nullptr) {
+		return;
+	}
+
+	switch (command.type)
+	{
+		case RenderCommandType::Circle:
+			drawCircle(command.position, command.radius,
+					   command.color, command.scale);
+			break;
+
+		case RenderCommandType::Rectangle:
+			drawRectangle(command.position, command.size,
+						  command.rotationDegrees, command.color,
+						  command.scale);
+			break;
+
+		case RenderCommandType::None:
+			break;
+	}
 }
 
 void SDLRenderer::setTitle(const std::string& title)

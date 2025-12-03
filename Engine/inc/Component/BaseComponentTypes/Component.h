@@ -99,4 +99,4 @@ class Component
 };
 
 /// Implementation of the template functions:
-#include "ComponentImplementation.inl"
+#include "../ComponentImplementation.inl"

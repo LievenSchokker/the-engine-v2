@@ -1,5 +1,4 @@
 #include "Core/SpelMotor.h"
-
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
 #include "External/SdlContext.h"
@@ -7,11 +6,10 @@
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Input/SDLInputAdapter.h"
 
 #include <iostream>
 #include <ostream>
-
-#include "Input/SDLInputAdapter.h"
 
 SpelMotor::SpelMotor(ApplicationSpecifications const& applicationSpecifications)
 	: running(false),
@@ -77,7 +75,7 @@ void SpelMotor::run()
 
 		// TODO Network->Update()
 		// TODO Audio->Update();
-		renderer->presentFrame();
+		renderer->endFrame();
 	}
 }
 

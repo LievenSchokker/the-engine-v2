@@ -3,7 +3,7 @@
 #include "GameObject/GameObject.h"
 #include "Rendering/Color.h"
 #include "Rendering/IRenderer.h"
-#include "Rendering/RenderQueue.h"
+#include "../../Engine/inc/Rendering/RenderQueue/RenderQueue.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
@@ -22,7 +22,7 @@ struct FakeRenderer: public IRenderer {
 		++beginCalls;
 	}
 
-	void presentFrame() override
+	void endFrame() override
 	{
 		++presentCalls;
 	}

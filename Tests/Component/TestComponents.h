@@ -6,7 +6,7 @@
 #pragma once
 
 
-#include "Component/Component.h"
+#include "../../Engine/inc/Component/BaseComponentTypes/Component.h"
 
 
 namespace engine_tests

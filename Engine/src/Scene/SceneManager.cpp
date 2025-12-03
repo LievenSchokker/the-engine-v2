@@ -154,18 +154,6 @@ void SceneManager::update(float deltaTime)
 	}
 }
 
-void SceneManager::buildRenderQueue(RenderQueue& queue) const
-{
-	queue.clear();
-	queue.clearColor = clearColor;
-
-	if ( activeScene == nullptr || paused ) {
-		return;
-	}
-
-	activeScene->collectRenderCommands(queue.shapes);
-}
-
 void SceneManager::setClearColor(const Color& color)
 {
 	clearColor = color;

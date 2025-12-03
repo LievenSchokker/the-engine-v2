@@ -1,27 +1,34 @@
-#include "../../inc/Rendering/RenderQueue.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
+#include "Rendering/RenderCommand.h"
+#include <queue>
 
-#include "../../inc/Rendering/IRenderer.h"
-
-void executeRenderQueue(IRenderer& renderer, const RenderQueue& queue)
+void RenderQueue::push(RenderCommand& command)
 {
-	renderer.beginFrame(queue.clearColor);
+	commands.emplace_back(command);
+}
 
-	for ( const auto& command : queue.shapes ) {
-		switch ( command.type ) {
-			case ShapeRenderType::Circle:
-				renderer.drawCircle(command.position, command.radius,
-									command.color, command.scale);
-				break;
-			case ShapeRenderType::Rectangle:
-				renderer.drawRectangle(command.position, command.size,
-									   command.rotationDegrees, command.color,
-									   command.scale);
-				break;
-			case ShapeRenderType::None:
-			default:
-				break;
-		}
-	}
+void RenderQueue::sort()
+{
+	std::ranges::sort(commands,
+	                  [](const RenderCommand& command,
+	                     const RenderCommand& commandOther)
+	                  {
+		                  return command.getSortKey() < commandOther.
+		                         getSortKey();
+	                  });
+}
 
-	renderer.presentFrame();
+void RenderQueue::clear()
+{
+	commands.clear();
+}
+
+bool RenderQueue::isEmpty() const
+{
+	return commands.empty();
+}
+
+std::vector<RenderCommand>& RenderQueue::getCommands()
+{
+	return commands;
 }

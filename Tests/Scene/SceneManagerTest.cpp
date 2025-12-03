@@ -1,5 +1,5 @@
 #include "../../Engine/inc/GameObject/GameObject.h"
-#include "../../Engine/inc/Rendering/RenderQueue.h"
+#include "../../Engine/inc/Rendering/RenderQueue/RenderQueue.h"
 #include "../../Engine/inc/Scene/Scene.h"
 #include "../../Engine/inc/Scene/SceneManager.h"
 
