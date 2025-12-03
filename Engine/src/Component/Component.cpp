@@ -23,7 +23,7 @@ void Component::setGameObject(GameObject* object)
 
 GameObject* Component::getGameObject() const
 {
-    return (gameObject != nullptr) ? gameObject : nullptr;
+    return gameObject;
 }
 
 

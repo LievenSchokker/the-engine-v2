@@ -7,6 +7,7 @@
 #include "AI/Agent.h"
 #include "GameObject/GameObject.h"
 
+
 class AgentTest : public ::testing::Test
 {
     protected:
@@ -33,5 +34,18 @@ class AgentTest : public ::testing::Test
 
 TEST_F(AgentTest, AwakeSetsTransform)
 {
+    ASSERT_TRUE(agent->getHasAwakened());
     ASSERT_NE(agent->getTransform(), nullptr);
 }
+
+TEST(AgentTests, AwakeDisablesAgentOnMissingTransform)
+{
+    Agent* agent = new Agent();
+
+    EXPECT_EQ(agent->getGameObject(), nullptr);
+    EXPECT_EQ(agent->getTransform(), nullptr);
+    agent->awake();
+
+    EXPECT_EQ(agent->getIsEnabled(), false);
+}
+

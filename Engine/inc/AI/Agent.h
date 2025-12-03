@@ -17,7 +17,7 @@ enum class ModuleType;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : transform(nullptr),currentVelocity(Vector2{0, 0}), maxModuleForceMagnitude(0), maxVelocityMagnitude(0)
+        Agent() : currentVelocity(Vector2{0, 0}), maxModuleForceMagnitude(0), maxVelocityMagnitude(0)
         {
         };
 
@@ -56,7 +56,6 @@ class Agent final : public Behaviour
         template<typename T>
         bool tryGetAgentModule(ModuleData*& out, size_t& index) const;
 
-        Transform* transform;
         std::vector<std::unique_ptr<ModuleData>> moduleDatas;
         Vector2 currentVelocity;
         float maxModuleForceMagnitude;

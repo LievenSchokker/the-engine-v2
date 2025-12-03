@@ -8,8 +8,6 @@
 
 void Agent::onAwake()
 {
-    transform = gameObject->getTransform();
-
     if (transform == nullptr)
     {
         setEnabled(false);
