@@ -301,3 +301,86 @@ TEST_F(AgentTest, SetModuleStatus)
     EXPECT_EQ(retrieved, ModuleStatus::INACTIVE);
 }
 
+/// Tests the HasAgentModule<T> method:
+/// - Should return true if the agent has the module, false otherwise
+/// - Should work in runtime; after add/remove methods have been called.
+/// -Should return the same value as tryGetAgentModule<T> method
+TEST_F(AgentTest, HasModule)
+{
+    /// 1) Return false for non-exisiting modules
+    ASSERT_EQ(agent->getModuleCount(), 0);
+    bool nonExistingModuleCheck = agent->hasAgentModule<TestAgentModule>();
+    ASSERT_FALSE(nonExistingModuleCheck);
+
+    /// 2) Return true after module has been added
+    agent->addAgentModule<TestAgentModule>(1);
+    ASSERT_EQ(agent->getModuleCount(), 1);
+    bool hasExisting = agent->hasAgentModule<TestAgentModule>();
+    ASSERT_TRUE(hasExisting);
+
+    /// 3) Return false when module has been removed (runtime sim)
+    ASSERT_EQ(agent->getModuleCount(), 1);
+    agent->removeAgentModule<TestAgentModule>();
+    ASSERT_EQ(agent->getModuleCount(), 0);
+    bool hasRemoved = agent->hasAgentModule<TestAgentModule>();
+    ASSERT_FALSE(hasRemoved);
+}
+
+/* NOTE: These tests are commented out because the tryGetModule<T> methods are PRIVATE methods of Agent, so they cannot be called here.
+ * However, we can make them temporary public and run these tests to see if they work as intended.
+ *
+/// Tests if the tryGetModule<T>(param_1) method works as intended:
+/// - Return bool == true if agent has the module, false otherwise
+/// - Assigns the module to the out parameter if the module exists
+/// - Assigns 'nullptr' to the out parameter if the module does not exist
+TEST_F(AgentTest, TryGetModuleSingleParam)
+{
+    /// 1) Non-existing module;
+    /// Return false, out param == nullptr
+    ASSERT_EQ(agent->getModuleCount(), 0);
+    ModuleData* retrievedModule;
+    bool tryGetNonExistingModule = agent->tryGetAgentModule<TestAgentModule>(retrievedModule);
+    ASSERT_FALSE(tryGetNonExistingModule);
+    ASSERT_EQ(retrievedModule, nullptr);
+
+    /// 2) Tryget an exisiting module:
+    agent->addAgentModule<TestAgentModule>(1);
+    ASSERT_EQ(agent->getModuleCount(), 1);
+    bool hasExisting = agent->tryGetAgentModule<TestAgentModule>(retrievedModule);
+    ASSERT_TRUE(hasExisting);
+    ASSERT_NE(retrievedModule, nullptr);
+}
+
+/// Tests if the tryGetModule<T>(param_1, param_2) method works as intended:
+/// - Return bool == true if agent has the module, false otherwise
+/// - Assigns the module to the out parameter if the module exists
+/// - Assigns 'nullptr' to the out parameter if the module does not exist
+/// - Assigns the correct index of the module in the stored vector<> to the out index param if the module exists
+/// - Assigns -1 to the out index param if the module does not exist
+
+
+TEST_F(AgentTest, TryGetModuleDoubleParam)
+{
+    /// 1) Non-existing module;
+    /// Return false, out param == nullptr
+    ASSERT_EQ(agent->getModuleCount(), 0);
+
+    ModuleData* retrievedModule;
+    size_t retrievedIndex;
+
+    bool tryGetNonExistingModule = agent->tryGetAgentModule<TestAgentModule>(retrievedModule, retrievedIndex);
+    ASSERT_FALSE(tryGetNonExistingModule);
+    ASSERT_EQ(retrievedModule, nullptr);
+    ASSERT_EQ(retrievedIndex, -1); /// Non existing modules should return an index of -1.
+
+    /// 2) Tryget an exisiting module:
+    agent->addAgentModule<TestAgentModule>(1);
+    ASSERT_EQ(agent->getModuleCount(), 1);
+    bool hasExisting = agent->tryGetAgentModule<TestAgentModule>(retrievedModule, retrievedIndex);
+    ASSERT_TRUE(hasExisting);
+    ASSERT_NE(retrievedModule, nullptr);
+    ASSERT_EQ(retrievedIndex, 0);
+}
+*
+*  END OF PRIVATE TRYGETMODULE<T> TESTS
+ */

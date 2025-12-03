@@ -36,13 +36,13 @@ class Agent final : public Behaviour
         bool removeAgentModule();
 
         template<typename T>
-        [[nodiscard]] bool setModuleWeight(float desiredWeight) const;
+        bool setModuleWeight(float desiredWeight) const;
 
         template<typename T>
         [[nodiscard]] float getModuleWeight() const;
 
         template<typename T>
-        [[nodiscard]] bool setModuleStatus(ModuleStatus status) const;
+        bool setModuleStatus(ModuleStatus status) const;
 
         template<typename T>
         [[nodiscard]] ModuleStatus getModuleStatus() const;
@@ -50,12 +50,12 @@ class Agent final : public Behaviour
         template<typename t>
         [[nodiscard]] bool hasAgentModule() const;
 
-        float getMaxModuleForceMagnitude() const;
+        [[nodiscard]] float getMaxModuleForceMagnitude() const;
         void setMaxModuleForceMagnitude(float max);
-        float getMaxVelocityMagnitude() const;
+        [[nodiscard]] float getMaxVelocityMagnitude() const;
         void setMaxVelocityMagnitude(float max);
 
-        size_t getModuleCount() const;
+        [[nodiscard]] size_t getModuleCount() const;
 
     private:
         template<typename T>

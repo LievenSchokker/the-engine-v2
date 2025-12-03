@@ -153,5 +153,6 @@ bool Agent::tryGetAgentModule(ModuleData*& out, size_t& index) const
     }
 
     out = nullptr;
+    index = -1;
     return false;
 }
