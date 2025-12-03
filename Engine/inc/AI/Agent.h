@@ -6,6 +6,7 @@
 #include <map>
 #include <unordered_map>
 #include "Math/Vector2.h"
+struct ModuleData;
 enum class ModuleState;
 enum class ModuleType;
 #include "AI/BaseAgentModule.h"
@@ -51,8 +52,11 @@ class Agent final : public Behaviour
 
         Transform* transform;
         std::vector<std::unique_ptr<BaseAgentModule> > modules;
+        std::vector<std::unique_ptr<ModuleData>> moduleDatas;
         std::unordered_map<ModuleType, float> moduleWeights;
         Vector2 currentVelocity;
         float maxModuleForceMagnitude;
         float maxVelocityMagnitude;
 };
+
+#include "AI/AgentImplementation.h"
