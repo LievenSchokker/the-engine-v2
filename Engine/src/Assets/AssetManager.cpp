@@ -69,7 +69,7 @@ bool AssetManager::unLoad(const std::string & filePath)
 		return false;
 	}
 
-	if(!asset->isLoaded())
+	if(asset->isLoaded())
 	{
 		return asset->unLoad();
 	}

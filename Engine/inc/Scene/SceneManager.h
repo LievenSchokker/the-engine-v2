@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Rendering/Color.h"
-#include "../Rendering/RenderQueue.h"
+#include "Rendering/Color.h"
+#include "Rendering/RenderQueue.h"
 #include "Scene.h"
 
 #include <memory>
@@ -17,7 +17,7 @@
 class SceneManager
 {
    public:
-	SceneManager() = default;
+	SceneManager();
 
 	/**
 	 * @brief Register a scene owned by the manager.
