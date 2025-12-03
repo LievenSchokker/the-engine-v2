@@ -8,7 +8,12 @@
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
 
-SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
+#include <iostream>
+#include <ostream>
+
+#include "Input/SDLInputAdapter.h"
+
+SpelMotor::SpelMotor(ApplicationSpecifications const& applicationSpecifications)
 	: running(false),
 	  specifications(applicationSpecifications),
 	  timer(nullptr),
@@ -16,18 +21,22 @@ SpelMotor::SpelMotor(ApplicationSpecifications const applicationSpecifications)
 	  physicsWorld(std::make_unique<Box2DPhysicsWorld>(
 		  applicationSpecifications.tickRate))
 {
-	if ( applicationSpecifications.renderBackend == RenderBackend::SDL )
+	if (applicationSpecifications.renderBackend == RenderBackend::SDL)
 	{
 		SdlContext context = SdlContext();
 		timer.reset();
 
 		// TODO SDL Injection layer
-		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
+		clockFunction = []()
+		{
+			return SDL_GetTicks() / 1000.0;
+		};
 		timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
 
 		renderer = std::make_unique<SDLRenderer>(context);
 	}
 }
+
 
 SpelMotor::~SpelMotor() = default;
 
@@ -50,16 +59,16 @@ void SpelMotor::run()
 
 	InputManager* input = InputManager::getInstance();
 
-	while ( running )
+	while (running)
 	{
 		timer->tick();
 
-		if ( input->quitRequested() )
+		if (input->quitRequested())
 		{
 			running = false;
 		}
 
-		while ( timer->shouldFixedUpdate() )
+		while (timer->shouldFixedUpdate())
 		{
 			input->update();
 			physicsWorld->fixedUpdate();
@@ -75,7 +84,6 @@ void SpelMotor::run()
 void SpelMotor::shutdown()
 {
 	running = false;
-
 	// TODO audioSystem->shutdown()
 	InputManager::shutdown();
 	renderer->close();
