@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../GameObject/Vector2.h"
 #include "Animation/AnimationCurve.h"
+#include "GameObject/Vector2.h"
 
 #include <variant>
 

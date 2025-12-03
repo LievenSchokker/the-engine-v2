@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Component/Component.h"
 #include "Animation/AnimationClip.h"
+#include "Component/Component.h"
 
 class AnimationSystem;
 class GameObject;
