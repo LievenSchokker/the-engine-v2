@@ -1,15 +1,18 @@
 //
 // Created by samle on 02/12/2025.
 //
+
+
 #pragma once
+
+
 #include "Behaviour/Behaviour.h"
-#include <map>
-#include <unordered_map>
 #include "Math/Vector2.h"
+
 struct ModuleData;
 enum class ModuleState;
 enum class ModuleType;
-#include "AI/BaseAgentModule.h"
+
 
 class Agent final : public Behaviour
 {

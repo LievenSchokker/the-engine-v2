@@ -5,6 +5,7 @@
 #include "AI/Agent.h"
 #include "Component/Transform.h"
 
+
 void Agent::onAwake()
 {
     transform = gameObject->getTransform();
@@ -22,6 +23,7 @@ void Agent::update()
     transform->setPosition(transform->getPosition() + velocity);
 }
 
+
 Vector2 Agent::computeDesiredVelocity()
 {
     Vector2 totalModulesForce = computeModuleForce();
@@ -33,6 +35,7 @@ Vector2 Agent::computeDesiredVelocity()
 
     return totalModulesForce;
 }
+
 
 Vector2 Agent::computeModuleForce()
 {
@@ -63,20 +66,24 @@ Vector2 Agent::computeModuleForce()
     return totalForce;
 }
 
+
 float Agent::getMaxModuleForceMagnitude() const
 {
     return maxModuleForceMagnitude;
 }
+
 
 void Agent::setMaxModuleForceMagnitude(float max)
 {
     maxModuleForceMagnitude = max;
 }
 
+
 float Agent::getMaxVelocityMagnitude() const
 {
     return maxVelocityMagnitude;
 }
+
 
 void Agent::setMaxVelocityMagnitude(float max)
 {
