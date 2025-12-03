@@ -150,25 +150,20 @@ int main()
 	pingPongClip.addTrack(pingPongReverseTrack);
 
 	// Add Animators to GameObjects and set up animations
+	// AnimationSystem will automatically find and update these animators
 	auto* movingCircleAnimator = movingCircle->addComponent<Animator>();
-	movingCircleAnimator->setAnimationSystem(sceneManager.getAnimationSystem());
 	movingCircleAnimator->play(&positionClip);
 
 	auto* rotatingSquareAnimator = rotatingSquare->addComponent<Animator>();
-	rotatingSquareAnimator->setAnimationSystem(
-		sceneManager.getAnimationSystem());
 	rotatingSquareAnimator->play(&rotationClip);
 
 	auto* pulsingRectAnimator = pulsingRect->addComponent<Animator>();
-	pulsingRectAnimator->setAnimationSystem(sceneManager.getAnimationSystem());
 	pulsingRectAnimator->play(&scaleClip);
 
 	auto* combinedAnimator = combinedObject->addComponent<Animator>();
-	combinedAnimator->setAnimationSystem(sceneManager.getAnimationSystem());
 	combinedAnimator->play(&combinedClip);
 
 	auto* pingPongAnimator = pingPongObject->addComponent<Animator>();
-	pingPongAnimator->setAnimationSystem(sceneManager.getAnimationSystem());
 	pingPongAnimator->play(&pingPongClip);
 
 	// Add GameObjects to scene

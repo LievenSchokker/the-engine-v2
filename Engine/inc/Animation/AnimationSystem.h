@@ -1,16 +1,16 @@
 #pragma once
 
-#include <vector>
-
 class Animator;
+class Scene;
 
 /**
  * @class AnimationSystem
  * @brief Manages and updates all Animator components in the scene.
  *
- * AnimationSystem is responsible for registering Animators and updating
- * them each frame. It should be owned by SceneManager and updated in
- * the main game loop.
+ * AnimationSystem finds and updates Animator components by iterating
+ * through the Scene's GameObjects, similar to how Behaviour components
+ * are updated. This pull-model approach is consistent with other engine
+ * systems and avoids manual registration/deregistration.
  */
 class AnimationSystem
 {
@@ -26,42 +26,14 @@ class AnimationSystem
 	~AnimationSystem();
 
 	/**
-	 * @brief Registers an Animator to be updated each frame.
+	 * @brief Updates all Animator components in the given scene.
 	 *
-	 * @param animator Pointer to the Animator to register
-	 */
-	void registerAnimator(Animator* animator);
-
-	/**
-	 * @brief Unregisters an Animator from updates.
+	 * Iterates through all GameObjects in the scene and updates any
+	 * Animator components that are playing and on active GameObjects.
+	 * This pull-model approach is consistent with Behaviour updates.
 	 *
-	 * @param animator Pointer to the Animator to unregister
-	 */
-	void unregisterAnimator(Animator* animator);
-
-	/**
-	 * @brief Updates all registered Animators.
-	 *
-	 * This should be called each frame with the delta time.
-	 * Automatically cleans up destroyed animators.
-	 *
+	 * @param scene The scene containing GameObjects with Animator components
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	void update(float deltaTime);
-
-	/**
-	 * @brief Gets the number of registered animators.
-	 * @return Number of registered animators
-	 */
-	size_t getAnimatorCount() const;
-
-   private:
-	std::vector<Animator*> animators;
-
-	/**
-	 * @brief Removes null pointers from the animators vector.
-	 *
-	 * Called automatically during Step() to clean up destroyed animators.
-	 */
-	void cleanupDestroyedAnimators();
+	void update(Scene* scene, float deltaTime);
 };

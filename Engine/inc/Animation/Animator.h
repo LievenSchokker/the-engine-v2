@@ -3,7 +3,6 @@
 #include "Animation/AnimationClip.h"
 #include "Component/Component.h"
 
-class AnimationSystem;
 class GameObject;
 
 /**
@@ -22,13 +21,12 @@ class Animator: public Component
 	Animator();
 
 	/**
-	 * @brief Destructor. Unregisters from AnimationSystem if registered.
+	 * @brief Destructor.
 	 */
 	~Animator() override;
 
 	/**
-	 * @brief Called when component is destroyed. Unregisters from
-	 * AnimationSystem.
+	 * @brief Called when component is destroyed.
 	 */
 	void onDestroy() override;
 
@@ -36,8 +34,8 @@ class Animator: public Component
 	 * @brief Plays the specified animation clip.
 	 *
 	 * If a clip is already playing, it will be stopped and the new clip
-	 * started. The animator will register itself with the AnimationSystem if
-	 * not already registered.
+	 * started. The AnimationSystem will automatically find and update this
+	 * animator each frame (pull-model, consistent with Behaviour components).
 	 *
 	 * @param clip Pointer to the AnimationClip to play (can be nullptr to stop)
 	 */
@@ -97,26 +95,10 @@ class Animator: public Component
 	float getCurrentTime() const;
 
 	/**
-	 * @brief Sets the AnimationSystem this Animator should register with.
-	 *
-	 * This must be called manually by the user/game code after creating an
-	 * Animator component. Typically called with the AnimationSystem from
-	 * SceneManager::getAnimationSystem().
-	 *
-	 * @param system Pointer to the AnimationSystem (usually from SceneManager)
-	 */
-	void setAnimationSystem(AnimationSystem* system);
-
-	/**
-	 * @brief Clears the reference to AnimationSystem without unregistering.
-	 *
-	 * Used when AnimationSystem is being destroyed to prevent dangling
-	 * pointers. Internal use only.
-	 */
-	void clearAnimationSystem();
-
-	/**
 	 * @brief Internal method called by AnimationSystem to update this animator.
+	 *
+	 * AnimationSystem finds this animator by iterating through Scene's
+	 * GameObjects (pull-model, consistent with Behaviour components).
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
@@ -127,16 +109,4 @@ class Animator: public Component
 	bool isPlaying;
 	float timeScale;
 	float currentTime;
-	AnimationSystem* animationSystem;
-	bool isRegistered;
-
-	/**
-	 * @brief Registers this animator with the AnimationSystem.
-	 */
-	void registerWithSystem();
-
-	/**
-	 * @brief Unregisters this animator from the AnimationSystem.
-	 */
-	void unregisterFromSystem();
 };

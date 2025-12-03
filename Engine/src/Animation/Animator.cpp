@@ -1,30 +1,22 @@
 #include "Animation/Animator.h"
 
 #include "Animation/AnimationCurve.h"
-#include "Animation/AnimationSystem.h"
 #include "GameObject/GameObject.h"
 
 #include <algorithm>
 #include <map>
 
 Animator::Animator()
-	: currentClip(nullptr),
-	  isPlaying(false),
-	  timeScale(1.0f),
-	  currentTime(0.0f),
-	  animationSystem(nullptr),
-	  isRegistered(false)
+	: currentClip(nullptr), isPlaying(false), timeScale(1.0f), currentTime(0.0f)
 {
 }
 
 Animator::~Animator()
 {
-	unregisterFromSystem();
 }
 
 void Animator::onDestroy()
 {
-	unregisterFromSystem();
 	Component::onDestroy();
 }
 
@@ -45,8 +37,6 @@ void Animator::play(AnimationClip* clip)
 	currentClip = clip;
 	isPlaying = true;
 	currentTime = 0.0f;
-
-	registerWithSystem();
 }
 
 void Animator::pause()
@@ -59,7 +49,6 @@ void Animator::resume()
 	if ( currentClip != nullptr && !isPlaying )
 	{
 		isPlaying = true;
-		registerWithSystem();
 	}
 }
 
@@ -93,27 +82,6 @@ void Animator::setTimeScale(float scale)
 float Animator::getCurrentTime() const
 {
 	return currentTime;
-}
-
-void Animator::setAnimationSystem(AnimationSystem* system)
-{
-	if ( animationSystem != system )
-	{
-		unregisterFromSystem();
-		animationSystem = system;
-		if ( isPlaying && animationSystem != nullptr )
-		{
-			registerWithSystem();
-		}
-	}
-}
-
-void Animator::clearAnimationSystem()
-{
-	// Clear the reference without trying to unregister
-	// This is called when AnimationSystem is being destroyed
-	animationSystem = nullptr;
-	isRegistered = false;
 }
 
 void Animator::update(float deltaTime)
@@ -203,23 +171,5 @@ void Animator::update(float deltaTime)
 			track.apply(this, normalizedTime);
 			propertyApplied[prop] = true;
 		}
-	}
-}
-
-void Animator::registerWithSystem()
-{
-	if ( animationSystem != nullptr && !isRegistered )
-	{
-		animationSystem->registerAnimator(this);
-		isRegistered = true;
-	}
-}
-
-void Animator::unregisterFromSystem()
-{
-	if ( animationSystem != nullptr && isRegistered )
-	{
-		animationSystem->unregisterAnimator(this);
-		isRegistered = false;
 	}
 }

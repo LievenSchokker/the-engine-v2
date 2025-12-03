@@ -13,18 +13,15 @@ class AnimatorTest: public ::testing::Test
    protected:
 	void SetUp() override
 	{
-		animationSystem = std::make_unique<AnimationSystem>();
 		gameObject = std::make_unique<GameObject>();
 		gameObject->setName("TestObject");
 		animator = gameObject->addComponent<Animator>();
-		animator->setAnimationSystem(animationSystem.get());
 	}
 
 	void TearDown() override
 	{
 	}
 
-	std::unique_ptr<AnimationSystem> animationSystem;
 	std::unique_ptr<GameObject> gameObject;
 	Animator* animator;
 };
