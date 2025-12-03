@@ -100,12 +100,12 @@ int main()
 			if ( circle != nullptr ) {
 				Vector2 currentPosition = circle->getTransform()->getPosition();
 				circle->getTransform()->setPosition(
-					{currentPosition.x + input->wheelDeltaX() * 10,
-					 currentPosition.y});
+					{currentPosition.x() + input->wheelDeltaX() * 10,
+					 currentPosition.y()});
 				Vector2 currentScale = circle->getTransform()->getScale();
 				circle->getTransform()->setScale(
-					{currentScale.x + input->wheelDeltaX() * 0.1,
-					 currentScale.y + input->wheelDeltaX() * 0.1});
+					{currentScale.x() + input->wheelDeltaX() * 0.1f,
+					 currentScale.y() + input->wheelDeltaX() * 0.1f});
 			}
 		}
 
