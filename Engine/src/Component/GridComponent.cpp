@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <corecrt_math_defines.h>
 
 GridComponent::GridComponent()
 {
@@ -265,14 +264,12 @@ void GridComponent::setDebugShowDiagonalLinks(bool enabled)
 	debugShowDiagonalLinks = enabled;
 }
 
-std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
+void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 {
-	std::vector<ShapeRenderCommand> commands;
-
 	if ( !debugRenderEnabled || tilemapComponent == nullptr ||
 		 !tilemapComponent->isReady() )
 	{
-		return commands;
+		return;
 	}
 
 	const Transform* transform = getTransform();
@@ -285,7 +282,7 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 		}
 		if ( transform == nullptr )
 		{
-			return commands;
+			return;
 		}
 	}
 
@@ -373,15 +370,15 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 			lineCenter.y = center.y + (lineVector.y / 2.0f);
 
 			// Create a thin rectangle to represent the line
-			ShapeRenderCommand line;
-			line.type = ShapeRenderType::Rectangle;
+			RenderCommand line;
+			line.type = RenderCommandType::Rectangle;
 			line.position = lineCenter;
 			line.size = {static_cast<float>(lineLength),
 						 static_cast<float>(lineThickness)};
 			line.rotationDegrees = angle;
 			line.scale = {1.0, 1.0};
 			line.color = debugGridLineColor;
-			commands.push_back(line);
+			queue.push(line);
 		}
 	}
 
@@ -389,14 +386,14 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 	for ( const auto& [cell, center] : walkableCenters )
 	{
 		// Draw a dot (small circle) at the center
-		ShapeRenderCommand dot;
-		dot.type = ShapeRenderType::Circle;
+		RenderCommand dot;
+		dot.type = RenderCommandType::Circle;
 		dot.position = center;
 		dot.radius = dotRadius;
 		dot.rotationDegrees = 0.0;
 		dot.scale = {1.0, 1.0};
 		dot.color = debugWalkableDotColor;
-		commands.push_back(dot);
+		queue.push(dot);
 	}
 
 	for ( const auto& key : blockedCells )
@@ -412,17 +409,15 @@ std::vector<ShapeRenderCommand> GridComponent::buildDebugRenderCommands() const
 		tileCenter.x = origin.x + (cell.x * tileSize.x) + (tileSize.x / 2.0f);
 		tileCenter.y = origin.y + (cell.y * tileSize.y) + (tileSize.y / 2.0f);
 
-		ShapeRenderCommand dot;
-		dot.type = ShapeRenderType::Circle;
+		RenderCommand dot;
+		dot.type = RenderCommandType::Circle;
 		dot.position = tileCenter;
 		dot.radius = dotRadius;
 		dot.rotationDegrees = 0.0;
 		dot.scale = {1.0, 1.0};
 		dot.color = debugBlockedDotColor;
-		commands.push_back(dot);
+		queue.push(dot);
 	}
-
-	return commands;
 }
 
 bool GridComponent::isReady() const
