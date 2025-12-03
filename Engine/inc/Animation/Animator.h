@@ -99,10 +99,11 @@ class Animator: public Component
 	/**
 	 * @brief Sets the AnimationSystem this Animator should register with.
 	 *
-	 * This should be called by the AnimationSystem or SceneManager when the
-	 * Animator is created.
+	 * This must be called manually by the user/game code after creating an
+	 * Animator component. Typically called with the AnimationSystem from
+	 * SceneManager::getAnimationSystem().
 	 *
-	 * @param system Pointer to the AnimationSystem
+	 * @param system Pointer to the AnimationSystem (usually from SceneManager)
 	 */
 	void setAnimationSystem(AnimationSystem* system);
 
