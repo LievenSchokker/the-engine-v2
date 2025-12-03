@@ -17,7 +17,7 @@ Animator::~Animator()
 
 void Animator::onDestroy()
 {
-	Component::onDestroy();
+	Behaviour::onDestroy();
 }
 
 void Animator::play(AnimationClip* clip)
@@ -86,8 +86,9 @@ float Animator::getCurrentTime() const
 
 void Animator::update(float deltaTime)
 {
-	if ( !isPlaying || currentClip == nullptr || gameObject == nullptr ||
-		 !gameObject->getIsActive() )
+	// Only update if playing and has a clip
+	// GameObject active check is handled by Behaviour's getIsActiveAndEnabled()
+	if ( !isPlaying || currentClip == nullptr )
 	{
 		return;
 	}

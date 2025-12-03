@@ -1,13 +1,10 @@
 #include "Scene/Scene.h"
 
+#include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
 #include "Component/GridComponent.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/TilemapComponent.h"
-#include "Rendering/RenderQueue.h"
-#include "Behaviour/Behaviour.h"
-#include "Component/ComponentManager.h"
-#include "Component/ShapeRenderer.h"
 #include "GameObject/GameObject.h"
 #include "Rendering/RenderQueue.h"
 
@@ -218,7 +215,7 @@ void Scene::update(float deltaTime)
 			/// Only update
 			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
 				continue;
-			behaviour->update();
+			behaviour->update(deltaTime);
 		}
 	}
 

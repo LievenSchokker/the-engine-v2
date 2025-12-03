@@ -1,18 +1,19 @@
 #pragma once
 
 #include "Animation/AnimationClip.h"
-#include "Component/Component.h"
+#include "Behaviour/Behaviour.h"
 
 class GameObject;
 
 /**
  * @class Animator
- * @brief Component that plays AnimationClips on a GameObject.
+ * @brief Behaviour component that plays AnimationClips on a GameObject.
  *
  * Animator manages the playback state of animation clips, including
- * play/pause/stop controls and time scaling.
+ * play/pause/stop controls and time scaling. It inherits from Behaviour
+ * so Scene automatically updates it each frame along with other behaviours.
  */
-class Animator: public Component
+class Animator: public Behaviour
 {
    public:
 	/**
@@ -34,8 +35,8 @@ class Animator: public Component
 	 * @brief Plays the specified animation clip.
 	 *
 	 * If a clip is already playing, it will be stopped and the new clip
-	 * started. The AnimationSystem will automatically find and update this
-	 * animator each frame (pull-model, consistent with Behaviour components).
+	 * started. Scene will automatically update this animator each frame
+	 * along with other Behaviour components.
 	 *
 	 * @param clip Pointer to the AnimationClip to play (can be nullptr to stop)
 	 */
@@ -95,14 +96,15 @@ class Animator: public Component
 	float getCurrentTime() const;
 
 	/**
-	 * @brief Internal method called by AnimationSystem to update this animator.
+	 * @brief Updates the animator each frame.
 	 *
-	 * AnimationSystem finds this animator by iterating through Scene's
-	 * GameObjects (pull-model, consistent with Behaviour components).
+	 * Called automatically by Scene when this Behaviour is enabled and active.
+	 * Advances animation time and applies tracks based on current playback
+	 * state.
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	void update(float deltaTime);
+	void update(float deltaTime) override;
 
    private:
 	AnimationClip* currentClip;

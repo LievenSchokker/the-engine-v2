@@ -173,7 +173,7 @@ class Scene
 	/**
 	 * @brief Gets all GameObjects in this scene for iteration.
 	 *
-	 * Used by systems (like AnimationSystem) to find and update components.
+	 * Used by systems to find and update components.
 	 *
 	 * @return Const reference to the vector of GameObjects
 	 */

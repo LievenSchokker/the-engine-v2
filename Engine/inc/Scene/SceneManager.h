@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../Animation/AnimationSystem.h"
-#include "../Rendering/Color.h"
-#include "../Rendering/RenderQueue.h"
+#include "Rendering/Color.h"
+#include "Rendering/RenderQueue.h"
 #include "Scene.h"
 
 #include <memory>
@@ -143,17 +142,10 @@ class SceneManager
 	 */
 	Color getClearColor() const;
 
-	/**
-	 * @brief Gets the AnimationSystem instance.
-	 * @return Pointer to the AnimationSystem
-	 */
-	AnimationSystem* getAnimationSystem() const;
-
    private:
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;
 	IRenderer* renderer = nullptr;
 	Color clearColor = Color::black();
-	std::unique_ptr<AnimationSystem> animationSystem;
 };

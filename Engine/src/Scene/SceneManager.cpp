@@ -1,13 +1,11 @@
 #include "Scene/SceneManager.h"
 
-#include "Animation/AnimationSystem.h"
 #include "GameObject/GameObject.h"
 
 #include <iostream>
 #include <utility>
 
 SceneManager::SceneManager()
-	: animationSystem(std::make_unique<AnimationSystem>())
 {
 }
 
@@ -175,7 +173,6 @@ void SceneManager::update(float deltaTime)
 	if ( activeScene != nullptr && !paused )
 	{
 		activeScene->update(deltaTime);
-		animationSystem->update(activeScene, deltaTime);
 	}
 }
 
@@ -200,9 +197,4 @@ void SceneManager::setClearColor(const Color& color)
 Color SceneManager::getClearColor() const
 {
 	return clearColor;
-}
-
-AnimationSystem* SceneManager::getAnimationSystem() const
-{
-	return animationSystem.get();
 }

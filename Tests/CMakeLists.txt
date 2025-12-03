@@ -27,7 +27,6 @@ add_executable(engine_tests
         Animation/AnimationTrackTest.cpp
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
-        Animation/AnimationSystemTest.cpp
         Scene/SceneBehavioursTests.cpp
 )
 

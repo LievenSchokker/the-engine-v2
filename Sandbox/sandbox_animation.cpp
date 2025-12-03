@@ -150,7 +150,7 @@ int main()
 	pingPongClip.addTrack(pingPongReverseTrack);
 
 	// Add Animators to GameObjects and set up animations
-	// AnimationSystem will automatically find and update these animators
+	// Scene will automatically update these animators as Behaviour components
 	auto* movingCircleAnimator = movingCircle->addComponent<Animator>();
 	movingCircleAnimator->play(&positionClip);
 
