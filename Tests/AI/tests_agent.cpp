@@ -2,12 +2,13 @@
 // Created by samle on 03/12/2025.
 //
 
-#include <gtest/gtest.h>
 
-#include "TestAgentModule.h"
 #include "AI/Agent.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
+#include "TestAgentModule.h"
+
+#include <gtest/gtest.h>
 
 
 class AgentTest : public ::testing::Test

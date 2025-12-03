@@ -2,6 +2,7 @@
 // Created by samle on 02/12/2025.
 //
 
+
 #include "AI/Agent.h"
 #include "Component/Transform.h"
 
@@ -42,6 +43,10 @@ Vector2 Agent::computeModuleForce()
 
     for (std::unique_ptr<ModuleData>& moduleData : moduleDatas)
     {
+        /// Skip inactive modules
+        if (!moduleData->isModuleActive())
+            continue;
+
         float weight = moduleData->getWeight();
 
         /// Skip computation for 0 weights.
@@ -87,6 +92,7 @@ void Agent::setMaxVelocityMagnitude(float max)
 {
     maxVelocityMagnitude = max;
 }
+
 
 size_t Agent::getModuleCount() const
 {

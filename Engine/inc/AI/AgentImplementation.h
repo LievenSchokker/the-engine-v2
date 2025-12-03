@@ -9,6 +9,7 @@
 #include "AI/ModuleData.h"
 #include "AI/ModuleStatus.h"
 
+
 template<typename T, typename... Args>
 bool Agent::addAgentModule(float desiredWeight, Args&&... args)
 {
@@ -26,6 +27,7 @@ bool Agent::addAgentModule(float desiredWeight, Args&&... args)
 
     return true;
 }
+
 
 template<typename T>
 bool Agent::removeAgentModule()
@@ -54,6 +56,7 @@ bool Agent::hasAgentModule() const
     return tryGetAgentModule<T>(temp);
 }
 
+
 template<typename T>
 bool Agent::setModuleWeight(float desiredWeight) const
 {
@@ -71,6 +74,7 @@ bool Agent::setModuleWeight(float desiredWeight) const
 
 }
 
+
 template<typename T>
 float Agent::getModuleWeight() const
 {
@@ -85,6 +89,7 @@ float Agent::getModuleWeight() const
 
     return 0;
 }
+
 
 template<typename T>
 bool Agent::setModuleStatus(ModuleStatus status) const

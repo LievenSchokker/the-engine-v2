@@ -2,10 +2,13 @@
 // Created by samle on 02/12/2025.
 //
 #pragma once
+
+
+#include "AI/BaseAgentModule.h"
+#include "AI/ModuleStatus.h"
+
 #include <memory>
 
-#include "AI/ModuleStatus.h"
-#include "AI/BaseAgentModule.h"
 
 struct ModuleData final
 {
@@ -23,6 +26,8 @@ struct ModuleData final
         [[nodiscard]] ModuleStatus getModuleStatus() const;
         [[nodiscard]] float getWeight() const;
 
+        [[nodiscard]] bool isModuleActive() const;
+
         void setWeight(float weight);
         void setModuleStatus(ModuleStatus state);
 
@@ -30,4 +35,5 @@ struct ModuleData final
         std::unique_ptr<BaseAgentModule> module;
         ModuleStatus moduleStatus;
         float weight;
+
 };
