@@ -24,6 +24,7 @@ add_executable(engine_tests
         Physics/PhysicsSystemTest.cpp
         Math/TestsVector2.cpp
         AI/tests_agent.cpp
+        AI/TestAgentModule.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE

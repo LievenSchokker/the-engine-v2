@@ -11,7 +11,7 @@ BaseAgentModule *ModuleData::getModule() const
     return module.get();
 }
 
-ModuleState ModuleData::getModuleState() const
+ModuleStatus ModuleData::getModuleState() const
 {
     return moduleStatus;
 }
@@ -26,7 +26,7 @@ void ModuleData::setWeight(const float desiredWeight)
     weight = desiredWeight;
 }
 
-void ModuleData::setModuleStatus(ModuleState newStatus)
+void ModuleData::setModuleStatus(ModuleStatus newStatus)
 {
     moduleStatus = newStatus;
 }

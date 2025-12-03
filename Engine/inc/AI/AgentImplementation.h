@@ -7,6 +7,7 @@
 
 #include "AI/BaseAgentModule.h"
 #include "AI/ModuleData.h"
+#include "AI/ModuleStatus.h"
 
 template<typename T, typename... Args>
 bool Agent::addAgentModule(float desiredWeight, Args&&... args)
@@ -18,9 +19,8 @@ bool Agent::addAgentModule(float desiredWeight, Args&&... args)
 
     moduleDatas.emplace_back(
           std::make_unique<ModuleData>(
-              desiredWeight,
-              ModuleState::ACTIVE,
-              std::forward<Args>(args)...
+              std::make_unique<T>(std::forward<Args>(args)...),
+              desiredWeight
           )
       );
 
@@ -72,7 +72,7 @@ bool Agent::setModuleWeight(float desiredWeight) const
 }
 
 template<typename T>
-bool Agent::setModuleStatus(ModuleState status) const
+bool Agent::setModuleStatus(ModuleStatus status) const
 {
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::setModuleStatus] T must derive from BaseAgentModule");
 

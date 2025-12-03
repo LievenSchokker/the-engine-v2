@@ -10,7 +10,7 @@
 #include "Math/Vector2.h"
 
 struct ModuleData;
-enum class ModuleState;
+enum class ModuleStatus;
 enum class ModuleType;
 
 
@@ -39,7 +39,7 @@ class Agent final : public Behaviour
         bool setModuleWeight(float desiredWeight) const;
 
         template<typename T>
-        [[nodiscard]] bool setModuleStatus(ModuleState status) const;
+        [[nodiscard]] bool setModuleStatus(ModuleStatus status) const;
 
         template<typename t>
         [[nodiscard]] bool hasAgentModule() const;

@@ -3,32 +3,31 @@
 //
 #pragma once
 #include <memory>
-class BaseAgentModule;
-enum class ModuleState;
+
+#include "AI/ModuleStatus.h"
+#include "AI/BaseAgentModule.h"
 
 struct ModuleData final
 {
     public:
-        template <typename T, typename... Args>
-        ModuleData(const float desiredWeight, const ModuleState state, Args&&... args):
-            module(std::make_unique<T>(std::forward<Args>(args)...)),
+        ModuleData(std::unique_ptr<BaseAgentModule> agentModule, const float desiredWeight):
+            module(std::move(agentModule)),
             weight(desiredWeight),
-            moduleStatus(state)
+            moduleStatus(ModuleStatus::ACTIVE)
         {
-            static_assert(std::is_base_of_v<BaseAgentModule, T>, "[ModuleData::constructor] T must derive from BaseAgentModule");
         }
 
         ~ModuleData() =default;
 
         [[nodiscard]] BaseAgentModule* getModule() const;
-        [[nodiscard]] ModuleState getModuleState() const;
+        [[nodiscard]] ModuleStatus getModuleState() const;
         [[nodiscard]] float getWeight() const;
 
         void setWeight(float weight);
-        void setModuleStatus(ModuleState state);
+        void setModuleStatus(ModuleStatus state);
 
     private:
         std::unique_ptr<BaseAgentModule> module;
-        ModuleState moduleStatus;
+        ModuleStatus moduleStatus;
         float weight;
 };
