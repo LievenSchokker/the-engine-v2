@@ -1,9 +1,12 @@
 #include "Game.h"
 #include "Core/SpelMotor.h"
+
 #include "Audio/MusicSource.h"
 #include "Audio/SDL/AudioBackendSDL.h"
+#include "Audio/SoundSource.h"
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
+#include "External/SDLBackendContext.h"
 #include "Input/InputManager.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Networking/Server/Server.h"

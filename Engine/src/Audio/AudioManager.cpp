@@ -2,6 +2,7 @@
 
 #include "Audio/IAudioBackend.h"
 #include "Audio/MusicSource.h"
+#include "SDL_mixer.h"
 
 bool AudioManager::initialize(std::unique_ptr<IAudioBackend> backendPtr)
 {
@@ -40,12 +41,11 @@ void AudioManager::unregisterAudioSource(AudioSource* source)
 	}
 }
 
-
 bool AudioManager::loadMusic(const std::string& path) const
 {
-	return backend->loadMusic(path);;
+	return backend->loadMusic(path);
+	;
 }
-
 
 bool AudioManager::setMusicSource(MusicSource* source)
 {
@@ -108,9 +108,39 @@ void AudioManager::stopMusic() const
 	backend->stopMusic();
 }
 
-
 void AudioManager::resumeMusic() const
 {
 	if ( !backend ) return;
 	backend->resumeMusic();
+}
+
+SoundHandle AudioManager::loadSound(const std::string& path)
+{
+	if ( !backend ) return -1;
+	return backend->loadSound(path);
+}
+
+
+int AudioManager::playSound(SoundHandle handle, int loops)
+{
+	if ( !backend ) return -1;
+
+	// Ask backend to choose a free channel
+	int channel = backend->reserveFreeChannel();
+	if ( channel < 0 ) return -1;
+
+	backend->playSound(handle, channel, loops);
+	return channel;
+}
+
+void AudioManager::stopChannel(int channel)
+{
+	if ( !backend ) return;
+	backend->stopChannel(channel);
+}
+
+void AudioManager::setChannelPanning(int channel, float left, float right)
+{
+	if ( !backend ) return;
+	backend->setChannelPanning(channel, left, right);
 }

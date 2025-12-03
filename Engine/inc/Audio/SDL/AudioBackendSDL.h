@@ -110,6 +110,8 @@ public:
      */
     void setChannelPanning(int channel, float left, float right) override;
 
+	int reserveFreeChannel() override;
+
 private:
     /// Map of sound handles to Mix_Chunk objects.
     std::unordered_map<SoundHandle, Mix_Chunk*> soundMap;

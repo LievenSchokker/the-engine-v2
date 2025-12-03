@@ -152,3 +152,9 @@ void AudioBackendSDL::setChannelPanning(int channel, float left, float right)
 
     Mix_SetPanning(channel, leftByte, rightByte);
 }
+
+
+int AudioBackendSDL::reserveFreeChannel()
+{
+	return Mix_GroupAvailable(-1);
+}

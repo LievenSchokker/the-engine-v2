@@ -25,124 +25,153 @@ class AudioListener;
  */
 class AudioManager
 {
-public:
-    /**
-     * @brief Constructs an empty AudioManager.
-     */
-    AudioManager() = default;
+   public:
+	/**
+	 * @brief Constructs an empty AudioManager.
+	 */
+	AudioManager() = default;
 
-    /**
-     * @brief Destructor.
-     */
-    ~AudioManager() = default;
+	/**
+	 * @brief Destructor.
+	 */
+	~AudioManager() = default;
 
-    /**
-     * @brief Initializes the audio manager with a backend.
-     * @param backendPtr Unique pointer to a backend implementation.
-     * @return True if backend initialization succeeded.
-     */
-    bool initialize(std::unique_ptr<IAudioBackend> backendPtr);
+	/**
+	 * @brief Initializes the audio manager with a backend.
+	 * @param backendPtr Unique pointer to a backend implementation.
+	 * @return True if backend initialization succeeded.
+	 */
+	bool initialize(std::unique_ptr<IAudioBackend> backendPtr);
 
-    /**
-     * @brief Shuts down the backend and clears all audio data.
-     */
-    void shutdown();
+	/**
+	 * @brief Shuts down the backend and clears all audio data.
+	 */
+	void shutdown();
 
-    /**
-     * @brief Registers a positional audio source.
-     * @param source The AudioSource to register.
-     */
-    void registerAudioSource(AudioSource* source);
+	/**
+	 * @brief Registers a positional audio source.
+	 * @param source The AudioSource to register.
+	 */
+	void registerAudioSource(AudioSource* source);
 
-    /**
-     * @brief Unregisters a positional audio source.
-     * @param source The AudioSource to remove.
-     */
-    void unregisterAudioSource(AudioSource* source);
+	/**
+	 * @brief Unregisters a positional audio source.
+	 * @param source The AudioSource to remove.
+	 */
+	void unregisterAudioSource(AudioSource* source);
 
-    /**
-     * @brief Loads a music track through the backend.
-     * @param path File path to the music file.
-     * @return True if loading succeeded.
-     */
-    bool loadMusic(const std::string& path) const;
+	/**
+	 * @brief Loads a music track through the backend.
+	 * @param path File path to the music file.
+	 * @return True if loading succeeded.
+	 */
+	bool loadMusic(const std::string& path) const;
 
-    /**
-     * @brief Assigns the active music source.
-     * @param source The MusicSource playing music.
-     * @return True if assigned.
-     */
-    bool setMusicSource(MusicSource* source);
+	/**
+	 * @brief Assigns the active music source.
+	 * @param source The MusicSource playing music.
+	 * @return True if assigned.
+	 */
+	bool setMusicSource(MusicSource* source);
 
-    /**
-     * @brief Removes the active music source.
-     * @param source Source requesting removal.
-     */
-    void unsetMusicSource(MusicSource* source);
+	/**
+	 * @brief Removes the active music source.
+	 * @param source Source requesting removal.
+	 */
+	void unsetMusicSource(MusicSource* source);
 
-    /**
-     * @brief Sets the position listener for 3D audio.
-     * @param listener The AudioListener reference.
-     * @return True if assigned.
-     */
-    bool setAudioListener(AudioListener* listener);
+	/**
+	 * @brief Sets the position listener for 3D audio.
+	 * @param listener The AudioListener reference.
+	 * @return True if assigned.
+	 */
+	bool setAudioListener(AudioListener* listener);
 
-    /**
-     * @return The current audio listener.
-     */
-    AudioListener* getAudioListener() const;
+	/**
+	 * @return The current audio listener.
+	 */
+	AudioListener* getAudioListener() const;
 
-    /**
-     * @brief Sets the global sound volume.
-     * @param volume Range: 0.0–1.0.
-     */
-    void setSoundVolume(float volume);
+	/**
+	 * @brief Sets the global sound volume.
+	 * @param volume Range: 0.0–1.0.
+	 */
+	void setSoundVolume(float volume);
 
-    /**
-     * @brief Sets the global music volume.
-     * @param volume Range: 0.0–1.0.
-     */
-    void setMusicVolume(float volume);
+	/**
+	 * @brief Sets the global music volume.
+	 * @param volume Range: 0.0–1.0.
+	 */
+	void setMusicVolume(float volume);
 
-    /**
-     * @brief Plays a music track by handle.
-     * @param handle Music handle.
-     * @param loop Whether the track should loop.
-     */
-    void playMusic(MusicHandle handle, bool loop) const;
+	/**
+	 * @brief Plays a music track by handle.
+	 * @param handle Music handle.
+	 * @param loop Whether the track should loop.
+	 */
+	void playMusic(MusicHandle handle, bool loop) const;
 
-    /**
-     * @brief Pauses the music.
-     */
-    void pauseMusic() const;
+	/**
+	 * @brief Pauses the music.
+	 */
+	void pauseMusic() const;
 
-    /**
-     * @brief Stops music playback.
-     */
-    void stopMusic() const;
+	/**
+	 * @brief Stops music playback.
+	 */
+	void stopMusic() const;
 
-    /**
-     * @brief Resumes paused music.
-     */
-    void resumeMusic() const;
+	/**
+	 * @brief Resumes paused music.
+	 */
+	void resumeMusic() const;
 
-private:
-    /// Pointer to the low-level backend.
-    std::unique_ptr<IAudioBackend> backend;
+	/**
+	 * @brief Loads a sound effect from disk.
+	 * @param path Path to the audio file.
+	 * @return Handle to the loaded sound, or -1 on failure.
+	 */
+	SoundHandle loadSound(const std::string& path);
 
-    /// Manager responsible for loading/unloading audio assets.
-    std::unique_ptr<AudioAssetManager> assetManager;
+	/**
+	 * @brief Plays a loaded sound.
+	 * @param handle Sound to play.
+	 * @param loops Number of loops (0 = once, -1 = infinite).
+	 * @return Channel index used for playback, or -1 on failure.
+	 */
+	int playSound(SoundHandle handle, int loops);
 
-    /// List of positional audio sources.
-    std::vector<AudioSource*> audioSources;
+	/**
+	 * @brief Stops playback on a specific channel.
+	 * @param channel Channel index to stop.
+	 */
+	void stopChannel(int channel);
 
-    /// Active music-playing component.
-    MusicSource* musicSource = nullptr;
+	/**
+	 * @brief Applies stereo panning to a channel.
+	 * @param channel Channel index.
+	 * @param left  Left volume (0.0–1.0).
+	 * @param right Right volume (0.0–1.0).
+	 */
+	void setChannelPanning(int channel, float left, float right);
 
-    /// Global audio listener for 3D audio support.
-    AudioListener* listener = nullptr;
+   private:
+	/// Pointer to the low-level backend.
+	std::unique_ptr<IAudioBackend> backend;
 
-    /// Global volume multipliers.
-    float soundVolume = 1.0f;
-    float musicVolume = 1.0f;
+	/// Manager responsible for loading/unloading audio assets.
+	std::unique_ptr<AudioAssetManager> assetManager;
+
+	/// List of positional audio sources.
+	std::vector<AudioSource*> audioSources;
+
+	/// Active music-playing component.
+	MusicSource* musicSource = nullptr;
+
+	/// Global audio listener for 3D audio support.
+	AudioListener* listener = nullptr;
+
+	/// Global volume multipliers.
+	float soundVolume = 1.0f;
+	float musicVolume = 1.0f;
 };

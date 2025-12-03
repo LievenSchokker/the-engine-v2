@@ -74,4 +74,26 @@ private:
 
 	std::unique_ptr<IEngineLoop> coreSystemLoop;
 	std::unique_ptr<ApplicationClock> coreClock;
+	
+	/** @brief Immutable configuration set at construction.
+	 * Const ensures runtime modifications don't destabilize systems. */
+	const ApplicationSpecifications specifications;
+
+	/** @brief renderer handle. */
+	std::unique_ptr<IRenderer> renderer;
+
+	/** @brief timeStep calculation for engine */
+	std::unique_ptr<ApplicationClock> timer;
+
+	/** @brief A functions that returns, the time the application has been running in second */
+	std::function<double()> clockFunction;
+
+	/** @brief the physics world where physics are simulated */
+	std::unique_ptr<IPhysicsWorld> physicsWorld;
+
+	/** @brief An audio manager to play and control audio */
+	std::unique_ptr<AudioManager> audioManager;
+
+	/** @brief The onderling backend */
+	std::unique_ptr<IBackendContext> backendContext;
 };
