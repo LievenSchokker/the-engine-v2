@@ -24,7 +24,7 @@ class Agent final : public Behaviour
         ~Agent() override = default;
 
         void onAwake() override;
-        void update() override;
+        void update(float deltaTime) override;
 
         Vector2 computeModuleForce();
         Vector2 computeDesiredVelocity();

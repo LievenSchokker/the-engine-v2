@@ -16,7 +16,7 @@ void Agent::onAwake()
 }
 
 
-void Agent::update()
+void Agent::update(float deltaTime)
 {
     Vector2 velocity = computeDesiredVelocity();
     transform->setPosition(transform->getPosition() + velocity);

@@ -36,9 +36,9 @@ std::variant<Vector2, float> AnimationTrack::sample(float t) const
 		Vector2 from = std::get<Vector2>(fromValue);
 		Vector2 to = std::get<Vector2>(toValue);
 
-		Vector2 result;
-		result.x = from.x + (to.x - from.x) * easedT;
-		result.y = from.y + (to.y - from.y) * easedT;
+		Vector2 result{0,0};
+		result.setX(from.x() + (to.x() - from.x()) * easedT);
+		result.setY(from.y() + (to.y() - from.y()) * easedT);
 
 		return result;
 	}
@@ -91,19 +91,19 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 				// When relative: start from (current + fromValue), end at
 				// toValue (absolute)
 				Vector2 currentPos = transform->getPosition();
-				Vector2 startPos = {currentPos.x + fromVal.x,
-									currentPos.y + fromVal.y};
-				Vector2 finalPos;
-				finalPos.x = startPos.x + (toVal.x - startPos.x) * easedT;
-				finalPos.y = startPos.y + (toVal.y - startPos.y) * easedT;
+				Vector2 startPos = {currentPos.x() + fromVal.x(),
+									currentPos.y() + fromVal.y()};
+				Vector2 finalPos{0,0};
+				finalPos.setX(startPos.x() + (toVal.x() - startPos.x()) * easedT);
+				finalPos.setY(startPos.y() + (toVal.y() - startPos.y()) * easedT);
 				transform->setPosition(finalPos);
 			}
 			else
 			{
 				// Absolute: interpolate directly between fromValue and toValue
-				Vector2 finalPos;
-				finalPos.x = fromVal.x + (toVal.x - fromVal.x) * easedT;
-				finalPos.y = fromVal.y + (toVal.y - fromVal.y) * easedT;
+				Vector2 finalPos{0,0};
+				finalPos.setX(fromVal.x() + (toVal.x() - fromVal.x()) * easedT);
+				finalPos.setY(fromVal.y() + (toVal.y() - fromVal.y()) * easedT);
 				transform->setPosition(finalPos);
 			}
 		}
@@ -146,19 +146,19 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 				// When relative: start from (current + fromValue), end at
 				// toValue (absolute)
 				Vector2 currentScale = transform->getScale();
-				Vector2 startScale = {currentScale.x + fromVal.x,
-									  currentScale.y + fromVal.y};
-				Vector2 finalScale;
-				finalScale.x = startScale.x + (toVal.x - startScale.x) * easedT;
-				finalScale.y = startScale.y + (toVal.y - startScale.y) * easedT;
+				Vector2 startScale = {currentScale.x() + fromVal.x(),
+									  currentScale.y() + fromVal.y()};
+				Vector2 finalScale{0,0};
+				finalScale.setX(startScale.x() + (toVal.x() - startScale.x()) * easedT);
+				finalScale.setY(startScale.y() + (toVal.y() - startScale.y()) * easedT);
 				transform->setScale(finalScale);
 			}
 			else
 			{
 				// Absolute: interpolate directly between fromValue and toValue
-				Vector2 finalScale;
-				finalScale.x = fromVal.x + (toVal.x - fromVal.x) * easedT;
-				finalScale.y = fromVal.y + (toVal.y - fromVal.y) * easedT;
+				Vector2 finalScale{0,0};
+				finalScale.setX(fromVal.x() + (toVal.x() - fromVal.x()) * easedT);
+				finalScale.setY(fromVal.y() + (toVal.y() - fromVal.y()) * easedT);
 				transform->setScale(finalScale);
 			}
 		}

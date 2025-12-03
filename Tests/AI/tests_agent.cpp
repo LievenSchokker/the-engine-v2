@@ -138,7 +138,7 @@ TEST_F(AgentTest, UpdateMovesTransformAsExpected)
     agent->addAgentModule<TestAgentModule>(1);
     Vector2 initPos = agent->getTransform()->getPosition();
 
-    agent->update();
+    agent->update(0.016f);
 
     Vector2 updatedPos = agent->getTransform()->getPosition();
     EXPECT_NE(initPos, updatedPos);
