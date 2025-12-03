@@ -11,7 +11,7 @@ BaseAgentModule *ModuleData::getModule() const
     return module.get();
 }
 
-ModuleStatus ModuleData::getModuleState() const
+ModuleStatus ModuleData::getModuleStatus() const
 {
     return moduleStatus;
 }

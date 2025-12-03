@@ -88,6 +88,12 @@ void Agent::setMaxVelocityMagnitude(float max)
     maxVelocityMagnitude = max;
 }
 
+size_t Agent::getModuleCount() const
+{
+    return moduleDatas.size();
+}
+
+
 
 
 

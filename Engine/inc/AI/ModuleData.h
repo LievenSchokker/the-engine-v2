@@ -20,7 +20,7 @@ struct ModuleData final
         ~ModuleData() =default;
 
         [[nodiscard]] BaseAgentModule* getModule() const;
-        [[nodiscard]] ModuleStatus getModuleState() const;
+        [[nodiscard]] ModuleStatus getModuleStatus() const;
         [[nodiscard]] float getWeight() const;
 
         void setWeight(float weight);

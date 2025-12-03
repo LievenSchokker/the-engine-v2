@@ -72,6 +72,21 @@ bool Agent::setModuleWeight(float desiredWeight) const
 }
 
 template<typename T>
+float Agent::getModuleWeight() const
+{
+    static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::getModuleWeight] T must derive from BaseAgentModule");
+
+    ModuleData* moduleData = nullptr;
+
+    if (tryGetAgentModule<T>(moduleData))
+    {
+        return moduleData->getWeight();
+    }
+
+    return 0;
+}
+
+template<typename T>
 bool Agent::setModuleStatus(ModuleStatus status) const
 {
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::setModuleStatus] T must derive from BaseAgentModule");
@@ -85,6 +100,21 @@ bool Agent::setModuleStatus(ModuleStatus status) const
     }
 
     return false;
+}
+
+
+template<typename T> ModuleStatus Agent::getModuleStatus() const
+{
+    static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::getModuleStatus] T must derive from BaseAgentModule");
+
+    ModuleData* moduleData = nullptr;
+
+    if (tryGetAgentModule<T>(moduleData))
+    {
+        return moduleData->getModuleStatus();
+    }
+
+    return ModuleStatus::INACTIVE;
 }
 
 
