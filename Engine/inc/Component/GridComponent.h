@@ -19,11 +19,12 @@ class TilemapComponent;
  * Needed because std::unordered_set doesn't know how to hash pairs by default.
  * This allows us to use cell coordinates as keys in the blockedCells set.
  */
-struct CellKeyHash {
+struct CellKeyHash
+{
 	size_t operator()(const std::pair<int, int>& key) const noexcept
 	{
 		return std::hash<int>()(key.first) ^
-			   (std::hash<int>()(key.second) << 1);
+		       (std::hash<int>()(key.second) << 1);
 	}
 };
 
@@ -40,7 +41,7 @@ struct CellKeyHash {
  */
 class GridComponent: public RenderComponent
 {
-   public:
+public:
 	GridComponent();
 	~GridComponent() override = default;
 
@@ -140,7 +141,7 @@ class GridComponent: public RenderComponent
 	 * @return Vector of walkable neighbor cells
 	 */
 	std::vector<Vector2> getNeighbors(Vector2 cell,
-									  bool includeDiagonals = false) const;
+	                                  bool includeDiagonals = false) const;
 
 	/**
 	 * @brief Calculate Manhattan distance between two cells (for pathfinding).
@@ -221,19 +222,23 @@ class GridComponent: public RenderComponent
 	 * @brief Check if the grid is ready for queries.
 	 */
 	bool isReady() const;
+	void setLayer(uint8_t l);
+	void setOrderInLayer(int8_t order);
 
-   private:
+private:
 	TilemapComponent* tilemapComponent = nullptr;
 	bool debugRenderEnabled = false;
-	Color debugWalkableDotColor = Color::green();  // Solid green for dots
-	Color debugBlockedDotColor = Color::red();	   // Solid red for blocked dots
+	Color debugWalkableDotColor = Color::green(); // Solid green for dots
+	Color debugBlockedDotColor = Color::red(); // Solid red for blocked dots
 	Color debugGridLineColor =
-		Color::darkGray();	// Dark gray for debug grid lines
+		Color::darkGray(); // Dark gray for debug grid lines
 	bool debugShowDiagonalLinks = false;
 	std::unordered_set<int> walkableTileIds{0};
 	std::unordered_set<std::pair<int, int>, CellKeyHash> blockedCells;
 	std::unordered_map<int, double>
-		tileWeights;  // Map tile ID to movement cost
+	tileWeights; // Map tile ID to movement cost
 
 	static std::pair<int, int> cellKey(Vector2 cell);
+	uint8_t layer = 0;
+	int8_t orderInLayer = 0;
 };

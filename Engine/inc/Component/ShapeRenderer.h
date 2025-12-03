@@ -19,6 +19,7 @@ class ShapeRenderer: public RenderComponent
 	ShapeRenderer& setColor(const Color& newColor);
 	ShapeRenderer& setCircle(float newRadius);
 	ShapeRenderer& setRectangle(Vector2 newSize);
+	ShapeRenderer& setLayer(uint8_t l) { layer = l; return *this; }
 
 	Color getColor() const;
 	float getRadius() const;
@@ -35,4 +36,6 @@ class ShapeRenderer: public RenderComponent
 	float radius = 25.0;
 	Vector2 size = {50.0, 50.0};
 	RenderCommandType type = RenderCommandType::None;
+	uint8_t layer = 0;
+	int8_t orderInLayer = 0;
 };

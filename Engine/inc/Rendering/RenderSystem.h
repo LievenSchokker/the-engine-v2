@@ -12,7 +12,7 @@ class RenderSystem
 {
 public:
 	//TODO create abstract backend
-	explicit RenderSystem(SdlContext& context);
+	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
 
 	void update(float deltaTime, Scene& scene);
 	void setClearColor(const Color& color);

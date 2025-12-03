@@ -74,6 +74,7 @@ void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 	command.rotationDegrees = rotation;
 	command.scale = scale;
 	command.color = color;
-
+	command.layer = layer;
+	command.orderInLayer = orderInLayer;
 	queue.push(command);
 }

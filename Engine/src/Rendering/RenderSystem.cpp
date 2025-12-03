@@ -4,8 +4,8 @@
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
 
-RenderSystem::RenderSystem(SdlContext& context)
-	: renderer(std::make_unique<SDLRenderer>(context))
+RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
+	: renderer(std::move(renderer))
 {
 }
 

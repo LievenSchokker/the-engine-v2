@@ -112,9 +112,13 @@ class TilemapComponent: public RenderComponent
 	 * @brief Check if the tilemap is loaded and ready.
 	 */
 	bool isReady() const;
+	void setLayer(uint8_t l);
+	void setOrderInLayer(int8_t order);
 
-   private:
+private:
 	TilemapAsset* tilemapAsset = nullptr;
 	Vector2 tileSize;
-	std::unordered_map<int, Color> tileColors;	// Map tile ID to color
+	std::unordered_map<int, Color> tileColors;
+	uint8_t layer = 0;
+	int8_t orderInLayer = 0;
 };
