@@ -1,29 +1,47 @@
 #include "Component/UIObject/UIObject.h"
 
-
-UIObject::UIObject(const int width, const int height)
-	: width(width), height(height)
-{
+UIObject::UIObject(float x, float y, float width, float height)
+	: x(x), y(y), width(width), height(height) {
 }
 
 UIObject::~UIObject() = default;
 
-int UIObject::getWidth() const
-{
+float UIObject::getX() const {
+	return x;
+}
+
+float UIObject::getY() const {
+	return y;
+}
+
+float UIObject::getWidth() const {
 	return width;
 }
 
-int UIObject::getHeight() const
-{
+float UIObject::getHeight() const {
 	return height;
 }
 
-void UIObject::setWidth(const int newWidth)
-{
+void UIObject::setX(float newX) {
+	x = newX;
+}
+
+void UIObject::setY(float newY) {
+	y = newY;
+}
+
+void UIObject::setWidth(float newWidth) {
 	width = newWidth;
 }
 
-void UIObject::setHeight(const int newHeight)
-{
+void UIObject::setHeight(float newHeight) {
 	height = newHeight;
+}
+
+bool UIObject::isVisible() const {
+	return visible;
+}
+
+void UIObject::setVisible(bool newVisible) {
+	visible = newVisible;
 }

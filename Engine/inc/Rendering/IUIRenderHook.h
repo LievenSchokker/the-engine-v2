@@ -7,6 +7,7 @@
 
 
 #pragma once
+#include "UIRenderCommand.h"
 
 struct UserInterfaceSettings;
 
@@ -39,6 +40,7 @@ public:
 	 */
 	virtual void beginFrame() = 0;
 
+	virtual void submit(UIRenderCommand command) = 0;
 	/**
 	 * @brief Submits UI draw commands to the renderer.
 	 *

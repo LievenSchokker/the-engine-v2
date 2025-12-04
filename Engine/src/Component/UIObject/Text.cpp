@@ -1,53 +1,55 @@
-#include "Component/UIObject/Text.h"
+#include <utility>
+
+#include "Component/UIObject/UITextObject.h"
 
 
-Text::Text(const int width, const int height, const std::string& text,
-		   const std::string& font, const int textSize,
+UITextObject::UITextObject(const int width, const int height, std::string  text,
+		   std::string  font, const int textSize,
 		   const Alignment alignment)
 	: UIObject(width, height),
-	  text(text),
-	  font(font),
+	  text(std::move(text)),
+	  font(std::move(font)),
 	  textSize(textSize),
 	  alignment(alignment)
 {
 }
 
-std::string Text::getText() const
+std::string UITextObject::getText() const
 {
 	return text;
 }
 
-std::string Text::getFont() const
+std::string UITextObject::getFont() const
 {
 	return font;
 }
 
-int Text::getTextSize() const
+int UITextObject::getTextSize() const
 {
 	return textSize;
 }
 
-Alignment Text::getAlignment() const
+Alignment UITextObject::getAlignment() const
 {
 	return alignment;
 }
 
-void Text::setText(const std::string& newText)
+void UITextObject::setText(const std::string& newText)
 {
 	text = newText;
 }
 
-void Text::setFont(const std::string& newFont)
+void UITextObject::setFont(const std::string& newFont)
 {
 	font = newFont;
 }
 
-void Text::setTextSize(const int newTextSize)
+void UITextObject::setTextSize(const int newTextSize)
 {
 	textSize = newTextSize;
 }
 
-void Text::setAlignment(const Alignment newAlignment)
+void UITextObject::setAlignment(const Alignment newAlignment)
 {
 	alignment = newAlignment;
 }
