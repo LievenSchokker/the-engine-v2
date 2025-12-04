@@ -1,4 +1,6 @@
 // Tests/Core/SpelMotorTest.cpp
+#include "Game.h"
+
 #include <gtest/gtest.h>
 #include <thread>
 #include <chrono>
@@ -11,6 +13,7 @@ class SpelMotorTest : public ::testing::Test
 {
 public:
     ApplicationSpecifications specifications{};
+	std::unique_ptr<Game> game = std::make_unique<Game>();
 protected:
     void SetUp() override
     {
@@ -18,8 +21,10 @@ protected:
         {
             FAIL() << "SDL_Init failed: " << SDL_GetError();
         }
+    	std::cerr << "SDL Error: " << SDL_GetError() << std::endl;
         specifications.windowOptions = {"Test Window", 800, 600};
         specifications.renderBackend = RenderBackend::SDL;
+    	game->setApplicationSpecifications(specifications);
     }
 
     void TearDown() override
@@ -46,8 +51,9 @@ protected:
 // Test 1: Cleanly destroying subsystems via SDL_QUIT event
 TEST_F(SpelMotorTest, CleanSubsystemShutdownViaQuitEvent)
 {
+
     //Arrange
-    auto* engine = new SpelMotor(specifications);
+    auto* engine = new SpelMotor(std::make_unique<Game>());
 
     std::thread quitThread([]()
     {

@@ -1,3 +1,4 @@
+#include "Game.h"
 #include "Core/SpelMotor.h"
 
 #include "Core/ApplicationClock.h"
@@ -13,15 +14,26 @@
 
 #include "Input/SDLInputAdapter.h"
 
-SpelMotor::SpelMotor(ApplicationSpecifications const& applicationSpecifications)
-	: running(false),
-	  specifications(applicationSpecifications),
-	  timer(nullptr),
-	  tickRate(applicationSpecifications.tickRate),
-	  physicsWorld(std::make_unique<Box2DPhysicsWorld>(
-		  applicationSpecifications.tickRate))
+SpelMotor::SpelMotor(std::unique_ptr<Game> gameArgument)
+	:
+	game{std::move(gameArgument)},
+	specifications(game->getApplicationSpecifications()),
+	running(false),
+	timer(nullptr),
+	tickRate(specifications.tickRate),
+	physicsWorld(std::make_unique<Box2DPhysicsWorld>(
+		specifications.tickRate)),
+	sceneManager(std::make_unique<SceneManager>())
 {
-	if (applicationSpecifications.renderBackend == RenderBackend::SDL)
+}
+
+
+SpelMotor::~SpelMotor() = default;
+
+void SpelMotor::start()
+{
+
+	if (specifications.renderBackend == RenderBackend::SDL)
 	{
 		SdlContext context = SdlContext();
 		timer.reset();
@@ -34,22 +46,15 @@ SpelMotor::SpelMotor(ApplicationSpecifications const& applicationSpecifications)
 		timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
 
 		renderer = std::make_unique<SDLRenderer>(context);
+
 	}
-}
-
-
-SpelMotor::~SpelMotor() = default;
-
-void SpelMotor::start()
-{
+	renderer->open(specifications.windowOptions);
 	timer->start();
 
 	// TODO Server or Client -> Start()
 	physicsWorld->start();
-	// TODO SceneManager -> Start()
 
-	renderer->open(specifications.windowOptions);
-
+	initFirstGameScene();
 	run();
 }
 
@@ -90,4 +95,18 @@ void SpelMotor::shutdown()
 	physicsWorld->shutdown();
 	// TODO scenemanager->shutdown()
 	// TODO server->shutdown() and client->shutdown()
+}
+
+void SpelMotor::initFirstGameScene() const
+{
+	std::unique_ptr<Scene> scene = game->getFirstScene();
+
+	if (scene == nullptr)
+	{
+		throw std::runtime_error("Game needs at least one scene to start!");
+	}
+
+	std::string sceneName = scene->getName();
+	sceneManager->addScene(std::move(scene));
+	sceneManager->setActiveScene(sceneName);
 }
