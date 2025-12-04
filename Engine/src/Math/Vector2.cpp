@@ -1,11 +1,13 @@
 //
 // Created by samle on 01/12/2025.
 //
-#pragma once
+
 
 #include "Math/Vector2.h"
+
 #include <cmath>
 #include <algorithm>
+
 
 constexpr float EPSILON = 1e-5f;
 
@@ -72,10 +74,10 @@ Vector2 Vector2::left()
 
 float Vector2::distance(const Vector2 &from, const Vector2 &to)
 {
-    float dx = to.x() - from.x();
-    float dy = to.y() - from.y();
+    float deltaX = to.x() - from.x();
+    float deltaY = to.y() - from.y();
 
-    return std::sqrt(dx*dx + dy*dy);
+    return std::sqrt(deltaX*deltaX + deltaY*deltaY);
 }
 
 
@@ -88,10 +90,21 @@ float Vector2::dot(const Vector2 &a, const Vector2 &b)
 
 float Vector2::angle(const Vector2 &from, const Vector2 &to)
 {
-    float dotProd = dot(from, to);
-    float magProd = from.magnitude() * to.magnitude();
+    float fromMagnitude = from.magnitude();
+    float toMagnitude = to.magnitude();
 
-    return std::acos(dotProd / magProd);
+    /// Prevents divide by 0 situations.
+    if (fromMagnitude <= 0.0f || toMagnitude <= 0.0f)
+        return 0.0f;
+
+    float dotProd = dot(from, to);
+
+    float x = dotProd / (fromMagnitude * toMagnitude);
+
+    /// Prevents domain error if x < -1 || > 1
+    x = std::max(-1.0f, std::min(1.0f, x));
+
+    return std::acos(x);
 }
 
 

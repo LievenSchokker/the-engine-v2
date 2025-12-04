@@ -6,7 +6,7 @@
 
 #include "External/SdlContext.h"
 #include "Math/Vector2Utils.h"
-#include "../../../inc/Rendering/Window/WindowOptions.h"
+#include "Rendering/Window/WindowOptions.h"
 
 #include <algorithm>
 #include <cassert>

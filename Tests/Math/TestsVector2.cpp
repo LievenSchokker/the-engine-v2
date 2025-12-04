@@ -5,7 +5,11 @@
 #include "gtest/gtest.h"
 #include "Math/Vector2.h"
 #include <cmath>
-#include <corecrt_math_defines.h>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 
 
 constexpr float EPSILON = 1e-5f;
