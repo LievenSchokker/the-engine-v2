@@ -19,3 +19,8 @@ void Game::addScene(std::unique_ptr<Scene> scene)
 	scenes.push_back(std::move(scene));
 }
 
+std::unique_ptr<Scene> Game::getFirstScene()
+{
+	if (scenes.empty()) return nullptr;
+	return std::move(scenes[0]);
+}

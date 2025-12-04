@@ -22,7 +22,8 @@ SpelMotor::SpelMotor(std::unique_ptr<Game> gameArgument)
 	timer(nullptr),
 	tickRate(specifications.tickRate),
 	physicsWorld(std::make_unique<Box2DPhysicsWorld>(
-		specifications.tickRate))
+		specifications.tickRate)),
+	sceneManager(std::make_unique<SceneManager>())
 {
 	if (specifications.renderBackend == RenderBackend::SDL)
 	{
@@ -49,10 +50,8 @@ void SpelMotor::start()
 
 	// TODO Server or Client -> Start()
 	physicsWorld->start();
-	// TODO SceneManager -> Start()
 
-	renderer->open(specifications.windowOptions);
-
+	initFirstGameScene();
 	run();
 }
 
@@ -93,4 +92,19 @@ void SpelMotor::shutdown()
 	physicsWorld->shutdown();
 	// TODO scenemanager->shutdown()
 	// TODO server->shutdown() and client->shutdown()
+}
+
+void SpelMotor::initFirstGameScene()
+{
+	std::unique_ptr<Scene> scene = game->getFirstScene();
+	
+	if (game == nullptr)
+	{
+		throw("Game Needs at least one scene to start!");
+	}
+
+	std::string sceneName = scene->getName();
+	sceneManager->addScene(std::move(scene));
+	sceneManager->setActiveScene(sceneName);
+
 }

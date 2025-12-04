@@ -3,6 +3,7 @@
 
 #include "ApplicationSpecifications.h"
 #include "Physics/IPhysicsWorld.h"
+#include "Scene/SceneManager.h"
 
 #include <functional>
 #include <memory>
@@ -48,6 +49,8 @@ public:
 	void shutdown();
 
 private:
+	void initFirstGameScene();
+
 	std::unique_ptr<Game> game;
 
 	/** @brief Immutable configuration set at construction.
@@ -78,5 +81,5 @@ private:
 	/** @brief the physics world where physics are simulated */
 	std::unique_ptr<IPhysicsWorld> physicsWorld;
 
-
+	std::unique_ptr<SceneManager> sceneManager;
 };

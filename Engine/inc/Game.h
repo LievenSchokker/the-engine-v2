@@ -9,7 +9,7 @@
  *
  * This class serves as the primary injection point where game developers
  * configure their application and register scenes.
- * 
+ *
  */
 class Game
 {
@@ -38,6 +38,8 @@ public:
      */
     void addScene(std::unique_ptr<Scene> scene);
 
+
+	std::unique_ptr<Scene> getFirstScene();
 private:
     ApplicationSpecifications specifications;
 
