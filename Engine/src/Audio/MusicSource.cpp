@@ -1,19 +1,24 @@
 #include "Audio/MusicSource.h"
+
 #include "Audio/AudioManager.h"
 
+MusicSource::MusicSource(AudioManager* audioManagerPtr)
+	: audioManager(audioManagerPtr)
+{
+}
 
 bool MusicSource::loadMusic(const std::string& path)
 {
-	if (!audioManager) return false;
+	if ( !audioManager ) return false;
 	handle = audioManager->loadMusic(path);
-	if (handle == -1) return false;
+	if ( handle == -1 ) return false;
 	musicAssetTag = path;
 	return true;
 }
 
 void MusicSource::play()
 {
-	if (!audioManager || handle == -1) return;
+	if ( !audioManager || handle == -1 ) return;
 	audioManager->setMusicSource(this);
 	audioManager->setMusicVolume(volume);
 	audioManager->playMusic(handle, loop ? -1 : 0);

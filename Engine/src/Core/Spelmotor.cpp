@@ -58,26 +58,21 @@ void SpelMotor::run()
 	InputManager* input = InputManager::getInstance();
 
 	// --- Create background music source ---
-	// auto music = std::make_unique<MusicSource>();
-	// music->audioManager = audioManager.get();
-	// music->setLoop(true);
-	// music->loadMusic(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
-	// music->play();
+	auto music = std::make_unique<MusicSource>(audioManager.get());
+	music->setLoop(true);
+	music->loadMusic(
+		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
+	music->play();
 
-	auto explosion = std::make_unique<SoundSource>();
-	explosion->audioManager = audioManager.get();
+	// Create explosion sound
+	auto explosion = std::make_unique<SoundSource>(audioManager.get());
+	explosion->loadSound(
+		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_voice.wav)");
 
-	// Load
-	explosion->loadSound(R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_voice.wav)");
-
-	// Play once
-	explosion->play();
-
-	// Loop sound 3 times
-	explosion->play(3);
-
-	// Stereo panning
-	// explosion->setPanning(1.0f, 0.0f);
+	// Create pigeons sound
+	auto pigeons = std::make_unique<SoundSource>(audioManager.get());
+	pigeons->loadSound(
+		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
 
 
 	while ( running )
@@ -94,6 +89,26 @@ void SpelMotor::run()
 			input->update();
 			physicsWorld->fixedUpdate();
 			timer->consumeFixedUpdate();
+		}
+
+		if ( input->isKeyDown(KeyCode::SPACE) )
+		{
+			explosion->play();
+			pigeons->play();
+		}
+
+		if ( input->isKeyDown(KeyCode::LEFT_ARROW) )
+		{
+			explosion->setPanning(1.0f, 0.0f);
+		}
+		if ( input->isKeyDown(KeyCode::DOWN_ARROW) )
+		{
+			explosion->setPanning(1.0f, 1.0f);
+		}
+
+		if ( input->isKeyDown(KeyCode::RIGHT_ARROW) )
+		{
+			explosion->setPanning(0.0f, 1.0f);
 		}
 
 		// TODO Network->Update()
