@@ -4,6 +4,7 @@ project(engineSandbox)
 add_executable(engineSandbox
         main.cpp
         SimpleMoveBehaviour.cpp
+        AgentsZandbak.cpp
 )
 
 target_link_libraries(

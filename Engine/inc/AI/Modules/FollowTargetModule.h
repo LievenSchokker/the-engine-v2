@@ -9,7 +9,7 @@ class FollowTargetModule final : public BaseAgentModule
 {
     public:
         explicit FollowTargetModule(const Agent& agent) : BaseAgentModule(agent){}
-        explicit FollowTargetModule(const Agent& agent, const Transform& target) : BaseAgentModule(agent){}
+        explicit FollowTargetModule(const Agent& agent, const Transform& target) : BaseAgentModule(agent), followTarget(&target){}
         ~FollowTargetModule() override = default;
 
         Vector2 compute() override;

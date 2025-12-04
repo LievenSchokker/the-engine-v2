@@ -47,7 +47,7 @@ class Agent final : public Behaviour
         template<typename T>
         [[nodiscard]] ModuleStatus getModuleStatus() const;
 
-        template<typename t>
+        template<typename T>
         [[nodiscard]] bool hasAgentModule() const;
 
         [[nodiscard]] float getMaxModuleForceMagnitude() const;

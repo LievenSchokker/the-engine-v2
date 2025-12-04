@@ -7,6 +7,9 @@
 
 #include <iostream>
 
+#include "AgentsZandbak.h"
+#include "IZandbak.h"
+
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's
 #undef main
@@ -22,10 +25,13 @@ int main(int argc, char** argv)
 	spec.renderBackend = RenderBackend::SDL;
 	spec.windowOptions = {"GameEngine", 700, 700};
 	std::unique_ptr<Game> spel = std::make_unique<Game>();
-	std::unique_ptr<Scene> scene = std::make_unique<Scene>("SpelScene");
 
+    /// Note: Change the unique_ptr to create the sandbox you want
+    std::unique_ptr<IZandbak> zandbak = std::make_unique<AgentsZandbak>();
+
+	std::unique_ptr<Scene> scene = zandbak->getScene();
 	spel->addScene(std::move(scene));
  	spel->setApplicationSpecifications(spec);
-    return SpelMotorEntry::main(std::move(spel));
 
+    return SpelMotorEntry::main(std::move(spel));
 }
