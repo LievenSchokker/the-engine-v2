@@ -57,7 +57,7 @@ void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
     def.type = rigidBody->isDynamic ? b2_dynamicBody : b2_staticBody;
 
     Vector2 pos = transform->getPosition();
-    def.position = {pos.x, pos.y};
+    def.position = {pos.x(), pos.y()};
 
     b2BodyId body = b2CreateBody(worldId, &def);
 
@@ -74,8 +74,8 @@ void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
         b2CreateCircleShape(body, &shapeDef, &circle);
     } else if (collider->shape == PhysicsShapeType::Rectangle) {
         b2Polygon poly = b2MakeBox(
-            collider->size.x * 0.5f,
-            collider->size.y * 0.5f
+            collider->size.x() * 0.5f,
+            collider->size.y() * 0.5f
             );
         b2CreatePolygonShape(body, &shapeDef, &poly);
     }
@@ -103,7 +103,7 @@ void Box2DPhysicsWorld::applyForce(const RigidBody* rigidBody, Vector2 force)
     auto it = bodies.find(rigidBody);
     if (it == bodies.end()) return;
 
-    b2Vec2 b2Force = {force.x, force.y};
+    b2Vec2 b2Force = {force.x(), force.y()};
     b2Body_ApplyForceToCenter(it->second, b2Force, true);
 }
 
@@ -117,7 +117,7 @@ void Box2DPhysicsWorld::syncTransforms()
         b2Vec2 pos = b2Body_GetPosition(box2DID);
         b2Rot rot = b2Body_GetRotation(box2DID);
 
-        gameObject->getTransform()->setPosition({pos.x, pos.y});
+        gameObject->getTransform()->setPosition(Vector2(pos.x, pos.y));
         gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rot));
     }
 }

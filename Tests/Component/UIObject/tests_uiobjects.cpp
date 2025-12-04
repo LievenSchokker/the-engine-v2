@@ -1,5 +1,5 @@
 #include "Component/UIObject/Button.h"
-#include "Component/UIObject/Text.h"
+#include "Component/UIObject/UITextObject.h"
 #include "Component/UIObject/UIObject.h"
 
 #include <gtest/gtest.h>
@@ -16,7 +16,7 @@ TEST(UIObjectTests, DefaultUIObject)
 
 TEST(UIObjectTests, CustomUIObject)
 {
-	UIObject uiObject(10, 20);
+	UIObject uiObject(10, 20, 10, 20);
 
 	EXPECT_EQ(uiObject.getWidth(), 10);
 	EXPECT_EQ(uiObject.getHeight(), 20);
@@ -67,19 +67,19 @@ TEST(ButtonTests, SetInteractable)
 
 TEST(TextTests, DefaultTextObject)
 {
-	Text text;
+	UITextObject text;
 
 	EXPECT_EQ(text.getWidth(), 0);
 	EXPECT_EQ(text.getHeight(), 0);
 	EXPECT_EQ(text.getText(), "");
-	EXPECT_EQ(text.getFont(), "Arial");
+	EXPECT_EQ(text.getFont(), "default");
 	EXPECT_EQ(text.getTextSize(), 12);
 	EXPECT_EQ(text.getAlignment(), Alignment::Left);
 }
 
 TEST(TextTests, CustomTextObject)
 {
-	Text text(10, 10, "Hello World", "Arial2", 10, Alignment::Right);
+	UITextObject text(10, 10, "Hello World", "Arial2", 10, Alignment::Right);
 
 	EXPECT_EQ(text.getText(), "Hello World");
 	EXPECT_EQ(text.getFont(), "Arial2");
@@ -89,7 +89,7 @@ TEST(TextTests, CustomTextObject)
 
 TEST(TextTests, SetText)
 {
-	Text text(10, 10, "Hello World");
+	UITextObject text(10, 10, "Hello World");
 
 	text.setText("Goodbye World");
 
@@ -98,7 +98,7 @@ TEST(TextTests, SetText)
 
 TEST(TextTests, SetFont)
 {
-	Text text(10, 10, "Hello World", "NotArial");
+	UITextObject text(10, 10, "Hello World", "NotArial");
 
 	text.setFont("Arial");
 
@@ -107,7 +107,7 @@ TEST(TextTests, SetFont)
 
 TEST(TextTests, SetTextSize)
 {
-	Text text(10, 10, "Hello World", "Arial", 10, Alignment::Right);
+	UITextObject text(10, 10, "Hello World", "Arial", 10, Alignment::Right);
 
 	text.setTextSize(20);
 
@@ -116,10 +116,10 @@ TEST(TextTests, SetTextSize)
 
 TEST(TextTests, SetAlignment)
 {
-	Text text(10, 10, "Hello World", "Arial", 10, Alignment::Left);
+	UITextObject text(10, 10, "Hello World", "Arial", 10, Alignment::Left);
 
 	text.setAlignment(Alignment::Left);
 
 	EXPECT_EQ(text.getAlignment(), Alignment::Left);
 }
-}  // namespace engine_tests
+}

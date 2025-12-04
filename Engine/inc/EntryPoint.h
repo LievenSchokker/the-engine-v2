@@ -1,8 +1,10 @@
 #pragma once
 
 
+#include "Game.h"
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
+#include "Networking/Client.h"
 
 /// This has been added because sometimes SDL causes main to be redefined.
 /// Which then causes linking error's
@@ -11,14 +13,9 @@
 namespace SpelMotorEntry
 {
 
-	inline int main(int argc, char** argv)
+	inline int main(std::unique_ptr<Game> game)
 	{
-		ApplicationSpecifications specifications{};
-
-		specifications.windowOptions = {"SpelMotor", 700, 700};
-		specifications.renderBackend = RenderBackend::SDL;
-		specifications.tickRate = 60;
-		SpelMotor engine(specifications);
+		SpelMotor engine(std::move(game));
 		engine.start();
 		return 0;
 	}

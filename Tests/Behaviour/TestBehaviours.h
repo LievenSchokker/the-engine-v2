@@ -16,7 +16,7 @@ namespace engine_tests
             void onAwake() override;
             void onEnable() override;
             void onStart() override;
-            void update() override;
+            void update(float deltaTime) override;
             void onDisable() override;
             void onDestroy() override;
 

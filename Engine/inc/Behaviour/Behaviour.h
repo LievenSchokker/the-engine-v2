@@ -65,8 +65,10 @@ class Behaviour : public Component
         /**
          * Update is called every frame when:
          * - @c isActiveAndEnabled == true, meaning the GameObject is active, and the Behaviour is enabled
+         *
+         * @param deltaTime Time elapsed since last update in seconds
          */
-        virtual void update() {};
+        virtual void update(float deltaTime) {};
 
         /**
          * @brief fixedUpdate is called at regular and fixed intervals as part of the engine's physics loop.

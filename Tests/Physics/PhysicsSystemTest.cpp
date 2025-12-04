@@ -29,12 +29,12 @@ TEST(Box2DPhysicsWorldTest, PhysicsSimulationUpdatesTransform)
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_NE(initialPos.y, newPos.y);
+    EXPECT_NE(initialPos.y(), newPos.y());
 }
 
 
@@ -49,7 +49,7 @@ TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>();
 
     world.createBody(obj.getComponent<RigidBody>());
@@ -64,7 +64,7 @@ TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
     Vector2 newPos = obj.getTransform()->getPosition();
 
     // Box2D default gravity pushes DOWN in +Y direction
-    EXPECT_GT(newPos.y, initialPos.y);
+    EXPECT_GT(newPos.y(), initialPos.y());
 }
 
 
@@ -78,7 +78,7 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     auto rb = obj.addComponent<RigidBody>();
     rb->makeStatic();
 
@@ -86,12 +86,12 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_EQ(initialPos.y, newPos.y);
+    EXPECT_EQ(initialPos.y(), newPos.y());
 }
 
 
@@ -105,19 +105,19 @@ TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>();
 
     world.createBody(obj.getComponent<RigidBody>());
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    world.applyForce(obj.getComponent<RigidBody>(), {50, 0});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
     world.fixedUpdate();
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_GT(newPos.x, initialPos.x); // Object moved horizontally
+    EXPECT_GT(newPos.x(), initialPos.x()); // Object moved horizontally
 }
 
 
@@ -131,7 +131,7 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
 
     GameObject floor;
     floor.addComponent<Transform>();
-    floor.addComponent<Collider>()->setRectangle({200, 20});
+    floor.addComponent<Collider>()->setRectangle(Vector2(200, 20));
     floor.addComponent<RigidBody>()->makeStatic();
 
     GameObject ball;
@@ -148,7 +148,7 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
     }
 
     Vector2 ballPos = ball.getTransform()->getPosition();
-    EXPECT_LE(ballPos.y, 100 - 10); // Ball rests on floor (radius 10)
+    EXPECT_LE(ballPos.y(), 100 - 10); // Ball rests on floor (radius 10)
 }
 
 
@@ -162,20 +162,20 @@ TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>();
 
     world.createBody(obj.getComponent<RigidBody>());
 
-    world.applyForce(obj.getComponent<RigidBody>(), {50, 0});
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
 
     world.fixedUpdate();
     world.syncTransforms();
 
     Vector2 pos = obj.getTransform()->getPosition();
-    EXPECT_GT(pos.x, 0);
-    EXPECT_GT(pos.y, 0);
+    EXPECT_GT(pos.x(), 0);
+    EXPECT_GT(pos.y(), 0);
 }
 
 
@@ -189,7 +189,7 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>()->makeStatic();
 
     world.createBody(obj.getComponent<RigidBody>());
@@ -200,12 +200,12 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
     world.destroyBody(obj.getComponent<RigidBody>());
 
     // Apply a force and update world
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_EQ(newPos.y, initialPos.y); // Object no longer simulated
+    EXPECT_EQ(newPos.y(), initialPos.y()); // Object no longer simulated
 }
 
 
@@ -231,12 +231,12 @@ TEST(Box2DPhysicsWorldTest, DestroyDynamicObject)
 
     // Apply a force and simulate multiple frames
     for (int i = 0; i < 10; ++i) {
-        world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+        world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
         world.fixedUpdate();
         world.syncTransforms();
     }
 
 	Vector2 newPos = obj.getTransform()->getPosition();
-	EXPECT_EQ(newPos.x, initialPos.x);
-	EXPECT_EQ(newPos.y, initialPos.y); // No movement after destruction
+	EXPECT_EQ(newPos.x(), initialPos.x());
+	EXPECT_EQ(newPos.y(), initialPos.y()); // No movement after destruction
 }
