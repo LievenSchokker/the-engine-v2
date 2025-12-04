@@ -15,7 +15,7 @@
 class SimpleMoveBehaviour : public Behaviour
 {
     public:
-        SimpleMoveBehaviour();
+        SimpleMoveBehaviour() : inputManager(nullptr), currentDirection(Vector2::zero()){}
         ~SimpleMoveBehaviour() override = default;
 
         void onAwake() override;
