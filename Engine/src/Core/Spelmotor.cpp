@@ -25,6 +25,14 @@ SpelMotor::SpelMotor(std::unique_ptr<Game> gameArgument)
 		specifications.tickRate)),
 	sceneManager(std::make_unique<SceneManager>())
 {
+}
+
+
+SpelMotor::~SpelMotor() = default;
+
+void SpelMotor::start()
+{
+
 	if (specifications.renderBackend == RenderBackend::SDL)
 	{
 		SdlContext context = SdlContext();
@@ -38,14 +46,9 @@ SpelMotor::SpelMotor(std::unique_ptr<Game> gameArgument)
 		timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
 
 		renderer = std::make_unique<SDLRenderer>(context);
+
 	}
-}
-
-
-SpelMotor::~SpelMotor() = default;
-
-void SpelMotor::start()
-{
+	renderer->open(specifications.windowOptions);
 	timer->start();
 
 	// TODO Server or Client -> Start()
@@ -106,5 +109,4 @@ void SpelMotor::initFirstGameScene() const
 	std::string sceneName = scene->getName();
 	sceneManager->addScene(std::move(scene));
 	sceneManager->setActiveScene(sceneName);
-
 }

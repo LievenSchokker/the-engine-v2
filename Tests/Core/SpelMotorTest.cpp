@@ -21,6 +21,7 @@ protected:
         {
             FAIL() << "SDL_Init failed: " << SDL_GetError();
         }
+    	std::cerr << "SDL Error: " << SDL_GetError() << std::endl;
         specifications.windowOptions = {"Test Window", 800, 600};
         specifications.renderBackend = RenderBackend::SDL;
     	game->setApplicationSpecifications(specifications);
