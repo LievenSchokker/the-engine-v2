@@ -4,9 +4,13 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
 
+/// This has been added because sometimes SDL causes main to be redefined.
+/// Which then causes linking error's
+#undef main
 
 namespace SpelMotorEntry
 {
+
 	inline int main(int argc, char** argv)
 	{
 		ApplicationSpecifications specifications{};
@@ -15,7 +19,7 @@ namespace SpelMotorEntry
 		specifications.renderBackend = RenderBackend::SDL;
 		specifications.tickRate = 60;
 		SpelMotor engine(specifications);
-		engine.run();
+		engine.start();
 		return 0;
 	}
 }

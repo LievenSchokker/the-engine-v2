@@ -104,7 +104,7 @@ public:
     * @tparam Pointer to the component to check
     * @return true if @c components contains the component, false otherwise
     */
-    bool hasComponent(Component* comp) const;
+    bool hasComponent(const Component* comp) const;
 
 
     /**
@@ -114,14 +114,20 @@ public:
     const std::vector<Behaviour*>& getAllBehaviours() const;
 
     /**
+     * Gets all the behaviours that are currently enabled.
+     * @return a const vector of pointers to the enabled behaviours on this gameobject.
+     */
+    const std::vector<Behaviour*>& getEnabledBehaviours();
+
+    /**
    * @brief Activates all @c Behaviour in @c components.
    */
-    void enableAllBehaviours();
+    void enableAllBehaviours() const;
 
     /**
     * @brief Deactivates all @c Behaviour in @c components.
     */
-    void disableAllBehaviours();
+    void disableAllBehaviours() const;
 
     /**
     * @brief Returns the total number of components stored inside @c components
@@ -143,8 +149,11 @@ private:
         /// All components stored by this object
     std::vector<std::unique_ptr<Component>> components;
 
-        /// All behaviours of this object
+        /// All behaviours of this gameobject
     std::vector<Behaviour*> behaviours;
+
+        /// All enabled behaviours of this gameobject.
+    std::vector<Behaviour*> enabledBehaviours;
 };
 
 /// Template implementations:

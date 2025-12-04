@@ -11,7 +11,7 @@
 class Transform : public Component
 {
 public:
-    Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0, Vector2 scale = {0.0, 0.0});
+    Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0, Vector2 scale = {1.0, 1.0});
     ~Transform();
 
     /**

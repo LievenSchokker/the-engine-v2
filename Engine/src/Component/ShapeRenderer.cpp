@@ -7,7 +7,7 @@
 
 namespace
 {
-constexpr double kEpsilon = 1e-6;
+constexpr float kEpsilon = 1e-6;
 }
 
 ShapeRenderer& ShapeRenderer::setColor(const Color& newColor)
@@ -16,7 +16,7 @@ ShapeRenderer& ShapeRenderer::setColor(const Color& newColor)
 	return *this;
 }
 
-ShapeRenderer& ShapeRenderer::setCircle(double newRadius)
+ShapeRenderer& ShapeRenderer::setCircle(float newRadius)
 {
 	type = ShapeRenderType::Circle;
 	radius = std::max(newRadius, kEpsilon);
@@ -26,8 +26,9 @@ ShapeRenderer& ShapeRenderer::setCircle(double newRadius)
 ShapeRenderer& ShapeRenderer::setRectangle(Vector2 newSize)
 {
 	type = ShapeRenderType::Rectangle;
-	size.setX(std::max(newSize.x(), float(kEpsilon)));
-	size.setY(std::max(newSize.y(), float(kEpsilon)));
+    constexpr float kEpsilon = 0.0001f;
+	size.setX(std::max(newSize.x(), kEpsilon));
+	size.setY(std::max(newSize.y(), kEpsilon));
 	return *this;
 }
 
@@ -36,7 +37,7 @@ Color ShapeRenderer::getColor() const
 	return color;
 }
 
-double ShapeRenderer::getRadius() const
+float ShapeRenderer::getRadius() const
 {
 	return radius;
 }

@@ -33,6 +33,11 @@ void Behaviour::setEnabled(const bool value)
     if (isEnabled == value)
         return;
 
+    /// This might prevent crashes when attempting to enable a behaviour right after it has been deleted
+    if (value == true)
+        if (gameObject == nullptr || gameObject->getIsDestroyed())
+            return;
+
     isEnabled = value;
 
     if (isEnabled)
