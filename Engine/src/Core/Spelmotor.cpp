@@ -97,10 +97,10 @@ void SpelMotor::shutdown()
 void SpelMotor::initFirstGameScene()
 {
 	std::unique_ptr<Scene> scene = game->getFirstScene();
-	
-	if (game == nullptr)
+
+	if (scene == nullptr)
 	{
-		throw("Game Needs at least one scene to start!");
+		throw std::runtime_error("Game needs at least one scene to start!");
 	}
 
 	std::string sceneName = scene->getName();
