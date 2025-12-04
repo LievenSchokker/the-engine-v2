@@ -13,5 +13,15 @@
 
 int main(int argc, char** argv)
 {
-    return SpelMotorEntry::main(argc, argv);
+	ApplicationSpecifications spec = {};
+	spec.tickRate = 60;
+	spec.renderBackend = RenderBackend::SDL;
+	spec.windowOptions = {"GameEngine", 700, 700};
+	std::unique_ptr<Game> spel = std::make_unique<Game>();
+	std::unique_ptr<Scene> scene = std::make_unique<Scene>("SpelScene");
+
+	spel->addScene(std::move(scene));
+ 	spel->setApplicationSpecifications(spec);
+    return SpelMotorEntry::main(std::move(spel));
+
 }
