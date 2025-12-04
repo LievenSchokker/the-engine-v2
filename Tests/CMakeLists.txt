@@ -9,6 +9,8 @@ add_executable(engine_tests
         Asset/AssetManagerTest.cpp
         Scene/SceneManagerTest.cpp
         Core/SpelMotorTest.cpp
+        Core/ServerLoopTest.cpp
+        Core/ClientLoopTest.cpp
         Core/TimerTest.cpp
         Component/tests_TestComponents.cpp
         Component/TestComponentBase.cpp

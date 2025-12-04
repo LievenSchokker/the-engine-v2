@@ -4,6 +4,8 @@
 #include "Rendering/RenderQueue.h"
 #include "Scene.h"
 
+class GameWorld;
+
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -142,7 +144,9 @@ class SceneManager
 	 */
 	Color getClearColor() const;
 
+    void setWorld(const GameWorld& world);
    private:
+    const GameWorld* gameWorld = nullptr;
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;

@@ -4,6 +4,7 @@
 #include "Game.h"
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
+#include "Networking/Client.h"
 
 /// This has been added because sometimes SDL causes main to be redefined.
 /// Which then causes linking error's

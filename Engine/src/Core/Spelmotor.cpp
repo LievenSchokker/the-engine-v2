@@ -1,60 +1,49 @@
 #include "Game.h"
 #include "Core/SpelMotor.h"
-
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
-#include "Physics/Box2D/Box2DPhysicsWorld.h"
-#include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Networking/Server/Server.h"
+#include "Networking/Client.h"
+#include "Networking/TransportGNS.h"
 
 #include <iostream>
-#include <ostream>
+#include <chrono>
 
-#include "Input/SDLInputAdapter.h"
+#include "Core/IEngineLoop.h"
+#include "Core/EngineLoopFactory.h"
+#include "Scene/SceneManager.h"
 
-SpelMotor::SpelMotor(std::unique_ptr<Game> gameArgument)
+SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 	:
-	game{std::move(gameArgument)},
-	specifications(game->getApplicationSpecifications()),
 	running(false),
-	timer(nullptr),
-	tickRate(specifications.tickRate),
-	physicsWorld(std::make_unique<Box2DPhysicsWorld>(
-		specifications.tickRate)),
-	sceneManager(std::make_unique<SceneManager>())
+	specifications(game->getApplicationSpecifications()),
+	coreSystemLoop(
+		EngineLoopFactory::createEngineLoop(std::move(game))),
+	coreClock(std::make_unique<ApplicationClock>(coreSystemLoop->getClock(),
+	                                             specifications.
+	                                             networkingOptions.tickRate,
+	                                             specifications.
+	                                             maxFrameTime))
 {
+	if (coreSystemLoop == nullptr)
+	{
+		throw std::runtime_error(
+			"Core System Loop is null double check your applicationSpecifications.");
+	}
 }
 
-
-SpelMotor::~SpelMotor() = default;
+SpelMotor::~SpelMotor()
+{
+	shutdown();
+}
 
 void SpelMotor::start()
 {
-
-	if (specifications.renderBackend == RenderBackend::SDL)
-	{
-		SdlContext context = SdlContext();
-		timer.reset();
-
-		// TODO SDL Injection layer
-		clockFunction = []()
-		{
-			return SDL_GetTicks() / 1000.0;
-		};
-		timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
-
-		renderer = std::make_unique<SDLRenderer>(context);
-
-	}
-	renderer->open(specifications.windowOptions);
-	timer->start();
-
-	// TODO Server or Client -> Start()
-	physicsWorld->start();
-
-	initFirstGameScene();
+	coreClock->start();
+	coreSystemLoop->start();
 	run();
 }
 
@@ -62,51 +51,21 @@ void SpelMotor::run()
 {
 	running = true;
 
-	InputManager* input = InputManager::getInstance();
-
 	while (running)
 	{
-		timer->tick();
+		coreClock->tick();
 
-		if (input->quitRequested())
+		while (coreClock->shouldFixedUpdate())
 		{
-			running = false;
+			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
+			coreClock->consumeFixedUpdate();
 		}
 
-		while (timer->shouldFixedUpdate())
-		{
-			input->update();
-			physicsWorld->fixedUpdate();
-			timer->consumeFixedUpdate();
-		}
-
-		// TODO Network->Update()
-		// TODO Audio->Update();
-		renderer->presentFrame();
+		coreSystemLoop->update(coreClock->getDeltaTime());
 	}
 }
 
-void SpelMotor::shutdown()
+void SpelMotor::shutdown() const
 {
-	running = false;
-	// TODO audioSystem->shutdown()
-	InputManager::shutdown();
-	renderer->close();
-	physicsWorld->shutdown();
-	// TODO scenemanager->shutdown()
-	// TODO server->shutdown() and client->shutdown()
-}
-
-void SpelMotor::initFirstGameScene() const
-{
-	std::unique_ptr<Scene> scene = game->getFirstScene();
-
-	if (scene == nullptr)
-	{
-		throw std::runtime_error("Game needs at least one scene to start!");
-	}
-
-	std::string sceneName = scene->getName();
-	sceneManager->addScene(std::move(scene));
-	sceneManager->setActiveScene(sceneName);
+	coreSystemLoop->shutdown();
 }

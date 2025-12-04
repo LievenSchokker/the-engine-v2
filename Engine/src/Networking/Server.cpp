@@ -15,6 +15,8 @@
 
 #include <iostream>
 
+#include "Core/ApplicationSpecifications.h"
+
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
@@ -220,4 +222,12 @@ void Server::kickClient(const int clientId)
         transport->disconnectFromSocket(clientId);
         connectedClients.erase(clientId);
     }
+}
+
+ServerConnectionInformation Server::convertApplicationSettings(const ApplicationSpecifications& specifications)
+{
+    ServerConnectionInformation server;
+    server.ip = specifications.networkingOptions.serverIP;
+    server.port = specifications.networkingOptions.port;
+    return server;
 }
