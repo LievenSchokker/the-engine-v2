@@ -205,7 +205,7 @@ void Scene::update(double deltaTime)
             /// Only update
             if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
                 continue;
-            behaviour->update();
+            behaviour->update(deltaTime);
         }
     }
 

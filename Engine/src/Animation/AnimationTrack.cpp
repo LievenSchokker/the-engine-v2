@@ -89,8 +89,8 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 				// When relative: start from (current + fromValue), end at
 				// toValue (absolute)
 				Vector2 currentPos = transform->getPosition();
-				Vector2 startPos(currentPos.x() + fromVal.x(),
-								 currentPos.y() + fromVal.y());
+				Vector2 startPos(currentPos.x + fromVal.x,
+								 currentPos.y + fromVal.y);
 				Vector2 finalPos = Vector2::lerp(startPos, toVal, easedT);
 				transform->setPosition(finalPos);
 			}
@@ -140,8 +140,8 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 				// When relative: start from (current + fromValue), end at
 				// toValue (absolute)
 				Vector2 currentScale = transform->getScale();
-				Vector2 startScale(currentScale.x() + fromVal.x(),
-								   currentScale.y() + fromVal.y());
+				Vector2 startScale(currentScale.x + fromVal.x,
+								   currentScale.y + fromVal.y);
 				Vector2 finalScale = Vector2::lerp(startScale, toVal, easedT);
 				transform->setScale(finalScale);
 			}

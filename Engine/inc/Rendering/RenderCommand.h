@@ -4,6 +4,7 @@
 #include "Color.h"
 #include "RenderCommandType.h"
 #include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 
 /**
@@ -12,8 +13,9 @@
 struct RenderCommand {
 	RenderCommandType type = RenderCommandType::None;
 
-	Vector2 position{};
-	Vector2 size{};
+
+	Vector2 position{0.0, 0.0};
+	Vector2 size{0.0, 0.0};
 	double radius = 0.0;
 	double rotationDegrees = 0.0;
 	Vector2 scale{1.0, 1.0};

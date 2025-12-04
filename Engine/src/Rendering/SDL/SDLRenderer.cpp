@@ -176,8 +176,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 	}
 
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
-	const double scaledRadiusX = std::abs(radius * finalScale.x());
-	const double scaledRadiusY = std::abs(radius * finalScale.y());
+	const double scaledRadiusX = std::abs(radius * finalScale.x);
+	const double scaledRadiusY = std::abs(radius * finalScale.y);
 
 	if (scaledRadiusX <= 0.0 || scaledRadiusY <= 0.0) {
 		return;
@@ -185,8 +185,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-	const int centerX = static_cast<int>(std::round(center.x()));
-	const int centerY = static_cast<int>(std::round(center.y()));
+	const int centerX = static_cast<int>(std::round(center.x));
+	const int centerY = static_cast<int>(std::round(center.y));
 	const int rx = std::max(1, static_cast<int>(std::round(scaledRadiusX)));
 	const int ry = std::max(1, static_cast<int>(std::round(scaledRadiusY)));
 
@@ -212,8 +212,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 	}
 
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
-	const double width = std::abs(size.x() * finalScale.x());
-	const double height = std::abs(size.y() * finalScale.y());
+	const double width = std::abs(size.x * finalScale.x);
+	const double height = std::abs(size.y * finalScale.y);
 
 	if (width <= 0.0 || height <= 0.0) {
 		return;
@@ -228,8 +228,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 
 	const double halfWidth = width * 0.5;
 	const double halfHeight = height * 0.5;
-	SDL_FRect rect{static_cast<float>(center.x() - halfWidth),
-				   static_cast<float>(center.y() - halfHeight),
+	SDL_FRect rect{static_cast<float>(center.x - halfWidth),
+				   static_cast<float>(center.y - halfHeight),
 				   static_cast<float>(width), static_cast<float>(height)};
 
 	if (std::abs(rotationDegrees) < kRotationThresholdDegrees) {

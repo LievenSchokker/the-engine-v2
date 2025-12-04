@@ -316,7 +316,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			}
 
 			// Calculate tile center position
-			Vector2 tileCenter{};
+			Vector2 tileCenter{0.0, 0.0};
 			tileCenter.x = origin.x + (static_cast<float>(x) * tileSize.x) +
 			               (tileSize.x / 2.0f);
 			tileCenter.y = origin.y + (static_cast<float>(y) * tileSize.y) +
@@ -347,14 +347,14 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			}
 
 			// Find the world center of the neighbor
-			Vector2 neighborCenter{};
+			Vector2 neighborCenter{0.0, 0.0};
 			neighborCenter.x =
 				origin.x + (neighborCell.x * tileSize.x) + (tileSize.x / 2.0f);
 			neighborCenter.y =
 				origin.y + (neighborCell.y * tileSize.y) + (tileSize.y / 2.0f);
 
 			// Calculate line properties
-			Vector2 lineVector{};
+			Vector2 lineVector{0.0, 0.0};
 			lineVector.x = neighborCenter.x - center.x;
 			lineVector.y = neighborCenter.y - center.y;
 
@@ -365,7 +365,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 				std::atan2(lineVector.y, lineVector.x) * 180.0 / M_PI;
 
 			// Calculate line center position
-			Vector2 lineCenter{};
+			Vector2 lineCenter{0.0, 0.0};
 			lineCenter.x = center.x + (lineVector.x / 2.0f);
 			lineCenter.y = center.y + (lineVector.y / 2.0f);
 
@@ -410,7 +410,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			continue;
 		}
 
-		Vector2 tileCenter{};
+		Vector2 tileCenter{0.0, 0.0};
 		tileCenter.x = origin.x + (cell.x * tileSize.x) + (tileSize.x / 2.0f);
 		tileCenter.y = origin.y + (cell.y * tileSize.y) + (tileSize.y / 2.0f);
 

@@ -5,7 +5,7 @@
  */
 struct Vector2
 {
-    Vector2(const float x_, const float y_) : _x(x_), _y(y_) {}
+    Vector2(const float x_, const float y_) : x(x_), y(y_) {}
 
     /// Shorthand for writing Vector2{1.0, 1.0}
     static Vector2 one();
@@ -37,12 +37,6 @@ struct Vector2
 
     /// Linearly interpolates between @c from and @c to by @c t (t will be normalised between 0 and 1).
     static Vector2 lerp(const Vector2& from, const Vector2& to, float t);
-
-    /// Gets the value of the x component of this vector
-    [[nodiscard]] float x() const;
-
-    /// Gets the value of the y component of this vector
-    [[nodiscard]] float y() const;
 
     /// Sets the value of this vector's x component
     void setX(float value);
@@ -101,7 +95,6 @@ struct Vector2
     /// Returns whether this and the other vector are not equal
     bool operator!=(const Vector2& other) const;
 
-    private:
-        float _x = 0;
-        float _y = 0;
+    float x = 0;
+    float y = 0;
 };

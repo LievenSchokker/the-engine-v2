@@ -9,7 +9,7 @@
 #include "Networking/TransportGNS.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Rendering/IRenderer.h"
-#include "Rendering/RenderQueue.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
@@ -56,8 +56,6 @@ void ClientLoop::update(double deltaTime)
 {
 	inputManager->update();
 	RenderQueue renderQueue;
-	sceneManager->buildRenderQueue(renderQueue);
-	renderer->presentFrame();
 	client->poll();
 }
 

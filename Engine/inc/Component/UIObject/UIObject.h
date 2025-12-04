@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Component/Component.h"
+#include "Component/BaseComponentTypes/Component.h"
 
 class UIObject: public Component
 {
