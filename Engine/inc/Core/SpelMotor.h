@@ -1,15 +1,13 @@
 #pragma once
 
 
-#include <memory>
-
-
 #include "ApplicationSpecifications.h"
 #include "Physics/IPhysicsWorld.h"
 
 #include <functional>
+#include <memory>
 
-
+class Game;
 class ApplicationClock;
 class IRenderer;
 
@@ -26,7 +24,7 @@ class IRenderer;
 class SpelMotor
 {
 public:
-	SpelMotor(const ApplicationSpecifications& applicationSpecifications);
+	explicit SpelMotor(std::unique_ptr<Game> game);
 
 	~SpelMotor();
 
@@ -50,6 +48,11 @@ public:
 	void shutdown();
 
 private:
+	std::unique_ptr<Game> game;
+
+	/** @brief Immutable configuration set at construction.
+	 * Const ensures runtime modifications don't destabilize systems. */
+	const ApplicationSpecifications specifications;
 	/**
 	 * @brief The main game loop that runs until shutdown is requested.
 	 *
@@ -63,10 +66,6 @@ private:
 	/** @brief Tracks whether the game loop is active. */
 	bool running;
 
-	/** @brief Immutable configuration set at construction.
-	 * Const ensures runtime modifications don't destabilize systems. */
-	const ApplicationSpecifications specifications;
-
 	/** @brief renderer handle. */
 	std::unique_ptr<IRenderer> renderer;
 
@@ -78,4 +77,6 @@ private:
 
 	/** @brief the physics world where physics are simulated */
 	std::unique_ptr<IPhysicsWorld> physicsWorld;
+
+
 };

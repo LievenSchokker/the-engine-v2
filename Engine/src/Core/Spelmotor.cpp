@@ -1,3 +1,4 @@
+#include "Game.h"
 #include "Core/SpelMotor.h"
 
 #include "Core/ApplicationClock.h"
@@ -13,15 +14,17 @@
 
 #include "Input/SDLInputAdapter.h"
 
-SpelMotor::SpelMotor(ApplicationSpecifications const& applicationSpecifications)
-	: running(false),
-	  specifications(applicationSpecifications),
-	  timer(nullptr),
-	  tickRate(applicationSpecifications.tickRate),
-	  physicsWorld(std::make_unique<Box2DPhysicsWorld>(
-		  applicationSpecifications.tickRate))
+SpelMotor::SpelMotor(std::unique_ptr<Game> gameArgument)
+	:
+	game{std::move(gameArgument)},
+	specifications(game->getApplicationSpecifications()),
+	running(false),
+	timer(nullptr),
+	tickRate(specifications.tickRate),
+	physicsWorld(std::make_unique<Box2DPhysicsWorld>(
+		specifications.tickRate))
 {
-	if (applicationSpecifications.renderBackend == RenderBackend::SDL)
+	if (specifications.renderBackend == RenderBackend::SDL)
 	{
 		SdlContext context = SdlContext();
 		timer.reset();
