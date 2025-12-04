@@ -36,9 +36,7 @@ std::variant<Vector2, float> AnimationTrack::sample(float t) const
 		Vector2 from = std::get<Vector2>(fromValue);
 		Vector2 to = std::get<Vector2>(toValue);
 
-		Vector2 result;
-		result.x = from.x + (to.x - from.x) * easedT;
-		result.y = from.y + (to.y - from.y) * easedT;
+		Vector2 result = Vector2::lerp(from, to, easedT);
 
 		return result;
 	}
@@ -91,19 +89,15 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 				// When relative: start from (current + fromValue), end at
 				// toValue (absolute)
 				Vector2 currentPos = transform->getPosition();
-				Vector2 startPos = {currentPos.x + fromVal.x,
-									currentPos.y + fromVal.y};
-				Vector2 finalPos;
-				finalPos.x = startPos.x + (toVal.x - startPos.x) * easedT;
-				finalPos.y = startPos.y + (toVal.y - startPos.y) * easedT;
+				Vector2 startPos(currentPos.x() + fromVal.x(),
+								 currentPos.y() + fromVal.y());
+				Vector2 finalPos = Vector2::lerp(startPos, toVal, easedT);
 				transform->setPosition(finalPos);
 			}
 			else
 			{
 				// Absolute: interpolate directly between fromValue and toValue
-				Vector2 finalPos;
-				finalPos.x = fromVal.x + (toVal.x - fromVal.x) * easedT;
-				finalPos.y = fromVal.y + (toVal.y - fromVal.y) * easedT;
+				Vector2 finalPos = Vector2::lerp(fromVal, toVal, easedT);
 				transform->setPosition(finalPos);
 			}
 		}
@@ -146,19 +140,15 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 				// When relative: start from (current + fromValue), end at
 				// toValue (absolute)
 				Vector2 currentScale = transform->getScale();
-				Vector2 startScale = {currentScale.x + fromVal.x,
-									  currentScale.y + fromVal.y};
-				Vector2 finalScale;
-				finalScale.x = startScale.x + (toVal.x - startScale.x) * easedT;
-				finalScale.y = startScale.y + (toVal.y - startScale.y) * easedT;
+				Vector2 startScale(currentScale.x() + fromVal.x(),
+								   currentScale.y() + fromVal.y());
+				Vector2 finalScale = Vector2::lerp(startScale, toVal, easedT);
 				transform->setScale(finalScale);
 			}
 			else
 			{
 				// Absolute: interpolate directly between fromValue and toValue
-				Vector2 finalScale;
-				finalScale.x = fromVal.x + (toVal.x - fromVal.x) * easedT;
-				finalScale.y = fromVal.y + (toVal.y - fromVal.y) * easedT;
+				Vector2 finalScale = Vector2::lerp(fromVal, toVal, easedT);
 				transform->setScale(finalScale);
 			}
 		}

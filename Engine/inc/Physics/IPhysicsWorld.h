@@ -4,7 +4,7 @@
 struct b2BodyId;
 
 #include "Components/RigidBody.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 
 /**

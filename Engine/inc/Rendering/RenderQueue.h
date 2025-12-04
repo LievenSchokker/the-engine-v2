@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../GameObject/Vector2.h"
+#include "Math/Vector2.h"
 #include "Color.h"
 
 #include <vector>
@@ -17,8 +17,8 @@ enum class ShapeRenderType { None, Circle, Rectangle };
  */
 struct ShapeRenderCommand {
 	ShapeRenderType type = ShapeRenderType::None;
-	Vector2 position{};
-	Vector2 size{};
+	Vector2 position = Vector2::zero();
+	Vector2 size = Vector2::zero();
 	double radius = 0.0;
 	double rotationDegrees = 0.0;
 	Vector2 scale{1.0, 1.0};

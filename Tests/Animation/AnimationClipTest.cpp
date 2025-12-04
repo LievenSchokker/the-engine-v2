@@ -1,7 +1,7 @@
 #include "Animation/AnimationClip.h"
 #include "Animation/AnimationTrack.h"
 #include "Animation/AnimationCurve.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 #include <gtest/gtest.h>
 
 class AnimationClipTest : public ::testing::Test
