@@ -121,7 +121,7 @@ SoundHandle AudioManager::loadSound(const std::string& path)
 }
 
 
-int AudioManager::playSound(SoundHandle handle, int loops)
+int AudioManager::playSound(SoundHandle handle, int loops,float left, float right)
 {
 	if ( !backend ) return -1;
 
@@ -129,6 +129,7 @@ int AudioManager::playSound(SoundHandle handle, int loops)
 	int channel = backend->reserveFreeChannel();
 	if ( channel < 0 ) return -1;
 
+	backend->setChannelPanning(channel, left, right);
 	backend->playSound(handle, channel, loops);
 	return channel;
 }
@@ -139,8 +140,3 @@ void AudioManager::stopChannel(int channel)
 	backend->stopChannel(channel);
 }
 
-void AudioManager::setChannelPanning(int channel, float left, float right)
-{
-	if ( !backend ) return;
-	backend->setChannelPanning(channel, left, right);
-}

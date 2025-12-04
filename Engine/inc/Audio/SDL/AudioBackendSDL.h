@@ -116,8 +116,14 @@ private:
     /// Map of sound handles to Mix_Chunk objects.
     std::unordered_map<SoundHandle, Mix_Chunk*> soundMap;
 
+	/// Map of path and sound handle, to implement caching
+	std::unordered_map<std::string, SoundHandle> soundCache;
+
     /// Map of music handles to Mix_Music objects.
     std::unordered_map<MusicHandle, Mix_Music*> musicMap;
+
+	/// Map of path and music handle, to implement caching
+	std::unordered_map<std::string, MusicHandle> musicCache;
 
     /// Next available sound handle.
     SoundHandle nextSoundHandle = 1;

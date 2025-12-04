@@ -74,6 +74,18 @@ void SpelMotor::run()
 	pigeons->loadSound(
 		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
 
+	// Create pigeons sound
+	auto pigeons2 = std::make_unique<SoundSource>(audioManager.get());
+	pigeons2->loadSound(
+		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
+	// Create pigeons sound
+	auto pigeons3 = std::make_unique<SoundSource>(audioManager.get());
+	pigeons3->loadSound(
+		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
+	// Create pigeons sound
+	auto pigeons4 = std::make_unique<SoundSource>(audioManager.get());
+	pigeons4->loadSound(
+		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
 
 	while ( running )
 	{
