@@ -24,7 +24,7 @@ class SimpleMoveBehaviour : public Behaviour
         void update(float deltaTime) override;
         void onDisable() override;
 
-        void move();
+        void move(float deltaTime);
         void pollInput();
 
     private:

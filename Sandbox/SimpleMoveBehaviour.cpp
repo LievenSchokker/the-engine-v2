@@ -32,10 +32,10 @@ void SimpleMoveBehaviour::onStart()
 
 void SimpleMoveBehaviour::update(float deltaTime)
 {
-	(void)deltaTime;  // Not used in this behaviour
 	pollInput();
 
-	if ( canMove ) move();
+	if (canMove)
+	    move(deltaTime);
 }
 
 void SimpleMoveBehaviour::onDisable()
@@ -44,9 +44,9 @@ void SimpleMoveBehaviour::onDisable()
     currentSpeed = 0;
 }
 
-void SimpleMoveBehaviour::move()
+void SimpleMoveBehaviour::move(float deltaTime)
 {
-    Vector2 newPos = transform->getPosition() + currentDirection * currentSpeed;
+    Vector2 newPos = transform->getPosition() + currentDirection * currentSpeed * deltaTime;
     transform->setPosition(newPos);
 }
 
@@ -66,12 +66,11 @@ void SimpleMoveBehaviour::pollInput()
     if (inputManager->isKeyDown(KeyCode::D))
         currentDirection.setX(1.0f);
 
-    float length = std::sqrt(currentDirection.x() * currentDirection.x() + currentDirection.y() * currentDirection.y());
-    if (length > 0.0f)
-    {
-        // currentDirection.setX(currentDirection.x() /= length);
-        // currentDirection.y()/= length;
-    }}
+    currentDirection.normalize();
+}
+
+
+
 
 
 
