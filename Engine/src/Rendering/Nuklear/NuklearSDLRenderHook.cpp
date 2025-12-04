@@ -8,6 +8,7 @@
 #include "Input/MouseButton.h"
 
 #include <iostream>
+#include <algorithm>
 
 NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
                                            SDL_Renderer* renderer)
@@ -110,6 +111,11 @@ void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands)
 
 
 void NuklearSDLRenderHook::flushCommands() {
+	std::sort(rootPanels.begin(), rootPanels.end());
+
+	for (uint32_t id : rootPanels) {
+		renderPanel(id);
+	}
 	/// Sort pannels so panels are always infront of the queue
 	std::stable_partition(commandQueue.begin(), commandQueue.end(),
 		[](const UIRenderCommand& cmd) {
@@ -191,8 +197,26 @@ void NuklearSDLRenderHook::renderElement(const UIRenderCommand& command)
 			renderImage(command);
 			break;
 
+		case UICommandType::Chart:
+		{
+			renderChart(command);
+			break;
+		}
+
 		default:
 			break;
+	}
+}
+
+void NuklearSDLRenderHook::renderChart(const UIRenderCommand& command)
+{
+	if (nk_chart_begin(nuklearContext, NK_CHART_LINES, command.chartData.size(), command.chartMin, command.chartMax))
+	{
+		for (float value : command.chartData)
+		{
+			nk_chart_push(nuklearContext, value);
+		}
+		nk_chart_end(nuklearContext);
 	}
 }
 
@@ -233,7 +257,8 @@ void NuklearSDLRenderHook::renderProgressBar(const UIRenderCommand& command)
 
 void NuklearSDLRenderHook::renderSeparator(const UIRenderCommand& command)
 {
-	nk_layout_row_dynamic(nuklearContext, 2, 1);
+	// Use a small but visible height for the separator
+	nk_layout_row_dynamic(nuklearContext, 15, 1);
 
 	struct nk_rect bounds = nk_widget_bounds(nuklearContext);
 	struct nk_command_buffer* canvas = nk_window_get_canvas(nuklearContext);
@@ -248,9 +273,12 @@ void NuklearSDLRenderHook::renderSeparator(const UIRenderCommand& command)
 		nk_rgb(100, 100, 100)
 	);
 
-	nk_spacing(nuklearContext, 1);
-}
+	// Consume the widget space
+	nk_label(nuklearContext, "", NK_TEXT_LEFT);
 
+	// Restore standard row height for following elements
+	nk_layout_row_dynamic(nuklearContext, 20, 1);
+}
 void NuklearSDLRenderHook::renderImage(const UIRenderCommand& command)
 {
 	// TODO: Implement when texture/asset system

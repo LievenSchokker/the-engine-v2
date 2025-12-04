@@ -74,4 +74,10 @@ private:
 	Color getFPSColor() const;
 	Color getFrameTimeColor() const;
 	std::string formatFloat(float value, int decimals) const;
+
+
+	bool demoMode = true;
+	float demoTime = 0.0f;
+	std::deque<float> demoData;
+	bool showFrameGraph = true;
 };

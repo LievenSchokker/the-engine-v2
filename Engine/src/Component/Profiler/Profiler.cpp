@@ -30,22 +30,40 @@ void Profiler::update(float deltaTime, GameWorld* world)
 
 void Profiler::calculateFPS(float deltaTime)
 {
-    frameTimes.push_back(deltaTime);
+	// Real frame time tracking
+	frameTimes.push_back(deltaTime);
+	if (frameTimes.size() > kMaxFrameSamples)
+	{
+		frameTimes.pop_front();
+	}
 
-    if (frameTimes.size() > kMaxFrameSamples)
-    {
-        frameTimes.pop_front();
-    }
+	if (!frameTimes.empty())
+	{
+		float sum = std::accumulate(frameTimes.begin(), frameTimes.end(), 0.0f);
+		averageFrameTime = sum / static_cast<float>(frameTimes.size());
+		currentFPS = averageFrameTime > 0.0f ? 1.0f / averageFrameTime : 0.0f;
 
-    if (!frameTimes.empty())
-    {
-        float sum = std::accumulate(frameTimes.begin(), frameTimes.end(), 0.0f);
-        averageFrameTime = sum / static_cast<float>(frameTimes.size());
-        currentFPS = averageFrameTime > 0.0f ? 1.0f / averageFrameTime : 0.0f;
+		minFrameTime = *std::min_element(frameTimes.begin(), frameTimes.end());
+		maxFrameTime = *std::max_element(frameTimes.begin(), frameTimes.end());
+	}
 
-        minFrameTime = *std::min_element(frameTimes.begin(), frameTimes.end());
-        maxFrameTime = *std::max_element(frameTimes.begin(), frameTimes.end());
-    }
+	// Demo mode: generate sine wave data
+	if (demoMode)
+	{
+		demoTime += deltaTime;
+
+		// Combine multiple sine waves for interesting pattern
+		float value = 0.025f +
+					  0.015f * std::sin(demoTime * 2.0f) +
+					  0.008f * std::sin(demoTime * 5.0f) +
+					  0.005f * std::sin(demoTime * 11.0f);
+
+		demoData.push_back(value);
+		if (demoData.size() > kMaxFrameSamples)
+		{
+			demoData.pop_front();
+		}
+	}
 }
 
 void Profiler::updateStats(GameWorld* world)
@@ -58,20 +76,16 @@ void Profiler::updateStats(GameWorld* world)
         return;
     }
 
-    // Cache values for rendering
     isServer = world->isServer();
     isClient = world->isClient();
     localClientId = world->localClientId;
 
-    // Entity count from SceneManager
     if (world->sceneManager != nullptr)
     {
-        // Adjust based on your SceneManager API
         entityCount = 0;
         activeSceneCount = 1;
     }
 
-    // Network stats
     if (isServer && world->server != nullptr)
     {
         networkStatus = "Server";
@@ -123,7 +137,6 @@ void Profiler::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& que
         queue.push(fpsLabel);
     }
 
-    // Frame Time
     if (showFrameTime)
     {
         UIRenderCommand frameTimeLabel;
@@ -144,13 +157,11 @@ void Profiler::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& que
         queue.push(minMaxLabel);
     }
 
-    // Separator
     UIRenderCommand sep1;
     sep1.type = UICommandType::Separator;
     sep1.panelId = panelId;
     queue.push(sep1);
 
-    // Entity Count
     if (showEntityCount)
     {
         UIRenderCommand entityLabel;
@@ -170,13 +181,11 @@ void Profiler::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& que
         queue.push(sceneLabel);
     }
 
-    // Separator
     UIRenderCommand sep2;
     sep2.type = UICommandType::Separator;
     sep2.panelId = panelId;
     queue.push(sep2);
 
-    // Network
     if (showNetworkStats)
     {
         UIRenderCommand netStatusLabel;
@@ -242,6 +251,24 @@ void Profiler::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& que
         clientIdLabel.alignment = Alignment::Left;
         queue.push(clientIdLabel);
     }
+
+	if (showFrameGraph)
+	{
+		const auto& dataSource = demoMode ? demoData : frameTimes;
+
+		if (!dataSource.empty())
+		{
+			UIRenderCommand chart;
+			chart.type = UICommandType::Chart;
+			chart.panelId = panelId;
+			chart.chartData = std::vector<float>(dataSource.begin(), dataSource.end());
+			chart.chartMin = 0.0f;
+			chart.chartMax = 0.05f;  
+			chart.chartHeight = 60;
+			chart.color = goodColor;
+			queue.push(chart);
+		}
+	}
 }
 
 void Profiler::toggle()

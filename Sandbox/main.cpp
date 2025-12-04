@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
 	// Panel
 	std::unique_ptr<GameObject> profiler = std::make_unique<GameObject>();
-	profiler->addComponent<Profiler>();
+	profiler->addComponent<Profiler>(480.0f, 10.0f, 210.0f, 320.0f);  // Top-right of 700x700 window
 
 	scene->addGameObject(std::move(profiler));
 	spel->addScene(std::move(scene));

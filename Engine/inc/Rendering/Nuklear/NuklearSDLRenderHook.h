@@ -103,6 +103,7 @@ private:
 	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
 	void renderElement(const UIRenderCommand& command);
+	void renderChart(const UIRenderCommand& command);
 	void renderProgressBar(const UIRenderCommand& command);
 	void renderSeparator(const UIRenderCommand& command);
 	void renderImage(const UIRenderCommand& command);

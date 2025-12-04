@@ -4,6 +4,8 @@
 #include "Rendering/Color.h"
 #include "Component/UIObject/Alignment.h"
 
+#include <vector>
+
 constexpr uint32_t NO_PARENT = 0;
 
 enum class UICommandType
@@ -14,6 +16,7 @@ enum class UICommandType
 	Separator,
 	Spacer,
 	Image,
+	Chart,
 };
 
 struct UIRenderCommand
@@ -51,6 +54,11 @@ struct UIRenderCommand
 
 	uint8_t layer = 0;
 	uint8_t orderInLayer = 0;
+
+	std::vector<float> chartData;
+	float chartMin = 0.0f;
+	float chartMax = 1.0f;
+	int chartHeight = 50;
 
 	int getSortKey() const
 	{
