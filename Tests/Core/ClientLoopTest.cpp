@@ -1,4 +1,6 @@
+#include "Core/EngineLoops/ClientLoop.h"
 #include "Core/EngineLoops/ServerLoop.h"
+#include "Game.h"
 
 #include <memory>
 #include <gtest/gtest.h>
@@ -14,7 +16,9 @@ protected:
 		specs.windowOptions.width = 800;
 		specs.windowOptions.height = 600;
 		specs.windowOptions.title = "Test Window";
-		clientLoop = std::make_unique<ClientLoop>(specs);
+		std::unique_ptr<Game> game = std::make_unique<Game>();
+		game->setApplicationSpecifications(specs);
+		clientLoop = std::make_unique<ClientLoop>(std::move(game));
 	}
 
 	void TearDown() override

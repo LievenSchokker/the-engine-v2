@@ -1,4 +1,6 @@
 // Tests/Core/SpelMotorTest.cpp
+#include "Game.h"
+
 #include <gtest/gtest.h>
 #include <thread>
 #include <chrono>
@@ -10,7 +12,7 @@ class SpelMotorTest : public ::testing::Test
 {
 protected:
     ApplicationSpecifications specifications{};
-
+	std::unique_ptr<Game> game;
     void SetUp() override
     {
         if (SDL_Init(SDL_INIT_EVENTS | SDL_INIT_VIDEO) < 0)
@@ -23,6 +25,10 @@ protected:
     	specifications.networkingOptions.port = 7777;
     	specifications.networkingOptions.serverIP = "127.0.0.1";
         specifications.maxFrameTime = 0.25;
+    	game = std::make_unique<Game>();
+    	std::unique_ptr<Scene> scene = std::make_unique<Scene>("Yoo");
+    	game->addScene(std::move(scene));
+    	game->setApplicationSpecifications(specifications);
     }
 
     void TearDown() override
@@ -46,16 +52,19 @@ protected:
 TEST_F(SpelMotorTest, ConstructionInitializesEngineLoop)
 {
     ASSERT_NO_THROW({
-        SpelMotor engine(specifications);
+        SpelMotor engine(std::move(game));
     });
 }
 
 TEST_F(SpelMotorTest, ThrowsOnInvalidConfiguration)
 {
-    ApplicationSpecifications invalidSpecs{};
-    invalidSpecs.renderBackend = static_cast<RenderBackend>(-1);  // Invalid
+	ApplicationSpecifications invalidSpecs{};
+	invalidSpecs.renderBackend = static_cast<RenderBackend>(-1);  // Invalid
+	
+	auto invalidGame = std::make_unique<Game>();
+	invalidGame->setApplicationSpecifications(invalidSpecs);
 
-    ASSERT_THROW({
-        SpelMotor engine(invalidSpecs);
-    }, std::runtime_error);
+	ASSERT_THROW({
+		SpelMotor engine(std::move(invalidGame));
+	}, std::runtime_error);
 }

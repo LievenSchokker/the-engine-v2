@@ -5,6 +5,7 @@
 #include "Core/EngineLoops/ServerLoop.h"
 #include "Core/EngineLoops/ClientLoop.h"
 #include "Core/ApplicationSpecifications.h"
+#include "Game.h"
 
 class ServerLoopTest : public ::testing::Test
 {
@@ -14,7 +15,10 @@ protected:
 		ApplicationSpecifications specs;
 		specs.networkingOptions.tickRate = 60;
 		specs.networkingOptions.port = 7777;
-		serverLoop = std::make_unique<ServerLoop>(specs);
+
+		std::unique_ptr<Game> game = std::make_unique<Game>();
+		game->setApplicationSpecifications(specs);
+		serverLoop = std::make_unique<ServerLoop>(std::move(game));
 	}
 
 	void TearDown() override
