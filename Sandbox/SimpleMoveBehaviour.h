@@ -9,7 +9,7 @@
 
 #include "../Engine/inc/Input/InputManager.h"
 #include "../Engine/inc/Behaviour/Behaviour.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 
 class SimpleMoveBehaviour : public Behaviour
