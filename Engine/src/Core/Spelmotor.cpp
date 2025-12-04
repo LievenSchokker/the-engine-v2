@@ -94,7 +94,7 @@ void SpelMotor::shutdown()
 	// TODO server->shutdown() and client->shutdown()
 }
 
-void SpelMotor::initFirstGameScene()
+void SpelMotor::initFirstGameScene() const
 {
 	std::unique_ptr<Scene> scene = game->getFirstScene();
 

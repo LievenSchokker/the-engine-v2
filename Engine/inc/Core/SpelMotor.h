@@ -49,7 +49,7 @@ public:
 	void shutdown();
 
 private:
-	void initFirstGameScene();
+	void initFirstGameScene() const;
 
 	std::unique_ptr<Game> game;
 
