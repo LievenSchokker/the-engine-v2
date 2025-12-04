@@ -15,15 +15,17 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(box2d)
 
-add_library(engine STATIC ${ENGINE_SOURCES})
+add_library(engine STATIC
+        third-party/nuklearImplemntation.cpp
+        ${ENGINE_SOURCES})
 
 target_include_directories(engine PUBLIC
         ${CMAKE_SOURCE_DIR}/Engine/inc
+        ${CMAKE_SOURCE_DIR}/Engine/third-party
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMAGE_INCLUDE_DIRS}
         ${GAMENETWORKINGSOCKETS_INCLUDE_DIRS}
 )
-
 
 target_link_libraries(engine PUBLIC
         SDL2::SDL2

@@ -19,7 +19,7 @@ class GameWorld;
 class SceneManager
 {
    public:
-	SceneManager() = default;
+	SceneManager();
 
 	/**
 	 * @brief Register a scene owned by the manager.
@@ -150,5 +150,6 @@ class SceneManager
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;
+	IRenderer* renderer = nullptr;
 	Color clearColor = Color::black();
 };

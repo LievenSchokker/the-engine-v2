@@ -21,6 +21,7 @@ void Transform::setPosition(const Vector2 newPosition) {
     position = newPosition;
 }
 
+
 void Transform::setRotationAngle(const double newRotationAngle) {
     rotationAngle = newRotationAngle;
 }

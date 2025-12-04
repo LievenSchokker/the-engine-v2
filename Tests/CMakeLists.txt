@@ -4,6 +4,7 @@ project(engine_tests)
 add_executable(engine_tests
         Rendering/SDL/SDLRendererTest.cpp
         Rendering/ShapeRendererTest.cpp
+        Rendering/UserInterface/TextCommandTest.cpp
         Input/InputManagerTest.cpp
         Asset/AssetManagerTest.cpp
         Scene/SceneManagerTest.cpp
@@ -15,6 +16,8 @@ add_executable(engine_tests
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
+        Component/GridComponentTest.cpp
+        Component/UIObject/tests_uiobjects.cpp
         GameObject/tests_game_object.cpp
         Scene/SceneManagerTest.cpp
         Networking/Messages/MessageReaderTest.cpp
@@ -22,6 +25,14 @@ add_executable(engine_tests
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
+        Math/TestsVector2.cpp
+        Scene/SceneManagerTest.cpp
+        Physics/PhysicsSystemTest.cpp
+        Animation/AnimationCurveTest.cpp
+        Animation/AnimationTrackTest.cpp
+        Animation/AnimationClipTest.cpp
+        Animation/AnimatorTest.cpp
+        Scene/SceneBehavioursTests.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE

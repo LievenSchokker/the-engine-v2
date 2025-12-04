@@ -162,14 +162,14 @@ namespace engine_tests
         TestBehaviourTwo* behaviour2 = go.addComponent<TestBehaviourTwo>();
         TestBehaviourThree* behaviour3 = go.addComponent<TestBehaviourThree>();
 
-        auto activeBehavioursAfterBehaviourConstruction = go.getActiveBehaviours();
+        auto activeBehavioursAfterBehaviourConstruction = go.getEnabledBehaviours();
 
         EXPECT_EQ(activeBehavioursAfterBehaviourConstruction.size(), 3);
 
         behaviour1->setEnabled(false);
         behaviour2->setEnabled(false);
 
-        auto currentActiveBehaviours = go.getActiveBehaviours();
+        auto currentActiveBehaviours = go.getEnabledBehaviours();
 
         EXPECT_EQ(currentActiveBehaviours.size(), 1);
     }
