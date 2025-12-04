@@ -134,26 +134,20 @@ class AudioManager
 	SoundHandle loadSound(const std::string& path);
 
 	/**
-	 * @brief Plays a loaded sound.
+	 * @brief Plays a loaded sound, with the given stereo on the channel
 	 * @param handle Sound to play.
 	 * @param loops Number of loops (0 = once, -1 = infinite).
+	 * @param left  Left volume (0.0–1.0).
+	 * @param right Right volume (0.0–1.0).
 	 * @return Channel index used for playback, or -1 on failure.
 	 */
-	int playSound(SoundHandle handle, int loops);
+	int playSound(SoundHandle handle, int loops, float left, float right);
 
 	/**
 	 * @brief Stops playback on a specific channel.
 	 * @param channel Channel index to stop.
 	 */
 	void stopChannel(int channel);
-
-	/**
-	 * @brief Applies stereo panning to a channel.
-	 * @param channel Channel index.
-	 * @param left  Left volume (0.0–1.0).
-	 * @param right Right volume (0.0–1.0).
-	 */
-	void setChannelPanning(int channel, float left, float right);
 
    private:
 	/// Pointer to the low-level backend.

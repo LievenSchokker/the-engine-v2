@@ -52,35 +52,54 @@ bool AudioBackendSDL::initialize()
 	return true;
 }
 
+
 SoundHandle AudioBackendSDL::loadSound(const std::string& path)
 {
+	// 1. Check cache first
+	auto cached = soundCache.find(path);
+	if (cached != soundCache.end())
+		return cached->second;
+
+	// 2. Else load from disk
 	Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
-	if ( !chunk )
-	{
-		std::cerr << "Failed to load sound: " << path << " - " << Mix_GetError()
-				  << std::endl;
+	if (!chunk) {
+		std::cerr << "Failed to load sound: " << path << " - "
+				  << Mix_GetError() << std::endl;
 		return -1;
 	}
 
+	// 3. Assign new handle and enter into maps
 	SoundHandle handle = nextSoundHandle++;
 	soundMap[handle] = chunk;
+	soundCache[path] = handle;
+
 	return handle;
 }
+
 
 MusicHandle AudioBackendSDL::loadMusic(const std::string& path)
 {
+	// 1. Check cache
+	auto cached = musicCache.find(path);
+	if (cached != musicCache.end())
+		return cached->second;
+
+	// 2. Load fresh asset
 	Mix_Music* music = Mix_LoadMUS(path.c_str());
-	if ( !music )
-	{
-		std::cerr << "Failed to load music: " << path << " - " << Mix_GetError()
-				  << std::endl;
+	if (!music) {
+		std::cerr << "Failed to load music: " << path << " - "
+				  << Mix_GetError() << std::endl;
 		return -1;
 	}
 
+	// 3. Store handle
 	MusicHandle handle = nextMusicHandle++;
 	musicMap[handle] = music;
+	musicCache[path] = handle;
+
 	return handle;
 }
+
 
 void AudioBackendSDL::unloadSound(SoundHandle handle)
 {

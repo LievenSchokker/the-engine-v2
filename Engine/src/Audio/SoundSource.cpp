@@ -1,5 +1,4 @@
 #include "Audio/SoundSource.h"
-
 #include "Audio/AudioManager.h"
 
 SoundSource::SoundSource(AudioManager* audioManagerPtr)
@@ -22,9 +21,7 @@ void SoundSource::play(int loops)
 {
 	if ( !audioManager || handle < 0 ) return;
 
-	// Ask AudioManager to play sound
-	channel = audioManager->playSound(handle, loops);
-	audioManager->setChannelPanning(channel, lastLeft, lastRight);
+	channel = audioManager->playSound(handle, loops, lastLeft, lastRight);
 }
 
 void SoundSource::stop()
@@ -38,8 +35,4 @@ void SoundSource::setPanning(float left, float right)
 {
 	lastLeft = left;
 	lastRight = right;
-
-	if ( !audioManager || channel < 0 ) return;
-
-	audioManager->setChannelPanning(channel, left, right);
 }
