@@ -11,38 +11,38 @@
 #include <type_traits>
 
 
-template<typename T>
-T* ComponentManager::addComponent()
+template<typename T, typename... Args>
+T* ComponentManager::addComponent(Args&&... args)
 {
-    static_assert(std::is_base_of_v<Component, T>, "T must derive from Component!");
+	static_assert(std::is_base_of_v<Component, T>, "T must derive from Component!");
 
-    if (gameObject == nullptr)
-        return nullptr;
+	if (gameObject == nullptr)
+		return nullptr;
 
-    if constexpr (std::is_same_v<Transform, T>) {
-        return nullptr;
-    }
+	if constexpr (std::is_same_v<Transform, T>)
+	{
+		return nullptr;
+	}
 
+	auto iterator = getComponentIterator<T>();
+	if (iterator != components.end())
+	{
+		return dynamic_cast<T*>(iterator->get());
+	}
 
-    auto iterator = getComponentIterator<T>();
-    if (iterator != components.end())
-    {
-        /// Todo: 1) Implement ways to allow certain components to be duplicates, 2) Thow warning, exception, nothing here?
-        return dynamic_cast<T*>(iterator->get());
-    }
+	auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
+	T* rawPtr = newComponent.get();
 
-    auto& component = components.emplace_back(std::make_unique<T>());
-    component->setGameObject(gameObject);
+	newComponent->setGameObject(gameObject);
 
-    /// Add T component to the @c behaviours if T is a subclass of @c Behaviour
-    if constexpr (std::is_base_of_v<Behaviour, T>)
-    {
-        behaviours.push_back(static_cast<Behaviour*>(component.get()));
-    }
+	if constexpr (std::is_base_of_v<Behaviour, T>)
+	{
+		behaviours.push_back(static_cast<Behaviour*>(rawPtr));
+	}
 
-    return dynamic_cast<T*>(component.get());
+	components.push_back(std::move(newComponent));
+	return rawPtr;
 }
-
 
 template<typename T>
 T* ComponentManager::getComponent() const

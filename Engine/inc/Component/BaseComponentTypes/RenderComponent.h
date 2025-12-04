@@ -4,7 +4,7 @@
 #include "Rendering/RenderQueue/IRenderQueueWriter.h"
 #include <optional>
 
-class RenderComponent : public Component
+class RenderComponent : virtual public Component
 {
 public:
 	~RenderComponent() = default;

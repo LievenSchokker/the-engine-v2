@@ -119,6 +119,14 @@ void SDLRenderer::beginFrame(const Color& clearColor)
 }
 
 
+void SDLRenderer::submitUI(const std::vector<UIRenderCommand>& commands)
+{
+	if (userInterfaceHook != nullptr)
+	{
+		userInterfaceHook->process(commands);
+	}
+}
+
 void SDLRenderer::endFrame()
 {
 	if (renderer == nullptr) {

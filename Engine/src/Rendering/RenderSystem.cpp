@@ -1,8 +1,12 @@
 #include "Scene/Scene.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Rendering/RenderSystem.h"
+
+#include "Component/UIObject/UIObject.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
+
+#include <iostream>
 
 RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 	: renderer(std::move(renderer))
@@ -11,23 +15,23 @@ RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 
 void RenderSystem::update(float deltaTime, Scene& scene)
 {
-	if (renderer == nullptr) return;
+	if (!renderer || !renderer->isOpen())
+	{
+		return;
+	}
 
+	queue.clearAll();
+	collectCommands(scene);
+	queue.sortAll();
 	renderer->beginFrame(clearColor);
 
-	queue.clear();
-	collectCommands(scene);
-
-	// 3. Sort by layer
-	queue.sort();
-
-	// 4. Execute each command
-	for (const auto& command : queue.getCommands())
+	for (auto& command : queue.world().getCommands())
 	{
 		renderer->execute(command);
 	}
 
-	// 5. End frame
+	renderer->submitUI(queue.ui().getCommands());
+
 	renderer->endFrame();
 }
 
@@ -41,6 +45,17 @@ void RenderSystem::collectCommands(Scene& scene)
 		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
 
 		component->fillRenderQueue(queue);
+	}
+
+	for (auto* component : scene.getAllComponentsOfType<
+		     UserInterfaceRenderComponent>())
+	{
+		if (component == nullptr) continue;
+
+		auto* gameObject = component->getGameObject();
+		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
+
+		component->fillUserInterfaceRenderQueue(queue);
 	}
 }
 

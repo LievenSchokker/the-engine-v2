@@ -121,6 +121,7 @@ class SDLRenderer: public IRenderer
 
     void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
+	void submitUI(const std::vector<UIRenderCommand>& commands) override;
    private:
 	/**
 	 * @brief Draw a filled circle in window space.

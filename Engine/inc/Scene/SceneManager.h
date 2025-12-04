@@ -3,6 +3,7 @@
 #include "../Rendering/Color.h"
 #include "../Rendering/RenderQueue/RenderQueue.h"
 #include "Scene.h"
+#include "Rendering/IRenderer.h"
 
 #include <memory>
 #include <string>
@@ -123,7 +124,7 @@ class SceneManager
 	 *
 	 * @param deltaTime Seconds elapsed since the previous update call.
 	 */
-	void update(float deltaTime);
+	void update(float deltaTime, GameWorld* world);
 
 	/**
 	 * @brief Change the clear color used at the start of each frame.

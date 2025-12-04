@@ -29,6 +29,12 @@ struct FakeRenderer : public IRenderer
 		++endCalls;
 	}
 
+
+	void submitUI(const std::vector<UIRenderCommand>& commands) override
+	{
+		// Empty stub for testing
+	}
+
 	void execute(const RenderCommand& command) override
 	{
 		executedCommands.push_back(command);
@@ -80,7 +86,7 @@ TEST(ShapeRendererTest, FillsQueueWithCircleCommand)
     }
 
     // Assert
-    const auto& commands = queue.getCommands();
+    const auto& commands = queue.world().getCommands();
     ASSERT_EQ(commands.size(), 1);
     EXPECT_EQ(commands[0].type, RenderCommandType::Circle);
     EXPECT_DOUBLE_EQ(commands[0].radius, 25.0);
@@ -112,7 +118,7 @@ TEST(ShapeRendererTest, FillsQueueWithRectangleCommand)
     }
 
     // Assert
-    const auto& commands = queue.getCommands();
+    const auto& commands = queue.world().getCommands();
     ASSERT_EQ(commands.size(), 1);
     EXPECT_EQ(commands[0].type, RenderCommandType::Rectangle);
     EXPECT_DOUBLE_EQ(commands[0].size.x, 80.0);

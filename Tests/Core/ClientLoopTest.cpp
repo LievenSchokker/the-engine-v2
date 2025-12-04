@@ -17,6 +17,9 @@ protected:
 		specs.windowOptions.height = 600;
 		specs.windowOptions.title = "Test Window";
 		std::unique_ptr<Game> game = std::make_unique<Game>();
+
+		auto testScene = std::make_unique<Scene>("TestScene");
+		game->addScene(std::move(testScene));
 		game->setApplicationSpecifications(specs);
 		clientLoop = std::make_unique<ClientLoop>(std::move(game));
 	}

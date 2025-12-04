@@ -1,3 +1,4 @@
+#include "Game.h"
 #include "GameObject/GameObject.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
@@ -40,7 +41,9 @@ TEST(SceneManagerTest, MainFlowIntegration)
 TEST(SceneManagerTest, CompleteLifecycle)
 {
     // Arrange
-    SceneManager sceneManager;
+	std::unique_ptr<Scene> scene = std::make_unique<Scene>("Scene");
+	std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
+	SceneManager sceneManager;
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Object1");
     auto* obj1Ptr = obj1.get();
@@ -65,14 +68,14 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Activate Scene1
     sceneManager.loadScene("Scene1");
-    sceneManager.update(0.1f);
+    sceneManager.update(0.1f, gameWorld.get());
 
     // Assert
     EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene1");
 
     // Act - Pause
     sceneManager.pause();
-    sceneManager.update(0.1f);
+    sceneManager.update(0.1f, gameWorld.get());
 
     // Assert
     EXPECT_TRUE(sceneManager.isPaused());
@@ -85,7 +88,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Resume
     sceneManager.resume();
-    sceneManager.update(0.1f);
+    sceneManager.update(0.1f, gameWorld.get());
 
     // Assert
     EXPECT_FALSE(sceneManager.isPaused());
@@ -98,7 +101,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Switch to Scene2
     sceneManager.setActiveScene("Scene2");
-    sceneManager.update(0.2f);
+    sceneManager.update(0.2f, gameWorld.get());
 
     // Assert
     EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene2");
@@ -177,13 +180,14 @@ TEST(SceneManagerTest, UpdateWithNoActiveScene)
 {
     // Arrange
     SceneManager sceneManager;
+	std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Object1");
     scene1->addGameObject(std::move(obj1));
     sceneManager.addScene(std::move(scene1));
 
     // Act - Should not crash with no active scene
-    sceneManager.update(0.1f);
+    sceneManager.update(0.1f, gameWorld.get());
 
     // Assert - Scene should still be retrievable
     EXPECT_NE(sceneManager.getScene("Scene1"), nullptr);

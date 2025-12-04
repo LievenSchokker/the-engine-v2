@@ -11,7 +11,6 @@ class IRenderer;
 class RenderSystem
 {
 public:
-	//TODO create abstract backend
 	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
 
 	void update(float deltaTime, Scene& scene);

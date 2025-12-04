@@ -7,12 +7,11 @@
 #include "Component/ComponentManager.h"
 
 
-template<typename T>
-T* GameObject::addComponent()
+template<typename T, typename... Args>
+T* GameObject::addComponent(Args&&... args)
 {
-    return componentManager->template addComponent<T>();
+	return componentManager->template addComponent<T>(std::forward<Args>(args)...);
 }
-
 
 template<typename T>
 T* GameObject::getComponent() const

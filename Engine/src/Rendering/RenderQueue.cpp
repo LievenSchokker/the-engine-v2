@@ -1,34 +1,33 @@
 #include "Rendering/RenderQueue/RenderQueue.h"
-#include "Rendering/RenderCommand.h"
-#include <queue>
 
 void RenderQueue::push(RenderCommand& command)
 {
-	commands.emplace_back(command);
+	worldQueue.push(command);
 }
 
-void RenderQueue::sort()
+void RenderQueue::push(UIRenderCommand& command)
 {
-	std::ranges::sort(commands,
-	                  [](const RenderCommand& command,
-	                     const RenderCommand& commandOther)
-	                  {
-		                  return command.getSortKey() < commandOther.
-		                         getSortKey();
-	                  });
+	uiQueue.push(command);
 }
 
-void RenderQueue::clear()
+void RenderQueue::sortAll()
 {
-	commands.clear();
+	worldQueue.sort();
+	uiQueue.sort();
 }
 
-bool RenderQueue::isEmpty() const
+void RenderQueue::clearAll()
 {
-	return commands.empty();
+	worldQueue.clear();
+	uiQueue.clear();
 }
 
-std::vector<RenderCommand>& RenderQueue::getCommands()
+RenderQueueBase<RenderCommand>& RenderQueue::world()
 {
-	return commands;
+	return worldQueue;
+}
+
+RenderQueueBase<UIRenderCommand>& RenderQueue::ui()
+{
+	return uiQueue;
 }

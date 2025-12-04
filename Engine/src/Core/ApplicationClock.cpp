@@ -1,25 +1,36 @@
 #include "Core/ApplicationClock.h"
 
-ApplicationClock::ApplicationClock(const ClockFunction& clockFunction,
-                                   int tickrate,
-                                   double maxAccumulatedTime)
-	: getClock(clockFunction),
+#include <iostream>
+
+#include "Core/ApplicationClock.h"
+#include <chrono>
+#include <iostream>
+
+// Use a static start time
+static auto programStart = std::chrono::high_resolution_clock::now();
+
+static double getTimeSeconds()
+{
+	auto now = std::chrono::high_resolution_clock::now();
+	return std::chrono::duration<double>(now - programStart).count();
+}
+
+ApplicationClock::ApplicationClock(const ClockFunction& clockFunc,
+							int tickrate, double maxAccTime)
+	: getClock(getTimeSeconds),
+	  fixedDeltaTime(1.0 / tickrate),
 	  currentTime(0.0),
 	  accumulatedTime(0.0),
 	  simulationTime(0.0),
 	  totalTicks(0),
 	  tickRate(tickrate),
-	  fixedDeltaTime(1.0 / tickrate),
-	  maxAccumulatedTime(maxAccumulatedTime)
+	  maxAccumulatedTime(maxAccTime > 0.0 ? maxAccTime : 0.25)
 {
 }
 
 void ApplicationClock::start()
 {
 	currentTime = getClock();
-	accumulatedTime = 0.0;
-	simulationTime = 0.0;
-	totalTicks = 0;
 }
 
 void ApplicationClock::tick()
@@ -27,12 +38,12 @@ void ApplicationClock::tick()
 	double newTime = getClock();
 	double frameTime = newTime - currentTime;
 
-	// This is to prevent spiral of death.
+	double oldAccum = accumulatedTime;
+
 	if (frameTime > maxAccumulatedTime)
 	{
 		frameTime = maxAccumulatedTime;
 	}
-
 	currentTime = newTime;
 	accumulatedTime += frameTime;
 }

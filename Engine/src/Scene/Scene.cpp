@@ -185,32 +185,27 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(double deltaTime)
+void Scene::update(double deltaTime, GameWorld* world)
 {
-	if ( !active ) {
+	if (!active)
+	{
 		return;
 	}
 
+	for (auto& gameObject : gameObjects)
+	{
+		if (!gameObject->getIsActive())
+			continue;
 
-    /// Update all GameObject's behaviours:
-    for ( auto& gameObject : gameObjects )
-    {
-        /// Only behaviours on active GameObjects should be updated.
-        if (!gameObject->getIsActive())
-            continue;
+		for (const auto& behaviour : gameObject->getEnabledBehaviours())
+		{
+			if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
+				continue;
+			behaviour->update(deltaTime, world);
+		}
+	}
 
-        /// Iterate over all enabled behaviours.
-        for (const auto& behaviour : gameObject->getEnabledBehaviours())
-        {
-            /// Only update
-            if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
-                continue;
-            behaviour->update(deltaTime);
-        }
-    }
-
-    processDestroyQueue();
-
+	processDestroyQueue();
 }
 //
 // void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const

@@ -92,68 +92,6 @@ void NuklearSDLRenderHook::beginFrame()
     panelIndices.clear();
     panelElementIndices.clear();
     rootPanels.clear();
-
-    /// Example Panel for PR
-    UIRenderCommand consolePanel{};
-    consolePanel.type = UICommandType::Panel;
-    consolePanel.panelId = 3;
-    consolePanel.x = 20;
-    consolePanel.y = 220;
-    consolePanel.width = 470;
-    consolePanel.height = 150;
-    consolePanel.hasBorder = true;
-    consolePanel.hasTitle = true;
-    consolePanel.title = "Console";
-    consolePanel.rowHeight = 18;
-    submit(consolePanel);
-
-    UIRenderCommand log1{};
-    log1.type = UICommandType::Text;
-    log1.panelId = 3;
-    log1.text = "[INFO] Engine initialized successfully";
-    log1.alignment = Alignment::Left;
-    log1.color = Color::white();
-    submit(log1);
-
-    UIRenderCommand log2{};
-    log2.type = UICommandType::Text;
-    log2.panelId = 3;
-    log2.text = "[INFO] Loaded 24 textures";
-    log2.alignment = Alignment::Left;
-    log2.color = Color::white();
-    submit(log2);
-
-    UIRenderCommand log3{};
-    log3.type = UICommandType::Text;
-    log3.panelId = 3;
-    log3.text = "[WARN] Missing shader: bloom.frag";
-    log3.alignment = Alignment::Left;
-    log3.color = Color::yellow();
-    submit(log3);
-
-    UIRenderCommand log4{};
-    log4.type = UICommandType::Text;
-    log4.panelId = 3;
-    log4.text = "[ERROR] Failed to load: missing_asset.png";
-    log4.alignment = Alignment::Left;
-    log4.color = Color::red();
-    submit(log4);
-
-    UIRenderCommand log5{};
-    log5.type = UICommandType::Text;
-    log5.panelId = 3;
-    log5.text = "[INFO] UI system ready";
-    log5.alignment = Alignment::Left;
-    log5.color = Color::green();
-    submit(log5);
-
-    // This one does not have a panel
-    UIRenderCommand floatingText{};
-    floatingText.type = UICommandType::Text;
-    floatingText.panelId = 99;  // No panel defined - will auto-create
-    floatingText.text = "Floating text (auto-panel)";
-    floatingText.color = Color::purple();
-    submit(floatingText);
 }
 
 void NuklearSDLRenderHook::presentFrame()
@@ -162,9 +100,12 @@ void NuklearSDLRenderHook::presentFrame()
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
 }
 
-void NuklearSDLRenderHook::submit(UIRenderCommand command)
+void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands)
 {
-	commandQueue.push_back(std::move(command));
+	for (auto command : commands)
+	{
+		commandQueue.push_back(std::move(command));
+	}
 }
 
 
@@ -231,13 +172,93 @@ void NuklearSDLRenderHook::renderElement(const UIRenderCommand& command)
 			break;
 
 		case UICommandType::Text:
-		{
 			renderText(command);
 			break;
-		}
+
+		case UICommandType::ProgressBar:
+			renderProgressBar(command);
+			break;
+
+		case UICommandType::Separator:
+			renderSeparator(command);
+			break;
+
+		case UICommandType::Spacer:
+			renderSpacer(command);
+			break;
+
+		case UICommandType::Image:
+			renderImage(command);
+			break;
+
 		default:
 			break;
 	}
+}
+
+void NuklearSDLRenderHook::renderProgressBar(const UIRenderCommand& command)
+{
+	// Save original style
+	struct nk_style_progress originalStyle = nuklearContext->style.progress;
+
+	// Convert our colors to nuklear colors
+	nk_color barColor = nk_rgba(
+		command.barColor.r,
+		command.barColor.g,
+		command.barColor.b,
+		command.barColor.a
+	);
+
+	nk_color bgColor = nk_rgba(
+		command.backgroundColor.r,
+		command.backgroundColor.g,
+		command.backgroundColor.b,
+		command.backgroundColor.a
+	);
+
+	nuklearContext->style.progress.normal = nk_style_item_color(bgColor);
+	nuklearContext->style.progress.hover = nk_style_item_color(bgColor);
+	nuklearContext->style.progress.active = nk_style_item_color(bgColor);
+
+	nuklearContext->style.progress.cursor_normal = nk_style_item_color(barColor);
+	nuklearContext->style.progress.cursor_hover = nk_style_item_color(barColor);
+	nuklearContext->style.progress.cursor_active = nk_style_item_color(barColor);
+
+	nk_size value = static_cast<nk_size>(command.progress * 100.0f);
+	nk_size max = 100;
+	nk_progress(nuklearContext, &value, max, NK_FIXED);
+
+	nuklearContext->style.progress = originalStyle;
+}
+
+void NuklearSDLRenderHook::renderSeparator(const UIRenderCommand& command)
+{
+	nk_layout_row_dynamic(nuklearContext, 2, 1);
+
+	struct nk_rect bounds = nk_widget_bounds(nuklearContext);
+	struct nk_command_buffer* canvas = nk_window_get_canvas(nuklearContext);
+
+	nk_stroke_line(
+		canvas,
+		bounds.x,
+		bounds.y + bounds.h / 2,
+		bounds.x + bounds.w,
+		bounds.y + bounds.h / 2,
+		1.0f,
+		nk_rgb(100, 100, 100)
+	);
+
+	nk_spacing(nuklearContext, 1);
+}
+
+void NuklearSDLRenderHook::renderImage(const UIRenderCommand& command)
+{
+	// TODO: Implement when texture/asset system
+}
+void NuklearSDLRenderHook::renderSpacer(const UIRenderCommand& command)
+{
+	nk_layout_row_dynamic(nuklearContext, command.spacerHeight, 1);
+	nk_spacing(nuklearContext, 1);
 }
 
 void NuklearSDLRenderHook::renderText(const UIRenderCommand& command)

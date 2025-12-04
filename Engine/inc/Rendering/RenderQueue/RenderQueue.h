@@ -1,25 +1,25 @@
 #pragma once
 
-
+#include "RenderQueueBase.h"
 #include "IRenderQueueWriter.h"
-#include "Rendering/Color.h"
+#include "IUserInterfaceRenderQueueWriter.h"
+#include "Rendering/RenderCommand.h"
+#include "Rendering/UIRenderCommand.h"
 
-class IRenderer;
-
-#include <queue>
-
-/**
- * @brief Lightweight queue that stores all rendercommands scheduled for a
- * frame.
- */
-class RenderQueue : public IRenderQueueWriter
+class RenderQueue : public IRenderQueueWriter,
+					public IUserInterfaceRenderQueueWriter
 {
 public:
 	void push(RenderCommand& command) override;
-	void sort();
-	bool isEmpty() const;
-	void clear();
-	std::vector<RenderCommand>& getCommands();
+	void push(UIRenderCommand& command) override;
+
+	void sortAll();
+	void clearAll();
+
+	RenderQueueBase<RenderCommand>& world();
+	RenderQueueBase<UIRenderCommand>& ui();
+
 private:
-	std::vector<RenderCommand> commands;
+	RenderQueueBase<RenderCommand> worldQueue;
+	RenderQueueBase<UIRenderCommand> uiQueue;
 };

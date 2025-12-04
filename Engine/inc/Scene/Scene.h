@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/GameWorld.h"
 
 class GameObject;
 class Behaviour;
@@ -114,8 +115,9 @@ class Scene
          * @brief Update all game objects when the scene is active.
          *
          * @param deltaTime Seconds elapsed since the previous update.
+         * @param world
          */
-        void update(double deltaTime);
+        void update(double deltaTime, GameWorld* world);
 
         /**
          * @brief Collect render commands for active objects in this scene.

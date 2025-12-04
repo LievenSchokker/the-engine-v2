@@ -1,4 +1,3 @@
-// Rendering/UIRenderCommand.h
 #pragma once
 
 #include <string>
@@ -7,28 +6,56 @@
 
 constexpr uint32_t NO_PARENT = 0;
 
-enum class UICommandType {
+enum class UICommandType
+{
 	Panel,
 	Text,
+	ProgressBar,
+	Separator,
+	Spacer,
+	Image,
 };
 
-struct UIRenderCommand {
+struct UIRenderCommand
+{
 	UICommandType type = UICommandType::Panel;
 	uint32_t panelId = NO_PARENT;
 	uint32_t parentId = 0;
 
-	float x = 0, y = 0, width = 100, height = 30;
+	float x = 0;
+	float y = 0;
+	float width = 100;
+	float height = 30;
+
 	std::string title{};
 	bool hasTitle = false;
 	bool hasBorder = false;
 	float rowHeight = 30.0f;
 	int columns = 1;
 
-	// Text
 	std::string text{};
 	Alignment alignment = Alignment::Left;
 	Color color = Color::white();
 	int fontSize = 14;
+
+	float progress = 0.0f;
+	float minValue = 0.0f;
+	float maxValue = 1.0f;
+	Color barColor = Color::green();
+	Color backgroundColor = Color::black();
+
+	float spacerHeight = 10.0f;
+
+	std::string imagePath{};
+	uint32_t textureId = 0;
+
+	uint8_t layer = 0;
+	uint8_t orderInLayer = 0;
+
+	int getSortKey() const
+	{
+		return (layer << 8) | orderInLayer;
+	}
 
 	UIRenderCommand() = default;
 };

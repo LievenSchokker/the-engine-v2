@@ -79,6 +79,7 @@ public:
 	 */
 	virtual void close() = 0;
 
+	virtual void submitUI(const std::vector<UIRenderCommand>& commands) = 0;
 	/**
 	 * @brief Checks if the rendering window is currently open
 	 *

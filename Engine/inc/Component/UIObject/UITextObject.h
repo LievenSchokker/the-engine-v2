@@ -1,28 +1,41 @@
 #pragma once
-#include "Component/UIObject/Alignment.h"
-#include "Component/UIObject/UIObject.h"
 
+#include "Component/UIObject/UIObject.h"
+#include "Component/UIObject/Alignment.h"
+#include "Rendering/Color.h"
+
+#include <string>
 
 class UITextObject: public UIObject
 {
 public:
-	explicit UITextObject(int width = 0, int height = 0, std::string  text = "",
-		 std::string  font = "default", int textSize = 12,
-		 Alignment alignment = Alignment::Left);
+	explicit UITextObject(
+		float x = 0,
+		float y = 0,
+		float width = 100,
+		float height = 30,
+		std::string text = "",
+		int fontSize = 14,
+		Alignment alignment = Alignment::Left,
+		Color color = Color::white()
+		);
+
+	void fillUserInterfaceRenderQueue(
+		IUserInterfaceRenderQueueWriter& queue) const override;
 
 	std::string getText() const;
-	std::string getFont() const;
-	int getTextSize() const;
+	int getFontSize() const;
 	Alignment getAlignment() const;
+	Color getColor() const;
 
 	void setText(const std::string& newText);
-	void setFont(const std::string& newFont);
-	void setTextSize(int newTextSize);
+	void setFontSize(int newSize);
 	void setAlignment(Alignment newAlignment);
+	void setColor(const Color& newColor);
 
 private:
 	std::string text;
-	std::string font;
-	int textSize;
+	int fontSize;
 	Alignment alignment;
+	Color color;
 };

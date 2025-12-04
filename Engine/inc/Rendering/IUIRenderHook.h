@@ -40,7 +40,7 @@ public:
 	 */
 	virtual void beginFrame() = 0;
 
-	virtual void submit(UIRenderCommand command) = 0;
+	virtual void process(const std::vector<UIRenderCommand>& commands) = 0;
 	/**
 	 * @brief Submits UI draw commands to the renderer.
 	 *

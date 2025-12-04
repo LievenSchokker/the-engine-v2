@@ -54,7 +54,7 @@ void ServerLoop::update(double deltaTime)
 void ServerLoop::fixedUpdate(double deltaTime)
 {
 	server->update();
-	sceneManager->update(deltaTime);
+	sceneManager->update(deltaTime, gameWorld.get());
 	currentTick++;
 }
 

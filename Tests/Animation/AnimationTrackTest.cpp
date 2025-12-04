@@ -46,20 +46,20 @@ TEST_F(AnimationTrackTest, SampleVector2)
 	auto result0 = track.sample(0.0f);
 	ASSERT_TRUE(std::holds_alternative<Vector2>(result0));
 	Vector2 val0 = std::get<Vector2>(result0);
-	EXPECT_FLOAT_EQ(val0.x(), 0.0f);
-	EXPECT_FLOAT_EQ(val0.y(), 0.0f);
+	EXPECT_FLOAT_EQ(val0.x, 0.0f);
+	EXPECT_FLOAT_EQ(val0.y, 0.0f);
 
 	auto result1 = track.sample(1.0f);
 	ASSERT_TRUE(std::holds_alternative<Vector2>(result1));
 	Vector2 val1 = std::get<Vector2>(result1);
-	EXPECT_FLOAT_EQ(val1.x(), 100.0f);
-	EXPECT_FLOAT_EQ(val1.y(), 200.0f);
+	EXPECT_FLOAT_EQ(val1.x, 100.0f);
+	EXPECT_FLOAT_EQ(val1.y, 200.0f);
 
 	auto resultMid = track.sample(0.5f);
 	ASSERT_TRUE(std::holds_alternative<Vector2>(resultMid));
 	Vector2 valMid = std::get<Vector2>(resultMid);
-	EXPECT_FLOAT_EQ(valMid.x(), 50.0f);
-	EXPECT_FLOAT_EQ(valMid.y(), 100.0f);
+	EXPECT_FLOAT_EQ(valMid.x, 50.0f);
+	EXPECT_FLOAT_EQ(valMid.y, 100.0f);
 }
 
 TEST_F(AnimationTrackTest, SampleFloat)
@@ -99,13 +99,13 @@ TEST_F(AnimationTrackTest, ApplyPositionAbsolute)
 
 	track.apply(animator, 0.0f);
 	Vector2 pos0 = go->getTransform()->getPosition();
-	EXPECT_FLOAT_EQ(pos0.x(), 0.0f);
-	EXPECT_FLOAT_EQ(pos0.y(), 0.0f);
+	EXPECT_FLOAT_EQ(pos0.x, 0.0f);
+	EXPECT_FLOAT_EQ(pos0.y, 0.0f);
 
 	track.apply(animator, 1.0f);
 	Vector2 pos1 = go->getTransform()->getPosition();
-	EXPECT_FLOAT_EQ(pos1.x(), 100.0f);
-	EXPECT_FLOAT_EQ(pos1.y(), 200.0f);
+	EXPECT_FLOAT_EQ(pos1.x, 100.0f);
+	EXPECT_FLOAT_EQ(pos1.y, 200.0f);
 }
 
 TEST_F(AnimationTrackTest, ApplyRotationAbsolute)
@@ -143,11 +143,11 @@ TEST_F(AnimationTrackTest, ApplyScaleAbsolute)
 
 	track.apply(animator, 0.0f);
 	Vector2 scale0 = go->getTransform()->getScale();
-	EXPECT_FLOAT_EQ(scale0.x(), 1.0f);
-	EXPECT_FLOAT_EQ(scale0.y(), 1.0f);
+	EXPECT_FLOAT_EQ(scale0.x, 1.0f);
+	EXPECT_FLOAT_EQ(scale0.y, 1.0f);
 
 	track.apply(animator, 1.0f);
 	Vector2 scale1 = go->getTransform()->getScale();
-	EXPECT_FLOAT_EQ(scale1.x(), 2.0f);
-	EXPECT_FLOAT_EQ(scale1.y(), 3.0f);
+	EXPECT_FLOAT_EQ(scale1.x, 2.0f);
+	EXPECT_FLOAT_EQ(scale1.y, 3.0f);
 }

@@ -147,10 +147,11 @@ bool SceneManager::isPaused() const
 	return paused;
 }
 
-void SceneManager::update(float deltaTime)
+void SceneManager::update(float deltaTime, GameWorld* world)
 {
-	if ( activeScene != nullptr && !paused ) {
-		activeScene->update(deltaTime);
+	if (activeScene != nullptr && !paused)
+	{
+		activeScene->update(deltaTime, world);
 	}
 }
 
