@@ -1,8 +1,10 @@
 #pragma once
 
 
-#include "ApplicationSpecifications.h"
+#include "ApplicationClock.h"
 #include "GameWorld.h"
+
+#include <functional>
 
 /**
  * @interface IEngineLoop

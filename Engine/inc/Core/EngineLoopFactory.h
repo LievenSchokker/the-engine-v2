@@ -4,6 +4,8 @@
 #include "IEngineLoop.h"
 #include "EngineMode.h"
 
+struct ApplicationSpecifications;
+
 #include <memory>
 
 class EngineLoopFactory

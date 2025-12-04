@@ -1,12 +1,10 @@
 #pragma once
 
 
-#include "ApplicationClock.h"
-#include "Networking/Server/Server.h"
-#include "Networking/Client.h"
-#include "Rendering/IRenderer.h"
-#include "Scene/SceneManager.h"
-
+class Server;
+class Client;
+class IRenderer;
+class SceneManager;
 class IPhysicsWorld;
 class InputManager;
 class NetworkSpawnManager;

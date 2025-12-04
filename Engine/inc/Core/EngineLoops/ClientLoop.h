@@ -1,46 +1,46 @@
 #pragma once
 
+
 #include "Core/ApplicationSpecifications.h"
-#include "Core/GameWorld.h"
 #include "Core/IEngineLoop.h"
+#include "External/SdlContext.h"
+
+class Client;
+class IRenderer;
+class InputManager;
+
 #include <functional>
 #include <memory>
 
-class SceneManager;
-class Server;
-
 /**
- * @class ServerLoop
- * @brief Headless engine loop for authoritative game servers
+ * @class ClientLoop
+ * @brief Engine loop for interactive clients with rendering and input
  *
- * This implementation strips away all client-specific subsystems (rendering,
- * audio, local input) to run a dedicated server with minimal resource overhead.
- * Servers are authoritative—they own the true game state and validate all
- * client actions, making them the source of truth in networked games.
+ * Handles all player-facing responsibilities: rendering the game state,
+ * capturing input, and communicating with the authoritative server. Unlike
+ * ServerLoop, this implementation is not authoritative—it predicts game
+ * state locally for responsiveness but defers to server corrections.
  *
- * Runs headless to allow deployment on machines without graphics capabilities
- * and to maximize tick rate by avoiding rendering overhead. The same fixed
- * timestep logic ensures server and client simulations stay synchronized.
  *
- * @see ClientLoop, IEngineLoop
+ * @see ServerLoop, IEngineLoop
  */
-class ServerLoop : public IEngineLoop
+class ClientLoop : public IEngineLoop
 {
     using ClockFunction = std::function<double()>;
 
 public:
     /**
-     * @brief Constructs a server loop with the provided configuration
+     * @brief Constructs a client loop with rendering and networking support
      *
-     * Uses std::steady_clock rather than SDL timing to avoid pulling in SDL
-     * as a dependency for headless servers. steady_clock is guaranteed
-     * monotonic, preventing issues if system time is adjusted during runtime.
+     * Defers window creation to start() for two-phase initialization—this
+     * allows the engine to configure additional settings between construction
+     * and the window becoming visible.
      *
-     * @param applicationSpecifications Server configuration (tick rate, network settings)
+     * @param applicationSpecifications Client configuration (resolution, server address)
      */
-    explicit ServerLoop(
+    explicit ClientLoop(
         const ApplicationSpecifications& applicationSpecifications);
-    ~ServerLoop() override = default;
+    ~ClientLoop() override = default;
 
     GameWorld* getGameWorld() override;
     SceneManager* getSceneManager() override;
@@ -51,11 +51,20 @@ public:
     void shutdown() override;
 
 private:
-    /// Stored to allow runtime access to configuration (e.g., for network settings)
+    /**
+     * @brief Establishes connection to the game server
+     *
+     * Separated from start() to allow future flexibility in connection
+     * timing (e.g., connecting after a menu, reconnecting after disconnect).
+     */
+    void initializeNetworking();
+
     ApplicationSpecifications applicationSpecifications;
-    std::unique_ptr<SceneManager> sceneManager;
-    std::unique_ptr<Server> server;
     std::unique_ptr<GameWorld> gameWorld;
+    std::unique_ptr<SceneManager> sceneManager;
+    std::unique_ptr<Client> client;
+    std::unique_ptr<IRenderer> renderer;
+    std::unique_ptr<SdlContext> sdlContext;
+    InputManager* inputManager;
     ClockFunction clockFunction;
-    uint32_t currentTick = 0;
 };
