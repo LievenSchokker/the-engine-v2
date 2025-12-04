@@ -1,55 +1,49 @@
+#include "Game.h"
 #include "Core/SpelMotor.h"
-
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
-#include "Physics/Box2D/Box2DPhysicsWorld.h"
-#include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Networking/Server/Server.h"
+#include "Networking/Client.h"
+#include "Networking/TransportGNS.h"
 
 #include <iostream>
-#include <ostream>
+#include <chrono>
 
-#include "Input/SDLInputAdapter.h"
+#include "Core/IEngineLoop.h"
+#include "Core/EngineLoopFactory.h"
+#include "Scene/SceneManager.h"
 
-SpelMotor::SpelMotor(ApplicationSpecifications const& applicationSpecifications)
-	: running(false),
-	  specifications(applicationSpecifications),
-	  timer(nullptr),
-	  tickRate(applicationSpecifications.tickRate),
-	  physicsWorld(std::make_unique<Box2DPhysicsWorld>(
-		  applicationSpecifications.tickRate))
+SpelMotor::SpelMotor(std::unique_ptr<Game> game)
+	:
+	running(false),
+	specifications(game->getApplicationSpecifications()),
+	coreSystemLoop(
+		EngineLoopFactory::createEngineLoop(std::move(game))),
+	coreClock(std::make_unique<ApplicationClock>(coreSystemLoop->getClock(),
+	                                             specifications.
+	                                             networkingOptions.tickRate,
+	                                             specifications.
+	                                             maxFrameTime))
 {
-	if (applicationSpecifications.renderBackend == RenderBackend::SDL)
+	if (coreSystemLoop == nullptr)
 	{
-		SdlContext context = SdlContext();
-		timer.reset();
-
-		// TODO SDL Injection layer
-		clockFunction = []()
-		{
-			return SDL_GetTicks() / 1000.0;
-		};
-		timer = std::make_unique<ApplicationClock>(clockFunction, 60, 0.25);
-
-		renderer = std::make_unique<SDLRenderer>(context);
+		throw std::runtime_error(
+			"Core System Loop is null double check your applicationSpecifications.");
 	}
 }
 
-
-SpelMotor::~SpelMotor() = default;
+SpelMotor::~SpelMotor()
+{
+	shutdown();
+}
 
 void SpelMotor::start()
 {
-	timer->start();
-
-	// TODO Server or Client -> Start()
-	physicsWorld->start();
-	// TODO SceneManager -> Start()
-
-	renderer->open(specifications.windowOptions);
-
+	coreClock->start();
+	coreSystemLoop->start();
 	run();
 }
 
@@ -57,37 +51,21 @@ void SpelMotor::run()
 {
 	running = true;
 
-	InputManager* input = InputManager::getInstance();
-
 	while (running)
 	{
-		timer->tick();
+		coreClock->tick();
 
-		if (input->quitRequested())
+		while (coreClock->shouldFixedUpdate())
 		{
-			running = false;
+			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
+			coreClock->consumeFixedUpdate();
 		}
 
-		while (timer->shouldFixedUpdate())
-		{
-			input->update();
-			physicsWorld->fixedUpdate();
-			timer->consumeFixedUpdate();
-		}
-
-		// TODO Network->Update()
-		// TODO Audio->Update();
-		renderer->presentFrame();
+		coreSystemLoop->update(coreClock->getDeltaTime());
 	}
 }
 
-void SpelMotor::shutdown()
+void SpelMotor::shutdown() const
 {
-	running = false;
-	// TODO audioSystem->shutdown()
-	InputManager::shutdown();
-	renderer->close();
-	physicsWorld->shutdown();
-	// TODO scenemanager->shutdown()
-	// TODO server->shutdown() and client->shutdown()
+	coreSystemLoop->shutdown();
 }

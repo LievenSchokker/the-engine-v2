@@ -1,13 +1,4 @@
-///
-/// Created by Lieven Schokker on 11/11/2025.
-///
-
 #include "Rendering/SDL/SDLRenderer.h"
-
-#include "Rendering/SDL/SDLRenderer.h"
-#include "External/SdlContext.h"
-#include "Math/Vector2Utils.h"
-#include "../../../inc/Rendering/Window/WindowOptions.h"
 #include "External/SdlContext.h"
 #include "Math/Vector2Utils.h"
 #include "Rendering/Window/WindowOptions.h"

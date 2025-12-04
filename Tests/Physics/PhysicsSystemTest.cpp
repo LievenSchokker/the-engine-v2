@@ -29,7 +29,7 @@ TEST(Box2DPhysicsWorldTest, PhysicsSimulationUpdatesTransform)
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
     world.syncTransforms();
 
@@ -49,7 +49,7 @@ TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>();
 
     world.createBody(obj.getComponent<RigidBody>());
@@ -78,7 +78,7 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     auto rb = obj.addComponent<RigidBody>();
     rb->makeStatic();
 
@@ -86,7 +86,7 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
     world.syncTransforms();
 
@@ -105,14 +105,14 @@ TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>();
 
     world.createBody(obj.getComponent<RigidBody>());
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    world.applyForce(obj.getComponent<RigidBody>(), {50, 0});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
     world.fixedUpdate();
     world.syncTransforms();
 
@@ -131,7 +131,7 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
 
     GameObject floor;
     floor.addComponent<Transform>();
-    floor.addComponent<Collider>()->setRectangle({200, 20});
+    floor.addComponent<Collider>()->setRectangle(Vector2(200, 20));
     floor.addComponent<RigidBody>()->makeStatic();
 
     GameObject ball;
@@ -162,13 +162,13 @@ TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>();
 
     world.createBody(obj.getComponent<RigidBody>());
 
-    world.applyForce(obj.getComponent<RigidBody>(), {50, 0});
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
 
     world.fixedUpdate();
     world.syncTransforms();
@@ -189,7 +189,7 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
 
     GameObject obj;
     obj.addComponent<Transform>();
-    obj.addComponent<Collider>()->setRectangle({10, 10});
+    obj.addComponent<Collider>()->setRectangle(Vector2(10, 10));
     obj.addComponent<RigidBody>()->makeStatic();
 
     world.createBody(obj.getComponent<RigidBody>());
@@ -200,7 +200,7 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
     world.destroyBody(obj.getComponent<RigidBody>());
 
     // Apply a force and update world
-    world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+    world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
     world.syncTransforms();
 
@@ -231,7 +231,7 @@ TEST(Box2DPhysicsWorldTest, DestroyDynamicObject)
 
     // Apply a force and simulate multiple frames
     for (int i = 0; i < 10; ++i) {
-        world.applyForce(obj.getComponent<RigidBody>(), {0, 100});
+        world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
         world.fixedUpdate();
         world.syncTransforms();
     }

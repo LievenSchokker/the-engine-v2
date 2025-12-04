@@ -194,6 +194,12 @@ void SceneManager::setClearColor(const Color& color)
 	clearColor = color;
 }
 
+void SceneManager::setWorld(const GameWorld& world)
+{
+    gameWorld = &world;
+}
+
+
 Color SceneManager::getClearColor() const
 {
 	return clearColor;

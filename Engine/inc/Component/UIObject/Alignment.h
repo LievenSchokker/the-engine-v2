@@ -1,4 +1,4 @@
 #pragma once
 
 
-enum class Alignment { Left, Center, Right, Full };
+enum class Alignment { Left, Center, Right};

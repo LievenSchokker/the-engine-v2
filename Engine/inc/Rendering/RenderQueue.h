@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Math/Vector2.h"
+#include "Math/Vector2.h"
 #include "Color.h"
 
 #include <vector>

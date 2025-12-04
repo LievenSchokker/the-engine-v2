@@ -3,7 +3,7 @@
 #include "Animation/AnimationTrack.h"
 #include "Animation/Animator.h"
 #include "GameObject/GameObject.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 #include <gtest/gtest.h>
 

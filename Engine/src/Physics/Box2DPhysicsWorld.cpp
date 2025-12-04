@@ -117,7 +117,7 @@ void Box2DPhysicsWorld::syncTransforms()
         b2Vec2 pos = b2Body_GetPosition(box2DID);
         b2Rot rot = b2Body_GetRotation(box2DID);
 
-        gameObject->getTransform()->setPosition({pos.x, pos.y});
+        gameObject->getTransform()->setPosition(Vector2(pos.x, pos.y));
         gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rot));
     }
 }

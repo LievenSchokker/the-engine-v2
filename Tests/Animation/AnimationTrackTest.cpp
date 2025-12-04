@@ -3,7 +3,7 @@
 #include "Animation/Animator.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 #include <gtest/gtest.h>
 
@@ -22,8 +22,8 @@ class AnimationTrackTest: public ::testing::Test
 TEST_F(AnimationTrackTest, Constructor)
 {
 	AnimationCurve curve(EasingType::Linear);
-	Vector2 fromPos{0.0f, 0.0f};
-	Vector2 toPos{100.0f, 100.0f};
+	Vector2 fromPos(0.0f, 0.0f);
+	Vector2 toPos(100.0f, 100.0f);
 
 	AnimationTrack track(TargetType::Transform, PropertyType::Position, 1.0f,
 						 false, fromPos, toPos, curve);
@@ -37,8 +37,8 @@ TEST_F(AnimationTrackTest, Constructor)
 TEST_F(AnimationTrackTest, SampleVector2)
 {
 	AnimationCurve curve(EasingType::Linear);
-	Vector2 fromPos{0.0f, 0.0f};
-	Vector2 toPos{100.0f, 200.0f};
+	Vector2 fromPos(0.0f, 0.0f);
+	Vector2 toPos(100.0f, 200.0f);
 
 	AnimationTrack track(TargetType::Transform, PropertyType::Position, 1.0f,
 						 false, fromPos, toPos, curve);
@@ -91,8 +91,8 @@ TEST_F(AnimationTrackTest, ApplyPositionAbsolute)
 	Animator* animator = go->addComponent<Animator>();
 
 	AnimationCurve curve(EasingType::Linear);
-	Vector2 fromPos{0.0f, 0.0f};
-	Vector2 toPos{100.0f, 200.0f};
+	Vector2 fromPos(0.0f, 0.0f);
+	Vector2 toPos(100.0f, 200.0f);
 
 	AnimationTrack track(TargetType::Transform, PropertyType::Position, 1.0f,
 						 false, fromPos, toPos, curve);
@@ -135,8 +135,8 @@ TEST_F(AnimationTrackTest, ApplyScaleAbsolute)
 	Animator* animator = go->addComponent<Animator>();
 
 	AnimationCurve curve(EasingType::Linear);
-	Vector2 fromScale{1.0f, 1.0f};
-	Vector2 toScale{2.0f, 3.0f};
+	Vector2 fromScale(1.0f, 1.0f);
+	Vector2 toScale(2.0f, 3.0f);
 
 	AnimationTrack track(TargetType::Transform, PropertyType::Scale, 1.0f,
 						 false, fromScale, toScale, curve);

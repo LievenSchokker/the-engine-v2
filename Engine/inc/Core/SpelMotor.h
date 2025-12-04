@@ -1,17 +1,18 @@
 #pragma once
 
 
-#include <memory>
+#include "Core/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "Rendering/RenderQueue.h"
 
-
-#include "ApplicationSpecifications.h"
-#include "Physics/IPhysicsWorld.h"
-
-#include <functional>
-
-
+class Game;
+class IEngineLoop;
 class ApplicationClock;
-class IRenderer;
+
+#include <atomic>
+#include <memory>
+#include <thread>
+
 
 /**
  * @class SpelMotor
@@ -22,24 +23,28 @@ class IRenderer;
  *
  */
 
-
 class SpelMotor
 {
 public:
-	SpelMotor(const ApplicationSpecifications& applicationSpecifications);
-
+	explicit SpelMotor(std::unique_ptr<Game> game);
 	~SpelMotor();
-
 	/**
-	 * @brief Starts the engine and enters the main game loop.
-	 *
-	 * This method performs all system initialization (rendering, input, etc.) and then
-	 * enters the BLOCKING update loop.
-	 * It only returns when the engine has been shut down.
-	 *
-	 */
+	* @brief Starts the engine and enters the main game loop.
+	*
+	* This method performs all system initialization (rendering, input, etc.) and then
+	* enters the BLOCKING update loop.
+	* It only returns when the engine has been shut down.
+	*
+	*/
 	void start();
-
+	/**
+	* @brief The main game loop that runs until shutdown is requested.
+	*
+	* Encapsulated as a private method to enforce that the game loop can only be
+	* entered through run(), preventing accidental re-entry or misuse.
+	*
+	*/
+	void run();
 	/**
 	 * @brief Immediately shuts down all engine systems.
 	 *
@@ -47,35 +52,17 @@ public:
 	 * to prevent dependency issues.
 	 *
 	 */
-	void shutdown();
+	void shutdown() const;
 
 private:
-	/**
-	 * @brief The main game loop that runs until shutdown is requested.
-	 *
-	 * Encapsulated as a private method to enforce that the game loop can only be
-	 * entered through run(), preventing accidental re-entry or misuse.
-	 *
+	/** @brief Immutable configuration set at construction.
+	 * Const ensures runtime modifications don't destabilize systems.
 	 */
-	void run();
+	const ApplicationSpecifications specifications;
 
-	int tickRate;
 	/** @brief Tracks whether the game loop is active. */
 	bool running;
 
-	/** @brief Immutable configuration set at construction.
-	 * Const ensures runtime modifications don't destabilize systems. */
-	const ApplicationSpecifications specifications;
-
-	/** @brief renderer handle. */
-	std::unique_ptr<IRenderer> renderer;
-
-	/** @brief timeStep calculation for engine */
-	std::unique_ptr<ApplicationClock> timer;
-
-	/** @brief A functions that retusn, the time the applicationhas beenrunning in second */
-	std::function<double()> clockFunction;
-
-	/** @brief the physics world where physics are simulated */
-	std::unique_ptr<IPhysicsWorld> physicsWorld;
+	std::unique_ptr<IEngineLoop> coreSystemLoop;
+	std::unique_ptr<ApplicationClock> coreClock;
 };

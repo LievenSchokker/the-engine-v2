@@ -20,11 +20,11 @@
 #pragma once
 
 
-class IUIRenderHook;
 class string;
 struct WindowOptions;
 
-#include "../Math/Vector2.h"
+# include  "Rendering/IUIRenderHook.h"
+#include "Math/Vector2.h"
 #include "Color.h"
 
 #include <string>

@@ -2,27 +2,25 @@
 #include "Component/Transform.h"
 #include "External/SdlContext.h"
 #include "GameObject/GameObject.h"
+#include "Math/Vector2.h"
 #include "Input/InputManager.h"
+#include "Physics/Box2D/Box2DPhysicsWorld.h"
+#include "Physics/Components/Collider.h"
+#include "Physics/Components/RigidBody.h"
+#include "Physics/IPhysicsWorld.h"
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Scene/SceneManager.h"
-#include "Physics/IPhysicsWorld.h"
-#include "Physics/Box2D/Box2DPhysicsWorld.h"
-#include "Physics/Components/Collider.h"
-#include "Physics/Components/RigidBody.h"
-#include "GameObject/Vector2.h"
 
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <memory>
 
-
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's
 #undef main
-
 
 void createCircle(std::unique_ptr<GameObject>& circle)
 {
@@ -37,7 +35,6 @@ void createCircle(std::unique_ptr<GameObject>& circle)
 	circle->addComponent<Collider>()->setCircle(50);
 }
 
-
 void createRectangle(std::unique_ptr<GameObject>& rectangle)
 {
 	rectangle = std::make_unique<GameObject>();
@@ -51,19 +48,16 @@ void createRectangle(std::unique_ptr<GameObject>& rectangle)
 	rectangle->addComponent<Collider>()->setRectangle({400, 50});
 }
 
-
-
 int main()
 {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
 	SdlContext context(SDL_INIT_EVERYTHING);
 	SDLRenderer renderer(context);
 	InputManager* input = InputManager::getInstance();
 
 	WindowOptions options{"Shape Sandbox", 500, 500};
 	renderer.open(options);
-	if (!renderer.isOpen()) {
+	if ( !renderer.isOpen() )
+	{
 		std::cout << "Failed to open SDL window\n";
 		return 1;
 	}
@@ -91,19 +85,19 @@ int main()
 	GameObject* rectangleGO = activeScene->getGameObject("OrangeSquare");
 
 	// --- Physics World ---
-	std::unique_ptr<IPhysicsWorld> physicsWorld = std::make_unique<
-		Box2DPhysicsWorld>();
+	std::unique_ptr<IPhysicsWorld> physicsWorld =
+		std::make_unique<Box2DPhysicsWorld>();
 	physicsWorld->start();
 
 	// Register GameObjects directly
-    physicsWorld->createBody(circleGO->getComponent<RigidBody>());
-    physicsWorld->createBody(rectangleGO->getComponent<RigidBody>());
-
+	physicsWorld->createBody(circleGO->getComponent<RigidBody>());
+	physicsWorld->createBody(rectangleGO->getComponent<RigidBody>());
 
 	bool running = true;
 	Uint32 lastTicks = SDL_GetTicks();
 
-	while (running && renderer.isOpen()) {
+	while ( running && renderer.isOpen() )
+	{
 		input->update();
 
 		// --- Physics update ---
@@ -127,17 +121,21 @@ int main()
 		renderer.presentFrame();
 
 		// Input
-		if (input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE)) {
+		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) )
+		{
 			running = false;
 		}
 
-		if (input->wasKeyPressed(KeyCode::W)) {
+		if ( input->wasKeyPressed(KeyCode::W) )
+		{
 			physicsWorld->destroyBody(rectangleGO->getComponent<RigidBody>());
 		}
 
-		if (input->wasKeyPressed(KeyCode::SPACE)) {
+		if ( input->wasKeyPressed(KeyCode::SPACE) )
+		{
 			constexpr Vector2 force = {0, 100};
-			physicsWorld->applyForce(rectangleGO->getComponent<RigidBody>(), force);
+			physicsWorld->applyForce(rectangleGO->getComponent<RigidBody>(),
+									 force);
 		}
 
 		SDL_Delay(16);

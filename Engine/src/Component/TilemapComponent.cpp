@@ -31,9 +31,12 @@ void TilemapComponent::setTileColor(int tileId, const Color& color)
 Color TilemapComponent::getTileColor(int tileId) const
 {
 	auto it = tileColors.find(tileId);
-	if ( it != tileColors.end() ) {
+	if ( it != tileColors.end() )
+	{
 		return it->second;
-	} else {
+	}
+	else
+	{
 		std::cout << "[TilemapComponent] Tile color not set for tile ID: "
 				  << tileId << ", returning default white" << std::endl;
 		return Color::white();
@@ -44,12 +47,14 @@ std::vector<ShapeRenderCommand> TilemapComponent::buildRenderCommands() const
 {
 	std::vector<ShapeRenderCommand> commands;
 
-	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() ) {
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
+	{
 		return commands;
 	}
 
 	const Transform* transform = getTransform();
-	if ( transform == nullptr ) {
+	if ( transform == nullptr )
+	{
 		return commands;
 	}
 
@@ -58,19 +63,19 @@ std::vector<ShapeRenderCommand> TilemapComponent::buildRenderCommands() const
 	const int height = tilemapAsset->getHeight();
 
 	// Build a render command for each non-empty tile
-	for ( int y = 0; y < height; ++y ) {
-		for ( int x = 0; x < width; ++x ) {
+	for ( int y = 0; y < height; ++y )
+	{
+		for ( int x = 0; x < width; ++x )
+		{
 			int tileId = tilemapAsset->getTile(x, y);
 
 			// Calculate world position of this tile (top-left corner)
-			Vector2 tileWorldPos{0,0};
-			tileWorldPos.setX(origin.x() + (x * tileSize.x()));
-			tileWorldPos.setY(origin.y() + (y * tileSize.y()));
+			Vector2 tileWorldPos(origin.x() + (x * tileSize.x()),
+								 origin.y() + (y * tileSize.y()));
 
 			// Center the rectangle at the tile position
-			Vector2 tileCenter{0,0};
-			tileCenter.setX(tileWorldPos.x() + (tileSize.x() / 2.0));
-			tileCenter.setY(tileWorldPos.y() + (tileSize.y() / 2.0));
+			Vector2 tileCenter(tileWorldPos.x() + (tileSize.x() / 2.0),
+							   tileWorldPos.y() + (tileSize.y() / 2.0));
 
 			ShapeRenderCommand command;
 			command.type = ShapeRenderType::Rectangle;
@@ -89,53 +94,55 @@ std::vector<ShapeRenderCommand> TilemapComponent::buildRenderCommands() const
 
 Vector2 TilemapComponent::worldToCell(Vector2 worldPos) const
 {
-	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() ) {
-		return {0.0, 0.0};
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
+	{
+		return Vector2(0.0, 0.0);
 	}
 
 	const Transform* transform = getTransform();
-	if ( transform == nullptr ) {
-		return {0.0, 0.0};
+	if ( transform == nullptr )
+	{
+		return Vector2(0.0, 0.0);
 	}
 
 	const Vector2 origin = transform->getPosition();
 
 	// Convert world position to grid coordinates
-	Vector2 relativePos{0,0};
-	relativePos.setX(worldPos.x() - origin.x());
-	relativePos.setY( worldPos.y() - origin.y());
+	Vector2 relativePos(worldPos.x() - origin.x(), worldPos.y() - origin.y());
 
-	Vector2 cell{0,0};
-	cell.setX(std::floor(relativePos.x() / tileSize.x()));
-	cell.setY(std::floor(relativePos.y() / tileSize.y()));
+	Vector2 cell(std::floor(relativePos.x() / tileSize.x()),
+				 std::floor(relativePos.y() / tileSize.y()));
 
 	return cell;
 }
 
 Vector2 TilemapComponent::cellToWorld(Vector2 cell) const
 {
-	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() ) {
-		return {0.0, 0.0};
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
+	{
+		return Vector2(0.0, 0.0);
 	}
 
 	const Transform* transform = getTransform();
-	if ( transform == nullptr ) {
-		return {0.0, 0.0};
+	if ( transform == nullptr )
+	{
+		return Vector2(0.0, 0.0);
 	}
 
 	const Vector2 origin = transform->getPosition();
 
 	// Convert grid coordinates to world position (center of tile)
-	Vector2 worldPos{0,0};
-	worldPos.setX(origin.x() + (cell.x() * tileSize.x()) + (tileSize.x() / 2.0));
-	worldPos.setY(origin.y() + (cell.y() * tileSize.y() + (tileSize.y() / 2.0)));
+	Vector2 worldPos(
+		origin.x() + (cell.x() * tileSize.x()) + (tileSize.x() / 2.0),
+		origin.y() + (cell.y() * tileSize.y()) + (tileSize.y() / 2.0));
 
 	return worldPos;
 }
 
 int TilemapComponent::getTileAt(Vector2 cell) const
 {
-	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() ) {
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
+	{
 		return 0;
 	}
 
@@ -156,7 +163,8 @@ bool TilemapComponent::hasTileAt(Vector2 cell) const
 
 int TilemapComponent::getGridWidth() const
 {
-	if ( tilemapAsset == nullptr ) {
+	if ( tilemapAsset == nullptr )
+	{
 		return 0;
 	}
 	return tilemapAsset->getWidth();
@@ -164,7 +172,8 @@ int TilemapComponent::getGridWidth() const
 
 int TilemapComponent::getGridHeight() const
 {
-	if ( tilemapAsset == nullptr ) {
+	if ( tilemapAsset == nullptr )
+	{
 		return 0;
 	}
 	return tilemapAsset->getHeight();
