@@ -5,9 +5,8 @@
 #pragma once
 
 
-#include "AI/BaseAgentModule.h"
+#include "Modules/BaseAgentModule.h"
 #include "AI/ModuleData.h"
-#include "AI/ModuleStatus.h"
 
 
 template<typename T, typename... Args>
@@ -20,7 +19,7 @@ bool Agent::addAgentModule(float desiredWeight, Args&&... args)
 
     moduleDatas.emplace_back(
           std::make_unique<ModuleData>(
-              std::make_unique<T>(std::forward<Args>(args)...),
+              std::make_unique<T>(*this, std::forward<Args>(args)...),
               desiredWeight
           )
       );

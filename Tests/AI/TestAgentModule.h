@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include "AI/BaseAgentModule.h"
+#include "AI/Modules/BaseAgentModule.h"
 struct Vector2;
 
 /**
@@ -16,7 +16,7 @@ struct Vector2;
 class TestAgentModule : public BaseAgentModule
 {
     public:
-        TestAgentModule() = default;
+        TestAgentModule(const Agent& agent) : BaseAgentModule(agent) {};
         ~TestAgentModule() override = default;
 
         /// Returns Vector2::one().

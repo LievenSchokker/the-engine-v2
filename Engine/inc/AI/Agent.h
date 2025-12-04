@@ -17,7 +17,7 @@ enum class ModuleType;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : currentVelocity(Vector2{0, 0}), maxModuleForceMagnitude(0), maxVelocityMagnitude(0)
+        Agent() : currentVelocity(Vector2::zero()), maxModuleForceMagnitude(0), maxVelocityMagnitude(0)
         {
         };
 

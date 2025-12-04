@@ -5,14 +5,15 @@
 
 #pragma once
 
-
+class Agent;
+class Transform;
 struct Vector2;
 
 
 class BaseAgentModule
 {
     public:
-        BaseAgentModule() = default;
+        explicit BaseAgentModule(const Agent& _agent);
         virtual ~BaseAgentModule() = default;
 
         /**
@@ -20,4 +21,8 @@ class BaseAgentModule
          * @return the computed movement vector for this module.
          */
         virtual Vector2 compute() = 0;
+
+    protected:
+        const Agent& agent;
+        const Transform& agentTransform;
 };

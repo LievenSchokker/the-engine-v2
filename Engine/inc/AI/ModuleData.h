@@ -1,11 +1,11 @@
 //
 // Created by samle on 02/12/2025.
 //
+
 #pragma once
 
-
-#include "AI/BaseAgentModule.h"
 #include "AI/ModuleStatus.h"
+class BaseAgentModule;
 
 #include <memory>
 
