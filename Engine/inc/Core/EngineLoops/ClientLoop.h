@@ -5,6 +5,7 @@
 #include "Core/IEngineLoop.h"
 #include "External/SdlContext.h"
 
+class Game;
 class Client;
 class IRenderer;
 class InputManager;
@@ -38,9 +39,8 @@ public:
      *
      * @param applicationSpecifications Client configuration (resolution, server address)
      */
-    explicit ClientLoop(
-        const ApplicationSpecifications& applicationSpecifications);
-    ~ClientLoop() override = default;
+	explicit ClientLoop(std::unique_ptr<Game> game);
+    ~ClientLoop() override;
 
     GameWorld* getGameWorld() override;
     SceneManager* getSceneManager() override;
@@ -59,7 +59,8 @@ private:
      */
     void initializeNetworking();
 
-    ApplicationSpecifications applicationSpecifications;
+	std::unique_ptr<Game> game;
+    ApplicationSpecifications specifications;
     std::unique_ptr<GameWorld> gameWorld;
     std::unique_ptr<SceneManager> sceneManager;
     std::unique_ptr<Client> client;

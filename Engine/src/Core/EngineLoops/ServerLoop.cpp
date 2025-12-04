@@ -1,4 +1,6 @@
 #include "Core/EngineLoops/ServerLoop.h"
+#include "Networking/Client.h"
+#include "Game.h"
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ClientLoop.h"
 #include "Scene/SceneManager.h"
@@ -8,13 +10,12 @@
 #include "Networking/TransportGNS.h"
 #include "Networking/Server/Server.h"
 
-ServerLoop::ServerLoop(
-	const ApplicationSpecifications& applicationspecifications)
-	: applicationSpecifications(applicationspecifications)
+ServerLoop::ServerLoop(std::unique_ptr<Game> game)
+	: specifications(game->getApplicationSpecifications())
 	  , gameWorld(std::make_unique<GameWorld>())
 	  , sceneManager(std::make_unique<SceneManager>())
 	  , server(std::make_unique<Server>(
-		  Server::convertApplicationSettings(applicationspecifications),
+		  Server::convertApplicationSettings(specifications),
 		  std::make_unique<TransportGNS>()))
 {
 	clockFunction = []()
@@ -23,6 +24,8 @@ ServerLoop::ServerLoop(
 		return duration<double>(steady_clock::now().time_since_epoch()).count();
 	};
 }
+
+ServerLoop::~ServerLoop() = default;
 
 ServerLoop::ClockFunction ServerLoop::getClock()
 {

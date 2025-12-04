@@ -1,4 +1,6 @@
 #include "Core/EngineLoops/ClientLoop.h"
+
+#include "Game.h"
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
 #include "External/SdlContext.h"
@@ -14,21 +16,21 @@
 
 #include <iostream>
 #include <ostream>
-
+#include "Networking/Server/Server.h"
 
 //TODO Create proper factory for each system that needs to be created
-ClientLoop::ClientLoop(
-	const ApplicationSpecifications& applicationSpecifications)
+ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	: sceneManager(std::make_unique<SceneManager>()),
+	  game(std::move(spel)),
 	  gameWorld(std::make_unique<GameWorld>()),
-	  applicationSpecifications(applicationSpecifications),
+	  specifications(game->getApplicationSpecifications()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
 {
 	clockFunction = []()
 	{
 		return 1.0;
 	};
-	if (applicationSpecifications.renderBackend == RenderBackend::SDL)
+	if (specifications.renderBackend == RenderBackend::SDL)
 	{
 		sdlContext = std::make_unique<SdlContext>();
 		//TODO SDL Injection layer
@@ -42,9 +44,11 @@ ClientLoop::ClientLoop(
 	inputManager = InputManager::getInstance();
 }
 
+ClientLoop::~ClientLoop() = default;
+
 void ClientLoop::start()
 {
-	renderer->open(applicationSpecifications.windowOptions);
+	renderer->open(specifications.windowOptions);
 	initializeNetworking();
 }
 
@@ -70,8 +74,8 @@ void ClientLoop::fixedUpdate(double deltaTime)
 void ClientLoop::initializeNetworking()
 {
 	ServerConnectionInformation serverInfo;
-	serverInfo.ip = applicationSpecifications.networkingOptions.serverIP;
-	serverInfo.port = applicationSpecifications.networkingOptions.port;
+	serverInfo.ip = specifications.networkingOptions.serverIP;
+	serverInfo.port = specifications.networkingOptions.port;
 	client->connectToServer(serverInfo);
 }
 

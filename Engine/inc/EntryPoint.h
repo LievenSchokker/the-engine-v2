@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "Game.h"
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
 #include "Networking/Client.h"
@@ -12,17 +13,9 @@
 namespace SpelMotorEntry
 {
 
-	inline int main(int argc, char** argv)
+	inline int main(std::unique_ptr<Game> game)
 	{
-		ApplicationSpecifications specifications{};
-
-		specifications.windowOptions = {"SpelMotor", 700, 700};
-		specifications.renderBackend = RenderBackend::SDL;
-		specifications.networkingOptions.tickRate = 60;
-	    specifications.networkingOptions.mode = EngineMode::CLIENT;
-	    specifications.networkingOptions.port = 8080;
-	    specifications.networkingOptions.serverIP = "127.0.0.1";
-		SpelMotor engine(specifications);
+		SpelMotor engine(std::move(game));
 		engine.start();
 		return 0;
 	}

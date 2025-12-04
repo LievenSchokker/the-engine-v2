@@ -5,6 +5,7 @@
 #include "Core/GameWorld.h"
 #include "Rendering/RenderQueue.h"
 
+class Game;
 class IEngineLoop;
 class ApplicationClock;
 
@@ -25,8 +26,7 @@ class ApplicationClock;
 class SpelMotor
 {
 public:
-	explicit SpelMotor(
-		const ApplicationSpecifications& applicationSpecifications);
+	explicit SpelMotor(std::unique_ptr<Game> game);
 	~SpelMotor();
 	/**
 	* @brief Starts the engine and enters the main game loop.
@@ -55,13 +55,14 @@ public:
 	void shutdown() const;
 
 private:
+	/** @brief Immutable configuration set at construction.
+	 * Const ensures runtime modifications don't destabilize systems.
+	 */
+	const ApplicationSpecifications specifications;
+
 	/** @brief Tracks whether the game loop is active. */
 	bool running;
 
 	std::unique_ptr<IEngineLoop> coreSystemLoop;
-	/** @brief Immutable configuration set at construction.
-	 * Const ensures runtime modifications don't destabilize systems. */
-	const ApplicationSpecifications specifications;
-
 	std::unique_ptr<ApplicationClock> coreClock;
 };
