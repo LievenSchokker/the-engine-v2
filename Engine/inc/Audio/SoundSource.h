@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Component/Component.h"
 #include "Audio/Handles.h"
+#include "AudioManager.h"
+#include "Behaviour/Behaviour.h"
 
 #include <string>
-
-class AudioManager;
 
 /**
  * @class SoundSource
@@ -14,10 +13,10 @@ class AudioManager;
  * SoundSource supports one-shot playback (explosions, UI sounds) and
  * optionally looping. Each SoundSource may play multiple times (Mix channels).
  */
-class SoundSource : public Component
+class SoundSource: public Component
 {
-public:
-	SoundSource() = default;
+   public:
+	SoundSource(AudioManager* audioManagerPtr);
 	~SoundSource() = default;
 
 	/**
@@ -45,13 +44,17 @@ public:
 	 */
 	void setPanning(float left, float right);
 
-	/// Tag/path of the loaded sound track.
+	/// Tag/path of the loaded soundtrack.
 	std::string soundAssetTag;
 
+   private:
 	/// Pointer to the audio manager.
 	AudioManager* audioManager = nullptr;
 
-private:
 	SoundHandle handle = -1;
+
 	int channel = -1;
+
+	float lastLeft = 1.0f;
+	float lastRight = 1.0f;
 };

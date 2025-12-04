@@ -1,4 +1,5 @@
 #include "Audio/SDL/AudioBackendSDL.h"
+
 #include "Audio/Handles.h"
 #include "SDL.h"
 #include "SDL_mixer.h"
@@ -7,117 +8,115 @@
 
 AudioBackendSDL::~AudioBackendSDL()
 {
-    // Cleanup audio
-    for (auto& s : soundMap)
-        Mix_FreeChunk(s.second);
-    for (auto& m : musicMap)
-        Mix_FreeMusic(m.second);
+	// Cleanup audio
+	for ( auto& s : soundMap ) Mix_FreeChunk(s.second);
+	for ( auto& m : musicMap ) Mix_FreeMusic(m.second);
 
-    soundMap.clear();
-    musicMap.clear();
+	soundMap.clear();
+	musicMap.clear();
 
-    if (initialized)
-    {
-        Mix_CloseAudio();
-        Mix_Quit();
-        SDL_QuitSubSystem(SDL_INIT_AUDIO);
-    }
+	if ( initialized )
+	{
+		Mix_CloseAudio();
+		Mix_Quit();
+		SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	}
 }
 
 bool AudioBackendSDL::initialize()
 {
-    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0)
-    {
-        std::cerr << "SDL audio init error: " << SDL_GetError() << std::endl;
-        return false;
-    }
+	if ( SDL_InitSubSystem(SDL_INIT_AUDIO) < 0 )
+	{
+		std::cerr << "SDL audio init error: " << SDL_GetError() << std::endl;
+		return false;
+	}
 
 	int flags = MIX_INIT_OGG;
 	int initted = Mix_Init(flags);
-	if ((initted & flags) != flags)
+	if ( (initted & flags) != flags )
 	{
 		std::cerr << "SDL_mixer init error: " << Mix_GetError() << std::endl;
 		// return false;
 	}
 
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
-    {
-        std::cerr << "SDL_mixer open audio error: " << Mix_GetError() << std::endl;
-        return false;
-    }
+	if ( Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0 )
+	{
+		std::cerr << "SDL_mixer open audio error: " << Mix_GetError()
+				  << std::endl;
+		return false;
+	}
 
-    initialized = true;
-    return true;
+	Mix_AllocateChannels(32);
+
+	initialized = true;
+	return true;
 }
 
 SoundHandle AudioBackendSDL::loadSound(const std::string& path)
 {
-    Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
-    if (!chunk)
-    {
-        std::cerr << "Failed to load sound: " << path
-                  << " - " << Mix_GetError() << std::endl;
-        return -1;
-    }
+	Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
+	if ( !chunk )
+	{
+		std::cerr << "Failed to load sound: " << path << " - " << Mix_GetError()
+				  << std::endl;
+		return -1;
+	}
 
-    SoundHandle handle = nextSoundHandle++;
-    soundMap[handle] = chunk;
-    return handle;
+	SoundHandle handle = nextSoundHandle++;
+	soundMap[handle] = chunk;
+	return handle;
 }
 
 MusicHandle AudioBackendSDL::loadMusic(const std::string& path)
 {
-    Mix_Music* music = Mix_LoadMUS(path.c_str());
-    if (!music)
-    {
-        std::cerr << "Failed to load music: " << path
-                  << " - " << Mix_GetError() << std::endl;
-        return -1;
-    }
+	Mix_Music* music = Mix_LoadMUS(path.c_str());
+	if ( !music )
+	{
+		std::cerr << "Failed to load music: " << path << " - " << Mix_GetError()
+				  << std::endl;
+		return -1;
+	}
 
-    MusicHandle handle = nextMusicHandle++;
-    musicMap[handle] = music;
-    return handle;
+	MusicHandle handle = nextMusicHandle++;
+	musicMap[handle] = music;
+	return handle;
 }
 
 void AudioBackendSDL::unloadSound(SoundHandle handle)
 {
-    auto it = soundMap.find(handle);
-    if (it != soundMap.end())
-    {
-        Mix_FreeChunk(it->second);
-        soundMap.erase(it);
-    }
+	auto it = soundMap.find(handle);
+	if ( it != soundMap.end() )
+	{
+		Mix_FreeChunk(it->second);
+		soundMap.erase(it);
+	}
 }
 
 void AudioBackendSDL::unloadMusic(MusicHandle handle)
 {
-    auto it = musicMap.find(handle);
-    if (it != musicMap.end())
-    {
-        Mix_FreeMusic(it->second);
-        musicMap.erase(it);
-    }
+	auto it = musicMap.find(handle);
+	if ( it != musicMap.end() )
+	{
+		Mix_FreeMusic(it->second);
+		musicMap.erase(it);
+	}
 }
 
 void AudioBackendSDL::playSound(SoundHandle handle, int channel, int loops)
 {
-    auto it = soundMap.find(handle);
-    if (it == soundMap.end())
-        return;
+	auto it = soundMap.find(handle);
+	if ( it == soundMap.end() ) return;
 
-    Mix_PlayChannel(channel, it->second, loops);
+	Mix_PlayChannel(channel, it->second, loops);
 }
 
 bool AudioBackendSDL::playMusic(MusicHandle handle, int loops)
 {
-    auto it = musicMap.find(handle);
-    if (it == musicMap.end())
-        return false;
+	auto it = musicMap.find(handle);
+	if ( it == musicMap.end() ) return false;
 
-    return Mix_PlayMusic(it->second, loops) == 0;
+	return Mix_PlayMusic(it->second, loops) == 0;
 }
-
 
 void AudioBackendSDL::pauseMusic()
 {
@@ -131,28 +130,27 @@ void AudioBackendSDL::resumeMusic()
 
 void AudioBackendSDL::stopChannel(int channel)
 {
-    Mix_HaltChannel(channel);
+	Mix_HaltChannel(channel);
 }
 
 void AudioBackendSDL::stopMusic()
 {
-    Mix_HaltMusic();
+	Mix_HaltMusic();
 }
 
 void AudioBackendSDL::setMusicVolume(float volume)
 {
-    int vol = static_cast<int>(volume * MIX_MAX_VOLUME);
-    Mix_VolumeMusic(vol);
+	int vol = static_cast<int>(volume * MIX_MAX_VOLUME);
+	Mix_VolumeMusic(vol);
 }
 
 void AudioBackendSDL::setChannelPanning(int channel, float left, float right)
 {
-    Uint8 leftByte  = (Uint8)(left  * 255);
-    Uint8 rightByte = (Uint8)(right * 255);
+	Uint8 leftByte = static_cast<Uint8>(left * 255);
+	Uint8 rightByte = static_cast<Uint8>(right * 255);
 
-    Mix_SetPanning(channel, leftByte, rightByte);
+	Mix_SetPanning(channel, leftByte, rightByte);
 }
-
 
 int AudioBackendSDL::reserveFreeChannel()
 {

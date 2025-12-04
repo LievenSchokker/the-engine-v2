@@ -1,6 +1,7 @@
 #pragma once
 
 #include "AudioAssetManager.h"
+#include "Behaviour/Behaviour.h"
 #include "Component/Component.h"
 
 #include <string>
@@ -14,10 +15,10 @@ class AudioManager;
  * MusicSource represents a single logical music player. It communicates with
  * the AudioManager to load music assets and control playback parameters.
  */
-class MusicSource : public Component
+class MusicSource: public Component
 {
-public:
-	MusicSource() = default;
+   public:
+	MusicSource(AudioManager* audioManagerPtr);
 	~MusicSource() = default;
 
 	/**
@@ -62,12 +63,19 @@ public:
 	/// Path or tag of the loaded music track.
 	std::string musicAssetTag;
 
+   private:
 	/// Reference to the AudioManager controlling playback.
 	AudioManager* audioManager = nullptr;
 
-private:
-	bool playing = false;      ///< Whether the music is currently playing.
-	bool loop = false;         ///< Should the music loop?
-	float volume = 0.9f;       ///< Playback volume.
-	MusicHandle handle = -1;   ///< Handle to the loaded music asset.
+	///< Whether the music is currently playing.
+	bool playing = false;
+
+	///< Should the music loop?
+	bool loop = false;
+
+	///< Playback volume.
+	float volume = 0.9f;
+
+	///< Handle to the loaded music asset.
+	MusicHandle handle = -1;
 };
