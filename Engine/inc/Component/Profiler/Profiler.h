@@ -52,28 +52,15 @@ private:
 	float minFrameTime;
 	float maxFrameTime;
 
-	// Demo mode
-	bool demoMode;
-	float demoTime;
-	std::deque<float> demoData;
-
 	// Cached stats
 	int entityCount;
 	int activeSceneCount;
-	std::string networkStatus;
-	int networkPing;
-	int connectedClients;
-	int localClientId;
-	bool isServer;
-	bool isClient;
 
 	// Display toggles
 	bool showFPS;
 	bool showFrameTime;
 	bool showFrameGraph;
 	bool showEntityCount;
-	bool showNetworkStats;
-	bool showPhysicsStats;
 
 	// Colors
 	Color titleColor;

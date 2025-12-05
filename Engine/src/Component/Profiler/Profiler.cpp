@@ -18,22 +18,12 @@ Profiler::Profiler(float x, float y, float width, float height)
 	  , averageFrameTime(0.0f)
 	  , minFrameTime(0.0f)
 	  , maxFrameTime(0.0f)
-	  , demoMode(false)
-	  , demoTime(0.0f)
 	  , entityCount(0)
 	  , activeSceneCount(0)
-	  , networkStatus("Offline")
-	  , networkPing(0)
-	  , connectedClients(0)
-	  , localClientId(-1)
-	  , isServer(false)
-	  , isClient(false)
 	  , showFPS(true)
 	  , showFrameTime(true)
 	  , showFrameGraph(true)
 	  , showEntityCount(true)
-	  , showNetworkStats(true)
-	  , showPhysicsStats(true)
 	  , titleColor(Color::yellow())
 	  , labelColor(Color::white())
 	  , goodColor(Color::green())
@@ -74,58 +64,14 @@ void Profiler::calculateFPS(float deltaTime)
 		maxFrameTime = *std::max_element(frameTimes.begin(), frameTimes.end());
 	}
 
-	// Demo mode: generate sine wave data
-	if (demoMode)
-	{
-		demoTime += deltaTime;
-
-		// Combine multiple sine waves for interesting pattern
-		float value = 0.025f +
-		              0.015f * std::sin(demoTime * 2.0f) +
-		              0.008f * std::sin(demoTime * 5.0f) +
-		              0.005f * std::sin(demoTime * 11.0f);
-
-		demoData.push_back(value);
-		if (demoData.size() > kMaxFrameSamples)
-		{
-			demoData.pop_front();
-		}
-	}
 }
 
 void Profiler::updateStats(GameWorld* world)
 {
-	if (world == nullptr)
-	{
-		networkStatus = "No World";
-		isServer = false;
-		isClient = false;
-		return;
-	}
-
-	isServer = world->isServer();
-	isClient = world->isClient();
-	localClientId = world->localClientId;
-
 	if (world->sceneManager != nullptr)
 	{
 		entityCount = 0;
 		activeSceneCount = 1;
-	}
-
-	if (isServer && world->server != nullptr)
-	{
-		networkStatus = "Server";
-		connectedClients = 0;
-	}
-	else if (isClient && world->client != nullptr)
-	{
-		networkStatus = "Client";
-		networkPing = 0;
-	}
-	else
-	{
-		networkStatus = "Offline";
 	}
 }
 
@@ -262,16 +208,6 @@ void Profiler::setShowFrameTime(bool show)
 void Profiler::setShowEntityCount(bool show)
 {
 	showEntityCount = show;
-}
-
-void Profiler::setShowNetworkStats(bool show)
-{
-	showNetworkStats = show;
-}
-
-void Profiler::setShowPhysicsStats(bool show)
-{
-	showPhysicsStats = show;
 }
 
 Color Profiler::getFPSColor() const
