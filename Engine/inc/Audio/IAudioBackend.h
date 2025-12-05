@@ -89,6 +89,7 @@ class IAudioBackend
 
 	/**
 	 * @brief Sets stereo panning for a channel.
+	 * @param channel  The channel where to change the stereo
 	 * @param left  Left volume (0.0–1.0)
 	 * @param right Right volume (0.0–1.0)
 	 */

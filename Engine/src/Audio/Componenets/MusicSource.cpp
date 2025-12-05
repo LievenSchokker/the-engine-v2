@@ -1,4 +1,4 @@
-#include "Audio/MusicSource.h"
+#include "../../../inc/Audio/Components/MusicSource.h"
 
 #include "Audio/AudioManager.h"
 
@@ -46,9 +46,15 @@ void MusicSource::resume()
 
 void MusicSource::setVolume(float value)
 {
-	volume = value;
+	float newVolume = std::clamp<float>(value, 0.0f, 1.0f);
+	volume = newVolume;
 	if ( !audioManager ) return;
 	audioManager->setMusicVolume(volume);
+}
+
+float MusicSource::getCurrentVolume() const
+{
+	return volume;
 }
 
 void MusicSource::setLoop(bool shouldLoop)

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "AudioAssetManager.h"
-#include "Behaviour/Behaviour.h"
+#include "../Handles.h"
 #include "Component/Component.h"
 
 #include <string>
@@ -59,6 +58,8 @@ class MusicSource: public Component
 	 * @param shouldLoop True to loop, false to play once.
 	 */
 	void setLoop(bool shouldLoop);
+
+	float getCurrentVolume() const;
 
 	/// Path or tag of the loaded music track.
 	std::string musicAssetTag;
