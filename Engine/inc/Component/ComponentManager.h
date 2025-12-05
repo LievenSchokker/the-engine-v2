@@ -43,9 +43,8 @@ public:
    * @tparam T Type of the component to add (must inherit from Component)
    * @return Pointer to the newly added component
    */
-    template <typename T>
-    T* addComponent();
-
+    template <typename T, typename... Args>
+    T* addComponent(Args&&... args);
 
     /**
     * @brief Retrieves a component of type T from  @c components, if it exists.
@@ -157,5 +156,5 @@ private:
 };
 
 /// Template implementations:
-#include "Component/Component.h"
+#include "BaseComponentTypes/Component.h"
 #include "ComponentManagerImplementation.inl"

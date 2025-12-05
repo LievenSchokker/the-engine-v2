@@ -17,14 +17,14 @@ enum class ModuleType;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : currentVelocity(Vector2::zero()), maxModuleForceMagnitude(0), maxVelocityMagnitude(0)
+        Agent() : currentVelocity(Vector2::zero()), maxModuleForceMagnitude(0), maxVelocityMagnitude(0), arrivingDistance(10.0f)
         {
         };
 
         ~Agent() override = default;
 
         void onAwake() override;
-        void update(float deltaTime) override;
+        void update(float deltaTime, GameWorld* gameWorld) override;
 
         Vector2 computeModuleForce();
         Vector2 computeDesiredVelocity();
@@ -57,6 +57,9 @@ class Agent final : public Behaviour
 
         [[nodiscard]] size_t getModuleCount() const;
 
+        float getArrivingDistance() const;
+        void setArrivingDistance(float distance);
+
     private:
         template<typename T>
         bool tryGetAgentModule(ModuleData*& out) const;
@@ -68,6 +71,7 @@ class Agent final : public Behaviour
         Vector2 currentVelocity;
         float maxModuleForceMagnitude;
         float maxVelocityMagnitude;
+        float arrivingDistance;
 };
 
 #include "AI/AgentImplementation.h"

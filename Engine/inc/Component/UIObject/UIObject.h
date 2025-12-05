@@ -1,13 +1,12 @@
 #pragma once
 
+#include "Component/BaseComponentTypes/UIRenderComponent.h"
 
-#include "Component/Component.h"
-
-class UIObject: public Component
+class UIObject : public UserInterfaceRenderComponent
 {
 public:
-	explicit UIObject(float x = 0, float y = 0, float width = 0, float height = 0);
-	~UIObject() override;
+	explicit UIObject(float x = 0, float y = 0, float width = 100, float height = 30);
+	~UIObject() override = default;
 
 	float getX() const;
 	float getY() const;
@@ -22,8 +21,16 @@ public:
 	bool isVisible() const;
 	void setVisible(bool newVisible);
 
-private:
+	void setPanelId(uint32_t id);
+	uint32_t getPanelId() const;
+
+	void setParentId(uint32_t id);
+	uint32_t getParentId() const;
+
+protected:
 	float x, y;
 	float width, height;
 	bool visible = true;
+	uint32_t panelId = 0;
+	uint32_t parentId = NO_PARENT;
 };

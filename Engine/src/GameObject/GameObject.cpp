@@ -6,6 +6,7 @@
 #include "Component/ComponentManager.h"
 #include "Component/Transform.h"
 #include "GameObject/ScenePlaceholder.h"
+#include "Scene/Scene.h"
 
 GameObject::GameObject()
 {

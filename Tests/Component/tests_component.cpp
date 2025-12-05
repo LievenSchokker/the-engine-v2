@@ -3,7 +3,7 @@
 // //
 
 #include "GameObject/GameObject.h"
-#include "Component/Component.h"
+#include "../../Engine/inc/Component/BaseComponentTypes/Component.h"
 #include "Component/ComponentManager.h"
 #include "GameObject/ScenePlaceholder.h"
 #include "../Component/TestComponents.h"

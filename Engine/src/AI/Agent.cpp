@@ -16,7 +16,7 @@ void Agent::onAwake()
 }
 
 
-void Agent::update(float deltaTime)
+void Agent::update(float deltaTime, GameWorld* gameWorld)
 {
     Vector2 velocity = computeDesiredVelocity();
     transform->setPosition(transform->getPosition() + velocity);
@@ -98,6 +98,19 @@ size_t Agent::getModuleCount() const
 {
     return moduleDatas.size();
 }
+
+
+float Agent::getArrivingDistance() const
+{
+    return arrivingDistance;
+}
+
+
+void Agent::setArrivingDistance(float distance)
+{
+    arrivingDistance = distance;
+}
+
 
 
 

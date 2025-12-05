@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <functional>
 
-
 /**
  * @class ApplicationClock
  * @brief frame timing with fixed timestep accumulation for deterministic simulation.

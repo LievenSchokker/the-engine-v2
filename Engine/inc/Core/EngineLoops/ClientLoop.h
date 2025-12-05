@@ -4,6 +4,7 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Core/IEngineLoop.h"
 #include "External/SdlContext.h"
+#include "Rendering/RenderSystem.h"
 
 class Game;
 class Client;
@@ -64,7 +65,7 @@ private:
     std::unique_ptr<GameWorld> gameWorld;
     std::unique_ptr<SceneManager> sceneManager;
     std::unique_ptr<Client> client;
-    std::unique_ptr<IRenderer> renderer;
+    std::unique_ptr<RenderSystem> renderer;
     std::unique_ptr<SdlContext> sdlContext;
     InputManager* inputManager;
     ClockFunction clockFunction;

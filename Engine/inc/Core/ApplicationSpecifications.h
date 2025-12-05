@@ -5,7 +5,6 @@
 #include "Rendering/Window/WindowOptions.h"
 #include "Rendering/RenderBackend.h"
 
-
 struct ApplicationSpecifications
 {
     NetworkingOptions networkingOptions;

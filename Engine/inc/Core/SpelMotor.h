@@ -3,7 +3,7 @@
 
 #include "Core/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
-#include "Rendering/RenderQueue.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 
 class Game;
 class IEngineLoop;

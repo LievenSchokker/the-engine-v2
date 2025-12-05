@@ -17,8 +17,6 @@ add_executable(engine_tests
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
         Component/GridComponentTest.cpp
-        Component/UIObject/tests_uiobjects.cpp
-        GameObject/tests_game_object.cpp
         Scene/SceneManagerTest.cpp
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp

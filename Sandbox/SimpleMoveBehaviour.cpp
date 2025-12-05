@@ -30,7 +30,7 @@ void SimpleMoveBehaviour::onStart()
     std::cout << "SimpleMoveBehaviour is now started" << std::endl;
 }
 
-void SimpleMoveBehaviour::update(float deltaTime)
+void SimpleMoveBehaviour::update(float deltaTime, GameWorld* world)
 {
 	pollInput();
 
@@ -68,6 +68,13 @@ void SimpleMoveBehaviour::pollInput()
 
     currentDirection.normalize();
 }
+
+
+void SimpleMoveBehaviour::setMaxSpeed(float speed)
+{
+    maxSpeed = speed;
+}
+
 
 
 

@@ -97,13 +97,18 @@ public:
 	* reserved size of 250 elements.
 	*
 	*/
-	void submit(UIRenderCommand command) override;
+	void process(const std::vector<UIRenderCommand>& commands) override;
 
 private:
 	void flushCommands();
 	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
 	void renderElement(const UIRenderCommand& command);
+	void renderChart(const UIRenderCommand& command);
+	void renderProgressBar(const UIRenderCommand& command);
+	void renderSeparator(const UIRenderCommand& command);
+	void renderImage(const UIRenderCommand& command);
+	void renderSpacer(const UIRenderCommand& command);
 	void renderText(const UIRenderCommand& command);
 	
 	InputManager* inputManager;

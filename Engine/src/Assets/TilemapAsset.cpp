@@ -118,7 +118,7 @@ int TilemapAsset::getTile(int x, int y) const
 
 int TilemapAsset::getTile(Vector2 cell) const
 {
-	return getTile(static_cast<int>(cell.x()), static_cast<int>(cell.y()));
+	return getTile(static_cast<int>(cell.x), static_cast<int>(cell.y));
 }
 
 bool TilemapAsset::hasTile(int x, int y) const
