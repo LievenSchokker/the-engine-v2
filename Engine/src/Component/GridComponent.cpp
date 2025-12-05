@@ -6,6 +6,11 @@
 #include <algorithm>
 #include <cmath>
 
+#if defined WIN32
+    #include <corecrt_math_defines.h>
+#endif
+
+
 GridComponent::GridComponent()
 {
 }
