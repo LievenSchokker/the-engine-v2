@@ -12,6 +12,7 @@ add_executable(engine_tests
         Core/ServerLoopTest.cpp
         Core/ClientLoopTest.cpp
         Core/TimerTest.cpp
+        Component/Profiler/ProfilerTest.cpp
         Component/tests_TestComponents.cpp
         Component/TestComponentBase.cpp
         Component/tests_component.cpp

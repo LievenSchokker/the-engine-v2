@@ -68,11 +68,11 @@ void Profiler::calculateFPS(float deltaTime)
 
 void Profiler::updateStats(GameWorld* world)
 {
-	if (world->sceneManager != nullptr)
-	{
-		entityCount = 0;
-		activeSceneCount = 1;
-	}
+    if (world != nullptr && world->sceneManager != nullptr)
+    {
+        entityCount = 0;
+        activeSceneCount = 1;
+    }
 }
 
 void Profiler::fillUserInterfaceRenderQueue(
