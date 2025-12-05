@@ -12,17 +12,14 @@ bool AudioManager::initialize(std::unique_ptr<IAudioBackend> backendPtr)
 
 void AudioManager::shutdown()
 {
-	audioSources.clear();
 	musicSource = nullptr;
 	listener = nullptr;
 	backend = nullptr;
 }
 
-
-bool AudioManager::loadMusic(const std::string& path) const
+MusicHandle AudioManager::loadMusic(const std::string& path) const
 {
 	return backend->loadMusic(path);
-	;
 }
 
 bool AudioManager::setMusicSource(MusicSource* source)

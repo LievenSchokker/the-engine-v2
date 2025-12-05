@@ -4,7 +4,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 class IAudioBackend;
 class AudioSource;
@@ -46,7 +45,7 @@ class AudioManager
 	 * @param path File path to the music file.
 	 * @return True if loading succeeded.
 	 */
-	bool loadMusic(const std::string& path) const;
+	MusicHandle  loadMusic(const std::string& path) const;
 
 	/**
 	 * @brief Assigns the active music source.
@@ -130,9 +129,6 @@ class AudioManager
    private:
 	/// Pointer to the low-level backend.
 	std::unique_ptr<IAudioBackend> backend;
-
-	/// List of positional audio sources.
-	std::vector<AudioSource*> audioSources;
 
 	/// Active music-playing component.
 	MusicSource* musicSource = nullptr;
