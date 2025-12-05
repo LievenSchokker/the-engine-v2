@@ -3,6 +3,8 @@
 
 #include "Core/ApplicationSpecifications.h"
 #include "Core/IEngineLoop.h"
+#include "Events/EventDispatcher.h"
+#include "Events/SDL/SDLEventProccesor.h"
 #include "External/SdlContext.h"
 #include "Rendering/RenderSystem.h"
 
@@ -47,10 +49,13 @@ public:
     SceneManager* getSceneManager() override;
     ClockFunction getClock() override;
     void start() override;
+    void initializeEvents();
     void update(double deltaTime) override;
     void fixedUpdate(double deltaTime) override;
     void shutdown() override;
 
+	Events::EventDispatcher& getEventDispatcher();
+	Events::EventQueue& getEventQueue();
 private:
     /**
      * @brief Establishes connection to the game server
@@ -59,6 +64,16 @@ private:
      * timing (e.g., connecting after a menu, reconnecting after disconnect).
      */
     void initializeNetworking();
+
+
+	// Event system
+	Events::EventDispatcher eventDispatcher;
+	Events::EventQueue eventQueue;
+	Events::SDLEventProcessor sdlEventProcessor;
+
+	// Event subscription handles
+	Events::SubscriptionHandle windowCloseHandle;
+	Events::SubscriptionHandle windowResizeHandle;
 
 	std::unique_ptr<Game> game;
     ApplicationSpecifications specifications;

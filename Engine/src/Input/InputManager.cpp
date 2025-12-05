@@ -1,7 +1,7 @@
 #include "Input/InputManager.h"
-#include "Input/SDLInputAdapter.h"
-#include <utility>
 
+#include "Events/ApplicationEvents.h"
+#include <SDL_keycode.h>
 
 InputManager* InputManager::instance = nullptr;
 
@@ -23,40 +23,70 @@ void InputManager::shutdown()
     }
 }
 
-InputManager::~InputManager()
+void InputManager::initialize(Events::EventDispatcher& dispatcher)
 {
-}
-
-void InputManager::setAdapter(std::unique_ptr<IInputAdapter> newAdapter)
-{
-    adapter = std::move(newAdapter);
-}
-
-void InputManager::update()
-{
-    resetPerFrameState();
-    if (!adapter)
+    if (initialized)
     {
-        adapter = std::make_unique<SDLInputAdapter>();
+        return;
     }
-    if (adapter)
+
+    keyPressedHandle = dispatcher.subscribe<Events::KeyPressedEvent>(
+        [this](const Events::KeyPressedEvent& e) {
+            onKeyPressed(e);
+        });
+
+    keyReleasedHandle = dispatcher.subscribe<Events::KeyReleasedEvent>(
+        [this](const Events::KeyReleasedEvent& e) {
+            onKeyReleased(e);
+        });
+
+    mouseMovedHandle = dispatcher.subscribe<Events::MouseMovedEvent>(
+        [this](const Events::MouseMovedEvent& e) {
+            onMouseMoved(e);
+        });
+
+    mousePressedHandle = dispatcher.subscribe<Events::MouseButtonPressedEvent>(
+        [this](const Events::MouseButtonPressedEvent& e) {
+            onMouseButtonPressed(e);
+        });
+
+    mouseReleasedHandle = dispatcher.subscribe<Events::MouseButtonReleasedEvent>(
+        [this](const Events::MouseButtonReleasedEvent& e) {
+            onMouseButtonReleased(e);
+        });
+
+    mouseScrollHandle = dispatcher.subscribe<Events::MouseScrollEvent>(
+        [this](const Events::MouseScrollEvent& e) {
+            onMouseScroll(e);
+        });
+
+    windowCloseHandle = dispatcher.subscribe<Events::WindowCloseEvent>(
+        [this](const Events::WindowCloseEvent& e) {
+            onWindowClose(e);
+        });
+
+    initialized = true;
+}
+
+void InputManager::disconnect(Events::EventDispatcher& dispatcher)
+{
+    if (!initialized)
     {
-        adapter->poll(*this);
+        return;
     }
-    computeTransitions();
+
+    dispatcher.unsubscribe(keyPressedHandle);
+    dispatcher.unsubscribe(keyReleasedHandle);
+    dispatcher.unsubscribe(mouseMovedHandle);
+    dispatcher.unsubscribe(mousePressedHandle);
+    dispatcher.unsubscribe(mouseReleasedHandle);
+    dispatcher.unsubscribe(mouseScrollHandle);
+    dispatcher.unsubscribe(windowCloseHandle);
+
+    initialized = false;
 }
 
-void InputManager::signalQuit()
-{
-    quitSignaled = true;
-}
-
-bool InputManager::quitRequested() const
-{
-    return quitSignaled;
-}
-
-void InputManager::resetPerFrameState()
+void InputManager::beginFrame()
 {
     keysPressed.clear();
     keysReleased.clear();
@@ -71,62 +101,88 @@ void InputManager::resetPerFrameState()
     wheelY = 0;
 }
 
-void InputManager::computeTransitions()
+void InputManager::endFrame()
 {
-    for (const auto& k : keysCurrent)
+    for (const auto& key : keysCurrent)
     {
-        if (keysPrevious.find(k) == keysPrevious.end())
-            keysPressed.insert(k);
+        if (keysPrevious.find(key) == keysPrevious.end())
+        {
+            keysPressed.insert(key);
+        }
     }
-    for (const auto& k : keysPrevious)
+    for (const auto& key : keysPrevious)
     {
-        if (keysCurrent.find(k) == keysCurrent.end())
-            keysReleased.insert(k);
+        if (keysCurrent.find(key) == keysCurrent.end())
+        {
+            keysReleased.insert(key);
+        }
     }
     keysPrevious = keysCurrent;
 
-    for (const auto& b : mouseCurrent)
+    for (const auto& button : mouseCurrent)
     {
-        if (mousePrevious.find(b) == mousePrevious.end())
-            mousePressed.insert(b);
+        if (mousePrevious.find(button) == mousePrevious.end())
+        {
+            mousePressed.insert(button);
+        }
     }
-    for (const auto& b : mousePrevious)
+    for (const auto& button : mousePrevious)
     {
-        if (mouseCurrent.find(b) == mouseCurrent.end())
-            mouseReleased.insert(b);
+        if (mouseCurrent.find(button) == mouseCurrent.end())
+        {
+            mouseReleased.insert(button);
+        }
     }
     mousePrevious = mouseCurrent;
 
-    mouseMovedInFrame =
-        (currentMouseX != previousMouseX) || (currentMouseY != previousMouseY);
+    mouseMovedInFrame = (currentMouseX != previousMouseX) ||
+                        (currentMouseY != previousMouseY);
 }
 
-void InputManager::setKeyDown(KeyCode key, bool isDown)
+void InputManager::onKeyPressed(const Events::KeyPressedEvent& e)
 {
-    if (isDown)
-        keysCurrent.insert(key);
-    else
-        keysCurrent.erase(key);
+    if (!e.isRepeat)
+    {
+        keysCurrent.insert(static_cast<KeyCode>(e.scanCode));
+    }
 }
 
-void InputManager::setMouseDown(MouseButton button, bool isDown)
+void InputManager::onKeyReleased(const Events::KeyReleasedEvent& e)
 {
-    if (isDown)
-        mouseCurrent.insert(button);
-    else
-        mouseCurrent.erase(button);
+    keysCurrent.erase(static_cast<KeyCode>(e.scanCode));
 }
 
-void InputManager::setMousePosition(int x, int y)
+void InputManager::onMouseMoved(const Events::MouseMovedEvent& e)
 {
-    currentMouseX = x;
-    currentMouseY = y;
+    currentMouseX = e.x;
+    currentMouseY = e.y;
+    mouseMovedInFrame = true;
 }
 
-void InputManager::addMouseWheelDelta(int dx, int dy)
+void InputManager::onMouseButtonPressed(const Events::MouseButtonPressedEvent& e)
 {
-    wheelX += dx;
-    wheelY += dy;
+    mouseCurrent.insert(static_cast<MouseButton>(e.button));
+}
+
+void InputManager::onMouseButtonReleased(const Events::MouseButtonReleasedEvent& e)
+{
+    mouseCurrent.erase(static_cast<MouseButton>(e.button));
+}
+
+void InputManager::onMouseScroll(const Events::MouseScrollEvent& e)
+{
+    wheelX += static_cast<int>(e.deltaX);
+    wheelY += static_cast<int>(e.deltaY);
+}
+
+void InputManager::onWindowClose(const Events::WindowCloseEvent& e)
+{
+    quitSignaled = true;
+}
+
+bool InputManager::quitRequested() const
+{
+    return quitSignaled;
 }
 
 bool InputManager::isKeyDown(KeyCode key) const

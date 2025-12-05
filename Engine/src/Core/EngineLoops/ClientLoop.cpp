@@ -3,6 +3,7 @@
 #include "Game.h"
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
+#include "Events/ApplicationEvents.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
@@ -24,7 +25,8 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  game(std::move(spel)),
 	  gameWorld(std::make_unique<GameWorld>()),
 	  specifications(game->getApplicationSpecifications()),
-	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
+	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
+	  inputManager(nullptr)
 {
 	clockFunction = []()
 	{
@@ -38,18 +40,19 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		{
 			return SDL_GetTicks() / 1000.0;
 		};
-		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*sdlContext);
+		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(
+			*sdlContext);
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
 	}
 	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
 	std::string scene = scenePtr->getName();
 
+	inputManager = InputManager::getInstance();
+	inputManager->initialize(eventDispatcher);
+
 	sceneManager->addScene(std::move(scenePtr));
 	sceneManager->setActiveScene(scene);
-
-	inputManager = InputManager::getInstance();
-
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -57,11 +60,30 @@ ClientLoop::~ClientLoop() = default;
 void ClientLoop::start()
 {
 	initializeNetworking();
+	initializeEvents();
+}
+
+
+void ClientLoop::initializeEvents()
+{
+	eventDispatcher.subscribe<Events::KeyPressedEvent>(
+		[this](const Events::KeyPressedEvent& e) {
+			if (e.keyCode == SDLK_ESCAPE && !e.isRepeat)
+			{
+				shutdown();
+			}
+		});
 }
 
 void ClientLoop::update(double deltaTime)
 {
-	inputManager->update();
+	inputManager->beginFrame();
+
+	sdlEventProcessor.pollEvents(eventQueue);
+	eventQueue.processAll(eventDispatcher);
+
+	inputManager->endFrame();
+
 	renderer->update(deltaTime, *sceneManager->getActiveScene());
 	RenderQueue renderQueue;
 }
@@ -70,10 +92,6 @@ void ClientLoop::fixedUpdate(double deltaTime)
 {
 	client->poll();
 	sceneManager->update(deltaTime, gameWorld.get());
-	if (inputManager->quitRequested())
-	{
-		shutdown();
-	}
 }
 
 void ClientLoop::initializeNetworking()
@@ -86,6 +104,9 @@ void ClientLoop::initializeNetworking()
 
 void ClientLoop::shutdown()
 {
+	eventDispatcher.unsubscribe(windowCloseHandle);
+	eventDispatcher.unsubscribe(windowResizeHandle);
+
 	InputManager::shutdown();
 	renderer.release();
 	client->disconnect();
@@ -105,4 +126,14 @@ SceneManager* ClientLoop::getSceneManager()
 {
 	if (sceneManager) return sceneManager.get();
 	return nullptr;
+}
+
+Events::EventDispatcher& ClientLoop::getEventDispatcher()
+{
+	return eventDispatcher;
+}
+
+Events::EventQueue& ClientLoop::getEventQueue()
+{
+	return eventQueue;
 }
