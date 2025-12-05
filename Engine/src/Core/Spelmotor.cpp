@@ -57,18 +57,6 @@ void SpelMotor::run()
 	running = true;
 	InputManager* input = InputManager::getInstance();
 
-	// --- Create background music source ---
-	auto music = std::make_unique<MusicSource>(audioManager.get());
-	music->setLoop(true);
-	music->loadMusic(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_jam.wav)");
-	music->play();
-
-	// Create explosion sound
-	auto discover = std::make_unique<SoundSource>(audioManager.get());
-	discover->loadSound(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_voice.wav)");
-
 	while ( running )
 	{
 		timer->tick();
@@ -83,30 +71,6 @@ void SpelMotor::run()
 			input->update();
 			physicsWorld->fixedUpdate();
 			timer->consumeFixedUpdate();
-		}
-
-		if ( input->isKeyDown(KeyCode::SPACE) )
-		{
-			music->pause();
-		}
-		if ( input->isKeyDown(KeyCode::C) )
-		{
-			music->resume();
-		}
-
-		if ( input->isKeyDown(KeyCode::P) )
-		{
-			discover->play();
-		}
-		if ( input->isKeyDown(KeyCode::UP_ARROW) )
-		{
-			float volume = music->getCurrentVolume();
-			volume += 0.1f;
-			music->setVolume(volume);
-		}
-		if ( input->isKeyDown(KeyCode::DOWN_ARROW) )
-		{
-			discover->stop();
 		}
 
 		// TODO Network->Update()
