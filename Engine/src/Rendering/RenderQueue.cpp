@@ -1,11 +1,11 @@
 #include "Rendering/RenderQueue/RenderQueue.h"
 
-void RenderQueue::push(RenderCommand& command)
+void RenderQueue::push(RenderCommand command)
 {
 	worldQueue.push(command);
 }
 
-void RenderQueue::push(UIRenderCommand& command)
+void RenderQueue::push(UIRenderCommand command)
 {
 	uiQueue.push(command);
 }

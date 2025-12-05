@@ -12,5 +12,5 @@ class IUserInterfaceRenderQueueWriter
 {
 public :
 	virtual ~IUserInterfaceRenderQueueWriter() = default;
-	virtual void push(UIRenderCommand& command) = 0;
+	virtual void push(UIRenderCommand command) = 0;
 };

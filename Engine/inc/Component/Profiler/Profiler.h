@@ -14,13 +14,19 @@ class Profiler : public UIObject, public Behaviour
 {
 public:
 	explicit Profiler(
-		float x = 10.0f,
-		float y = 10.0f,
-		float width = 250.0f,
-		float height = 300.0f
+	   float x = 10.0f,
+	   float y = 10.0f,
+	   float width = 250.0f,
+	   float height = 300.0f
 	);
 
 	void fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const override;
+	UIRenderCommand renderPanel() const;
+	UIRenderCommand renderFps() const;
+	UIRenderCommand renderFrameTime() const;
+	UIRenderCommand renderMinMaxLabel() const;
+	UIRenderCommand renderEntityLabel() const;
+	UIRenderCommand renderSceneLabel() const;
 
 	void update(float deltaTime, GameWorld* world) override;
 
@@ -34,50 +40,51 @@ public:
 	void setShowPhysicsStats(bool show);
 
 private:
-	float updateInterval = 0.25f;
-	float timeSinceLastUpdate = 0.0f;
+	static constexpr size_t kMaxFrameSamples = 60;
+
+	float updateInterval;
+	float timeSinceLastUpdate;
 
 	// FPS calculation
 	std::deque<float> frameTimes;
-	static constexpr size_t kMaxFrameSamples = 60;
-	float currentFPS = 0.0f;
-	float averageFrameTime = 0.0f;
-	float minFrameTime = 0.0f;
-	float maxFrameTime = 0.0f;
+	float currentFPS;
+	float averageFrameTime;
+	float minFrameTime;
+	float maxFrameTime;
+
+	// Demo mode
+	bool demoMode;
+	float demoTime;
+	std::deque<float> demoData;
 
 	// Cached stats
-	int entityCount = 0;
-	int activeSceneCount = 0;
-	std::string networkStatus = "Offline";
-	int networkPing = 0;
-	int connectedClients = 0;
-	int localClientId = -1;
-	bool isServer = false;
-	bool isClient = false;
+	int entityCount;
+	int activeSceneCount;
+	std::string networkStatus;
+	int networkPing;
+	int connectedClients;
+	int localClientId;
+	bool isServer;
+	bool isClient;
 
 	// Display toggles
-	bool showFPS = true;
-	bool showFrameTime = true;
-	bool showEntityCount = true;
-	bool showNetworkStats = true;
-	bool showPhysicsStats = true;
+	bool showFPS;
+	bool showFrameTime;
+	bool showFrameGraph;
+	bool showEntityCount;
+	bool showNetworkStats;
+	bool showPhysicsStats;
 
 	// Colors
-	Color titleColor = Color::yellow();
-	Color labelColor = Color::white();
-	Color goodColor = Color::green();
-	Color warningColor = Color::yellow();
-	Color badColor = Color::red();
+	Color titleColor;
+	Color labelColor;
+	Color goodColor;
+	Color warningColor;
+	Color badColor;
 
 	void updateStats(GameWorld* world);
 	void calculateFPS(float deltaTime);
 	Color getFPSColor() const;
 	Color getFrameTimeColor() const;
 	std::string formatFloat(float value, int decimals) const;
-
-
-	bool demoMode = true;
-	float demoTime = 0.0f;
-	std::deque<float> demoData;
-	bool showFrameGraph = true;
 };

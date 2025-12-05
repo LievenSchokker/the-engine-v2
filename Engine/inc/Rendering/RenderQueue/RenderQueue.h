@@ -10,8 +10,8 @@ class RenderQueue : public IRenderQueueWriter,
 					public IUserInterfaceRenderQueueWriter
 {
 public:
-	void push(RenderCommand& command) override;
-	void push(UIRenderCommand& command) override;
+	void push(RenderCommand command) override;
+	void push(UIRenderCommand command) override;
 
 	void sortAll();
 	void clearAll();
