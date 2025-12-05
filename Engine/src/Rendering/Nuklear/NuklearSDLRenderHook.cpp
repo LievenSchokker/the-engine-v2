@@ -1,12 +1,13 @@
 // Rendering/Nuklear/NuklearSDLRenderHook.cpp
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 
-#include "nuklear.h"
-#include "nuklear_sdl_renderer.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
+#include "nuklear.h"
+#include "nuklear_sdl_renderer.h"
 
+#include <algorithm>
 #include <iostream>
 
 NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,

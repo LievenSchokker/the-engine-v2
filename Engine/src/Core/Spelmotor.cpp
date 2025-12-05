@@ -1,41 +1,27 @@
-#include "Game.h"
 #include "Core/SpelMotor.h"
 
-#include "../../inc/Audio/Components/MusicSource.h"
-#include "Audio/Components/SoundSource.h"
-#include "Audio/SDL/AudioBackendSDL.h"
+#include "Audio/Components/MusicSource.h"
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
-#include "External/SDLBackendContext.h"
-#include "Input/InputManager.h"
-#include "Rendering/SDL/SDLRenderer.h"
-#include "Networking/Server/Server.h"
-#include "Networking/Client.h"
-#include "Networking/TransportGNS.h"
+#include "Core/EngineLoopFactory.h"
+#include "Core/IEngineLoop.h"
+#include "Game.h"
 
-#include <iostream>
 #include <chrono>
 
-#include "Core/IEngineLoop.h"
-#include "Core/EngineLoopFactory.h"
-#include "Scene/SceneManager.h"
-
 SpelMotor::SpelMotor(std::unique_ptr<Game> game)
-	:
-	running(false),
-	specifications(game->getApplicationSpecifications()),
-	coreSystemLoop(
-		EngineLoopFactory::createEngineLoop(std::move(game))),
-	coreClock(std::make_unique<ApplicationClock>(coreSystemLoop->getClock(),
-	                                             specifications.
-	                                             networkingOptions.tickRate,
-	                                             specifications.
-	                                             maxFrameTime))
+	: running(false),
+	  specifications(game->getApplicationSpecifications()),
+	  coreSystemLoop(EngineLoopFactory::createEngineLoop(std::move(game))),
+	  coreClock(std::make_unique<ApplicationClock>(
+		  coreSystemLoop->getClock(), specifications.networkingOptions.tickRate,
+		  specifications.maxFrameTime))
 {
-	if (coreSystemLoop == nullptr)
+	if ( coreSystemLoop == nullptr )
 	{
 		throw std::runtime_error(
-			"Core System Loop is null double check your applicationSpecifications.");
+			"Core System Loop is null double check your "
+			"applicationSpecifications.");
 	}
 }
 
@@ -55,11 +41,11 @@ void SpelMotor::run()
 {
 	running = true;
 
-	while (running)
+	while ( running )
 	{
 		coreClock->tick();
 
-		while (coreClock->shouldFixedUpdate())
+		while ( coreClock->shouldFixedUpdate() )
 		{
 			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
 			coreClock->consumeFixedUpdate();

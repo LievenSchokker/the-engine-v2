@@ -1,27 +1,21 @@
 #pragma once
-#include "External/IBackendContext.h"
-
-
 #include "Core/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
+#include "External/IBackendContext.h"
 #include "Rendering/RenderQueue.h"
 
 class Game;
 class IEngineLoop;
 class ApplicationClock;
 
+#include "ApplicationSpecifications.h"
+#include "Audio/AudioManager.h"
+#include "Physics/IPhysicsWorld.h"
+
 #include <atomic>
+#include <functional>
 #include <memory>
 #include <thread>
-
-
-#include "ApplicationSpecifications.h"
-#include "Physics/IPhysicsWorld.h"
-#include "Audio/AudioManager.h"
-
-#include <memory>
-#include <functional>
-
 
 /**
  * @class SpelMotor
@@ -34,36 +28,36 @@ class ApplicationClock;
 
 class SpelMotor
 {
-public:
+   public:
 	explicit SpelMotor(std::unique_ptr<Game> game);
 	~SpelMotor();
 	/**
-	* @brief Starts the engine and enters the main game loop.
-	*
-	* This method performs all system initialization (rendering, input, etc.) and then
-	* enters the BLOCKING update loop.
-	* It only returns when the engine has been shut down.
-	*
-	*/
+	 * @brief Starts the engine and enters the main game loop.
+	 *
+	 * This method performs all system initialization (rendering, input, etc.)
+	 * and then enters the BLOCKING update loop. It only returns when the engine
+	 * has been shut down.
+	 *
+	 */
 	void start();
 	/**
-	* @brief The main game loop that runs until shutdown is requested.
-	*
-	* Encapsulated as a private method to enforce that the game loop can only be
-	* entered through run(), preventing accidental re-entry or misuse.
-	*
-	*/
+	 * @brief The main game loop that runs until shutdown is requested.
+	 *
+	 * Encapsulated as a private method to enforce that the game loop can only
+	 * be entered through run(), preventing accidental re-entry or misuse.
+	 *
+	 */
 	void run();
 	/**
 	 * @brief Immediately shuts down all engine systems.
 	 *
-	 * Performs cleanup of all subsystems in the reverse order of their initialization
-	 * to prevent dependency issues.
+	 * Performs cleanup of all subsystems in the reverse order of their
+	 * initialization to prevent dependency issues.
 	 *
 	 */
 	void shutdown() const;
 
-private:
+   private:
 	/** @brief Immutable configuration set at construction.
 	 * Const ensures runtime modifications don't destabilize systems.
 	 */
@@ -74,26 +68,4 @@ private:
 
 	std::unique_ptr<IEngineLoop> coreSystemLoop;
 	std::unique_ptr<ApplicationClock> coreClock;
-	
-	/** @brief Immutable configuration set at construction.
-	 * Const ensures runtime modifications don't destabilize systems. */
-	const ApplicationSpecifications specifications;
-
-	/** @brief renderer handle. */
-	std::unique_ptr<IRenderer> renderer;
-
-	/** @brief timeStep calculation for engine */
-	std::unique_ptr<ApplicationClock> timer;
-
-	/** @brief A functions that returns, the time the application has been running in second */
-	std::function<double()> clockFunction;
-
-	/** @brief the physics world where physics are simulated */
-	std::unique_ptr<IPhysicsWorld> physicsWorld;
-
-	/** @brief An audio manager to play and control audio */
-	std::unique_ptr<AudioManager> audioManager;
-
-	/** @brief The onderling backend */
-	std::unique_ptr<IBackendContext> backendContext;
 };

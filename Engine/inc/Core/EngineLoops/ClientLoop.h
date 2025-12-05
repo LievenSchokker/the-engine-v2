@@ -1,9 +1,9 @@
 #pragma once
 
-
+#include "Audio/AudioManager.h"
 #include "Core/ApplicationSpecifications.h"
 #include "Core/IEngineLoop.h"
-#include "External/SdlContext.h"
+#include "External/IBackendContext.h"
 
 class Game;
 class Client;
@@ -65,7 +65,8 @@ private:
     std::unique_ptr<SceneManager> sceneManager;
     std::unique_ptr<Client> client;
     std::unique_ptr<IRenderer> renderer;
-    std::unique_ptr<SdlContext> sdlContext;
+    std::unique_ptr<IBackendContext> backendContext;
+	std::unique_ptr<AudioManager> audioManager;
     InputManager* inputManager;
     ClockFunction clockFunction;
 };

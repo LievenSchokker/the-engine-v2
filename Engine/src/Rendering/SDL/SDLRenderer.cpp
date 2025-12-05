@@ -1,15 +1,14 @@
 #include "Rendering/SDL/SDLRenderer.h"
-#include "External/SdlContext.h"
+#include "External/IBackendContext.h"
 #include "Math/Vector2Utils.h"
-#include "Rendering/Window/WindowOptions.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
+#include "Rendering/Window/WindowOptions.h"
 
 #include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <iostream>
-
 
 namespace
 {
