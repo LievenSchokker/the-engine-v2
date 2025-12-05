@@ -26,12 +26,12 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     /// Follow enemy:
     auto followEnemy = std::make_unique<GameObject>();
     auto followRenderer = followEnemy->addComponent<ShapeRenderer>();
-    followRenderer->setCircle(35);
+    followRenderer->setRectangle({30, 30});
     followRenderer->setColor(Color::red());
     Agent* followAgent = followEnemy->addComponent<Agent>();
-    followAgent->setMaxModuleForceMagnitude(10);
-    followAgent->setMaxVelocityMagnitude(100);
-    followAgent->addAgentModule<FollowTargetModule>(3, *player->getTransform());
+    followAgent->setRotationTurnRate(360);
+    followAgent->setMaxSpeed(300);
+    followAgent->addAgentModule<FollowTargetModule>(100, *player->getTransform());
 
 
     /// Avoid enemy:
@@ -41,17 +41,16 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     avoidRender->setCircle(25);
     avoidRender->setColor(Color::lightRed());
     Agent* avoidAgent = avoidEnemy->addComponent<Agent>();
-    avoidAgent->setMaxModuleForceMagnitude(10);
-    avoidAgent->setMaxVelocityMagnitude(100);
-    avoidAgent->addAgentModule<AvoidTargetModule>(5, *player->getTransform(), 200.0f);
+    avoidAgent->setMaxSpeed(100);
+    avoidAgent->addAgentModule<AvoidTargetModule>(15, *player->getTransform(), 200.0f);
 
 
     /// Construct and return scne
     auto scene = std::make_unique<Scene>("AgentsZandbak");
 
     scene->addGameObject(std::move(avoidEnemy));
-    scene->addGameObject(std::move(followEnemy));
     scene->addGameObject(std::move(player));
+    scene->addGameObject(std::move(followEnemy));
 
     return std::move(scene);
 }

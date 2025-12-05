@@ -17,7 +17,7 @@ enum class ModuleType;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : currentVelocity(Vector2::zero()), maxModuleForceMagnitude(0), maxVelocityMagnitude(0), arrivingDistance(10.0f)
+        Agent() : currentVelocity(Vector2::zero()), maxSpeed(1), arrivingDistance(10.0f), rotationTurnRate(90)
         {
         };
 
@@ -50,15 +50,16 @@ class Agent final : public Behaviour
         template<typename T>
         [[nodiscard]] bool hasAgentModule() const;
 
-        [[nodiscard]] float getMaxModuleForceMagnitude() const;
-        void setMaxModuleForceMagnitude(float max);
-        [[nodiscard]] float getMaxVelocityMagnitude() const;
-        void setMaxVelocityMagnitude(float max);
+        [[nodiscard]] float getMaxSpeed() const;
+        void setMaxSpeed(float max);
 
         [[nodiscard]] size_t getModuleCount() const;
 
         float getArrivingDistance() const;
         void setArrivingDistance(float distance);
+
+        float getRotationTurnRate() const;
+        void setRotationTurnRate(float value);
 
     private:
         template<typename T>
@@ -68,10 +69,14 @@ class Agent final : public Behaviour
         bool tryGetAgentModule(ModuleData*& out, size_t& index) const;
 
         std::vector<std::unique_ptr<ModuleData>> moduleDatas;
+
         Vector2 currentVelocity;
-        float maxModuleForceMagnitude;
-        float maxVelocityMagnitude;
+
+        float maxSpeed;
         float arrivingDistance;
+
+        /// @brief The rate to turn the agent towards its current velocity with, in degrees (0 -360).
+        float rotationTurnRate;
 };
 
 #include "AI/AgentImplementation.h"

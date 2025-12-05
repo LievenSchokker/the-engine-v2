@@ -19,27 +19,28 @@ void Agent::onAwake()
 void Agent::update(float deltaTime, GameWorld* gameWorld)
 {
     Vector2 velocity = computeDesiredVelocity();
-    transform->setPosition(transform->getPosition() + velocity);
+
+    transform->rotateTowards(velocity, rotationTurnRate, deltaTime);
+    transform->moveTowards(transform->getPosition() + velocity, velocity.magnitude() * deltaTime);
 }
 
 
 Vector2 Agent::computeDesiredVelocity()
 {
-    Vector2 totalModulesForce = computeModuleForce();
+    Vector2 desiredForce = computeModuleForce();
 
-    if (totalModulesForce.magnitude() > maxVelocityMagnitude)
+    if (desiredForce.magnitude() > maxSpeed)
     {
-        totalModulesForce = totalModulesForce.normalised() * maxVelocityMagnitude;
+        desiredForce = desiredForce.normalised() * maxSpeed;
     }
 
-    return totalModulesForce;
+    return desiredForce;
 }
 
 
 Vector2 Agent::computeModuleForce()
 {
     Vector2 totalForce = Vector2::zero();
-    Vector2 accumulatedForce = Vector2::zero();
 
     for (std::unique_ptr<ModuleData>& moduleData : moduleDatas)
     {
@@ -53,44 +54,25 @@ Vector2 Agent::computeModuleForce()
         if (weight <= 0)
             continue;
 
-        Vector2 force = moduleData->getModule()->compute();
-        accumulatedForce += force * weight;
-
-        /// Make sure the accumulated force vector doesnt exceed the max allowed magnitude.
-        if (accumulatedForce.magnitude() > maxModuleForceMagnitude)
-        {
-            accumulatedForce = accumulatedForce.normalised() * maxModuleForceMagnitude;
-        }
-
-        /// Add the current iterated module computation to the total force.
-        totalForce += accumulatedForce;
+        Vector2 direction = moduleData->getModule()->compute();
+        direction.normalize();
+        totalForce += direction * weight;
     }
+
 
     return totalForce;
 }
 
 
-float Agent::getMaxModuleForceMagnitude() const
+float Agent::getMaxSpeed() const
 {
-    return maxModuleForceMagnitude;
+    return maxSpeed;
 }
 
 
-void Agent::setMaxModuleForceMagnitude(float max)
+void Agent::setMaxSpeed(float max)
 {
-    maxModuleForceMagnitude = max;
-}
-
-
-float Agent::getMaxVelocityMagnitude() const
-{
-    return maxVelocityMagnitude;
-}
-
-
-void Agent::setMaxVelocityMagnitude(float max)
-{
-    maxVelocityMagnitude = max;
+    maxSpeed = max;
 }
 
 
@@ -110,6 +92,18 @@ void Agent::setArrivingDistance(float distance)
 {
     arrivingDistance = distance;
 }
+
+
+float Agent::getRotationTurnRate() const
+{
+    return rotationTurnRate;
+}
+
+void Agent::setRotationTurnRate(float value)
+{
+    rotationTurnRate = value;
+}
+
 
 
 
