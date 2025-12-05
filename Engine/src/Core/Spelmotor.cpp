@@ -1,8 +1,8 @@
 #include "Core/SpelMotor.h"
 
-#include "Audio/MusicSource.h"
+#include "../../inc/Audio/Components/MusicSource.h"
+#include "Audio/Components/SoundSource.h"
 #include "Audio/SDL/AudioBackendSDL.h"
-#include "Audio/SoundSource.h"
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
 #include "External/SDLBackendContext.h"
@@ -61,31 +61,13 @@ void SpelMotor::run()
 	auto music = std::make_unique<MusicSource>(audioManager.get());
 	music->setLoop(true);
 	music->loadMusic(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_trailer.ogg)");
+		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_jam.wav)");
 	music->play();
 
 	// Create explosion sound
-	auto explosion = std::make_unique<SoundSource>(audioManager.get());
-	explosion->loadSound(
+	auto discover = std::make_unique<SoundSource>(audioManager.get());
+	discover->loadSound(
 		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_voice.wav)");
-
-	// Create pigeons sound
-	auto pigeons = std::make_unique<SoundSource>(audioManager.get());
-	pigeons->loadSound(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
-
-	// Create pigeons sound
-	auto pigeons2 = std::make_unique<SoundSource>(audioManager.get());
-	pigeons2->loadSound(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
-	// Create pigeons sound
-	auto pigeons3 = std::make_unique<SoundSource>(audioManager.get());
-	pigeons3->loadSound(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
-	// Create pigeons sound
-	auto pigeons4 = std::make_unique<SoundSource>(audioManager.get());
-	pigeons4->loadSound(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_pigeons_flying.wav)");
 
 	while ( running )
 	{
@@ -105,22 +87,26 @@ void SpelMotor::run()
 
 		if ( input->isKeyDown(KeyCode::SPACE) )
 		{
-			explosion->play();
-			pigeons->play();
+			music->pause();
+		}
+		if ( input->isKeyDown(KeyCode::C) )
+		{
+			music->resume();
 		}
 
-		if ( input->isKeyDown(KeyCode::LEFT_ARROW) )
+		if ( input->isKeyDown(KeyCode::P) )
 		{
-			explosion->setPanning(1.0f, 0.0f);
+			discover->play();
+		}
+		if ( input->isKeyDown(KeyCode::UP_ARROW) )
+		{
+			float volume = music->getCurrentVolume();
+			volume += 0.1f;
+			music->setVolume(volume);
 		}
 		if ( input->isKeyDown(KeyCode::DOWN_ARROW) )
 		{
-			explosion->setPanning(1.0f, 1.0f);
-		}
-
-		if ( input->isKeyDown(KeyCode::RIGHT_ARROW) )
-		{
-			explosion->setPanning(0.0f, 1.0f);
+			discover->stop();
 		}
 
 		// TODO Network->Update()

@@ -4,6 +4,7 @@
 #include "SDL.h"
 #include "SDL_mixer.h"
 
+#include <algorithm>
 #include <iostream>
 
 AudioBackendSDL::~AudioBackendSDL()
@@ -52,19 +53,18 @@ bool AudioBackendSDL::initialize()
 	return true;
 }
 
-
 SoundHandle AudioBackendSDL::loadSound(const std::string& path)
 {
 	// 1. Check cache first
 	auto cached = soundCache.find(path);
-	if (cached != soundCache.end())
-		return cached->second;
+	if ( cached != soundCache.end() ) return cached->second;
 
 	// 2. Else load from disk
 	Mix_Chunk* chunk = Mix_LoadWAV(path.c_str());
-	if (!chunk) {
-		std::cerr << "Failed to load sound: " << path << " - "
-				  << Mix_GetError() << std::endl;
+	if ( !chunk )
+	{
+		std::cerr << "Failed to load sound: " << path << " - " << Mix_GetError()
+				  << std::endl;
 		return -1;
 	}
 
@@ -76,19 +76,18 @@ SoundHandle AudioBackendSDL::loadSound(const std::string& path)
 	return handle;
 }
 
-
 MusicHandle AudioBackendSDL::loadMusic(const std::string& path)
 {
 	// 1. Check cache
 	auto cached = musicCache.find(path);
-	if (cached != musicCache.end())
-		return cached->second;
+	if ( cached != musicCache.end() ) return cached->second;
 
 	// 2. Load fresh asset
 	Mix_Music* music = Mix_LoadMUS(path.c_str());
-	if (!music) {
-		std::cerr << "Failed to load music: " << path << " - "
-				  << Mix_GetError() << std::endl;
+	if ( !music )
+	{
+		std::cerr << "Failed to load music: " << path << " - " << Mix_GetError()
+				  << std::endl;
 		return -1;
 	}
 
@@ -99,7 +98,6 @@ MusicHandle AudioBackendSDL::loadMusic(const std::string& path)
 
 	return handle;
 }
-
 
 void AudioBackendSDL::unloadSound(SoundHandle handle)
 {
@@ -159,14 +157,17 @@ void AudioBackendSDL::stopMusic()
 
 void AudioBackendSDL::setMusicVolume(float volume)
 {
-	int vol = static_cast<int>(volume * MIX_MAX_VOLUME);
+	const int vol = static_cast<int>(volume * MIX_MAX_VOLUME);
 	Mix_VolumeMusic(vol);
 }
 
 void AudioBackendSDL::setChannelPanning(int channel, float left, float right)
 {
-	Uint8 leftByte = static_cast<Uint8>(left * 255);
-	Uint8 rightByte = static_cast<Uint8>(right * 255);
+	const float leftFloat = std::clamp(left, 0.0f, 1.0f);
+	const float rightFloat = std::clamp(right, 0.0f, 1.0f);
+
+	const Uint8 leftByte = static_cast<Uint8>(leftFloat * 255);
+	const Uint8 rightByte = static_cast<Uint8>(rightFloat * 255);
 
 	Mix_SetPanning(channel, leftByte, rightByte);
 }

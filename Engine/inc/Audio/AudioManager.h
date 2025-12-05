@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Audio/Handles.h"
-#include "AudioAssetManager.h"
+// #include "AudioAssetManager.h"
 
 #include <memory>
+#include <string>
 #include <vector>
 
 class IAudioBackend;
@@ -26,14 +27,7 @@ class AudioListener;
 class AudioManager
 {
    public:
-	/**
-	 * @brief Constructs an empty AudioManager.
-	 */
 	AudioManager() = default;
-
-	/**
-	 * @brief Destructor.
-	 */
 	~AudioManager() = default;
 
 	/**
@@ -47,18 +41,6 @@ class AudioManager
 	 * @brief Shuts down the backend and clears all audio data.
 	 */
 	void shutdown();
-
-	/**
-	 * @brief Registers a positional audio source.
-	 * @param source The AudioSource to register.
-	 */
-	void registerAudioSource(AudioSource* source);
-
-	/**
-	 * @brief Unregisters a positional audio source.
-	 * @param source The AudioSource to remove.
-	 */
-	void unregisterAudioSource(AudioSource* source);
 
 	/**
 	 * @brief Loads a music track through the backend.
@@ -79,18 +61,6 @@ class AudioManager
 	 * @param source Source requesting removal.
 	 */
 	void unsetMusicSource(MusicSource* source);
-
-	/**
-	 * @brief Sets the position listener for 3D audio.
-	 * @param listener The AudioListener reference.
-	 * @return True if assigned.
-	 */
-	bool setAudioListener(AudioListener* listener);
-
-	/**
-	 * @return The current audio listener.
-	 */
-	AudioListener* getAudioListener() const;
 
 	/**
 	 * @brief Sets the global sound volume.
@@ -131,7 +101,7 @@ class AudioManager
 	 * @param path Path to the audio file.
 	 * @return Handle to the loaded sound, or -1 on failure.
 	 */
-	SoundHandle loadSound(const std::string& path);
+	SoundHandle loadSound(const std::string& path) const;
 
 	/**
 	 * @brief Plays a loaded sound, with the given stereo on the channel
@@ -141,20 +111,26 @@ class AudioManager
 	 * @param right Right volume (0.0–1.0).
 	 * @return Channel index used for playback, or -1 on failure.
 	 */
-	int playSound(SoundHandle handle, int loops, float left, float right);
+	int playSound(SoundHandle handle, int loops, float left, float right) const;
 
 	/**
 	 * @brief Stops playback on a specific channel.
 	 * @param channel Channel index to stop.
 	 */
-	void stopChannel(int channel);
+	void stopChannel(int channel) const;
+
+	/**
+	 * @brief Applies stereo panning to a channel, is reset after use.
+	 * And is only meant to change the panning of a already running sound.
+	 * @param channel Channel index.
+	 * @param left  Left volume (0.0–1.0).
+	 * @param right Right volume (0.0–1.0).
+	 */
+	void setChannelPanning(int channel, float left, float right) const;
 
    private:
 	/// Pointer to the low-level backend.
 	std::unique_ptr<IAudioBackend> backend;
-
-	/// Manager responsible for loading/unloading audio assets.
-	std::unique_ptr<AudioAssetManager> assetManager;
 
 	/// List of positional audio sources.
 	std::vector<AudioSource*> audioSources;
