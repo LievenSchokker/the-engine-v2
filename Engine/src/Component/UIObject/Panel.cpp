@@ -1,7 +1,4 @@
-#pragma once
-
 #include "Component/UIObject/UIObject.h"
-
 #include <string>
 
 /**
@@ -17,18 +14,19 @@
  * flows children left-to-right, top-to-bottom within that grid, avoiding
  * the need for manual coordinate math in game code.
  */
-class UIPanelObject : public UIObject
+class UIPanelObject: public UIObject
 {
 public:
 	explicit UIPanelObject(
-	   float x = 0,
-	   float y = 0,
-	   float width = 200,
-	   float height = 200,
-	   std::string title = ""
-	);
+		float x = 0,
+		float y = 0,
+		float width = 200,
+		float height = 200,
+		std::string title = ""
+		);
 
-	void fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const override;
+	void fillUserInterfaceRenderQueue(
+		IUserInterfaceRenderQueueWriter& queue) const override;
 
 	/// @name Panel properties
 	/// @{
