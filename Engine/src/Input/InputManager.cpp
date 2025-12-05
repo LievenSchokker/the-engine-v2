@@ -23,52 +23,52 @@ void InputManager::shutdown()
     }
 }
 
-void InputManager::initialize(Events::EventDispatcher& dispatcher)
+void InputManager::initialize(EventDispatcher& dispatcher)
 {
     if (initialized)
     {
         return;
     }
 
-    keyPressedHandle = dispatcher.subscribe<Events::KeyPressedEvent>(
-        [this](const Events::KeyPressedEvent& e) {
+    keyPressedHandle = dispatcher.subscribe<KeyPressedEvent>(
+        [this](const KeyPressedEvent& e) {
             onKeyPressed(e);
         });
 
-    keyReleasedHandle = dispatcher.subscribe<Events::KeyReleasedEvent>(
-        [this](const Events::KeyReleasedEvent& e) {
+    keyReleasedHandle = dispatcher.subscribe<KeyReleasedEvent>(
+        [this](const KeyReleasedEvent& e) {
             onKeyReleased(e);
         });
 
-    mouseMovedHandle = dispatcher.subscribe<Events::MouseMovedEvent>(
-        [this](const Events::MouseMovedEvent& e) {
+    mouseMovedHandle = dispatcher.subscribe<MouseMovedEvent>(
+        [this](const MouseMovedEvent& e) {
             onMouseMoved(e);
         });
 
-    mousePressedHandle = dispatcher.subscribe<Events::MouseButtonPressedEvent>(
-        [this](const Events::MouseButtonPressedEvent& e) {
+    mousePressedHandle = dispatcher.subscribe<MouseButtonPressedEvent>(
+        [this](const MouseButtonPressedEvent& e) {
             onMouseButtonPressed(e);
         });
 
-    mouseReleasedHandle = dispatcher.subscribe<Events::MouseButtonReleasedEvent>(
-        [this](const Events::MouseButtonReleasedEvent& e) {
+    mouseReleasedHandle = dispatcher.subscribe<MouseButtonReleasedEvent>(
+        [this](const MouseButtonReleasedEvent& e) {
             onMouseButtonReleased(e);
         });
 
-    mouseScrollHandle = dispatcher.subscribe<Events::MouseScrollEvent>(
-        [this](const Events::MouseScrollEvent& e) {
+    mouseScrollHandle = dispatcher.subscribe<MouseScrollEvent>(
+        [this](const MouseScrollEvent& e) {
             onMouseScroll(e);
         });
 
-    windowCloseHandle = dispatcher.subscribe<Events::WindowCloseEvent>(
-        [this](const Events::WindowCloseEvent& e) {
+    windowCloseHandle = dispatcher.subscribe<WindowCloseEvent>(
+        [this](const WindowCloseEvent& e) {
             onWindowClose(e);
         });
 
     initialized = true;
 }
 
-void InputManager::disconnect(Events::EventDispatcher& dispatcher)
+void InputManager::disconnect(EventDispatcher& dispatcher)
 {
     if (!initialized)
     {
@@ -139,7 +139,7 @@ void InputManager::endFrame()
                         (currentMouseY != previousMouseY);
 }
 
-void InputManager::onKeyPressed(const Events::KeyPressedEvent& e)
+void InputManager::onKeyPressed(const KeyPressedEvent& e)
 {
     if (!e.isRepeat)
     {
@@ -147,35 +147,35 @@ void InputManager::onKeyPressed(const Events::KeyPressedEvent& e)
     }
 }
 
-void InputManager::onKeyReleased(const Events::KeyReleasedEvent& e)
+void InputManager::onKeyReleased(const KeyReleasedEvent& e)
 {
     keysCurrent.erase(static_cast<KeyCode>(e.scanCode));
 }
 
-void InputManager::onMouseMoved(const Events::MouseMovedEvent& e)
+void InputManager::onMouseMoved(const MouseMovedEvent& e)
 {
     currentMouseX = e.x;
     currentMouseY = e.y;
     mouseMovedInFrame = true;
 }
 
-void InputManager::onMouseButtonPressed(const Events::MouseButtonPressedEvent& e)
+void InputManager::onMouseButtonPressed(const MouseButtonPressedEvent& e)
 {
     mouseCurrent.insert(static_cast<MouseButton>(e.button));
 }
 
-void InputManager::onMouseButtonReleased(const Events::MouseButtonReleasedEvent& e)
+void InputManager::onMouseButtonReleased(const MouseButtonReleasedEvent& e)
 {
     mouseCurrent.erase(static_cast<MouseButton>(e.button));
 }
 
-void InputManager::onMouseScroll(const Events::MouseScrollEvent& e)
+void InputManager::onMouseScroll(const MouseScrollEvent& event)
 {
-    wheelX += static_cast<int>(e.deltaX);
-    wheelY += static_cast<int>(e.deltaY);
+    wheelX += static_cast<int>(event.deltaX);
+    wheelY += static_cast<int>(event.deltaY);
 }
 
-void InputManager::onWindowClose(const Events::WindowCloseEvent& e)
+void InputManager::onWindowClose(const WindowCloseEvent& e)
 {
     quitSignaled = true;
 }

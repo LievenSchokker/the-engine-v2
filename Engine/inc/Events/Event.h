@@ -2,9 +2,6 @@
 
 #include <cstdint>
 
-namespace Events
-{
-
 /**
  * @brief Base class for all events with automatic type ID generation
  */
@@ -33,8 +30,8 @@ protected:
  * Usage:
  *   struct MyEvent : public Event<MyEvent> { ... };
  */
-template<typename T>
-class Event : public EventBase
+template <typename T>
+class Event: public EventBase
 {
 public:
 	static uint32_t staticTypeId()
@@ -48,5 +45,3 @@ public:
 		return staticTypeId();
 	}
 };
-
-} // namespace Events

@@ -54,8 +54,8 @@ public:
     void fixedUpdate(double deltaTime) override;
     void shutdown() override;
 
-	Events::EventDispatcher& getEventDispatcher();
-	Events::EventQueue& getEventQueue();
+	EventDispatcher& getEventDispatcher();
+	EventQueue& getEventQueue();
 private:
     /**
      * @brief Establishes connection to the game server
@@ -67,13 +67,13 @@ private:
 
 
 	// Event system
-	Events::EventDispatcher eventDispatcher;
-	Events::EventQueue eventQueue;
-	Events::SDLEventProcessor sdlEventProcessor;
+	EventDispatcher eventDispatcher;
+	EventQueue eventQueue;
+	SDLEventProcessor sdlEventProcessor;
 
 	// Event subscription handles
-	Events::SubscriptionHandle windowCloseHandle;
-	Events::SubscriptionHandle windowResizeHandle;
+	SubscriptionHandle windowCloseHandle;
+	SubscriptionHandle windowResizeHandle;
 
 	std::unique_ptr<Game> game;
     ApplicationSpecifications specifications;

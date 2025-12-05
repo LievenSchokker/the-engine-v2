@@ -66,8 +66,8 @@ void ClientLoop::start()
 
 void ClientLoop::initializeEvents()
 {
-	eventDispatcher.subscribe<Events::KeyPressedEvent>(
-		[this](const Events::KeyPressedEvent& e) {
+	eventDispatcher.subscribe<KeyPressedEvent>(
+		[this](const KeyPressedEvent& e) {
 			if (e.keyCode == SDLK_ESCAPE && !e.isRepeat)
 			{
 				shutdown();
@@ -128,12 +128,12 @@ SceneManager* ClientLoop::getSceneManager()
 	return nullptr;
 }
 
-Events::EventDispatcher& ClientLoop::getEventDispatcher()
+EventDispatcher& ClientLoop::getEventDispatcher()
 {
 	return eventDispatcher;
 }
 
-Events::EventQueue& ClientLoop::getEventQueue()
+EventQueue& ClientLoop::getEventQueue()
 {
 	return eventQueue;
 }

@@ -28,7 +28,6 @@ void NuklearSDLRenderHook::initialize()
 		nk_sdl_font_stash_begin(&atlas);
 		nk_sdl_font_stash_end();
 
-		// Transparent backgrounds
 		nuklearContext->style.window.fixed_background = nk_style_item_color(
 			nk_rgba(0, 0, 0, 255));
 		nuklearContext->style.window.header.normal = nk_style_item_color(
@@ -39,8 +38,6 @@ void NuklearSDLRenderHook::initialize()
 			nk_rgba(0, 0, 0, 0));
 	}
 
-	//This basicly prevents constant reallocation for small UI's
-	//We might need to discuss if we care about custom memory solutions but for now this is fine
 	commandQueue.reserve(256);
 	rootPanels.reserve(16);
 	panelIndices.reserve(32);
@@ -88,11 +85,11 @@ void NuklearSDLRenderHook::updateInput()
 
 void NuklearSDLRenderHook::beginFrame()
 {
-    updateInput();
-    commandQueue.clear();
-    panelIndices.clear();
-    panelElementIndices.clear();
-    rootPanels.clear();
+	updateInput();
+	commandQueue.clear();
+	panelIndices.clear();
+	panelElementIndices.clear();
+	rootPanels.clear();
 }
 
 void NuklearSDLRenderHook::presentFrame()
@@ -110,39 +107,51 @@ void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands)
 }
 
 
-void NuklearSDLRenderHook::flushCommands() {
+void NuklearSDLRenderHook::flushCommands()
+{
 	std::sort(rootPanels.begin(), rootPanels.end());
 
-	for (uint32_t id : rootPanels) {
+	for (uint32_t id : rootPanels)
+	{
 		renderPanel(id);
 	}
-	/// Sort pannels so panels are always infront of the queue
+
 	std::stable_partition(commandQueue.begin(), commandQueue.end(),
-		[](const UIRenderCommand& cmd) {
-			return cmd.type == UICommandType::Panel;
-		});
+	                      [](const UIRenderCommand& cmd)
+	                      {
+		                      return cmd.type == UICommandType::Panel;
+	                      });
 
 	size_t originalSize = commandQueue.size();
 
-	for (size_t i = 0; i < originalSize; ++i) {
+	for (size_t i = 0; i < originalSize; ++i)
+	{
 		const auto& commandIterator = commandQueue[i];
-		if (commandIterator.type == UICommandType::Panel) {
+		if (commandIterator.type == UICommandType::Panel)
+		{
 			panelIndices[commandIterator.panelId] = i;
-			if (commandIterator.parentId == NO_PARENT) {
+			if (commandIterator.parentId == NO_PARENT)
+			{
 				rootPanels.push_back(commandIterator.panelId);
-			} else {
+			}
+			else
+			{
 				panelElementIndices[commandIterator.parentId].push_back(i);
 			}
-		} else {
-			/// If no panelIndeices is found create default panel
-			if (panelIndices.find(commandIterator.panelId) == panelIndices.end()) {
+		}
+		else
+		{
+			if (panelIndices.find(commandIterator.panelId) == panelIndices.
+			    end())
+			{
 				createDefaultPanel(commandIterator.panelId);
 			}
 			panelElementIndices[commandIterator.panelId].push_back(i);
 		}
 	}
 
-	for (uint32_t id : rootPanels) {
+	for (uint32_t id : rootPanels)
+	{
 		renderPanel(id);
 	}
 }
@@ -210,7 +219,8 @@ void NuklearSDLRenderHook::renderElement(const UIRenderCommand& command)
 
 void NuklearSDLRenderHook::renderChart(const UIRenderCommand& command)
 {
-	if (nk_chart_begin(nuklearContext, NK_CHART_LINES, command.chartData.size(), command.chartMin, command.chartMax))
+	if (nk_chart_begin(nuklearContext, NK_CHART_LINES, command.chartData.size(),
+	                   command.chartMin, command.chartMax))
 	{
 		for (float value : command.chartData)
 		{
@@ -231,22 +241,24 @@ void NuklearSDLRenderHook::renderProgressBar(const UIRenderCommand& command)
 		command.barColor.g,
 		command.barColor.b,
 		command.barColor.a
-	);
+		);
 
 	nk_color bgColor = nk_rgba(
 		command.backgroundColor.r,
 		command.backgroundColor.g,
 		command.backgroundColor.b,
 		command.backgroundColor.a
-	);
+		);
 
 	nuklearContext->style.progress.normal = nk_style_item_color(bgColor);
 	nuklearContext->style.progress.hover = nk_style_item_color(bgColor);
 	nuklearContext->style.progress.active = nk_style_item_color(bgColor);
 
-	nuklearContext->style.progress.cursor_normal = nk_style_item_color(barColor);
+	nuklearContext->style.progress.cursor_normal =
+		nk_style_item_color(barColor);
 	nuklearContext->style.progress.cursor_hover = nk_style_item_color(barColor);
-	nuklearContext->style.progress.cursor_active = nk_style_item_color(barColor);
+	nuklearContext->style.progress.cursor_active =
+		nk_style_item_color(barColor);
 
 	nk_size value = static_cast<nk_size>(command.progress * 100.0f);
 	nk_size max = 100;
@@ -271,7 +283,7 @@ void NuklearSDLRenderHook::renderSeparator(const UIRenderCommand& command)
 		bounds.y + bounds.h / 2,
 		1.0f,
 		nk_rgb(100, 100, 100)
-	);
+		);
 
 	// Consume the widget space
 	nk_label(nuklearContext, "", NK_TEXT_LEFT);
@@ -279,10 +291,12 @@ void NuklearSDLRenderHook::renderSeparator(const UIRenderCommand& command)
 	// Restore standard row height for following elements
 	nk_layout_row_dynamic(nuklearContext, 20, 1);
 }
+
 void NuklearSDLRenderHook::renderImage(const UIRenderCommand& command)
 {
 	// TODO: Implement when texture/asset system
 }
+
 void NuklearSDLRenderHook::renderSpacer(const UIRenderCommand& command)
 {
 	nk_layout_row_dynamic(nuklearContext, command.spacerHeight, 1);

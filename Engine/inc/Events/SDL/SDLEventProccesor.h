@@ -6,8 +6,6 @@
 #include <SDL.h>
 #include <functional>
 
-namespace Events
-{
 
 /**
  * @brief Processes SDL events and converts them to engine events
@@ -40,10 +38,11 @@ public:
 	 * Use this to handle SDL events that aren't converted to
 	 * engine events (e.g., controller events, drop events).
 	 */
-	void setUnhandledEventCallback(std::function<void(const SDL_Event&)> callback);
+	void setUnhandledEventCallback(
+		std::function<void(const SDL_Event&)> callback);
 
 private:
-	template<typename Handler>
+	template <typename Handler>
 	bool processEvents(Handler handler);
 
 	std::function<void(const SDL_Event&)> unhandledCallback;
@@ -53,5 +52,3 @@ private:
 	int lastMouseY = 0;
 	bool hasLastMousePos = false;
 };
-
-} // namespace Events

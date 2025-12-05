@@ -7,8 +7,7 @@
 #include <memory>
 #include <unordered_set>
 
-namespace Events
-{
+
 struct KeyPressedEvent;
 struct KeyReleasedEvent;
 struct MouseMovedEvent;
@@ -16,7 +15,7 @@ struct MouseButtonPressedEvent;
 struct MouseButtonReleasedEvent;
 struct MouseScrollEvent;
 struct WindowCloseEvent;
-}
+
 
 /**
  * @brief Central coordinator for game input state.
@@ -42,7 +41,7 @@ public:
 	 * state.
 	 */
 	static void shutdown();
-	void initialize(Events::EventDispatcher& dispatcher);
+	void initialize(EventDispatcher& dispatcher);
 
 	/**
 	 * @brief Poll for new input events and update cached state.
@@ -210,22 +209,22 @@ private:
 	~InputManager() = default;
 	static InputManager* instance;
 
-	void disconnect(Events::EventDispatcher& dispatcher);
-	void onKeyPressed(const Events::KeyPressedEvent& e);
-	void onKeyReleased(const Events::KeyReleasedEvent& e);
-	void onMouseMoved(const Events::MouseMovedEvent& e);
-	void onMouseButtonPressed(const Events::MouseButtonPressedEvent& e);
-	void onMouseButtonReleased(const Events::MouseButtonReleasedEvent& e);
-	void onMouseScroll(const Events::MouseScrollEvent& e);
-	void onWindowClose(const Events::WindowCloseEvent& e);
+	void disconnect(EventDispatcher& dispatcher);
+	void onKeyPressed(const KeyPressedEvent& e);
+	void onKeyReleased(const KeyReleasedEvent& e);
+	void onMouseMoved(const MouseMovedEvent& e);
+	void onMouseButtonPressed(const MouseButtonPressedEvent& e);
+	void onMouseButtonReleased(const MouseButtonReleasedEvent& e);
+	void onMouseScroll(const MouseScrollEvent& e);
+	void onWindowClose(const WindowCloseEvent& e);
 
-	Events::SubscriptionHandle keyPressedHandle;
-	Events::SubscriptionHandle keyReleasedHandle;
-	Events::SubscriptionHandle mouseMovedHandle;
-	Events::SubscriptionHandle mousePressedHandle;
-	Events::SubscriptionHandle mouseReleasedHandle;
-	Events::SubscriptionHandle mouseScrollHandle;
-	Events::SubscriptionHandle windowCloseHandle;
+	SubscriptionHandle keyPressedHandle;
+	SubscriptionHandle keyReleasedHandle;
+	SubscriptionHandle mouseMovedHandle;
+	SubscriptionHandle mousePressedHandle;
+	SubscriptionHandle mouseReleasedHandle;
+	SubscriptionHandle mouseScrollHandle;
+	SubscriptionHandle windowCloseHandle;
 	bool initialized = false;
 
 	// Keyboard state

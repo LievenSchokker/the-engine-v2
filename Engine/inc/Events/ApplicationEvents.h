@@ -4,8 +4,7 @@
 #include <cstdint>
 #include <cstring>
 
-namespace Events
-{
+
 struct WindowResizeEvent : public Event<WindowResizeEvent>
 {
     int width;
@@ -126,4 +125,3 @@ struct SceneChangedEvent : public Event<SceneChangedEvent>
         : previousSceneId(previous), newSceneId(next) {}
 };
 
-}

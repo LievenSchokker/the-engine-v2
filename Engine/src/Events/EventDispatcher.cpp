@@ -1,8 +1,5 @@
 #include "Events/EventDispatcher.h"
 
-namespace Events
-{
-
 void EventDispatcher::unsubscribe(SubscriptionHandle& handle)
 {
 	if (!handle.isValid())
@@ -14,11 +11,8 @@ void EventDispatcher::unsubscribe(SubscriptionHandle& handle)
 	if (it != listeners.end())
 	{
 		auto& vec = it->second;
-		vec.erase(
-			std::remove_if(vec.begin(), vec.end(),
-				[&](const Subscription& s) { return s.id == handle.id; }),
-			vec.end()
-		);
+		std::erase_if(vec,
+		              [&](const Subscription& s) { return s.id == handle.id; });
 	}
 
 	handle.invalidate();
@@ -29,4 +23,3 @@ void EventDispatcher::unsubscribeAll()
 	listeners.clear();
 }
 
-} // namespace Events

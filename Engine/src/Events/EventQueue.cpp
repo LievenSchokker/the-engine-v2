@@ -1,8 +1,5 @@
 #include "Events/EventQueue.h"
 
-namespace Events
-{
-
 void EventQueue::processAll(EventDispatcher& dispatcher)
 {
 	std::queue<EventAction> toProcess;
@@ -61,5 +58,3 @@ std::size_t EventQueue::size() const
 	std::lock_guard<std::mutex> lock(mutex);
 	return pendingEvents.size();
 }
-
-} // namespace Events
