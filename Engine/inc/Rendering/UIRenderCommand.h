@@ -19,6 +19,25 @@ enum class UICommandType
 	Chart,
 };
 
+
+
+/**
+ * @brief A single UI draw instruction consumed by the render hook.
+ *
+ * Uses a flat struct rather than polymorphism so commands can be stored
+ * contiguously, sorted cheaply, and processed without virtual dispatch.
+ * Only a subset of fields is meaningful for each UICommandType—unused
+ * fields are simply ignored during rendering.
+ *
+ * Field groups:
+ *  - Panel:       x, y, width, height, title, hasTitle, hasBorder, rowHeight, columns
+ *  - Text:        text, alignment, color, fontSize
+ *  - ProgressBar: progress, minValue, maxValue, barColor, backgroundColor
+ *  - Spacer:      spacerHeight
+ *  - Image:       imagePath, textureId
+ *  - Chart:       chartData, chartMin, chartMax, chartHeight
+ */
+
 struct UIRenderCommand
 {
 	UICommandType type = UICommandType::Panel;
@@ -60,6 +79,12 @@ struct UIRenderCommand
 	float chartMax = 1.0f;
 	int chartHeight = 50;
 
+	/**
+	 * @brief Composite key for depth sorting.
+	 *
+	 * Packs layer and order into one integer so the render queue can
+	 * sort with a single comparison rather than two.
+	 */
 	int getSortKey() const
 	{
 		return (layer << 8) | orderInLayer;

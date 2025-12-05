@@ -36,8 +36,6 @@ public:
 	void setShowFPS(bool show);
 	void setShowFrameTime(bool show);
 	void setShowEntityCount(bool show);
-	void setShowNetworkStats(bool show);
-	void setShowPhysicsStats(bool show);
 
 private:
 	static constexpr size_t kMaxFrameSamples = 60;
