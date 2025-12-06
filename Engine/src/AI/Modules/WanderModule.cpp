@@ -4,6 +4,7 @@
 
 #include "AI/Modules/WanderModule.h"
 #include "Component/Transform.h"
+#include "Math/Vector2.h"
 #include <random>
 
 
@@ -22,7 +23,10 @@ float WanderModule::getRandomBetween(float min, float max)
 
 Vector2 WanderModule::compute()
 {
-    Vector2 randomDisplacement = Vector2{getRandomBetween(-1, 1), getRandomBetween(-1, 1) } * areaJitter;
+    Vector2 randomDisplacement = Vector2{
+        getRandomBetween(-1, 1) * areaJitter,
+        getRandomBetween(-1, 1) * areaJitter };
+
     currentTarget += randomDisplacement;
 
     currentTarget.normalize();
@@ -58,11 +62,11 @@ void WanderModule::setAreaDistance(float value)
 
 void WanderModule::setAreaRadius(float value)
 {
-    circleRadius = value;
+    areaRadius = value;
 }
 
 
 void WanderModule::setAreaJitter(float value)
 {
-    jitter = value;
+    areaJitter = value;
 }

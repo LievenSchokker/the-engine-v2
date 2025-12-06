@@ -31,7 +31,7 @@ class WanderModule final : public BaseAgentModule
     void setAreaJitter(float value);
 
 private:
-    Vector2 currentTarget = Vector2::one();
+    Vector2 currentTarget = Vector2::zero();
     float getRandomBetween(float min, float max);;
 
     float areaDistance = 0.0f;

@@ -22,8 +22,7 @@ class AgentTest : public ::testing::Test
             gameObject = new GameObject();
             agent = gameObject->addComponent<Agent>();
 
-            agent->setMaxModuleForceMagnitude(100);
-            agent->setMaxVelocityMagnitude(100);
+            agent->setMaxSpeed(100);
         }
 
         void TearDown() override
@@ -80,56 +79,15 @@ TEST_F(AgentTest, WeightedComputeModuleForce)
     ASSERT_EQ(agent->computeModuleForce(), Vector2(5.0f, 5.0f));
 }
 
-/// Tests if the ComputeModuleForce() method correctly truncates the computed vector to its maximum.
-TEST_F(AgentTest, ComputeModuleForceTruncatesToMax)
-{
-    /// Set max magnitude to 10:
-    agent->setMaxModuleForceMagnitude(10);
 
-    /// Weight > max magnitude so computeModuleForce() should truncate.
-    agent->addAgentModule<TestAgentModule>(15);
-
-    Vector2 computed = agent->computeModuleForce();
-
-    /// Computed magnitude should be truncated.
-    EXPECT_TRUE(computed.magnitude() < 15);
-
-    /// Computed magnitude has to be 10 (normalised() * maxMagnitude == 10)
-    ASSERT_EQ(computed.magnitude(), 10);
-}
-
-/// Tests if the computeDesiredVelocity method correctly truncates return vector to maxVelocityMagnitude if exceeding.
-TEST_F(AgentTest, ComputeDesiredVelocityTruncatesToMaxVelocity)
-{
-    agent->setMaxVelocityMagnitude(5);
-
-    /// Weight > max magnitude so computeDesiredVelocity() should truncate.
-    agent->addAgentModule<TestAgentModule>(10);
-
-    Vector2 computed = agent->computeDesiredVelocity();
-
-    /// Computed magnitude should be truncated.
-    EXPECT_TRUE(computed.magnitude() < 10);
-
-    /// Computed magnitude has to be 5 (normalised() * maxMagnitude == 5)
-    ASSERT_EQ(computed.magnitude(), 5);
-}
-
-/// Tests if the get/setMaxVelocityMagnitude methods work as intended
+/// Tests if the get/setMaxSpeed methods work as intended
 TEST_F(AgentTest, GetSetMaxVelocityMagnitude)
 {
-    agent->setMaxVelocityMagnitude(5);
-    float value = agent->getMaxVelocityMagnitude();
+    agent->setMaxSpeed(5);
+    float value = agent->getMaxSpeed();
     ASSERT_EQ(value, 5);
 }
 
-/// Tests if the get/setMaxModuleForceMagnitude methods work as intended
-TEST_F(AgentTest, GetSetMaxModuleForceMagnitude)
-{
-    agent->setMaxModuleForceMagnitude(10);
-    float value = agent->getMaxModuleForceMagnitude();
-    ASSERT_EQ(value, 10);
-}
 
 /// Tests if the update() method moves the agent's Transform correctly,
 /// (correct == using computeDesiredVelocity())
@@ -138,7 +96,7 @@ TEST_F(AgentTest, UpdateMovesTransformAsExpected)
     agent->addAgentModule<TestAgentModule>(1);
     Vector2 initPos = agent->getTransform()->getPosition();
 
-    agent->update(0.016f);
+    agent->update(0.016f, nullptr);
 
     Vector2 updatedPos = agent->getTransform()->getPosition();
     EXPECT_NE(initPos, updatedPos);
@@ -385,3 +343,40 @@ TEST_F(AgentTest, TryGetModuleDoubleParam)
 *
 *  END OF PRIVATE TRYGETMODULE<T> TESTS
  */
+
+
+
+
+/**
+ * DEPRECATED TESTS, MIGHT USE LATER
+ *
+ *
+ *
+ *
+ *
+/// Tests if the computeDesiredVelocity method correctly truncates return vector to maxVelocityMagnitude if exceeding.
+TEST_F(AgentTest, ComputeDesiredVelocityTruncatesToMaxVelocity)
+{
+    agent->setMaxVelocityMagnitude(5);
+
+    /// Weight > max magnitude so computeDesiredVelocity() should truncate.
+    agent->addAgentModule<TestAgentModule>(10);
+
+    Vector2 computed = agent->computeDesiredVelocity();
+
+    /// Computed magnitude should be truncated.
+    EXPECT_TRUE(computed.magnitude() < 10);
+
+    /// Computed magnitude has to be 5 (normalised() * maxMagnitude == 5)
+    ASSERT_EQ(computed.magnitude(), 5);
+}
+
+/// Tests if the get/setMaxModuleForceMagnitude methods work as intended
+TEST_F(AgentTest, GetSetMaxModuleForceMagnitude)
+{
+    agent->setMaxModuleForceMagnitude(10);
+    float value = agent->getMaxModuleForceMagnitude();
+    ASSERT_EQ(value, 10);
+}
+
+*/
