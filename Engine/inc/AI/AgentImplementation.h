@@ -17,12 +17,11 @@ bool Agent::addAgentModule(float desiredWeight, Args&&... args)
     if (hasAgentModule<T>())
         return false;
 
-    moduleDatas.emplace_back(
-          std::make_unique<ModuleData>(
-              std::make_unique<T>(*this, std::forward<Args>(args)...),
-              desiredWeight
-          )
-      );
+    std::unique_ptr<ModuleData> moduleData = std::make_unique<ModuleData>(std::make_unique<T>(*this, std::forward<Args>(args)...), desiredWeight);
+    ModuleData* added = moduleData.get();
+    moduleDatas.push_back(std::move(moduleData));
+
+    added->getModule()->initialise();
 
     return true;
 }

@@ -42,7 +42,7 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     avoidRender->setColor(Color::lightRed());
     Agent* avoidAgent = avoidEnemy->addComponent<Agent>();
     avoidAgent->setMaxSpeed(100);
-    avoidAgent->addAgentModule<AvoidTargetModule>(15, *player->getTransform(), 200.0f);
+    avoidAgent->addAgentModule<AvoidTargetModule>(75, *player->getTransform(), 200.0f);
 
 
     /// Construct and return scne

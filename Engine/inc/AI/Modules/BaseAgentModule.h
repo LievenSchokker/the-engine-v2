@@ -17,6 +17,14 @@ class BaseAgentModule
         virtual ~BaseAgentModule() = default;
 
         /**
+         * @brief Method used to initialise this module.
+         *
+         * Gets called immediatly after adding the module to the agent, only once.
+         * @return
+         */
+        virtual void initialise() {}
+
+        /**
          * Computes the Vector needed to move the agent based on this module's logic.
          * @return the computed movement vector for this module.
          */
