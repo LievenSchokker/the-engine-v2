@@ -2,8 +2,10 @@
 // Created by samle on 05/12/2025.
 //
 
-#include "../../../inc/AI/Modules/WanderModule.h"
+#include "AI/Modules/WanderModule.h"
+#include "Component/Transform.h"
 #include <random>
+
 
 void WanderModule::initialise()
 {
@@ -20,7 +22,15 @@ float WanderModule::getRandomBetween(float min, float max)
 
 Vector2 WanderModule::compute()
 {
+    Vector2 randomDisplacement = Vector2{getRandomBetween(-1, 1), getRandomBetween(-1, 1) } * areaJitter;
+    currentTarget += randomDisplacement;
 
+    currentTarget.normalize();
+    currentTarget *= areaRadius;
+
+    Vector2 target = currentTarget + agentTransform.forward() * areaDistance;
+
+    return target.normalised();
 }
 
 
