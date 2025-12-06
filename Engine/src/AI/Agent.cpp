@@ -55,6 +55,9 @@ Vector2 Agent::computeModuleForce()
             continue;
 
         Vector2 direction = moduleData->getModule()->compute();
+        if (direction == Vector2::zero())
+            continue;
+
         direction.normalize();
         totalForce += direction * weight;
     }

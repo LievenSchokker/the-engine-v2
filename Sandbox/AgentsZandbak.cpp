@@ -27,14 +27,15 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     /// Follow enemy:
     auto followEnemy = std::make_unique<GameObject>();
     auto followRenderer = followEnemy->addComponent<ShapeRenderer>();
+    followEnemy->getTransform()->setPosition({250, 150});
     followRenderer->setRectangle({30, 30});
     followRenderer->setColor(Color::darkRed());
-    Agent* followAgent = followEnemy->addComponent<Agent>();
-    followAgent->setRotationTurnRate(360);
-    followAgent->setMaxSpeed(300);
-    followAgent->addAgentModule<FollowTargetModule>(100, *player->getTransform());
-    followAgent->addAgentModule<WanderModule>(35, 25.0f, 100.0f, 10.0f);
 
+    Agent* followAgent = followEnemy->addComponent<Agent>();
+    followAgent->setRotationTurnRate(230);
+    followAgent->setMaxSpeed(300);
+    followAgent->addAgentModule<FollowTargetModule>(100, *player->getTransform(), 300.0f);
+    followAgent->addAgentModule<WanderModule>(50, 25.0f, 150.0f, 5.0f);
 
 
     /// Avoid enemy:
@@ -45,6 +46,8 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     avoidRenderer->setColor(Color::darkBlue());
 
     Agent* avoidAgent = avoidEnemy->addComponent<Agent>();
+    avoidAgent->setRotationTurnRate(180);
+
     avoidAgent->setMaxSpeed(100);
     avoidAgent->addAgentModule<AvoidTargetModule>(100, *player->getTransform(), 200.0f);
     avoidAgent->addAgentModule<WanderModule>(50, 25.0f, 100.0f, 10.0f);
