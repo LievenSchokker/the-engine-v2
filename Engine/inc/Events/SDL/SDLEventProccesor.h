@@ -14,7 +14,7 @@
  * Can either dispatch events immediately or queue them for
  * deferred processing.
  */
-class SDLEventProcessor : IEventProccesor
+class SDLEventProcessor: IEventProccesor
 {
 public:
 	SDLEventProcessor() = default;

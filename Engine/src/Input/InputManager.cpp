@@ -1,6 +1,9 @@
 #include "Input/InputManager.h"
 
 #include "Events/ApplicationEvents.h"
+
+#include <iostream>
+#include <ostream>
 #include <SDL_keycode.h>
 
 InputManager* InputManager::instance = nullptr;

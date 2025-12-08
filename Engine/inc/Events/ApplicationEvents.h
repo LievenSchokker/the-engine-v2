@@ -1,9 +1,7 @@
 #pragma once
 
-#include "Events/Event.h"
-#include <cstdint>
-#include <cstring>
 
+#include "Events/Event.h"
 
 struct WindowResizeEvent : public Event<WindowResizeEvent>
 {
@@ -46,16 +44,6 @@ struct KeyReleasedEvent : public Event<KeyReleasedEvent>
         : keyCode(keyCode), scanCode(scanCode) {}
 };
 
-struct TextInputEvent : public Event<TextInputEvent>
-{
-    char text[32];
-
-    explicit TextInputEvent(const char* inputText)
-    {
-        std::strncpy(text, inputText, sizeof(text) - 1);
-        text[sizeof(text) - 1] = '\0';
-    }
-};
 
 struct MouseMovedEvent : public Event<MouseMovedEvent>
 {
@@ -73,7 +61,7 @@ struct MouseButtonPressedEvent : public Event<MouseButtonPressedEvent>
     int button;
     int x;
     int y;
-    int clicks;  // 1 = single, 2 = double click
+    int clicks;
 
     MouseButtonPressedEvent(int button, int x, int y, int clicks = 1)
         : button(button), x(x), y(y), clicks(clicks) {}
@@ -96,32 +84,5 @@ struct MouseScrollEvent : public Event<MouseScrollEvent>
 
     MouseScrollEvent(float dx, float dy)
         : deltaX(dx), deltaY(dy) {}
-};
-
-struct CollisionEvent : public Event<CollisionEvent>
-{
-    uint32_t entityA;
-    uint32_t entityB;
-    float impactForce;
-
-    CollisionEvent(uint32_t a, uint32_t b, float force = 0.0f)
-        : entityA(a), entityB(b), impactForce(force) {}
-};
-
-struct EntityDestroyedEvent : public Event<EntityDestroyedEvent>
-{
-    uint32_t entityId;
-
-    explicit EntityDestroyedEvent(uint32_t id)
-        : entityId(id) {}
-};
-
-struct SceneChangedEvent : public Event<SceneChangedEvent>
-{
-    uint32_t previousSceneId;
-    uint32_t newSceneId;
-
-    SceneChangedEvent(uint32_t previous, uint32_t next)
-        : previousSceneId(previous), newSceneId(next) {}
 };
 

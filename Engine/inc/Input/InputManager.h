@@ -202,10 +202,6 @@ public:
 	void endFrame();
 private:
 	InputManager() = default;
-	InputManager(const InputManager&) = delete;
-	InputManager& operator=(const InputManager&) = delete;
-	InputManager(InputManager&&) = delete;
-	InputManager& operator=(InputManager&&) = delete;
 	~InputManager() = default;
 	static InputManager* instance;
 
@@ -218,13 +214,13 @@ private:
 	void onMouseScroll(const MouseScrollEvent& e);
 	void onWindowClose(const WindowCloseEvent& e);
 
-	SubscriptionHandle keyPressedHandle;
-	SubscriptionHandle keyReleasedHandle;
-	SubscriptionHandle mouseMovedHandle;
-	SubscriptionHandle mousePressedHandle;
-	SubscriptionHandle mouseReleasedHandle;
-	SubscriptionHandle mouseScrollHandle;
-	SubscriptionHandle windowCloseHandle;
+	SubscriptionHandle keyPressedHandle{0, 0};
+	SubscriptionHandle keyReleasedHandle{0, 0};
+	SubscriptionHandle mouseMovedHandle{0, 0};
+	SubscriptionHandle mousePressedHandle{0, 0};
+	SubscriptionHandle mouseReleasedHandle{0, 0};
+	SubscriptionHandle mouseScrollHandle{0, 0};
+	SubscriptionHandle windowCloseHandle{0, 0};
 	bool initialized = false;
 
 	// Keyboard state

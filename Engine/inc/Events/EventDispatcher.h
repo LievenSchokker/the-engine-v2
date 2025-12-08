@@ -1,5 +1,7 @@
 #pragma once
 
+
+#include "SubscriptionHandle.h"
 #include "Events/Event.h"
 
 #include <functional>
@@ -8,43 +10,8 @@
 #include <cstdint>
 #include <algorithm>
 
-/**
- * @brief Handle for managing event subscriptions
- *
- * Keep this handle to unsubscribe later. Invalid handles are safe to use
- * (unsubscribe will simply do nothing).
- */
-class SubscriptionHandle
-{
-public:
-	SubscriptionHandle() : id(0), typeId(0)
-	{
-	}
 
-	bool isValid() const
-	{
-		return id != 0;
-	}
-
-	void invalidate()
-	{
-		id = 0;
-	}
-
-private:
-	friend class EventDispatcher;
-
-	SubscriptionHandle(uint64_t id, uint32_t typeId)
-		: id(id), typeId(typeId)
-	{
-	}
-
-	uint64_t id;
-	uint32_t typeId;
-};
-
-/**
- * @brief Central event dispatcher for type-safe event handling
+/** * @brief Central event dispatcher for type-safe event handling
  *
  * Supports:
  * - Type-safe subscriptions via templates
@@ -56,10 +23,6 @@ class EventDispatcher
 public:
 	EventDispatcher() = default;
 	~EventDispatcher() = default;
-
-	// Non-copyable
-	EventDispatcher(const EventDispatcher&) = delete;
-	EventDispatcher& operator=(const EventDispatcher&) = delete;
 
 	/**
 	 * @brief Subscribe to an event type
@@ -82,7 +45,7 @@ public:
 		};
 
 		listeners[typeId].push_back({id, std::move(wrapper)});
-		return SubscriptionHandle(id, typeId);
+		return {id, typeId};
 	}
 
 	/**

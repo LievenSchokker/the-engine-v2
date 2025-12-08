@@ -25,7 +25,10 @@ protected:
 };
 
 /**
- * @brief CRTP base for type-safe events
+ * @brief Event base class for creation of events
+ *
+ * Has a template with the idea that the generic class still has
+ * access to the specefic static type of the template class.
  *
  * Usage:
  *   struct MyEvent : public Event<MyEvent> { ... };
@@ -40,7 +43,7 @@ public:
 		return id;
 	}
 
-	uint32_t getTypeId() const override
+	[[nodiscard]] uint32_t getTypeId() const override
 	{
 		return staticTypeId();
 	}

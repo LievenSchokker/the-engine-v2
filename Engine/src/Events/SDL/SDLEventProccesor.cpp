@@ -84,10 +84,6 @@ bool SDLEventProcessor::processEvents(Handler handler)
 				});
 				break;
 
-			case SDL_TEXTINPUT:
-				handler(TextInputEvent{sdlEvent.text.text});
-				break;
-
 			case SDL_MOUSEMOTION:
 			{
 				int deltaX = sdlEvent.motion.xrel;

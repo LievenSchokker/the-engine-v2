@@ -7,11 +7,11 @@ void EventDispatcher::unsubscribe(SubscriptionHandle& handle)
 		return;
 	}
 
-	auto it = listeners.find(handle.typeId);
-	if (it != listeners.end())
+	auto subscriptionIterator = listeners.find(handle.typeId);
+	if (subscriptionIterator != listeners.end())
 	{
-		auto& vec = it->second;
-		std::erase_if(vec,
+		auto& subscriptionVector = subscriptionIterator->second;
+		std::erase_if(subscriptionVector,
 		              [&](const Subscription& s) { return s.id == handle.id; });
 	}
 

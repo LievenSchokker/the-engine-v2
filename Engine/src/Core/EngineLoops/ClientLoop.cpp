@@ -21,7 +21,8 @@
 
 //TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-	: sceneManager(std::make_unique<SceneManager>()),
+	: windowCloseHandle(1, 1), windowResizeHandle(2, 2),
+	  sceneManager(std::make_unique<SceneManager>()),
 	  game(std::move(spel)),
 	  gameWorld(std::make_unique<GameWorld>()),
 	  specifications(game->getApplicationSpecifications()),
@@ -67,8 +68,8 @@ void ClientLoop::start()
 void ClientLoop::initializeEvents()
 {
 	eventDispatcher.subscribe<KeyPressedEvent>(
-		[this](const KeyPressedEvent& e) {
-			if (e.keyCode == SDLK_ESCAPE && !e.isRepeat)
+		[this](const KeyPressedEvent& event) {
+			if (event.keyCode == SDLK_ESCAPE && !event.isRepeat)
 			{
 				shutdown();
 			}
