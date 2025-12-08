@@ -5,8 +5,8 @@
 #pragma once
 
 
-#include "Modules/BaseAgentModule.h"
 #include "AI/ModuleData.h"
+#include "Modules/BaseAgentModule.h"
 
 
 template<typename T, typename... Args>
@@ -14,13 +14,22 @@ bool Agent::addAgentModule(float desiredWeight, Args&&... args)
 {
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::addAgentModule] T must derive from BaseAgentModule");
 
+    /// Prevent duplicate modules.
     if (hasAgentModule<T>())
         return false;
 
+    /// ModuleData is used to store the module (T), their weight, and the status.
+    /// Agent internally stores ModuleData objects, not directly the Module T.
+    /// Constructor arguments of the Module T get passed to the ModuleData constructor, which internally constructs and stores the desired Module.
     std::unique_ptr<ModuleData> moduleData = std::make_unique<ModuleData>(std::make_unique<T>(*this, std::forward<Args>(args)...), desiredWeight);
+
     ModuleData* added = moduleData.get();
+
+    /// The agent has ownership over all ModuleData objects
+    /// The ModuleData has ownership over the actual Module (stored in unique_ptr)
     moduleDatas.push_back(std::move(moduleData));
 
+    /// Initialise a module right after adding it.
     added->getModule()->initialise();
 
     return true;
@@ -33,10 +42,17 @@ bool Agent::removeAgentModule()
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::removeAgentModule] T must derive from BaseAgentModule");
 
     ModuleData* moduleData = nullptr;
-    size_t index = 0;
+    size_t index = -1; /// Initialise < 0 for safety
 
+    /// this method attempts to retrieve the ModuleData containing the module T, and it's index in the vector that stores the ModuleData objects
+    /// If it succeeds, the moduleData and index variables will contain their data, and can be used to remove the desired module by removing th estored Moduledata containing it.
     if (tryGetAgentModule<T>(moduleData, index))
     {
+        /// Make sure the index exists in the vector to prevent crashes
+        if (index < 0 || index >= moduleDatas.size())
+            return false;
+
+        /// Remove the ModuleData that exists on the retrieved index
         moduleDatas.erase(moduleDatas.begin() + index);
         return true;
     }
@@ -51,6 +67,8 @@ bool Agent::hasAgentModule() const
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::hasAgentModule] T must derive from BaseAgentModule");
 
     ModuleData* temp = nullptr;
+
+    /// Wrap the internally used tryGetAgentModule method to check if a module exists on the agent.
     return tryGetAgentModule<T>(temp);
 }
 
@@ -69,7 +87,6 @@ bool Agent::setModuleWeight(float desiredWeight) const
     }
 
     return false;
-
 }
 
 
@@ -117,6 +134,7 @@ template<typename T> ModuleStatus Agent::getModuleStatus() const
         return moduleData->getModuleStatus();
     }
 
+    /// Base case; if the module doesnt exist, return inactive.
     return ModuleStatus::INACTIVE;
 }
 

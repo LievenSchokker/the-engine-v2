@@ -27,7 +27,7 @@ void Agent::update(float deltaTime, GameWorld* gameWorld)
 
 Vector2 Agent::computeDesiredVelocity()
 {
-    Vector2 desiredForce = computeModuleForce();
+    Vector2 desiredForce = computeModulesForce();
 
     if (desiredForce.magnitude() > maxSpeed)
     {
@@ -38,7 +38,7 @@ Vector2 Agent::computeDesiredVelocity()
 }
 
 
-Vector2 Agent::computeModuleForce()
+Vector2 Agent::computeModulesForce()
 {
     Vector2 totalForce = Vector2::zero();
 
@@ -55,6 +55,8 @@ Vector2 Agent::computeModuleForce()
             continue;
 
         Vector2 direction = moduleData->getModule()->compute();
+
+        /// Skip modules that return a zero length vector, no contributions to the resulting force.
         if (direction == Vector2::zero())
             continue;
 
@@ -62,7 +64,7 @@ Vector2 Agent::computeModuleForce()
         totalForce += direction * weight;
     }
 
-
+    /// Return the sum of all computated module's directions, multiplied by their weights
     return totalForce;
 }
 
@@ -101,6 +103,7 @@ float Agent::getRotationTurnRate() const
 {
     return rotationTurnRate;
 }
+
 
 void Agent::setRotationTurnRate(float value)
 {
