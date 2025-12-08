@@ -5,16 +5,20 @@
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
+#include "Networking/MessageHandlers/IMessageHandler.h"
+#include "Networking/Messages/MessageDispatcher.h"
 
 
 #include <iostream>
 
+#include "Networking/Context/ServerNetworkContext.h"
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
@@ -25,6 +29,7 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
     {
         throw std::runtime_error("Port is not set");
     }
+
     setupInformation = serverConnectionInformation;
 }
 
@@ -121,19 +126,22 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
     MessageTypes messageType = message->getMessageType();
     const int clientId = rawMessage.connectionID;
 
-    switch (messageType)
-    {
-    case MessageTypes::ConnectionMessage:
-        if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
-        {
-            handleConnectionMessage(clientId, connMsg);
-        }
-        break;
+    messageDispatcher->processMessage(*message);
 
-    default:
-        std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
-        break;
-    }
+    /// #TODO: Remove below code into ConnectionMessageHandler
+    // switch (messageType)
+    // {
+    // case MessageTypes::ConnectionMessage:
+    //     if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
+    //     {
+    //         handleConnectionMessage(clientId, connMsg);
+    //     }
+    //     break;
+    //
+    // default:
+    //     std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
+    //     break;
+    // }
 }
 
 void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
@@ -220,4 +228,9 @@ void Server::kickClient(const int clientId)
         transport->disconnectFromSocket(clientId);
         connectedClients.erase(clientId);
     }
+}
+
+void Server::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+{
+    messageDispatcher = std::move(dispatcher);
 }

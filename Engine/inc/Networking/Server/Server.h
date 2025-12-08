@@ -7,6 +7,7 @@
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
 
 class TransportGNS;
 class IMessage;
@@ -15,6 +16,10 @@ class ConnectionMessage;
 struct ServerConnectionInformation;
 struct IncomingRawMessage;
 struct Connection;
+struct ServerConnectionInformation;
+struct IncomingRawMessage;
+struct Connection;
+class MessageDispatcher;
 
 enum class ConnectionStatus : uint8_t;
 

@@ -5,16 +5,19 @@
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "../../inc/Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
+#include "Networking/MessageHandlers/IMessageHandler.h"
 
 
 #include <iostream>
 
+#include "Networking/Context/ClientNetworkContext.h"
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport))
@@ -30,6 +33,8 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
     {
         onConnectionChanged(connection);
     });
+
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *networkContext);
 }
 
 Client::~Client()
@@ -118,17 +123,26 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
         return;
     }
 
-    switch (MessageTypes messageType = message->getMessageType())
-    {
-    case MessageTypes::ConnectionMessage:
-        {
-            if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
-            {
-                disconnect();
-            }
-            break;
-        }
-    default:
-        break;
-    }
+    messageDispatcher->processMessage(*message);
+
+
+    // switch (MessageTypes messageType = message->getMessageType())
+    // {
+    // case MessageTypes::ConnectionMessage:
+    //     {
+    //         if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
+    //         {
+    //             disconnect();
+    //         }
+    //         break;
+    //     }
+    // default:
+    //     break;
+    // }
 }
+
+void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+{
+    messageDispatcher = std::move(dispatcher);
+}
+
