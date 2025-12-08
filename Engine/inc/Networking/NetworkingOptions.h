@@ -1,5 +1,7 @@
-#include <string>
+#pragma once
 
+
+#include <string>
 #include "Core/EngineMode.h"
 
 struct NetworkingOptions
