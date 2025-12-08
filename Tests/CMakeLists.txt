@@ -22,6 +22,7 @@ add_executable(engine_tests
         Scene/SceneManagerTest.cpp
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp
+        Networking/Messages/MessageDispatcherTest.cpp
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
