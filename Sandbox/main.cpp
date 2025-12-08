@@ -3,9 +3,9 @@
 
 #include "EntryPoint.h"
 #include "Component/Profiler/Profiler.h"
-#include "Component/UIObject/UIPanelObject.h"
-#include "Component/UIObject/UIProgressBar.h"
-#include "Component/UIObject/UISpacer.h"
+#include "Component/UIElement/UIPanelElement.h"
+#include "Component/UIElement/UIProgressBar.h"
+#include "Component/UIElement/UISpacer.h"
 
 #undef main
 

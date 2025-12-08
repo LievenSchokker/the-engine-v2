@@ -13,12 +13,12 @@
  * their containing panel, allowing the render hook to group and position
  * children correctly without the UI objects needing to know about each other.
  */
-class UIObject: public UserInterfaceRenderComponent
+class UIElement: public UserInterfaceRenderComponent
 {
 public:
-	explicit UIObject(float x = 0, float y = 0, float width = 100,
+	explicit UIElement(float x = 0, float y = 0, float width = 100,
 	                  float height = 30);
-	~UIObject() override = default;
+	~UIElement() override = default;
 
 	/// @name Geometry accessors
 	/// @brief Screen-space coordinates. Origin is top-left; positive Y points down.

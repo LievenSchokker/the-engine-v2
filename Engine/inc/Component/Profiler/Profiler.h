@@ -2,7 +2,7 @@
 
 
 #include "Behaviour/Behaviour.h"
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 #include "Rendering/Color.h"
 #include "Rendering/IUIRenderHook.h"
 
@@ -24,7 +24,7 @@ class GameWorld;
  * keep the displayed values readable (rapidly changing numbers are hard
  * to follow).
  */
-class Profiler: public UIObject, public Behaviour
+class Profiler: public UIElement, public Behaviour
 {
 public:
 	explicit Profiler(

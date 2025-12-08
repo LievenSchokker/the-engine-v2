@@ -11,7 +11,7 @@
 #include <iostream>
 
 Profiler::Profiler(float x, float y, float width, float height)
-	: UIObject(x, y, width, height)
+	: UIElement(x, y, width, height)
 	  , updateInterval(0.25f)
 	  , timeSinceLastUpdate(0.0f)
 	  , currentFPS(0.0f)

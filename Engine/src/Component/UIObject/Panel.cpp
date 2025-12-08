@@ -1,4 +1,4 @@
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 #include <string>
 
 /**
@@ -14,10 +14,10 @@
  * flows children left-to-right, top-to-bottom within that grid, avoiding
  * the need for manual coordinate math in game code.
  */
-class UIPanelObject: public UIObject
+class UIPanelElement: public UIElement
 {
 public:
-	explicit UIPanelObject(
+	explicit UIPanelElement(
 		float x = 0,
 		float y = 0,
 		float width = 200,

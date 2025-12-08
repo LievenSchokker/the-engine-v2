@@ -1,9 +1,9 @@
 #pragma once
 
 
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 
-class Button: public UIObject
+class Button: public UIElement
 {
 public:
 	explicit Button(int width = 0, int height = 0, bool interactable = false);

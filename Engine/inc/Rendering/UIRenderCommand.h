@@ -2,7 +2,7 @@
 
 #include <string>
 #include "Rendering/Color.h"
-#include "Component/UIObject/Alignment.h"
+#include "Component/UIElement/Alignment.h"
 
 #include <vector>
 

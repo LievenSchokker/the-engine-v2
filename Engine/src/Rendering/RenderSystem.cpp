@@ -2,7 +2,7 @@
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Rendering/RenderSystem.h"
 
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
 

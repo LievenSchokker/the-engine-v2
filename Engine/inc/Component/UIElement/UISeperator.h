@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 
-class UISeparator : public UIObject
+class UISeparator : public UIElement
 {
 public:
 	explicit UISeparator();

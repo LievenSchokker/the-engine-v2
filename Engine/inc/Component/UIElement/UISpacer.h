@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 
 /**
  * @brief Invisible layout element that reserves vertical space between siblings.
@@ -9,7 +9,7 @@
  * elements. This keeps margins configurable per-layout rather than baked into
  * component defaults, and avoids the need for empty labels or padding hacks.
  */
-class UISpacer: public UIObject
+class UISpacer: public UIElement
 {
 public:
 	/// @param height Vertical space in pixels. Defaults to 10 for subtle

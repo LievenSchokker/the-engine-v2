@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Component/UIObject/UIObject.h"
-#include "Component/UIObject/Alignment.h"
+#include "Component/UIElement/UIElement.h"
+#include "Component/UIElement/Alignment.h"
 #include "Rendering/Color.h"
 
 #include <string>
@@ -14,10 +14,10 @@
  * element's bounds within its parent panel, making it easy to right-align
  * numeric values or center titles without pixel math.
  */
-class UITextObject: public UIObject
+class UITextElement: public UIElement
 {
 public:
-	explicit UITextObject(
+	explicit UITextElement(
 		float x = 0,
 		float y = 0,
 		float width = 100,

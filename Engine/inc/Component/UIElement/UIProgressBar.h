@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 #include "Rendering/Color.h"
 
 /**
@@ -11,7 +11,7 @@
  * handles clamping internally—setting a value outside the range won't break
  * rendering or produce visual artifacts.
  */
-class UIProgressBar: public UIObject
+class UIProgressBar: public UIElement
 {
 public:
 	explicit UIProgressBar(
