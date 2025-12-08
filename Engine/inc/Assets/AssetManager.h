@@ -1,13 +1,8 @@
-///
-/// Created by Lieven Schokker on 10/11/2025.
-///
-
 #pragma once
 
 
 #include <memory>
 #include <unordered_map>
-#include <unordered_set>
 #include <string>
 
 class Asset;

@@ -30,7 +30,7 @@ void SimpleMoveBehaviour::onStart()
     std::cout << "SimpleMoveBehaviour is now started" << std::endl;
 }
 
-void SimpleMoveBehaviour::update(float deltaTime)
+void SimpleMoveBehaviour::update(float deltaTime, GameWorld* world)
 {
 	(void)deltaTime;  // Not used in this behaviour
 	pollInput();

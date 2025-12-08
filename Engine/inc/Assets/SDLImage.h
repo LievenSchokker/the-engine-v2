@@ -1,14 +1,9 @@
-///
-/// Created by Lieven Schokker on 10/11/2025.
-///
-
 #pragma once
 
 
 #include "Asset.h"
-#include <SDL_image.h>
-#include <SDL.h>
 
+#include <SDL.h>
 
 class SDLImage : public Asset
 {

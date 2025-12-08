@@ -1,10 +1,10 @@
-#include "Component/UIObject/Button.h"
+#include "Component/UIElement/Button.h"
 
 #include <iostream>
 
 
 Button::Button(const int width, const int height, const bool interactable)
-	: UIObject(0, 0, width, height), interactable(interactable)
+	: UIElement(0, 0, width, height), interactable(interactable)
 {
 }
 
