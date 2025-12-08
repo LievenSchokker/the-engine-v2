@@ -1,10 +1,11 @@
 #pragma once
-#include "Component/UIObject/UIObject.h"
 
+
+#include "Component/UIObject/UIObject.h"
 
 class Button: public UIObject
 {
-   public:
+public:
 	explicit Button(int width = 0, int height = 0, bool interactable = false);
 
 	void setInteractable(bool newInteractable);
@@ -12,6 +13,6 @@ class Button: public UIObject
 
 	void onClick();
 
-   private:
+private:
 	bool interactable;
 };

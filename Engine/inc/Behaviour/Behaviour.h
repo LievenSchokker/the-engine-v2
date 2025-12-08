@@ -1,11 +1,7 @@
-//
-// Created by samle on 10/11/2025.
-//
-
 #pragma once
 
-#include "../Component/BaseComponentTypes/Component.h"
 
+#include "Component/BaseComponentTypes/Component.h"
 
 class GameWorld;
 /**
@@ -15,15 +11,17 @@ class GameWorld;
  *
  * Behaviour differs from Component because they can be enabled and disabled, and implement lifetime functions.
  */
-class Behaviour : virtual public Component
+class Behaviour: virtual public Component
 {
-    public:
-        Behaviour() :
-         isEnabled(true),  hasAwakened(false), hasStarted(false) {}
+public:
+	Behaviour() :
+		isEnabled(true), hasAwakened(false), hasStarted(false)
+	{
+	}
 
-        /**
-         * @brief Pure virtual destructor makes this class Abstract.
-         */
+	/**
+	 * @brief Pure virtual destructor makes this class Abstract.
+	 */
         virtual ~Behaviour() = 0;
 
         /**

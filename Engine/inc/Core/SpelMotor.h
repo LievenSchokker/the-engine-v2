@@ -2,17 +2,13 @@
 
 
 #include "Core/ApplicationSpecifications.h"
-#include "Core/GameWorld.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 
 class Game;
 class IEngineLoop;
 class ApplicationClock;
 
-#include <atomic>
 #include <memory>
 #include <thread>
-
 
 /**
  * @class SpelMotor

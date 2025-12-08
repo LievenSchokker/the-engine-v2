@@ -1,8 +1,7 @@
 #pragma once
 
-#include "nuklear.h"
 
-#include <SDL_video.h>
+#include "nuklear.h"
 
 #include "Input/InputManager.h"
 #include "Rendering/IUIRenderHook.h"
@@ -10,6 +9,7 @@
 
 #include <queue>
 #include <unordered_map>
+#include <SDL_video.h>
 
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.
@@ -110,7 +110,7 @@ private:
 	void renderImage(const UIRenderCommand& command);
 	void renderSpacer(const UIRenderCommand& command);
 	void renderText(const UIRenderCommand& command);
-	
+
 	InputManager* inputManager;
 	SDL_Window* sdlWindow;
 	SDL_Renderer* sdlRenderer;

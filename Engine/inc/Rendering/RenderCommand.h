@@ -3,14 +3,14 @@
 
 #include "Color.h"
 #include "RenderCommandType.h"
-#include "GameObject/Vector2.h"
 #include "Math/Vector2.h"
 
 
 /**
  * @brief Describes a single primitive shape ready for the renderer to consume.
  */
-struct RenderCommand {
+struct RenderCommand
+{
 	RenderCommandType type = RenderCommandType::None;
 
 

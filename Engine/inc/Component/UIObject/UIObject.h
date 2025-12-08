@@ -1,6 +1,8 @@
 #pragma once
 
+
 #include "Component/BaseComponentTypes/UIRenderComponent.h"
+#include "Rendering/UIRenderCommand.h"
 
 /**
  * @brief Base class providing common layout and hierarchy for UI elements.
@@ -11,10 +13,11 @@
  * their containing panel, allowing the render hook to group and position
  * children correctly without the UI objects needing to know about each other.
  */
-class UIObject : public UserInterfaceRenderComponent
+class UIObject: public UserInterfaceRenderComponent
 {
 public:
-	explicit UIObject(float x = 0, float y = 0, float width = 100, float height = 30);
+	explicit UIObject(float x = 0, float y = 0, float width = 100,
+	                  float height = 30);
 	~UIObject() override = default;
 
 	/// @name Geometry accessors

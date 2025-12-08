@@ -1,6 +1,6 @@
 #pragma once
 
-#include "External/SdlContext.h"
+
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/Color.h"
 #include "Scene/Scene.h"

@@ -2,12 +2,9 @@
 
 #include "Math/Vector2.h"
 #include "Rendering/Color.h"
-#include "../Rendering/RenderQueue/RenderQueue.h"
-#include "BaseComponentTypes/Component.h"
 #include "BaseComponentTypes/RenderComponent.h"
 
 #include <unordered_map>
-#include <vector>
 
 class TilemapAsset;
 
@@ -24,7 +21,7 @@ class TilemapAsset;
  */
 class TilemapComponent: public RenderComponent
 {
-   public:
+public:
 	TilemapComponent();
 	~TilemapComponent() override = default;
 

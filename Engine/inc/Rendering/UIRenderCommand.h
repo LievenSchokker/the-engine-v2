@@ -20,7 +20,6 @@ enum class UICommandType
 };
 
 
-
 /**
  * @brief A single UI draw instruction consumed by the render hook.
  *
