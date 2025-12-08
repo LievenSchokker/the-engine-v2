@@ -6,7 +6,7 @@ class ISceneStrategy;
 struct Vector2;
 
 /// NOTE: This struct can be used to inject Application dependencies to the MessageHandlers.
-/// Add more if neeced
+/// Add more if needed
 struct  NetworkContext
 {
     public:

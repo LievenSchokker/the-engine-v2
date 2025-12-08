@@ -1,9 +1,7 @@
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
-
 
 #include <cstring>
 

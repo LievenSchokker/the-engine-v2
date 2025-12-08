@@ -5,19 +5,14 @@
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
-#include "../../inc/Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
-#include "Networking/Messages/MessageTypes.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
 #include "Networking/Messages/MessageDispatcherFactory.h"
-#include "Networking/MessageHandlers/IMessageHandler.h"
-
 
 #include <iostream>
 
-#include "Networking/Context/ClientNetworkContext.h"
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport)),
@@ -38,10 +33,12 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
     messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *gameWorld);
 }
 
+
 Client::~Client()
 {
     disconnect();
 }
+
 
 bool Client::connectToServer(const ServerConnectionInformation&  serverInformartion) const
 {
@@ -53,6 +50,7 @@ bool Client::connectToServer(const ServerConnectionInformation&  serverInformart
     return true;
 }
 
+
 void Client::disconnect()
 {
     if (currentConnection.connectionStatus == ConnectionStatus::Connected)
@@ -62,6 +60,7 @@ void Client::disconnect()
     transport->closeOpenSocket();
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
+
 
 bool Client::sendMessage(const IMessage& message) const
 {
@@ -80,15 +79,18 @@ bool Client::sendMessage(const IMessage& message) const
     return result == TransportResult::SUCCESS;
 }
 
+
 void Client::poll() const
 {
     transport->poll();
 }
 
+
 bool Client::isConnected() const
 {
     return currentConnection.connectionStatus == ConnectionStatus::Connected;
 }
+
 
 void Client::onConnectionChanged(const Connection& connection)
 {
@@ -114,7 +116,8 @@ void Client::onConnectionChanged(const Connection& connection)
     }
 }
 
-void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
+
+void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
     std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
@@ -126,6 +129,7 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 
     messageDispatcher->processMessage(std::move(message));
 }
+
 
 void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
 {

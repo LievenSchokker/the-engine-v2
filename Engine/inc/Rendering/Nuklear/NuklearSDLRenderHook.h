@@ -1,15 +1,15 @@
 #pragma once
 
-#include "nuklear.h"
 
+#include "nuklear.h"
 #include <SDL_video.h>
+#include <unordered_map>
+#include <queue>
 
 #include "Input/InputManager.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/SDL/SDLRenderer.h"
 
-#include <queue>
-#include <unordered_map>
 
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.

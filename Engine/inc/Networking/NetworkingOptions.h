@@ -4,6 +4,7 @@
 #include <string>
 #include "Core/EngineMode.h"
 
+
 struct NetworkingOptions
 {
     EngineMode mode;

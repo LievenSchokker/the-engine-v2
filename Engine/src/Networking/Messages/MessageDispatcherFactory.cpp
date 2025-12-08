@@ -1,12 +1,10 @@
-//
-// Created by samle on 25/11/2025.
-//
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/MessageHandlers/IMessageHandler.h"
 #include "Networking/MessageHandlers/ConnectionMessageHandler.h"
 #include "Scene/SceneManager.h"
+
 
 namespace spelmotor_networking
 {
