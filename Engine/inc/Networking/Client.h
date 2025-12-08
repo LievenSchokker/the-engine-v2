@@ -5,12 +5,12 @@
 
 #include "Connection/Connection.h"
 #include "Server/ServerInformation.h"
-
+#include "Networking/Messages/MessageDispatcher.h"
 
 class ITransport;
 class TransportGNS;
 class IMessage;
-
+class NetworkContext;
 
 struct IncomingRawMessage;
 
@@ -68,6 +68,7 @@ public:
      */
     bool isConnected() const;
 
+    void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
 private:
     /**
      * @brief Callback invoked when a message is received from the server.
@@ -81,6 +82,8 @@ private:
      */
     void onConnectionChanged(const Connection& connection);
 
+    std::unique_ptr<NetworkContext> networkContext;
     std::unique_ptr<ITransport> transport;  ///< The underlying network transport.
     Connection currentConnection{};            ///< The current server connection.
+    std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
 };

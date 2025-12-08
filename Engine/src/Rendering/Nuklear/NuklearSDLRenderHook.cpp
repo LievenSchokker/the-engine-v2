@@ -1,6 +1,8 @@
 // Rendering/Nuklear/NuklearSDLRenderHook.cpp
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 
+#include <algorithm>
+
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
 #include "Input/InputManager.h"

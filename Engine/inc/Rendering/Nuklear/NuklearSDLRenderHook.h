@@ -9,6 +9,7 @@
 #include "Rendering/SDL/SDLRenderer.h"
 
 #include <queue>
+#include <unordered_map>
 
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.

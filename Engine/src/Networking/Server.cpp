@@ -5,7 +5,6 @@
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/ConnectionMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
@@ -16,12 +15,14 @@
 #include <iostream>
 
 #include "Core/ApplicationSpecifications.h"
+#include "Networking/Messages/Concretes/ConnectionMessage.h"
 
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport))
-    , status(ServerStatus::Stopping)
+    , status(ServerStatus::Stopping),
+    messageDispatcher(nullptr)
 {
     if (serverConnectionInformation.port == 0)
     {
