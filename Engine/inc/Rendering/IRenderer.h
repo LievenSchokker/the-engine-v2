@@ -56,7 +56,15 @@ public:
 	 */
 	virtual void beginFrame(const Color& clearColor) = 0;
 
-
+	/**
+	 * @brief execute's the handling of the  rendercommand.
+	 *
+	 * @return void
+	 * This will execute a single render command. It is important that
+	 * beginFrame is called before execution.
+	 * Otherwise this would draw on top of an old frame.
+	 *
+	 */
 	virtual void execute(const RenderCommand& command) = 0;
 
 	/**
@@ -79,6 +87,13 @@ public:
 	 */
 	virtual void close() = 0;
 
+	/**
+	 * @brief Presents the current frame to the screen
+	 *
+	 * Sets the new list of data to the renderingUI. Which will then be used
+	 * in rendering
+	 * @param commands The list of UIRenderCommands to be send for rendering
+	 */
 	virtual void submitUI(const std::vector<UIRenderCommand>& commands) = 0;
 	/**
 	 * @brief Checks if the rendering window is currently open
