@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Audio/Handles.h"
-
 #include <memory>
 #include <string>
 
@@ -44,7 +42,7 @@ class AudioManager
 	 * @param path File path to the music file.
 	 * @return True if loading succeeded.
 	 */
-	MusicHandle loadMusic(const std::string& path) const;
+	bool loadMusic(const std::string& path) const;
 
 	/**
 	 * @brief Assigns the active music source.
@@ -73,10 +71,10 @@ class AudioManager
 
 	/**
 	 * @brief Plays a music track by handle.
-	 * @param handle Music handle.
+	 * @param path
 	 * @param loop Whether the track should loop.
 	 */
-	void playMusic(MusicHandle handle, bool loop) const;
+	void playMusic(const std::string& path, bool loop) const;
 
 	/**
 	 * @brief Pauses the music.
@@ -98,17 +96,18 @@ class AudioManager
 	 * @param path Path to the audio file.
 	 * @return Handle to the loaded sound, or -1 on failure.
 	 */
-	SoundHandle loadSound(const std::string& path) const;
+	bool loadSound(const std::string& path) const;
 
 	/**
 	 * @brief Plays a loaded sound, with the given stereo on the channel
-	 * @param handle Sound to play.
+	 * @param path
 	 * @param loops Number of loops (0 = once, -1 = infinite).
 	 * @param left  Left volume (0.0–1.0).
 	 * @param right Right volume (0.0–1.0).
 	 * @return Channel index used for playback, or -1 on failure.
 	 */
-	int playSound(SoundHandle handle, int loops, float left, float right) const;
+	int playSound(const std::string& path, int loops, float left,
+				  float right) const;
 
 	/**
 	 * @brief Stops playback on a specific channel.

@@ -16,7 +16,7 @@ void AudioManager::shutdown()
 	backend = nullptr;
 }
 
-MusicHandle AudioManager::loadMusic(const std::string& path) const
+bool AudioManager::loadMusic(const std::string& path) const
 {
 	return backend->loadMusic(path);
 }
@@ -46,11 +46,11 @@ void AudioManager::setMusicVolume(float volume)
 	backend->setMusicVolume(volume);
 }
 
-void AudioManager::playMusic(MusicHandle handle, bool loop) const
+void AudioManager::playMusic(const std::string& path, bool loop) const
 {
 	if ( !backend ) return;
 	int amountOfLoops = loop ? -1 : 0;
-	backend->playMusic(handle, amountOfLoops);
+	backend->playMusic(path, amountOfLoops);
 }
 
 void AudioManager::pauseMusic() const
@@ -71,13 +71,13 @@ void AudioManager::resumeMusic() const
 	backend->resumeMusic();
 }
 
-SoundHandle AudioManager::loadSound(const std::string& path) const
+bool AudioManager::loadSound(const std::string& path) const
 {
 	if ( !backend ) return -1;
 	return backend->loadSound(path);
 }
 
-int AudioManager::playSound(SoundHandle handle, int loops, float left,
+int AudioManager::playSound(const std::string& path, int loops, float left,
 							float right) const
 {
 	if ( !backend ) return -1;
@@ -87,7 +87,7 @@ int AudioManager::playSound(SoundHandle handle, int loops, float left,
 	if ( channel < 0 ) return -1;
 
 	backend->setChannelPanning(channel, left, right);
-	backend->playSound(handle, channel, loops);
+	backend->playSound(path, channel, loops);
 	return channel;
 }
 

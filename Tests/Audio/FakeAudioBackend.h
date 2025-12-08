@@ -6,11 +6,11 @@ struct FakeAudioBackend: public IAudioBackend
 	bool initialized = false;
 
 	// Logged calls
+	std::string lastPlaySound_path = "";
 	int lastPlaySound_channel = -1;
-	int lastPlaySound_handle = -1;
 	int lastPlaySound_loops = -1;
 
-	int lastPlayMusic_handle = -1;
+	std::string lastPlayMusic_path = "";
 	int lastPlayMusic_loops = -1;
 
 	int lastStoppedChannel = -1;
@@ -28,34 +28,36 @@ struct FakeAudioBackend: public IAudioBackend
 		return true;
 	}
 
-	SoundHandle loadSound(const std::string&) override
+	bool loadSound(const std::string& path) override
 	{
-		return 10;	// arbitrary handle
+		// Pretend "load succeeded"
+		return true;
 	}
 
-	MusicHandle loadMusic(const std::string&) override
+	bool loadMusic(const std::string& path) override
 	{
-		return 5;  // arbitrary handle
+		// Pretend "load succeeded"
+		return true;
 	}
 
-	void unloadSound(SoundHandle) override
-	{
-	}
-
-	void unloadMusic(MusicHandle) override
+	void unloadSound(const std::string& path) override
 	{
 	}
 
-	void playSound(SoundHandle handle, int channel, int loops) override
+	void unloadMusic(const std::string& path) override
 	{
-		lastPlaySound_handle = handle;
+	}
+
+	void playSound(const std::string& path, int channel, int loops) override
+	{
+		lastPlaySound_path = path;
 		lastPlaySound_channel = channel;
 		lastPlaySound_loops = loops;
 	}
 
-	void playMusic(MusicHandle handle, int loops) override
+	void playMusic(const std::string& path, int loops) override
 	{
-		lastPlayMusic_handle = handle;
+		lastPlayMusic_path = path;
 		lastPlayMusic_loops = loops;
 	}
 
@@ -94,6 +96,5 @@ struct FakeAudioBackend: public IAudioBackend
 
 	void shutdown() override
 	{
-		return;
 	}
 };

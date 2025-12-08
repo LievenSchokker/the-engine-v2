@@ -18,7 +18,7 @@ TEST(SoundSourceTest, LoadAndPlaySound_UsesBackend)
 	src.setPanning(0.8f, 0.3f);
 	src.play(1);
 
-	EXPECT_EQ(ptr->lastPlaySound_handle, 10);
+	EXPECT_EQ(ptr->lastPlaySound_path, "fx.wav");
 	EXPECT_EQ(ptr->lastPlaySound_loops, 1);
 	EXPECT_EQ(ptr->lastPanLeft, 0.8f);
 	EXPECT_EQ(ptr->lastPanRight, 0.3f);

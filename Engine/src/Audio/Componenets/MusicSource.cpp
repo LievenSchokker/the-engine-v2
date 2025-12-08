@@ -13,21 +13,19 @@ MusicSource::~MusicSource()
 	audioManager->setMusicSource(nullptr);
 }
 
-bool MusicSource::loadMusic(const std::string& path)
+bool MusicSource::loadMusic(const std::string& newPath)
 {
+	path = newPath;
 	if ( !audioManager ) return false;
-	handle = audioManager->loadMusic(path);
-	if ( handle == -1 ) return false;
-	musicAssetTag = path;
-	return true;
+	return audioManager->loadMusic(path);
 }
 
 void MusicSource::play()
 {
-	if ( !audioManager || handle == -1 ) return;
+	if ( !audioManager ) return;
 	audioManager->setMusicSource(this);
 	audioManager->setMusicVolume(volume);
-	audioManager->playMusic(handle, loop ? -1 : 0);
+	audioManager->playMusic(path, loop ? -1 : 0);
 	playing = true;
 }
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Audio/Handles.h"
-
 #include <string>
 
 /**
@@ -27,40 +25,40 @@ class IAudioBackend
 	 * @param path File path.
 	 * @return Sound handle, or -1 on failure.
 	 */
-	virtual SoundHandle loadSound(const std::string& path) = 0;
+	virtual bool loadSound(const std::string& path) = 0;
 
 	/**
 	 * @brief Loads a music track.
 	 * @param path File path.
 	 * @return Music handle, or -1 on failure.
 	 */
-	virtual MusicHandle loadMusic(const std::string& path) = 0;
+	virtual bool loadMusic(const std::string& path) = 0;
 
 	/**
 	 * @brief Unloads a sound effect.
 	 */
-	virtual void unloadSound(SoundHandle handle) = 0;
+	virtual void unloadSound(const std::string& path) = 0;
 
 	/**
 	 * @brief Unloads a music track.
 	 */
-	virtual void unloadMusic(MusicHandle handle) = 0;
+	virtual void unloadMusic(const std::string& path) = 0;
 
 	/**
 	 * @brief Plays a sound on a given channel.
-	 * @param handle Sound handle.
+	 * @param path
 	 * @param channel Backend channel index.
 	 * @param loops Loop count (-1 infinite).
 	 */
-	virtual void playSound(SoundHandle handle, int channel, int loops) = 0;
+	virtual void playSound(const std::string& path, int channel, int loops) = 0;
 
 	/**
 	 * @brief Starts playing music.
-	 * @param handle Music handle.
+	 * @param path
 	 * @param loops Loop count.
 	 * @return True on success.
 	 */
-	virtual void playMusic(MusicHandle handle, int loops) = 0;
+	virtual void playMusic(const std::string& path, int loops) = 0;
 
 	/**
 	 * Pauses music playback.

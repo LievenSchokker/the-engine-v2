@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../Handles.h"
 #include "Component/Component.h"
 
 #include <string>
@@ -61,10 +60,11 @@ class MusicSource: public Component
 
 	float getCurrentVolume() const;
 
-	/// Path or tag of the loaded music track.
-	std::string musicAssetTag;
 
    private:
+	/// Path or tag of the loaded music track.
+	std::string path;
+
 	/// Reference to the AudioManager controlling playback.
 	AudioManager* audioManager = nullptr;
 
@@ -76,7 +76,4 @@ class MusicSource: public Component
 
 	///< Playback volume.
 	float volume = 0.9f;
-
-	///< Handle to the loaded music asset.
-	MusicHandle handle = -1;
 };

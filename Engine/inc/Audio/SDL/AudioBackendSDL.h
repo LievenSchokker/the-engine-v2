@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Audio/Handles.h"
 #include "Audio/IAudioBackend.h"
 
 #include <SDL2/SDL_mixer.h>
@@ -38,42 +37,42 @@ class AudioBackendSDL: public IAudioBackend
 	 * @param path Path to a WAV file.
 	 * @return SoundHandle for the loaded sound, or -1 on failure.
 	 */
-	SoundHandle loadSound(const std::string& path) override;
+	bool loadSound(const std::string& path) override;
 
 	/**
 	 * @brief Loads streamed music into memory.
 	 * @param path Path to a MUS/OGG/MP3 file.
 	 * @return MusicHandle for the loaded music, or -1 on failure.
 	 */
-	MusicHandle loadMusic(const std::string& path) override;
+	bool loadMusic(const std::string& path) override;
 
 	/**
 	 * @brief Unloads a previously loaded sound.
-	 * @param handle The SoundHandle to unload.
+	 * @param path
 	 */
-	void unloadSound(SoundHandle handle) override;
+	void unloadSound(const std::string& path) override;
 
 	/**
 	 * @brief Unloads a previously loaded music track.
-	 * @param handle The MusicHandle to unload.
+	 * @param path
 	 */
-	void unloadMusic(MusicHandle handle) override;
+	void unloadMusic(const std::string& path) override;
 
 	/**
 	 * @brief Plays a sound effect.
-	 * @param handle Sound to play.
+	 * @param path
 	 * @param channel Mixer channel index.
 	 * @param loops Number of loops (-1 = infinite).
 	 */
-	void playSound(SoundHandle handle, int channel, int loops) override;
+	void playSound(const std::string& path, int channel, int loops) override;
 
 	/**
 	 * @brief Plays a music track.
-	 * @param handle Music handle.
+	 * @param path
 	 * @param loops Loop count (-1 = infinite).
 	 * @return True on success, false on failure.
 	 */
-	void playMusic(MusicHandle handle, int loops) override;
+	void playMusic(const std::string& path, int loops) override;
 
 	/**
 	 * @brief Pauses currently playing music.
@@ -115,23 +114,27 @@ class AudioBackendSDL: public IAudioBackend
 	void shutdown() override;
 
    private:
-	/// Map of sound handles to Mix_Chunk objects.
-	std::unordered_map<SoundHandle, Mix_Chunk*> soundMap;
+	// /// Map of sound handles to Mix_Chunk objects.
+	// std::unordered_map<SoundHandle, Mix_Chunk*> soundMap;
+	//
+	// /// Map of path and sound handle, to implement caching
+	// std::unordered_map<std::string, SoundHandle> soundCache;
+	//
+	// /// Map of music handles to Mix_Music objects.
+	// std::unordered_map<MusicHandle, Mix_Music*> musicMap;
+	//
+	// /// Map of path and music handle, to implement caching
+	// std::unordered_map<std::string, MusicHandle> musicCache;
 
-	/// Map of path and sound handle, to implement caching
-	std::unordered_map<std::string, SoundHandle> soundCache;
+	std::unordered_map<std::string, Mix_Chunk*> sounds;
+	std::unordered_map<std::string, Mix_Music*> music;
 
-	/// Map of music handles to Mix_Music objects.
-	std::unordered_map<MusicHandle, Mix_Music*> musicMap;
-
-	/// Map of path and music handle, to implement caching
-	std::unordered_map<std::string, MusicHandle> musicCache;
-
-	/// Next available sound handle.
-	SoundHandle nextSoundHandle = 1;
-
-	/// Next available music handle.
-	MusicHandle nextMusicHandle = 1;
+	//
+	// /// Next available sound handle.
+	// SoundHandle nextSoundHandle = 1;
+	//
+	// /// Next available music handle.
+	// MusicHandle nextMusicHandle = 1;
 
 	/// Whether the backend successfully initialized.
 	bool initialized = false;

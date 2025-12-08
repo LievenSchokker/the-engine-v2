@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../AudioManager.h"
-#include "Audio/Handles.h"
+#include "Audio/AudioManager.h"
 #include "Behaviour/Behaviour.h"
 
 #include <string>
@@ -21,10 +20,10 @@ class SoundSource: public Component
 
 	/**
 	 * @brief Loads a sound effect through the AudioManager.
-	 * @param path File path to the sound asset.
+	 * @param newpath File path to the sound asset.
 	 * @return True if loading succeeded.
 	 */
-	bool loadSound(const std::string& path);
+	bool loadSound(const std::string& newpath);
 
 
 	/**
@@ -55,14 +54,12 @@ class SoundSource: public Component
 	 */
 	void setCurrentPanning(float left, float right) const;
 
-
-	/// Tag/path of the loaded soundtrack.
-	std::string soundAssetTag;
-
    private:
+	/// Path or tag of the loaded soundtrack.
+	std::string path;
+
 	/// Pointer to the audio manager.
 	AudioManager* audioManager = nullptr;
-	SoundHandle handle = -1;
 	int channel = -1;
 	float lastLeft = 1.0f;
 	float lastRight = 1.0f;

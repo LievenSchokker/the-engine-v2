@@ -19,10 +19,17 @@ TEST(MusicSourceTest, LoadAndPlayMusic_CallsBackend)
 	music.setVolume(0.7f);
 	music.play();
 
-	EXPECT_EQ(fakeAudioBackend->lastPlayMusic_handle, 5);  // from fake loadMusic()
-	EXPECT_EQ(fakeAudioBackend->lastPlayMusic_loops, -1);  // loop enabled
+	// Check playMusic was called
+	EXPECT_EQ(fakeAudioBackend->lastPlayMusic_path, "bgm.ogg");
+
+	// Loop enabled => loops = -1
+	EXPECT_EQ(fakeAudioBackend->lastPlayMusic_loops, -1);
+
+	// Volume forwarded
 	EXPECT_FLOAT_EQ(fakeAudioBackend->lastMusicVolume, 0.7f);
 }
+
+// ------------------------------------------------------------------------
 
 TEST(MusicSourceTest, PauseResumeStop_CallsBackend)
 {
@@ -39,5 +46,6 @@ TEST(MusicSourceTest, PauseResumeStop_CallsBackend)
 	music.resume();
 	music.stop();
 
-	EXPECT_EQ(ptr->lastPlayMusic_handle, 5);
+	// Only check that music was played at least once
+	EXPECT_EQ(ptr->lastPlayMusic_path, "bgm.ogg");
 }

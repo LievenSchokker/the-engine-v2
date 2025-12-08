@@ -7,26 +7,20 @@ SoundSource::SoundSource(AudioManager* audioManagerPtr)
 {
 }
 
-
-bool SoundSource::loadSound(const std::string& path)
+bool SoundSource::loadSound(const std::string& newpath)
 {
 	if ( !audioManager ) return false;
 
-	handle = audioManager->loadSound(path);
-	if ( handle < 0 ) return false;
-
-	soundAssetTag = path;
-	return true;
+	path = newpath;
+	return audioManager->loadSound(path);
 }
-
 
 void SoundSource::play(int loops)
 {
-	if ( !audioManager || handle < 0 ) return;
+	if ( !audioManager ) return;
 
-	channel = audioManager->playSound(handle, loops, lastLeft, lastRight);
+	channel = audioManager->playSound(path, loops, lastLeft, lastRight);
 }
-
 
 void SoundSource::stop() const
 {
@@ -35,13 +29,11 @@ void SoundSource::stop() const
 	audioManager->stopChannel(channel);
 }
 
-
 void SoundSource::setPanning(float left, float right)
 {
 	lastLeft = left;
 	lastRight = right;
 }
-
 
 void SoundSource::setCurrentPanning(float left, float right) const
 {
