@@ -2,7 +2,7 @@
 // Created by samle on 08/12/2025.
 //
 
-#include "PathResult.h"
+#include "../../../inc/AI/Navigation/PathResult.h"
 #include "Math/Vector2.h"
 
 const std::vector<Vector2> &PathResult::getPath() const
