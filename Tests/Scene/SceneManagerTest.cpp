@@ -1,4 +1,5 @@
 #include "../../Engine/inc/GameObject/GameObject.h"
+#include "../../Engine/inc/Rendering/RenderQueue.h"
 #include "../../Engine/inc/Scene/Scene.h"
 #include "../../Engine/inc/Scene/SceneManager.h"
 
@@ -14,6 +15,15 @@ class MockGameObject: public GameObject
 		setName(name);
 	}
 };
+
+namespace
+{
+void drainRenderQueue(SceneManager& manager)
+{
+	RenderQueue queue;
+	manager.buildRenderQueue(queue);
+}
+}  // namespace
 
 TEST(SceneManagerTest, MainFlowIntegration)
 {
@@ -33,9 +43,9 @@ TEST(SceneManagerTest, MainFlowIntegration)
 	const float deltaTime1 = 0.016f;
 	const float deltaTime2 = 0.033f;
 	sceneManager.update(deltaTime1);
-	sceneManager.render();
+	drainRenderQueue(sceneManager);
 	sceneManager.update(deltaTime2);
-	sceneManager.render();
+	drainRenderQueue(sceneManager);
 
 	// Assert
 	ASSERT_NE(scenePtr, nullptr);
@@ -73,7 +83,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 	// Act - Activate Scene1
 	sceneManager.loadScene("Scene1");
 	sceneManager.update(0.1f);
-	sceneManager.render();
+	drainRenderQueue(sceneManager);
 
 	// Assert
 	EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene1");
@@ -81,7 +91,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 	// Act - Pause
 	sceneManager.pause();
 	sceneManager.update(0.1f);
-	sceneManager.render();
+	drainRenderQueue(sceneManager);
 
 	// Assert
 	EXPECT_TRUE(sceneManager.isPaused());
@@ -95,7 +105,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 	// Act - Resume
 	sceneManager.resume();
 	sceneManager.update(0.1f);
-	sceneManager.render();
+	drainRenderQueue(sceneManager);
 
 	// Assert
 	EXPECT_FALSE(sceneManager.isPaused());
@@ -109,7 +119,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 	// Act - Switch to Scene2
 	sceneManager.setActiveScene("Scene2");
 	sceneManager.update(0.2f);
-	sceneManager.render();
+	drainRenderQueue(sceneManager);
 
 	// Assert
 	EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene2");
@@ -157,7 +167,6 @@ TEST(SceneManagerTest, AddGameObjectToActiveScene)
 	SceneManager sceneManager;
 	auto scene1 = std::make_unique<Scene>("Scene1");
 	auto obj1 = std::make_unique<MockGameObject>("Object1");
-	auto* obj1Ptr = obj1.get();
 	scene1->addGameObject(std::move(obj1));
 	bool sceneAdded = sceneManager.addScene(std::move(scene1));
 	ASSERT_TRUE(sceneAdded);
@@ -194,7 +203,7 @@ TEST(SceneManagerTest, UpdateRenderWithNoActiveScene)
 
 	// Act
 	sceneManager.update(0.1f);
-	sceneManager.render();
+	drainRenderQueue(sceneManager);
 
 	// Assert - No updates should occur without active scene
 }

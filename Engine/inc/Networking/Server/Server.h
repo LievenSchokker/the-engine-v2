@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 #include "ServerInformation.h"
+#include "Core/ApplicationSpecifications.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
@@ -124,6 +125,7 @@ public:
      */
     bool broadcastMessage(const IMessage& message, int excludeClientId) const;
 
+    static ServerConnectionInformation convertApplicationSettings(const ApplicationSpecifications& specifications);
 private:
     /**
      * @brief Deserializes and routes incoming messages
