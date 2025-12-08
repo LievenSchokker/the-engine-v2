@@ -19,16 +19,18 @@
 
 #pragma once
 
-
+class IUIRenderHook;
+class IImage;
 class string;
 struct WindowOptions;
+struct Rect;
 
-# include  "Rendering/IUIRenderHook.h"
-#include "Math/Vector2.h"
 #include "Color.h"
+#include "Math/Vector2.h"
+#include "Rendering/IUIRenderHook.h"
 
-#include <string>
 #include <memory>
+#include <string>
 
 class IRenderer
 {
@@ -106,5 +108,25 @@ class IRenderer
 							   double rotationDegrees, const Color& color,
 							   const Vector2& scale) = 0;
 
-    virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
+	/**
+	 * @brief Draw a sprite from an image with the given configuration.
+	 *
+	 * @param position World position (center) of the sprite
+	 * @param size Render size of the sprite
+	 * @param image IImage to render (nullptr if not available)
+	 * @param srcRect Source rectangle in the image (nullptr to render entire
+	 * image)
+	 * @param rotationDegrees Rotation angle in degrees
+	 * @param scale Scale factor
+	 * @param tint Color tint to apply
+	 * @param flipX Whether to flip horizontally
+	 * @param flipY Whether to flip vertically
+	 */
+	virtual void drawSprite(const Vector2& position, const Vector2& size,
+							IImage* image, const Rect* srcRect,
+							double rotationDegrees, const Vector2& scale,
+							const Color& tint, bool flipX = false,
+							bool flipY = false) = 0;
+
+	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
 };

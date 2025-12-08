@@ -4,6 +4,7 @@
 #include "Component/ComponentManager.h"
 #include "Component/GridComponent.h"
 #include "Component/ShapeRenderer.h"
+#include "Component/SpriteComponent.h"
 #include "Component/TilemapComponent.h"
 #include "GameObject/GameObject.h"
 #include "Rendering/RenderQueue.h"
@@ -222,7 +223,7 @@ void Scene::update(float deltaTime)
 	processDestroyQueue();
 }
 
-void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
+void Scene::collectRenderCommands(RenderQueue& queue) const
 {
 	if ( !active )
 	{
@@ -244,7 +245,18 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 			const auto command = shapeRenderer->buildRenderCommand();
 			if ( command.has_value() )
 			{
-				out.emplace_back(*command);
+				queue.shapes.emplace_back(*command);
+			}
+		}
+
+		// Collect SpriteComponent commands
+		auto* spriteComponent = gameObject->getComponent<SpriteComponent>();
+		if ( spriteComponent != nullptr )
+		{
+			const auto command = spriteComponent->buildRenderCommand();
+			if ( command.has_value() )
+			{
+				queue.sprites.emplace_back(*command);
 			}
 		}
 
@@ -254,7 +266,7 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 		{
 			const auto tilemapCommands =
 				tilemapComponent->buildRenderCommands();
-			out.insert(out.end(), tilemapCommands.begin(),
+			queue.shapes.insert(queue.shapes.end(), tilemapCommands.begin(),
 					   tilemapCommands.end());
 		}
 
@@ -269,7 +281,7 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 	}
 
 	// Append deferred debug overlays after regular render commands.
-	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
+	queue.shapes.insert(queue.shapes.end(), debugCommands.begin(), debugCommands.end());
 }
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)

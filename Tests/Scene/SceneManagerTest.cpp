@@ -1,7 +1,7 @@
-#include "../../Engine/inc/GameObject/GameObject.h"
-#include "../../Engine/inc/Rendering/RenderQueue.h"
-#include "../../Engine/inc/Scene/Scene.h"
-#include "../../Engine/inc/Scene/SceneManager.h"
+#include "GameObject/GameObject.h"
+#include "Rendering/RenderQueue.h"
+#include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 
 #include <gtest/gtest.h>
 #include <memory>

@@ -1,13 +1,13 @@
-#include "../Engine/inc/Component/ShapeRenderer.h"
-#include "../Engine/inc/Component/Transform.h"
-#include "../Engine/inc/External/SdlContext.h"
-#include "../Engine/inc/GameObject/GameObject.h"
-#include "../Engine/inc/Input/InputManager.h"
-#include "../Engine/inc/Rendering/Color.h"
-#include "../Engine/inc/Rendering/RenderQueue.h"
-#include "../Engine/inc/Rendering/SDL/SDLRenderer.h"
-#include "../Engine/inc/Rendering/Window/WindowOptions.h"
-#include "../Engine/inc/Scene/SceneManager.h"
+#include "Component/ShapeRenderer.h"
+#include "Component/Transform.h"
+#include "External/SdlContext.h"
+#include "GameObject/GameObject.h"
+#include "Input/InputManager.h"
+#include "Rendering/Color.h"
+#include "Rendering/RenderQueue.h"
+#include "Rendering/SDL/SDLRenderer.h"
+#include "Rendering/Window/WindowOptions.h"
+#include "Scene/SceneManager.h"
 
 #include <iostream>
 #include <memory>

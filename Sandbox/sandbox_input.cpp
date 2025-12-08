@@ -4,7 +4,7 @@
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
-#include "../Engine/inc/Input/InputManager.h"
+#include "Input/InputManager.h"
 
 int main()
 {

@@ -2,8 +2,8 @@
 #include "Component/Transform.h"
 #include "External/SdlContext.h"
 #include "GameObject/GameObject.h"
-#include "Math/Vector2.h"
 #include "Input/InputManager.h"
+#include "Math/Vector2.h"
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"
@@ -58,89 +58,110 @@ int main()
 	renderer.open(options);
 	if ( !renderer.isOpen() )
 	{
-		std::cout << "Failed to open SDL window\n";
-		return 1;
-	}
-
-	SceneManager sceneManager;
-	// sceneManager.setRenderer(&renderer);
-	sceneManager.setClearColor(Color::black());
-
-	auto scene = std::make_unique<Scene>("PrototypeScene");
-
-	std::unique_ptr<GameObject> circle;
-	std::unique_ptr<GameObject> rectangle;
-
-	createCircle(circle);
-	createRectangle(rectangle);
-
-	scene->addGameObject(std::move(circle));
-	scene->addGameObject(std::move(rectangle));
-
-	sceneManager.addScene(std::move(scene));
-	sceneManager.setActiveScene("PrototypeScene");
-
-	Scene* activeScene = sceneManager.getActiveScene();
-	GameObject* circleGO = activeScene->getGameObject("BlueCircle");
-	GameObject* rectangleGO = activeScene->getGameObject("OrangeSquare");
-
-	// --- Physics World ---
-	std::unique_ptr<IPhysicsWorld> physicsWorld =
-		std::make_unique<Box2DPhysicsWorld>();
-	physicsWorld->start();
-
-	// Register GameObjects directly
-	physicsWorld->createBody(circleGO->getComponent<RigidBody>());
-	physicsWorld->createBody(rectangleGO->getComponent<RigidBody>());
-
-	bool running = true;
-	Uint32 lastTicks = SDL_GetTicks();
-
-	while ( running && renderer.isOpen() )
-	{
-		input->update();
-
-		// --- Physics update ---
-		physicsWorld->fixedUpdate();
-
-		// Clock
-		Uint32 currentTicks = SDL_GetTicks();
-		float deltaTime = (currentTicks - lastTicks) / 1000.0f;
-		lastTicks = currentTicks;
-
-		// Update and render
-		sceneManager.update(deltaTime);
-
-		// Build render queue
-		RenderQueue queue;
-		sceneManager.buildRenderQueue(queue);
-
-		// --- Rendering ---
-		renderer.beginFrame(sceneManager.getClearColor());
-		executeRenderQueue(renderer, queue);
-		renderer.presentFrame();
-
-		// Input
-		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) )
+		if ( !renderer.isOpen() )
 		{
-			running = false;
+			std::cout << "Failed to open SDL window\n";
+			return 1;
 		}
 
-		if ( input->wasKeyPressed(KeyCode::W) )
+		SceneManager sceneManager;
+		// sceneManager.setRenderer(&renderer);
+		sceneManager.setClearColor(Color::black());
+
+		auto scene = std::make_unique<Scene>("PrototypeScene");
+
+		std::unique_ptr<GameObject> circle;
+		std::unique_ptr<GameObject> rectangle;
+
+		createCircle(circle);
+		createRectangle(rectangle);
+
+		scene->addGameObject(std::move(circle));
+		scene->addGameObject(std::move(rectangle));
+
+		sceneManager.addScene(std::move(scene));
+		sceneManager.setActiveScene("PrototypeScene");
+
+		Scene* activeScene = sceneManager.getActiveScene();
+		GameObject* circleGO = activeScene->getGameObject("BlueCircle");
+		GameObject* rectangleGO = activeScene->getGameObject("OrangeSquare");
+
+		// --- Physics World ---
+		std::unique_ptr<IPhysicsWorld> physicsWorld =
+			std::make_unique<Box2DPhysicsWorld>();
+		std::unique_ptr<IPhysicsWorld> physicsWorld =
+			std::make_unique<Box2DPhysicsWorld>();
+		physicsWorld->start();
+
+		// Register GameObjects directly
+		physicsWorld->createBody(circleGO->getComponent<RigidBody>());
+		physicsWorld->createBody(rectangleGO->getComponent<RigidBody>());
+		physicsWorld->createBody(circleGO->getComponent<RigidBody>());
+		physicsWorld->createBody(rectangleGO->getComponent<RigidBody>());
+
+		bool running = true;
+		Uint32 lastTicks = SDL_GetTicks();
+
+		while ( running && renderer.isOpen() )
 		{
-			physicsWorld->destroyBody(rectangleGO->getComponent<RigidBody>());
-		}
+			while ( running && renderer.isOpen() )
+			{
+				input->update();
 
-		if ( input->wasKeyPressed(KeyCode::SPACE) )
-		{
-			constexpr Vector2 force = {0, 100};
-			physicsWorld->applyForce(rectangleGO->getComponent<RigidBody>(),
-									 force);
-		}
+				// --- Physics update ---
+				physicsWorld->fixedUpdate();
 
-		SDL_Delay(16);
-	}
+				// Clock
+				Uint32 currentTicks = SDL_GetTicks();
+				float deltaTime = (currentTicks - lastTicks) / 1000.0f;
+				lastTicks = currentTicks;
 
-	renderer.close();
-	return 0;
-}
+				// Update and render
+				sceneManager.update(deltaTime);
+
+				// Build render queue
+				RenderQueue queue;
+				sceneManager.buildRenderQueue(queue);
+
+				// --- Rendering ---
+				renderer.beginFrame(sceneManager.getClearColor());
+				executeRenderQueue(renderer, queue);
+				renderer.presentFrame();
+
+				// Input
+				if ( input->quitRequested() ||
+					 input->wasKeyPressed(KeyCode::ESCAPE) )
+				{
+					if ( input->quitRequested() ||
+						 input->wasKeyPressed(KeyCode::ESCAPE) )
+					{
+						running = false;
+					}
+
+					if ( input->wasKeyPressed(KeyCode::W) )
+					{
+						if ( input->wasKeyPressed(KeyCode::W) )
+						{
+							physicsWorld->destroyBody(
+								rectangleGO->getComponent<RigidBody>());
+						}
+
+						if ( input->wasKeyPressed(KeyCode::SPACE) )
+						{
+							if ( input->wasKeyPressed(KeyCode::SPACE) )
+							{
+								constexpr Vector2 force = {0, 100};
+								physicsWorld->applyForce(
+									rectangleGO->getComponent<RigidBody>(),
+									force);
+								physicsWorld->applyForce(
+									rectangleGO->getComponent<RigidBody>(),
+									force);
+							}
+
+							SDL_Delay(16);
+						}
+
+						renderer.close();
+						return 0;
+					}

@@ -5,6 +5,8 @@
  */
 struct Vector2
 {
+    Vector2() : _x(0), _y(0) {}
+
     Vector2(const float x_, const float y_) : _x(x_), _y(y_) {}
 
     /// Shorthand for writing Vector2{1.0, 1.0}

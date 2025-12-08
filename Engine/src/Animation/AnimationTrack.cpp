@@ -1,15 +1,17 @@
 #include "Animation/AnimationTrack.h"
 
 #include "Animation/Animator.h"
+#include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 
 #include <algorithm>
+#include <cmath>
 
 AnimationTrack::AnimationTrack(TargetType target, PropertyType property,
 							   float duration, bool relative,
-							   std::variant<Vector2, float> fromValue,
-							   std::variant<Vector2, float> toValue,
+							   std::variant<Vector2, float, int> fromValue,
+							   std::variant<Vector2, float, int> toValue,
 							   AnimationCurve curve)
 	: target(target),
 	  property(property),
@@ -21,7 +23,7 @@ AnimationTrack::AnimationTrack(TargetType target, PropertyType property,
 {
 }
 
-std::variant<Vector2, float> AnimationTrack::sample(float t) const
+std::variant<Vector2, float, int> AnimationTrack::sample(float t) const
 {
 	// Clamp t to [0, 1]
 	t = std::clamp(t, 0.0f, 1.0f);
@@ -49,6 +51,20 @@ std::variant<Vector2, float> AnimationTrack::sample(float t) const
 		float result = from + (to - from) * easedT;
 		return result;
 	}
+	else if ( std::holds_alternative<int>(fromValue) &&
+			  std::holds_alternative<int>(toValue) )
+	{
+		// For frame animation, use discrete frame changes (round to nearest
+		// integer)
+		int from = std::get<int>(fromValue);
+		int to = std::get<int>(toValue);
+
+		float interpolated =
+			static_cast<float>(from) +
+			(static_cast<float>(to) - static_cast<float>(from)) * easedT;
+		int result = static_cast<int>(std::round(interpolated));
+		return result;
+	}
 
 	// Fallback (should not happen if track is constructed correctly)
 	return fromValue;
@@ -67,14 +83,128 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 		return;
 	}
 
+	// Evaluate easing curve
+	float easedT = curve.evaluate01(normalizedTime);
+
+	// Handle Sprite target
+	if ( target == TargetType::Sprite )
+	{
+		SpriteComponent* sprite = gameObject->getComponent<SpriteComponent>();
+		if ( sprite == nullptr )
+		{
+			return;
+		}
+
+		if ( property == PropertyType::Frame )
+		{
+			if ( std::holds_alternative<int>(fromValue) &&
+				 std::holds_alternative<int>(toValue) )
+			{
+				int fromVal = std::get<int>(fromValue);
+				int toVal = std::get<int>(toValue);
+
+				// Clamp to valid frame range
+				int maxFrame = std::max(0, sprite->getFrameCount() - 1);
+				fromVal = std::clamp(fromVal, 0, maxFrame);
+				toVal = std::clamp(toVal, 0, maxFrame);
+
+				if ( relative )
+				{
+					// When relative: start from (current + fromValue), end at
+					// toValue
+					int currentFrame = sprite->getFrame();
+					int startFrame =
+						std::clamp(currentFrame + fromVal, 0, maxFrame);
+					// Calculate frame based on eased time
+					float frameFloat = static_cast<float>(startFrame) +
+									   (static_cast<float>(toVal) -
+										static_cast<float>(startFrame)) *
+										   easedT;
+					int finalFrame = static_cast<int>(
+						std::floor(frameFloat + 0.5f));	 // Round to nearest
+					finalFrame = std::clamp(finalFrame, 0, maxFrame);
+					sprite->setFrame(finalFrame);
+				}
+				else
+				{
+					// Absolute: calculate discrete frame index directly
+					// For sprite frames, we want discrete steps, not
+					// interpolation
+					int totalFrames = std::abs(toVal - fromVal) + 1;
+					int frameIndex =
+						fromVal + static_cast<int>(easedT * (totalFrames - 1));
+					frameIndex = std::clamp(frameIndex, fromVal, toVal);
+					sprite->setFrame(frameIndex);
+				}
+			}
+		}
+		else if ( property == PropertyType::Offset )
+		{
+			if ( std::holds_alternative<Vector2>(fromValue) &&
+				 std::holds_alternative<Vector2>(toValue) )
+			{
+				Vector2 fromVal = std::get<Vector2>(fromValue);
+				Vector2 toVal = std::get<Vector2>(toValue);
+
+				if ( relative )
+				{
+					Vector2 currentOffset = sprite->getOffset();
+					Vector2 startOffset(currentOffset.x() + fromVal.x(),
+										currentOffset.y() + fromVal.y());
+					Vector2 finalOffset =
+						Vector2::lerp(startOffset, toVal, easedT);
+					sprite->setOffset(finalOffset);
+				}
+				else
+				{
+					Vector2 finalOffset = Vector2::lerp(fromVal, toVal, easedT);
+					sprite->setOffset(finalOffset);
+				}
+			}
+		}
+		else if ( property == PropertyType::FlipX )
+		{
+			if ( std::holds_alternative<int>(fromValue) &&
+				 std::holds_alternative<int>(toValue) )
+			{
+				int fromVal = std::get<int>(fromValue);
+				int toVal = std::get<int>(toValue);
+
+				// Interpolate between 0 and 1, then round to nearest boolean
+				float flipFloat =
+					static_cast<float>(fromVal) +
+					(static_cast<float>(toVal) - static_cast<float>(fromVal)) *
+						easedT;
+				bool flipValue = static_cast<int>(std::round(flipFloat)) != 0;
+				sprite->setFlipX(flipValue);
+			}
+		}
+		else if ( property == PropertyType::FlipY )
+		{
+			if ( std::holds_alternative<int>(fromValue) &&
+				 std::holds_alternative<int>(toValue) )
+			{
+				int fromVal = std::get<int>(fromValue);
+				int toVal = std::get<int>(toValue);
+
+				// Interpolate between 0 and 1, then round to nearest boolean
+				float flipFloat =
+					static_cast<float>(fromVal) +
+					(static_cast<float>(toVal) - static_cast<float>(fromVal)) *
+						easedT;
+				bool flipValue = static_cast<int>(std::round(flipFloat)) != 0;
+				sprite->setFlipY(flipValue);
+			}
+		}
+		return;
+	}
+
+	// Handle Transform target (existing code)
 	Transform* transform = gameObject->getTransform();
 	if ( transform == nullptr )
 	{
 		return;
 	}
-
-	// Evaluate easing curve
-	float easedT = curve.evaluate01(normalizedTime);
 
 	if ( property == PropertyType::Position )
 	{
@@ -175,12 +305,12 @@ bool AnimationTrack::isRelative() const
 	return relative;
 }
 
-const std::variant<Vector2, float>& AnimationTrack::getFromValue() const
+const std::variant<Vector2, float, int>& AnimationTrack::getFromValue() const
 {
 	return fromValue;
 }
 
-const std::variant<Vector2, float>& AnimationTrack::getToValue() const
+const std::variant<Vector2, float, int>& AnimationTrack::getToValue() const
 {
 	return toValue;
 }

@@ -186,7 +186,7 @@ void SceneManager::buildRenderQueue(RenderQueue& queue) const
 		return;
 	}
 
-	activeScene->collectRenderCommands(queue.shapes);
+	activeScene->collectRenderCommands(queue);
 }
 
 void SceneManager::setClearColor(const Color& color)

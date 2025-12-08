@@ -3,15 +3,19 @@
 #include "GameObject/GameObject.h"
 #include "Rendering/Color.h"
 #include "Rendering/IRenderer.h"
+#include "Rendering/Rect.h"
 #include "Rendering/RenderQueue.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
 #include <gtest/gtest.h>
 
+class IImage;
+
 namespace
 {
-struct FakeRenderer: public IRenderer {
+struct FakeRenderer: public IRenderer
+{
 	void open(const WindowOptions&) override
 	{
 	}
@@ -43,7 +47,6 @@ struct FakeRenderer: public IRenderer {
 
 	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override
 	{
-
 	}
 
 	void drawCircle(const Vector2& center, double radius, const Color& color,
@@ -68,6 +71,14 @@ struct FakeRenderer: public IRenderer {
 		lastRectScale = scale;
 	}
 
+	void drawSprite(const Vector2& position, const Vector2& size, IImage* image,
+					const Rect* srcRect, double rotationDegrees,
+					const Vector2& scale, const Color& tint, bool flipX,
+					bool flipY) override
+	{
+		// No-op for testing - these tests focus on ShapeRenderer
+	}
+
 	bool isWindowOpen = true;
 	int beginCalls = 0;
 	int presentCalls = 0;
@@ -77,7 +88,7 @@ struct FakeRenderer: public IRenderer {
 	Vector2 lastCircleCenter = Vector2::zero();
 	double lastCircleRadius = 0.0;
 	Color lastCircleColor = Color::black();
-	Vector2 lastCircleScale= Vector2::zero();
+	Vector2 lastCircleScale = Vector2::zero();
 	Vector2 lastRectCenter = Vector2::zero();
 	Vector2 lastRectSize = Vector2::zero();
 	double lastRectRotation = 0.0;
