@@ -1,4 +1,8 @@
 #include "Input/SDLInputAdapter.h"
+#include <SDL_events.h>
+
+#include <iostream>
+#include <ostream>
 
 void SDLInputAdapter::poll(InputManager& input)
 {

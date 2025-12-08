@@ -3,7 +3,6 @@
 
 #include <memory>
 
-
 #include "Connection/Connection.h"
 #include "Server/ServerInformation.h"
 

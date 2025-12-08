@@ -1,41 +1,33 @@
-#include "EntryPoint.h"
-#include "Networking/Messages/ActionMessage.h"
 
 #include <iostream>
 
+#include "EntryPoint.h"
+#include "Component/Profiler/Profiler.h"
+#include "Component/UIElement/UIPanelElement.h"
+#include "Component/UIElement/UIProgressBar.h"
+#include "Component/UIElement/UISpacer.h"
+
+#undef main
 
 int main(int argc, char** argv)
 {
-    ActionMessage original(10, 20, "Wow It works great", 12345);
-    std::cout << "Original Message:" << std::endl;
-    std::cout << "  Component ID: " << original.getComponentIdentity() << std::endl;
-    std::cout << "  GameObject ID: " << original.getGameObjectIdentity() << std::endl;
-    std::cout << "  Action: " << original.getAction() << std::endl;
-    std::cout << "  Tick: " << original.getTick() << std::endl;
+	ApplicationSpecifications spec = {};
+	spec.networkingOptions.port = 8080;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.mode = EngineMode::CLIENT;
+	spec.networkingOptions.tickRate = 60;
+	spec.renderBackend = RenderBackend::SDL;
+	spec.windowOptions = {"GameEngine", 700, 700};
 
-    // Serialize
-    auto serialized = original.serialize();
-    std::cout << "\nSerialized to " << serialized.size() << " bytes" << std::endl;
+	std::unique_ptr<Game> spel = std::make_unique<Game>();
+	std::unique_ptr<Scene> scene = std::make_unique<Scene>("SpelScene");
 
-    // Deserialize into new message
-    ActionMessage restored;
-    bool success = restored.deserialize(serialized.data(), serialized.size());
+	// Panel
+	std::unique_ptr<GameObject> profiler = std::make_unique<GameObject>();
+	profiler->addComponent<Profiler>(480.0f, 10.0f, 210.0f, 320.0f);  // Top-right of 700x700 window
 
-    std::cout << "Restored Message:" << std::endl;
-    std::cout << "  Component ID: " << restored.getComponentIdentity() << std::endl;
-    std::cout << "  GameObject ID: " << restored.getGameObjectIdentity() << std::endl;
-    std::cout << "  Action: " << restored.getAction() << std::endl;
-    std::cout << "  Tick: " << restored.getTick() << std::endl;
-
-
-    bool matches = (original.getComponentIdentity() == restored.getComponentIdentity() &&
-                   original.getGameObjectIdentity() == restored.getGameObjectIdentity() &&
-                   original.getAction() == restored.getAction() &&
-                   original.getTick() == restored.getTick());
-
-    std::cout << "\nData Match: " << (matches ? "PASS" : "FAIL") << std::endl;
-
-
-
-    return SpelMotorEntry::main(argc, argv);
+	scene->addGameObject(std::move(profiler));
+	spel->addScene(std::move(scene));
+	spel->setApplicationSpecifications(spec);
+	return SpelMotorEntry::main(std::move(spel));
 }

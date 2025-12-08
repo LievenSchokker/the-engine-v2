@@ -1,13 +1,14 @@
 #pragma once
 
 
-#include "../Rendering/Window/WindowOptions.h"
+#include "Networking/NetworkingOptions.h"
+#include "Rendering/Window/WindowOptions.h"
 #include "Rendering/RenderBackend.h"
-
 
 struct ApplicationSpecifications
 {
-    WindowOptions windowOptions;
-    RenderBackend renderBackend;
-    int tickRate;
+	NetworkingOptions networkingOptions;
+	WindowOptions windowOptions;
+	RenderBackend renderBackend;
+	double maxFrameTime;
 };

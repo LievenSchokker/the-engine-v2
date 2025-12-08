@@ -1,7 +1,5 @@
-//
-// Created by samle on 19/11/2025.
-//
 #pragma once
+
 
 class GameObject;
 
@@ -9,17 +7,17 @@ class GameObject;
 
 class ScenePlaceholder
 {
-    public:
-        ScenePlaceholder() = default;
-        ~ScenePlaceholder();
+public:
+	ScenePlaceholder() = default;
+	~ScenePlaceholder();
 
-        void addObject(GameObject* obj);
+	void addObject(GameObject* obj);
 
-        void queueDestroy(GameObject* obj);
+	void queueDestroy(GameObject* obj);
 
-        void processDestroyQueue();
+	void processDestroyQueue();
 
-    private:
-        std::vector<GameObject*> objects;
-        std::vector<GameObject*> destroyQueue;
+private:
+	std::vector<GameObject*> objects;
+	std::vector<GameObject*> destroyQueue;
 };
