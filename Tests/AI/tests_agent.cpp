@@ -59,15 +59,16 @@ TEST(AgentTests, AgentIsDisabledAfterAwakeIfTransformIsMissing)
 TEST_F(AgentTest, ComputeModuleForce)
 {
     agent->addAgentModule<TestAgentModule>(1);
-    agent->computeModuleForce();
+    agent->computeModulesForce();
+    Vector2 expectedResult = Vector2::one().normalised();
 
-    ASSERT_EQ(agent->computeModuleForce(), Vector2::one());
+    ASSERT_EQ(agent->computeModulesForce(), expectedResult);
 }
 
 /// Tests to see if the computeModuleForce returns a Vector2::zero() if the Agent does not have any modules
 TEST_F(AgentTest, ComputeModuleForceReturnsVector2ZeroWhenNoModules)
 {
-    ASSERT_EQ(agent->computeModuleForce(), Vector2::zero());
+    ASSERT_EQ(agent->computeModulesForce(), Vector2::zero());
 }
 
 /// Tests if the computeModuleForce method returns a computed vector based on weights.
@@ -75,8 +76,8 @@ TEST_F(AgentTest, WeightedComputeModuleForce)
 {
     /// Set weight to 5.
     agent->addAgentModule<TestAgentModule>(5);
-
-    ASSERT_EQ(agent->computeModuleForce(), Vector2(5.0f, 5.0f));
+    Vector2 expectedResult = (Vector2::one().normalised() * 5);
+    ASSERT_EQ(agent->computeModulesForce(), expectedResult);
 }
 
 
@@ -90,18 +91,29 @@ TEST_F(AgentTest, GetSetMaxVelocityMagnitude)
 
 
 /// Tests if the update() method moves the agent's Transform correctly,
-/// (correct == using computeDesiredVelocity())
 TEST_F(AgentTest, UpdateMovesTransformAsExpected)
 {
     agent->addAgentModule<TestAgentModule>(1);
-    Vector2 initPos = agent->getTransform()->getPosition();
 
-    agent->update(0.016f, nullptr);
+    Vector2 initialPos = agent->getTransform()->getPosition();
+    float deltaTime = 0.016f;
 
-    Vector2 updatedPos = agent->getTransform()->getPosition();
-    EXPECT_NE(initPos, updatedPos);
+    agent->update(deltaTime, nullptr);
 
-    ASSERT_EQ(updatedPos, initPos + Vector2::one());
+    Vector2 newPos = agent->getTransform()->getPosition();
+    Vector2 delta = newPos - initialPos;
+
+    ASSERT_NE(delta, Vector2::zero());
+
+    Vector2 expectedDir = Vector2::one().normalised();
+    EXPECT_NEAR(delta.normalised().x, expectedDir.x, 0.001f);
+    EXPECT_NEAR(delta.normalised().y, expectedDir.y, 0.001f);
+
+    float expectedDistance = agent->getMaxSpeed() < 1.0f
+        ? agent->getMaxSpeed() * deltaTime
+        : 1.0f * deltaTime;
+
+    EXPECT_NEAR(delta.magnitude(), expectedDistance, 0.001f);
 }
 
 /// Tests if the getModuleCount method works as intended,
