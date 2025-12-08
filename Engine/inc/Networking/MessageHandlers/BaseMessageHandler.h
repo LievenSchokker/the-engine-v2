@@ -1,11 +1,10 @@
-//
-// Created by samle on 24/11/2025.
-//
 #pragma once
+
+
 #include "IMessageHandler.h"
-#include "Networking/Connection/ConnectionMode.h"
 #include "Networking/Context/NetworkContext.h"
 #include <type_traits>
+
 /**
  * Abstract base class for all concrete MessageHandlers.
  *
