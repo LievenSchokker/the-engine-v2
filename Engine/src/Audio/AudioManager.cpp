@@ -13,7 +13,6 @@ bool AudioManager::initialize(std::unique_ptr<IAudioBackend> backendPtr)
 void AudioManager::shutdown()
 {
 	musicSource = nullptr;
-	listener = nullptr;
 	backend = nullptr;
 }
 
@@ -50,8 +49,8 @@ void AudioManager::setMusicVolume(float volume)
 void AudioManager::playMusic(MusicHandle handle, bool loop) const
 {
 	if ( !backend ) return;
-	loop = loop ? -1 : 0;
-	backend->playMusic(handle, loop);
+	int amountOfLoops = loop ? -1 : 0;
+	backend->playMusic(handle, amountOfLoops);
 }
 
 void AudioManager::pauseMusic() const

@@ -18,7 +18,7 @@ class MusicSource: public Component
 {
    public:
 	MusicSource(AudioManager* audioManagerPtr);
-	~MusicSource() = default;
+	~MusicSource();
 
 	/**
 	 * @brief Loads a music file through the AudioManager.

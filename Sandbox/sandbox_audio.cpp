@@ -76,7 +76,8 @@ int main()
 	auto audioManager = std::make_unique<AudioManager>();
 	audioManager->initialize(std::move(backend));
 
-	auto music = std::make_unique<MusicSource>(audioManager.get());
+	// auto music = std::make_unique<MusicSource>(audioManager.get());
+	MusicSource* music = new MusicSource(audioManager.get());
 	music->setLoop(true);
 	music->loadMusic(
 		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_jam.wav)");
@@ -102,6 +103,7 @@ int main()
 		if ( input->wasKeyPressed(KeyCode::SPACE) ) music->pause();
 		if ( input->wasKeyPressed(KeyCode::C) ) music->resume();
 		if ( input->wasKeyPressed(KeyCode::P) ) effect->play();
+		if ( input->wasKeyPressed(KeyCode::ESCAPE) ) delete music;
 		if ( input->wasKeyPressed(KeyCode::UP_ARROW) )
 			music->setVolume(music->getCurrentVolume() + 0.1f);
 		if ( input->wasKeyPressed(KeyCode::DOWN_ARROW) )

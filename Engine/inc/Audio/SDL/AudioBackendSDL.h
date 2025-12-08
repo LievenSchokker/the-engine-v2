@@ -73,7 +73,7 @@ class AudioBackendSDL: public IAudioBackend
 	 * @param loops Loop count (-1 = infinite).
 	 * @return True on success, false on failure.
 	 */
-	bool playMusic(MusicHandle handle, int loops) override;
+	void playMusic(MusicHandle handle, int loops) override;
 
 	/**
 	 * @brief Pauses currently playing music.
@@ -111,6 +111,8 @@ class AudioBackendSDL: public IAudioBackend
 	void setChannelPanning(int channel, float left, float right) override;
 
 	int reserveFreeChannel() override;
+
+	void shutdown() override;
 
    private:
 	/// Map of sound handles to Mix_Chunk objects.

@@ -7,6 +7,12 @@ MusicSource::MusicSource(AudioManager* audioManagerPtr)
 {
 }
 
+MusicSource::~MusicSource()
+{
+	audioManager->stopMusic();
+	audioManager->setMusicSource(nullptr);
+}
+
 bool MusicSource::loadMusic(const std::string& path)
 {
 	if ( !audioManager ) return false;

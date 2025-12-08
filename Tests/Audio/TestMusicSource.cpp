@@ -20,7 +20,7 @@ TEST(MusicSourceTest, LoadAndPlayMusic_CallsBackend)
 	music.play();
 
 	EXPECT_EQ(fakeAudioBackend->lastPlayMusic_handle, 5);  // from fake loadMusic()
-	EXPECT_EQ(fakeAudioBackend->lastPlayMusic_loops, 1);  // loop enabled
+	EXPECT_EQ(fakeAudioBackend->lastPlayMusic_loops, -1);  // loop enabled
 	EXPECT_FLOAT_EQ(fakeAudioBackend->lastMusicVolume, 0.7f);
 }
 

@@ -53,11 +53,10 @@ struct FakeAudioBackend: public IAudioBackend
 		lastPlaySound_loops = loops;
 	}
 
-	bool playMusic(MusicHandle handle, int loops) override
+	void playMusic(MusicHandle handle, int loops) override
 	{
 		lastPlayMusic_handle = handle;
 		lastPlayMusic_loops = loops;
-		return true;
 	}
 
 	void pauseMusic() override
@@ -91,5 +90,10 @@ struct FakeAudioBackend: public IAudioBackend
 	int reserveFreeChannel() override
 	{
 		return freeChannel;
+	}
+
+	void shutdown() override
+	{
+		return;
 	}
 };

@@ -60,7 +60,7 @@ class IAudioBackend
 	 * @param loops Loop count.
 	 * @return True on success.
 	 */
-	virtual bool playMusic(MusicHandle handle, int loops) = 0;
+	virtual void playMusic(MusicHandle handle, int loops) = 0;
 
 	/**
 	 * Pauses music playback.
@@ -100,4 +100,9 @@ class IAudioBackend
 	 * @return Channel index, or -1 if none available.
 	 */
 	virtual int reserveFreeChannel() = 0;
+
+	/**
+	 * @brief shuts down the backend, and releases resources.
+	 */
+	virtual void shutdown() = 0;
 };

@@ -9,19 +9,7 @@
 
 AudioBackendSDL::~AudioBackendSDL()
 {
-	// Cleanup audio
-	for ( auto& s : soundMap ) Mix_FreeChunk(s.second);
-	for ( auto& m : musicMap ) Mix_FreeMusic(m.second);
-
-	soundMap.clear();
-	musicMap.clear();
-
-	if ( initialized )
-	{
-		Mix_CloseAudio();
-		Mix_Quit();
-		SDL_QuitSubSystem(SDL_INIT_AUDIO);
-	}
+	shutdown();
 }
 
 bool AudioBackendSDL::initialize()
@@ -127,12 +115,12 @@ void AudioBackendSDL::playSound(SoundHandle handle, int channel, int loops)
 	Mix_PlayChannel(channel, it->second, loops);
 }
 
-bool AudioBackendSDL::playMusic(MusicHandle handle, int loops)
+void AudioBackendSDL::playMusic(MusicHandle handle, int loops)
 {
 	auto it = musicMap.find(handle);
-	if ( it == musicMap.end() ) return false;
+	if ( it == musicMap.end() ) return;
 
-	return Mix_PlayMusic(it->second, loops) == 0;
+	Mix_PlayMusic(it->second, -1);
 }
 
 void AudioBackendSDL::pauseMusic()
@@ -175,4 +163,23 @@ void AudioBackendSDL::setChannelPanning(int channel, float left, float right)
 int AudioBackendSDL::reserveFreeChannel()
 {
 	return Mix_GroupAvailable(-1);
+}
+
+void AudioBackendSDL::shutdown()
+{
+	// Cleanup audio
+	for ( auto& s : soundMap ) Mix_FreeChunk(s.second);
+	for ( auto& m : musicMap ) Mix_FreeMusic(m.second);
+
+	soundMap.clear();
+	musicMap.clear();
+
+	if ( initialized )
+	{
+		Mix_CloseAudio();
+		Mix_Quit();
+		SDL_QuitSubSystem(SDL_INIT_AUDIO);
+	}
+
+	initialized = false;
 }

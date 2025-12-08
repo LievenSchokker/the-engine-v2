@@ -8,7 +8,6 @@
 class IAudioBackend;
 class AudioSource;
 class MusicSource;
-class AudioListener;
 
 /**
  * @class AudioManager
@@ -45,7 +44,7 @@ class AudioManager
 	 * @param path File path to the music file.
 	 * @return True if loading succeeded.
 	 */
-	MusicHandle  loadMusic(const std::string& path) const;
+	MusicHandle loadMusic(const std::string& path) const;
 
 	/**
 	 * @brief Assigns the active music source.
@@ -130,11 +129,8 @@ class AudioManager
 	/// Pointer to the low-level backend.
 	std::unique_ptr<IAudioBackend> backend;
 
-	/// Active music-playing component.
+	/// Active music-playing component - owned where its created
 	MusicSource* musicSource = nullptr;
-
-	/// Global audio listener for 3D audio support.
-	AudioListener* listener = nullptr;
 
 	/// Global volume multipliers.
 	float soundVolume = 1.0f;
