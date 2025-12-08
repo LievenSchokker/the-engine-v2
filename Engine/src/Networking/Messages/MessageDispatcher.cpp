@@ -1,10 +1,4 @@
-//
-// Created by samle on 24/11/2025.
-//
-
-
 #include "Networking/Messages/MessageDispatcher.h"
-
 #include "Networking/MessageHandlers/IMessageHandler.h"
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/MessageTypes.h"
@@ -12,13 +6,13 @@
 
 namespace spelmotor_networking
 {
-    void MessageDispatcher::processMessage(const IMessage& message)
+    void MessageDispatcher::processMessage(std::unique_ptr<IMessage> message)
     {
-        IMessageHandler* handler = getMessageHandler(message.getMessageType());
+        IMessageHandler* handler = getMessageHandler(message->getMessageType());
 
         if (handler != nullptr)
         {
-            handler->handleMessage(message);
+            handler->handleMessage(std::move(message));
         }
     }
 
@@ -35,7 +29,7 @@ namespace spelmotor_networking
 
     IMessageHandler* MessageDispatcher::getMessageHandler(MessageTypes type)
     {
-        auto it = messageHandlers.find(type);
-        return it != messageHandlers.end() ? it->second.get() : nullptr;
+        auto messagehHandler = messageHandlers.find(type);
+        return messagehHandler != messageHandlers.end() ? messagehHandler->second.get() : nullptr;
     }
-} // spelmotor_networking
+}

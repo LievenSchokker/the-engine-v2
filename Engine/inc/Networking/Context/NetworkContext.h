@@ -1,10 +1,6 @@
-//
-// Created by samle on 25/11/2025.
-//
-
-
 #pragma once
-#include <cstdint>
+
+
 class SceneManager;
 class ISceneStrategy;
 struct Vector2;

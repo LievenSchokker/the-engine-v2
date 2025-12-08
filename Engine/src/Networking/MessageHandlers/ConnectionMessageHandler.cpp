@@ -2,7 +2,7 @@
 
 ConnectionMessageHandler::~ConnectionMessageHandler() = default;
 
-void ConnectionMessageHandler::handleMessageInternal(const ConnectionMessage &message)
+void ConnectionMessageHandler::handleMessageInternal()
 {
 
 }

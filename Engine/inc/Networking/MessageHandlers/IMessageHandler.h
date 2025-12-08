@@ -1,9 +1,7 @@
-//
-// Created by samle on 24/11/2025.
-//
-
 #pragma once
 
+
+#include <memory>
 
 class IMessage;
 
@@ -16,5 +14,5 @@ class IMessageHandler
 {
     public:
         virtual ~IMessageHandler() = default;
-        virtual void handleMessage(const IMessage& message) = 0;
+        virtual void handleMessage(std::unique_ptr<IMessage> message) = 0;
 };

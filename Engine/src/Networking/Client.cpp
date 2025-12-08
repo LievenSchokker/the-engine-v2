@@ -20,7 +20,8 @@
 #include "Networking/Context/ClientNetworkContext.h"
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
-    : transport(std::move(injectedTransport))
+    : transport(std::move(injectedTransport)),
+    gameWorld(nullptr)
 {
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 
@@ -34,7 +35,7 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
         onConnectionChanged(connection);
     });
 
-    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *networkContext);
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *gameWorld);
 }
 
 Client::~Client()
@@ -115,30 +116,15 @@ void Client::onConnectionChanged(const Connection& connection)
 
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
 {
-    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
-    if (!message)
+    if (message == nullptr)
     {
         std::cerr << "Failed to parse message" << std::endl;
         return;
     }
 
-    messageDispatcher->processMessage(*message);
-
-
-    // switch (MessageTypes messageType = message->getMessageType())
-    // {
-    // case MessageTypes::ConnectionMessage:
-    //     {
-    //         if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
-    //         {
-    //             disconnect();
-    //         }
-    //         break;
-    //     }
-    // default:
-    //     break;
-    // }
+    messageDispatcher->processMessage(std::move(message));
 }
 
 void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)

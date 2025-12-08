@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "Connection/Connection.h"
+#include "Core/GameWorld.h"
 #include "Server/ServerInformation.h"
 #include "Networking/Messages/MessageDispatcher.h"
 
@@ -82,7 +83,7 @@ private:
      */
     void onConnectionChanged(const Connection& connection);
 
-    std::unique_ptr<NetworkContext> networkContext;
+    std::unique_ptr<GameWorld> gameWorld;
     std::unique_ptr<ITransport> transport;  ///< The underlying network transport.
     Connection currentConnection{};            ///< The current server connection.
     std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;

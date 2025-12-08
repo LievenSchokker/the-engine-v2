@@ -41,11 +41,11 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
 
     switch (messageType)
     {
-    case MessageTypes::ConnectionMessage:
-        message = std::make_unique<ConnectionMessage>();
-        break;
-    default:
-        return nullptr;
+        case MessageTypes::ConnectionMessage:
+            message = std::make_unique<ConnectionMessage>();
+            break;
+        default:
+            return nullptr;
     }
 
     return message;

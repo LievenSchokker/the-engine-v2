@@ -2,7 +2,7 @@
 
 
 #include "IMessageHandler.h"
-#include "Networking/Context/NetworkContext.h"
+#include "Core/GameWorld.h"
 #include <type_traits>
 
 /**
@@ -11,30 +11,33 @@
  * Template ensures an IMessage is always associated with the correct handler behaviour corresponding to it.
  *
  * Use this base class when implementing new IMessage types and requiring some behaviour to handle them.
- * @tparam TMessage the IMessage this handler works on.
+ * @tparam ConcreteTemplateMessage the IMessage this handler works on.
  */
-template<typename TMessage>
+template<typename ConcreteTemplateMessage>
 class BaseMessageHandler : public IMessageHandler
 {
-    static_assert(std::is_base_of<IMessage, TMessage>::value,
+    static_assert(std::is_base_of<IMessage, ConcreteTemplateMessage>::value,
                   "[BaseMessageHandler]: TMessage must derive from IMessage.");
 
     public:
-        explicit BaseMessageHandler(NetworkContext& networkContext_) : networkContext(networkContext_) {}
-        ~BaseMessageHandler() override = default;
+    explicit BaseMessageHandler(GameWorld& gameWorld) : gameWorld(&gameWorld) {}
+    ~BaseMessageHandler() override = default;
 
-        void handleMessage(const IMessage &message) override
+        void handleMessage(const std::unique_ptr<IMessage> message) override
         {
-            auto* concrete = dynamic_cast<const TMessage*>(&message);
+            auto* concrete = dynamic_cast<ConcreteTemplateMessage*>(message.get());
 
             if (concrete != nullptr)
             {
-                handleMessageInternal(*concrete);
+                internalMessage = std::make_unique<ConcreteTemplateMessage>(*concrete);
+                handleMessageInternal();
             }
         }
 
     protected:
-        virtual void handleMessageInternal(const TMessage& message) = 0;
+        virtual void handleMessageInternal() = 0;
+        GameWorld* gameWorld;
 
-        NetworkContext& networkContext;
+    private:
+        std::unique_ptr<ConcreteTemplateMessage> internalMessage;
 };
