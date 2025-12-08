@@ -9,21 +9,25 @@
 
 Vector2 AvoidTargetModule::compute()
 {
-    if (followTarget == nullptr)
+    /// Return if target is MIA
+    if (target == nullptr)
         return Vector2::zero();
 
+    /// Return if avoidRadius is not set
     if (avoidRadius <= 0)
         return Vector2::zero();
 
-    if (Vector2::distance(agentTransform.getPosition(), followTarget->getPosition()) > avoidRadius)
+    /// Return if the target is outside the avoiding radius
+    if (Vector2::distance(agentTransform.getPosition(), target->getPosition()) > avoidRadius)
         return Vector2::zero();
 
-    return -(followTarget->getPosition() - agentTransform.getPosition()).normalised();
+    /// Return a normalised vector, pointing directly away from the target
+    return -(target->getPosition() - agentTransform.getPosition()).normalised();
 }
 
-void AvoidTargetModule::setFollowTarget(const Transform &target)
+void AvoidTargetModule::setFollowTarget(const Transform& newTarget)
 {
-    followTarget = &target;
+    target = &newTarget;
 }
 
 

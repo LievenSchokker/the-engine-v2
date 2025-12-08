@@ -42,18 +42,19 @@ bool Agent::removeAgentModule()
     static_assert(std::is_base_of_v<BaseAgentModule, T>, "[Agent::removeAgentModule] T must derive from BaseAgentModule");
 
     ModuleData* moduleData = nullptr;
-    size_t index = -1; /// Initialise < 0 for safety
+    size_t index = 0;
 
     /// this method attempts to retrieve the ModuleData containing the module T, and it's index in the vector that stores the ModuleData objects
     /// If it succeeds, the moduleData and index variables will contain their data, and can be used to remove the desired module by removing th estored Moduledata containing it.
     if (tryGetAgentModule<T>(moduleData, index))
     {
         /// Make sure the index exists in the vector to prevent crashes
-        if (index < 0 || index >= moduleDatas.size())
+        if (index >= moduleDatas.size())
             return false;
 
         /// Remove the ModuleData that exists on the retrieved index
-        moduleDatas.erase(moduleDatas.begin() + index);
+        moduleDatas.erase(std::next(moduleDatas.begin(), static_cast<ptrdiff_t>(index)));
+
         return true;
     }
 
