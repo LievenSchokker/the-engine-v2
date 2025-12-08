@@ -19,8 +19,10 @@ add_executable(engine_tests
         Component/tests_component_manager.cpp
         Component/GridComponentTest.cpp
         Scene/SceneManagerTest.cpp
+        Networking/Messages/ActionMessageTest.cpp
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp
+        Networking/SerializationTest.cpp
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp

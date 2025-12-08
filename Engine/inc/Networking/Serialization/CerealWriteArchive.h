@@ -20,10 +20,11 @@
  * instantiation, we surface clear, actionable errors at the call site. This drastically
  * reduces debugging time when someone tries to network a non-serializable type.
  */
-template<typename T>
-concept CerealSerializable = requires(cereal::BinaryOutputArchive& archive, T& value)
+template <typename T>
+concept CerealSerializable = requires(cereal::BinaryOutputArchive& archive,
+                                      T& value)
 {
-    archive(value);
+	archive(value);
 };
 
 /**
@@ -39,56 +40,56 @@ concept CerealSerializable = requires(cereal::BinaryOutputArchive& archive, T& v
 class CerealWriteArchive
 {
 public:
-    /**
-     * @brief Initializes the archive with a fresh output stream.
-     *
-     * Construction binds the archive to its stream immediately because Cereal archives
-     * are not rebindable—this isn't a limitation we impose but one we inherit.
-     *
-     */
-    CerealWriteArchive();
+	/**
+	 * @brief Initializes the archive with a fresh output stream.
+	 *
+	 * Construction binds the archive to its stream immediately because Cereal archives
+	 * are not rebindable—this isn't a limitation we impose but one we inherit.
+	 *
+	 */
+	CerealWriteArchive();
 
-    /**
-     * @brief Finalizes the archive, flushing any buffered data.
-     *
-     * Explicit destructor ensures proper cleanup ordering between the archive
-     * and its underlying stream. Cereal may buffer writes, so destruction
-     * order matters for data integrity.
-     *
-     */
-    ~CerealWriteArchive();
+	/**
+	 * @brief Finalizes the archive, flushing any buffered data.
+	 *
+	 * Explicit destructor ensures proper cleanup ordering between the archive
+	 * and its underlying stream. Cereal may buffer writes, so destruction
+	 * order matters for data integrity.
+	 *
+	 */
+	~CerealWriteArchive();
 
-    /**
-     * @brief Appends a value to the serialization buffer.
-     * @tparam T Any type satisfying CerealSerializable.
-     *
-     * Takes by reference to support both serializing existing objects and allowing Cereal
-     * to handle complex types that may need internal traversal.
-     *
-     * Intentionally mirrors ReadArchive's interface so serialization and deserialization
-     * code can be structurally identical, reducing bugs from asymmetric field ordering.
-     *
-     */
-    template<typename T>
-       requires CerealSerializable<T>
-    void process(T& value)
-    {
-       archive(value);
-    }
+	/**
+	 * @brief Appends a value to the serialization buffer.
+	 * @tparam T Any type satisfying CerealSerializable.
+	 *
+	 * Takes by reference to support both serializing existing objects and allowing Cereal
+	 * to handle complex types that may need internal traversal.
+	 *
+	 * Intentionally mirrors ReadArchive's interface so serialization and deserialization
+	 * code can be structurally identical, reducing bugs from asymmetric field ordering.
+	 *
+	 */
+	template <typename T> requires CerealSerializable<T>
+	void process(T& value)
+	{
+		archive(value);
+	}
 
-    /**
-     * @brief Extracts the accumulated serialized data as a byte vector.
-     *
-     * Returns a copy rather than a view because the underlying stream may be
-     * invalidated or reused after this call. The const qualifier signals that
-     * this is a read-only extraction—calling it doesn't reset or modify the archive.
-     *
-     * Returns std::byte (not char) to clearly distinguish serialized
-     * network data from text strings, preventing accidental misuse.
-     */
-    std::vector<std::byte> getBytes() const;
+	/**
+	 * @brief Extracts the accumulated serialized data as a byte vector.
+	 *
+	 * Returns a copy rather than a view because the underlying stream may be
+	 * invalidated or reused after this call. The const qualifier signals that
+	 * this is a read-only extraction—calling it doesn't reset or modify the archive.
+	 *
+	 * Returns std::byte (not char) to clearly distinguish serialized
+	 * network data from text strings, preventing accidental misuse.
+	 */
+	std::vector<std::byte> getBytes() const;
 
 private:
-    std::ostringstream stream;           ///< Backing buffer; must outlive archive
-    cereal::BinaryOutputArchive archive; ///< Performs actual serialization; bound to stream at construction
+	std::ostringstream stream; ///< Backing buffer; must outlive archive
+	cereal::BinaryOutputArchive archive;
+	///< Performs actual serialization; bound to stream at construction
 };

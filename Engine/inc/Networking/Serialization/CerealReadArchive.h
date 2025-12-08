@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CerealWriteArchive.h"
+#include "CerealReadArchive.h"
 
 /**
  * @class CerealReadArchive
