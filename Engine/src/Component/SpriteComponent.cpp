@@ -2,6 +2,8 @@
 
 #include "Component/Transform.h"
 #include "Math/Vector2Utils.h"
+#include "Rendering/RenderCommandType.h"
+#include "Rendering/RenderQueue/IRenderQueueWriter.h"
 
 #include <algorithm>
 
@@ -115,23 +117,23 @@ bool SpriteComponent::getFlipY() const
 	return flipY;
 }
 
-std::optional<SpriteRenderCommand> SpriteComponent::buildRenderCommand() const
+void SpriteComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 {
 	if ( sprite == nullptr || !sprite->isLoaded() || getFrameCount() == 0 )
 	{
-		return std::nullopt;
+		return;
 	}
 
 	const Transform* transform = getTransform();
 	if ( transform == nullptr )
 	{
-		return std::nullopt;
+		return;
 	}
 
 	Rect srcRect = calculateSourceRect();
 	if ( srcRect.isEmpty() )
 	{
-		return std::nullopt;
+		return;
 	}
 
 	const Vector2 position = transform->getPosition() + offset;
@@ -139,7 +141,8 @@ std::optional<SpriteRenderCommand> SpriteComponent::buildRenderCommand() const
 	const Vector2 scale = Vector2Utils::sanitizeScale(transform->getScale());
 	const Vector2 size = getSize();
 
-	SpriteRenderCommand command;
+	RenderCommand command;
+	command.type = RenderCommandType::Sprite;
 	command.sprite = sprite;
 	command.srcRect = srcRect;
 	command.position = position;
@@ -149,8 +152,10 @@ std::optional<SpriteRenderCommand> SpriteComponent::buildRenderCommand() const
 	command.tint = tint;
 	command.flipX = flipX;
 	command.flipY = flipY;
+	command.layer = 0;		   // Can be extended later if needed
+	command.orderInLayer = 0;  // Can be extended later if needed
 
-	return command;
+	queue.push(command);
 }
 
 Rect SpriteComponent::calculateSourceRect() const

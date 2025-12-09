@@ -23,6 +23,7 @@
 
 #include "Rendering/IRenderer.h"
 #include "Rendering/IUIRenderHook.h"
+#include "Rendering/RenderCommand.h"
 
 #include <SDL.h>
 #include <memory>
@@ -98,6 +99,8 @@ class SDLRenderer: public IRenderer
 	 */
 	void close() override;
 
+	void execute(const RenderCommand& command) override;
+
 	/**
 	 * @brief Updates window title at runtime for dynamic feedback
 	 *
@@ -113,20 +116,24 @@ class SDLRenderer: public IRenderer
 	 *
 	 * @note Returns early if renderer is invalid to prevent crashes
 	 */
-	void presentFrame() override;
+	void endFrame() override;
 
+    void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
+
+	void submitUI(const std::vector<UIRenderCommand>& commands) override;
+   private:
 	/**
 	 * @brief Draw a filled circle in window space.
 	 */
 	void drawCircle(const Vector2& center, double radius, const Color& color,
-					const Vector2& scale) override;
+					const Vector2& scale);
 
 	/**
 	 * @brief Draw a filled rectangle in window space.
 	 */
 	void drawRectangle(const Vector2& center, const Vector2& size,
 					   double rotationDegrees, const Color& color,
-					   const Vector2& scale) override;
+					   const Vector2& scale);
 
 	/**
 	 * @brief Draw a sprite from an image in window space.
@@ -134,9 +141,7 @@ class SDLRenderer: public IRenderer
 	void drawSprite(const Vector2& position, const Vector2& size, IImage* image,
 					const Rect* srcRect, double rotationDegrees,
 					const Vector2& scale, const Color& tint, bool flipX = false,
-					bool flipY = false) override;
-
-	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
+					bool flipY = false);
 
    private:
 	std::unique_ptr<IUIRenderHook> userInterfaceHook;

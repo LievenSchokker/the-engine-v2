@@ -2,13 +2,10 @@
 
 #include "Animation/SpritesheetDefinition.h"
 #include "Assets/IImage.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Math/Vector2.h"
 #include "Rendering/Color.h"
 #include "Rendering/Rect.h"
-#include "Rendering/RenderQueue.h"
-#include "Component.h"
-
-#include <optional>
 
 /**
  * @class SpriteComponent
@@ -18,7 +15,7 @@
  * a grid layout definition. The frame index can be animated using the
  * animation system.
  */
-class SpriteComponent: public Component
+class SpriteComponent: public RenderComponent
 {
    public:
 	SpriteComponent() = default;
@@ -131,12 +128,11 @@ class SpriteComponent: public Component
 	bool getFlipY() const;
 
 	/**
-	 * @brief Builds a render command for the current frame.
+	 * @brief Fills the render queue with a sprite render command.
 	 *
-	 * @return Optional SpriteRenderCommand, or nullopt if sprite not set or
-	 * invalid
+	 * @param queue The render queue writer to push commands to
 	 */
-	std::optional<SpriteRenderCommand> buildRenderCommand() const;
+	void fillRenderQueue(IRenderQueueWriter& queue) const override;
 
    private:
 	IImage* sprite = nullptr;

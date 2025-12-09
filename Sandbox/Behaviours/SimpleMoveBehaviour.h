@@ -5,8 +5,9 @@
 #pragma once
 
 #include "Behaviour/Behaviour.h"
-#include "Math/Vector2.h"
 #include "Input/InputManager.h"
+#include "Math/Vector2.h"
+
 #include <iostream>
 
 class SimpleMoveBehaviour: public Behaviour
@@ -22,7 +23,7 @@ class SimpleMoveBehaviour: public Behaviour
 	void onAwake() override;
 	void onEnable() override;
 	void onStart() override;
-	void update(float deltaTime) override;
+	void update(float deltaTime, GameWorld* world) override;
 	void onDisable() override;
 
 	void move();

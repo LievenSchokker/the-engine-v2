@@ -2,11 +2,13 @@
 
 #include "Assets/IImage.h"
 #include "Assets/SDLImage.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
 #include "External/SdlContext.h"
 #include "Math/Vector2Utils.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 #include "Rendering/Rect.h"
+#include "Rendering/RenderCommand.h"
 #include "Rendering/Window/WindowOptions.h"
 
 #include <algorithm>
@@ -127,7 +129,15 @@ void SDLRenderer::beginFrame(const Color& clearColor)
 	// }
 }
 
-void SDLRenderer::presentFrame()
+void SDLRenderer::submitUI(const std::vector<UIRenderCommand>& commands)
+{
+	if ( userInterfaceHook != nullptr )
+	{
+		userInterfaceHook->process(commands);
+	}
+}
+
+void SDLRenderer::endFrame()
 {
 	if ( renderer == nullptr )
 	{
@@ -140,6 +150,37 @@ void SDLRenderer::presentFrame()
 	}
 
 	SDL_RenderPresent(renderer);
+}
+
+void SDLRenderer::execute(const RenderCommand& command)
+{
+	if ( renderer == nullptr )
+	{
+		return;
+	}
+
+	switch ( command.type )
+	{
+		case RenderCommandType::Circle:
+			drawCircle(command.position, command.radius, command.color,
+					   command.scale);
+			break;
+
+		case RenderCommandType::Rectangle:
+			drawRectangle(command.position, command.size,
+						  command.rotationDegrees, command.color,
+						  command.scale);
+			break;
+
+		case RenderCommandType::Sprite:
+			drawSprite(command.position, command.size, command.sprite,
+					   &command.srcRect, command.rotationDegrees, command.scale,
+					   command.tint, command.flipX, command.flipY);
+			break;
+
+		case RenderCommandType::None:
+			break;
+	}
 }
 
 void SDLRenderer::setTitle(const std::string& title)
@@ -164,8 +205,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 	}
 
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
-	const double scaledRadiusX = std::abs(radius * finalScale.x());
-	const double scaledRadiusY = std::abs(radius * finalScale.y());
+	const double scaledRadiusX = std::abs(radius * finalScale.x);
+	const double scaledRadiusY = std::abs(radius * finalScale.y);
 
 	if ( scaledRadiusX <= 0.0 || scaledRadiusY <= 0.0 )
 	{
@@ -174,8 +215,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
-	const int centerX = static_cast<int>(std::round(center.x()));
-	const int centerY = static_cast<int>(std::round(center.y()));
+	const int centerX = static_cast<int>(std::round(center.x));
+	const int centerY = static_cast<int>(std::round(center.y));
 	const int rx = std::max(1, static_cast<int>(std::round(scaledRadiusX)));
 	const int ry = std::max(1, static_cast<int>(std::round(scaledRadiusY)));
 
@@ -203,8 +244,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 	}
 
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
-	const double width = std::abs(size.x() * finalScale.x());
-	const double height = std::abs(size.y() * finalScale.y());
+	const double width = std::abs(size.x * finalScale.x);
+	const double height = std::abs(size.y * finalScale.y);
 
 	if ( width <= 0.0 || height <= 0.0 )
 	{
@@ -221,8 +262,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 
 	const double halfWidth = width * 0.5;
 	const double halfHeight = height * 0.5;
-	SDL_FRect rect{static_cast<float>(center.x() - halfWidth),
-				   static_cast<float>(center.y() - halfHeight),
+	SDL_FRect rect{static_cast<float>(center.x - halfWidth),
+				   static_cast<float>(center.y - halfHeight),
 				   static_cast<float>(width), static_cast<float>(height)};
 
 	if ( std::abs(rotationDegrees) < kRotationThresholdDegrees )
@@ -301,8 +342,8 @@ void SDLRenderer::drawSprite(const Vector2& position, const Vector2& size,
 	}
 
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
-	const double width = std::abs(size.x() * finalScale.x());
-	const double height = std::abs(size.y() * finalScale.y());
+	const double width = std::abs(size.x * finalScale.x);
+	const double height = std::abs(size.y * finalScale.y);
 
 	if ( width <= 0.0 || height <= 0.0 )
 	{
@@ -315,8 +356,8 @@ void SDLRenderer::drawSprite(const Vector2& position, const Vector2& size,
 
 	const double halfWidth = width * 0.5;
 	const double halfHeight = height * 0.5;
-	SDL_FRect destRect{static_cast<float>(position.x() - halfWidth),
-					   static_cast<float>(position.y() - halfHeight),
+	SDL_FRect destRect{static_cast<float>(position.x - halfWidth),
+					   static_cast<float>(position.y - halfHeight),
 					   static_cast<float>(width), static_cast<float>(height)};
 
 	// Convert Rect to SDL_Rect for SDL API calls

@@ -43,7 +43,7 @@ SpelMotor::~SpelMotor()
 void SpelMotor::start()
 {
 	coreClock->start();
-	coreSystemLoop->start();
+	coreSystemLoop->start(); // what does this do?
 	run();
 }
 
@@ -55,7 +55,7 @@ void SpelMotor::run()
 	{
 		coreClock->tick();
 
-		while (coreClock->shouldFixedUpdate())
+		while (coreClock->shouldFixedUpdate()) // what is difference between fixed and normal update?
 		{
 			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
 			coreClock->consumeFixedUpdate();

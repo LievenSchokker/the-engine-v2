@@ -110,7 +110,7 @@ class Animator: public Behaviour
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	void update(float deltaTime) override;
+	void update(float deltaTime, GameWorld* world) override;
 
 	/**
 	 * @brief Adds a spritesheet animation clip that can be played by name.

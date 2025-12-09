@@ -1,10 +1,12 @@
 #pragma once
+
+
 /**
  * @brief Enumeration for different mouse buttons.
  */
 enum class MouseButton
 {
-    LEFT = 1,
-    MIDDLE = 2,
-    RIGHT = 3
+	LEFT = 1,
+	MIDDLE = 2,
+	RIGHT = 3
 };

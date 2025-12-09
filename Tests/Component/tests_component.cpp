@@ -1,9 +1,5 @@
-// //
-// // Created by samle on 14/11/2025.
-// //
-
 #include "GameObject/GameObject.h"
-#include "Component/Component.h"
+#include "Component/BaseComponentTypes/Component.h"
 #include "Component/ComponentManager.h"
 #include "GameObject/ScenePlaceholder.h"
 #include "../Component/TestComponents.h"

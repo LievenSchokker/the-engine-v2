@@ -5,6 +5,7 @@
 #include "Math/Vector2.h"
 
 class Animator;
+class GameWorld;
 
 /**
  * @class PlayerControllerBehaviour
@@ -23,7 +24,7 @@ class PlayerControllerBehaviour: public Behaviour
 
 	void onAwake() override;
 	void onStart() override;
-	void update(float deltaTime) override;
+	void update(float deltaTime, GameWorld* world) override;
 
 	/**
 	 * @brief Sets the movement speed in pixels per second.

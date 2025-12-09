@@ -5,10 +5,6 @@
 #include <iostream>
 #include <utility>
 
-SceneManager::SceneManager()
-{
-}
-
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
 	if ( scene == nullptr )
@@ -168,39 +164,10 @@ bool SceneManager::isPaused() const
 	return paused;
 }
 
-void SceneManager::update(float deltaTime)
+void SceneManager::update(float deltaTime, GameWorld* world)
 {
 	if ( activeScene != nullptr && !paused )
 	{
-		activeScene->update(deltaTime);
+		activeScene->update(deltaTime, world);
 	}
-}
-
-void SceneManager::buildRenderQueue(RenderQueue& queue) const
-{
-	queue.clear();
-	queue.clearColor = clearColor;
-
-	if ( activeScene == nullptr || paused )
-	{
-		return;
-	}
-
-	activeScene->collectRenderCommands(queue);
-}
-
-void SceneManager::setClearColor(const Color& color)
-{
-	clearColor = color;
-}
-
-void SceneManager::setWorld(const GameWorld& world)
-{
-    gameWorld = &world;
-}
-
-
-Color SceneManager::getClearColor() const
-{
-	return clearColor;
 }

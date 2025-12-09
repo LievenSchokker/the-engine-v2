@@ -2,11 +2,9 @@
 
 #include "Math/Vector2.h"
 #include "Rendering/Color.h"
-#include "Rendering/RenderQueue.h"
-#include "Component.h"
+#include "BaseComponentTypes/RenderComponent.h"
 
 #include <unordered_map>
-#include <vector>
 
 class TilemapAsset;
 
@@ -21,9 +19,9 @@ class TilemapAsset;
  *
  * The tilemap is positioned based on the GameObject's Transform.
  */
-class TilemapComponent: public Component
+class TilemapComponent: public RenderComponent
 {
-   public:
+public:
 	TilemapComponent();
 	~TilemapComponent() override = default;
 
@@ -62,7 +60,7 @@ class TilemapComponent: public Component
 	 * @brief Build render commands for all visible tiles.
 	 * @return Vector of render commands, or empty if no tilemap is loaded
 	 */
-	std::vector<ShapeRenderCommand> buildRenderCommands() const;
+	void fillRenderQueue(IRenderQueueWriter& queue) const override;
 
 	/**
 	 * @brief Convert world coordinates to grid cell coordinates.
@@ -111,9 +109,13 @@ class TilemapComponent: public Component
 	 * @brief Check if the tilemap is loaded and ready.
 	 */
 	bool isReady() const;
+	void setLayer(uint8_t l);
+	void setOrderInLayer(int8_t order);
 
-   private:
+private:
 	TilemapAsset* tilemapAsset = nullptr;
 	Vector2 tileSize;
-	std::unordered_map<int, Color> tileColors;	// Map tile ID to color
+	std::unordered_map<int, Color> tileColors;
+	uint8_t layer = 0;
+	int8_t orderInLayer = 0;
 };

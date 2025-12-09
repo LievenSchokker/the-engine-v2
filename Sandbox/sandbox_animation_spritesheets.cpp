@@ -5,19 +5,19 @@
 #include "Animation/SpritesheetAnimationClip.h"
 #include "Assets/AssetManager.h"
 #include "Assets/SpritesheetLoader.h"
+#include "Behaviour/Behaviour.h"
 #include "Behaviours/PlayerControllerBehaviour.h"
 #include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
-#include "External/SdlContext.h"
+#include "Core/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "EntryPoint.h"
+#include "Game.h"
 #include "GameObject/GameObject.h"
-#include "GameObject/Vector2.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
-#include "Rendering/Color.h"
-#include "Rendering/RenderQueue.h"
-#include "Rendering/SDL/SDLRenderer.h"
-#include "Rendering/Window/WindowOptions.h"
-#include "Scene/SceneManager.h"
+#include "Math/Vector2.h"
+#include "Scene/Scene.h"
 
 #include <iostream>
 #include <memory>
@@ -25,21 +25,60 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
-int main()
+/**
+ * @brief Simple behavior to handle ESC key for exit.
+ *
+ * Signals quit when ESC is pressed. Window close events are handled
+ * automatically by the engine.
+ */
+class ExitBehaviour: public Behaviour
 {
-	SdlContext context(SDL_INIT_VIDEO);
-	SDLRenderer renderer(context);
-
-	WindowOptions options{"Player Game", SCREEN_WIDTH, SCREEN_HEIGHT};
-	renderer.open(options);
-	if ( !renderer.isOpen() )
+   public:
+	ExitBehaviour() : inputManager(nullptr)
 	{
-		std::cout << "Failed to open SDL window\n";
-		return 1;
 	}
 
-	SceneManager sceneManager;
-	sceneManager.setClearColor(Color::darkGray());
+	~ExitBehaviour() override = default;
+
+	void onAwake() override
+	{
+		inputManager = InputManager::getInstance();
+	}
+
+	void update(float deltaTime, GameWorld* world) override
+	{
+		(void)deltaTime;
+		(void)world;
+
+		if ( inputManager != nullptr &&
+			 inputManager->wasKeyPressed(KeyCode::ESCAPE) )
+		{
+			// Signal quit to the engine
+			inputManager->signalQuit();
+		}
+	}
+
+   private:
+	InputManager* inputManager;
+};
+
+#undef main
+
+int main(int argc, char** argv)
+{
+	(void)argc;
+	(void)argv;
+
+	ApplicationSpecifications spec = {};
+	spec.networkingOptions.port = 8080;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.mode = EngineMode::CLIENT;
+	spec.networkingOptions.tickRate = 60;
+	spec.renderBackend = RenderBackend::SDL;
+	spec.windowOptions = {"Player Game", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.maxFrameTime = 0.1;  // 100ms max frame time
+
+	std::unique_ptr<Game> game = std::make_unique<Game>();
 
 	// Create AssetManager for loading spritesheets
 	std::unique_ptr<AssetManager> assetManager =
@@ -231,9 +270,9 @@ int main()
 		std::cout << "Rat loaded successfully\n";
 		std::cout << "Rat movement clip length: " << ratMoveClip.getLength()
 				  << " seconds\n";
-		std::cout << "Rat start pos: (" << ratStartPos.x() << ", "
-				  << ratStartPos.y() << ")\n";
-		std::cout << "Rat end pos: (" << ratEndPos.x() << ", " << ratEndPos.y()
+		std::cout << "Rat start pos: (" << ratStartPos.x << ", "
+				  << ratStartPos.y << ")\n";
+		std::cout << "Rat end pos: (" << ratEndPos.x << ", " << ratEndPos.y
 				  << ")\n";
 	}
 	else
@@ -241,52 +280,23 @@ int main()
 		std::cout << "Warning: Failed to load rat.png\n";
 	}
 
+	// Create a GameObject for exit handling
+	auto exitHandler = std::make_unique<GameObject>();
+	exitHandler->setName("ExitHandler");
+	exitHandler->addComponent<ExitBehaviour>();
+
 	// Add GameObjects to scene
 	gameScene->addGameObject(std::move(player));
 	gameScene->addGameObject(std::move(rat));
+	gameScene->addGameObject(std::move(exitHandler));
 
-	sceneManager.addScene(std::move(gameScene));
-	sceneManager.setActiveScene("GameScene");
+	game->addScene(std::move(gameScene));
+	game->setApplicationSpecifications(spec);
 
 	std::cout << "\n=== Player Game ===\n";
 	std::cout << "Controls:\n";
 	std::cout << "  WASD or Arrow Keys - Move player\n";
 	std::cout << "  ESC - Exit\n\n";
 
-	bool running = true;
-	Uint32 lastTicks = SDL_GetTicks();
-	RenderQueue renderQueue;
-	InputManager* input = InputManager::getInstance();
-
-	while ( running && renderer.isOpen() )
-	{
-		input->update();
-
-		// Calculate deltaTime
-		Uint32 currentTicks = SDL_GetTicks();
-		float deltaTime =
-			static_cast<float>(currentTicks - lastTicks) / 1000.0f;
-		lastTicks = currentTicks;
-
-		// Clamp deltaTime to prevent large jumps
-		if ( deltaTime > 0.1f )
-		{
-			deltaTime = 0.1f;
-		}
-
-		// Handle input for exit
-		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) )
-		{
-			running = false;
-		}
-
-		sceneManager.update(deltaTime);
-		sceneManager.buildRenderQueue(renderQueue);
-		executeRenderQueue(renderer, renderQueue);
-
-		SDL_Delay(16);
-	}
-
-	renderer.close();
-	return 0;
+	return SpelMotorEntry::main(std::move(game));
 }

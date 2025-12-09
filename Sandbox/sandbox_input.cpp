@@ -1,100 +1,142 @@
-#include <SDL2/SDL.h>
+#include "Behaviour/Behaviour.h"
+#include "Core/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "EntryPoint.h"
+#include "Game.h"
+#include "Input/InputManager.h"
+#include "Input/KeyCode.h"
+#include "Input/MouseButton.h"
+#include "Scene/Scene.h"
+
 #include <iostream>
 
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
 
-#include "Input/InputManager.h"
-
-int main()
+/**
+ * @brief Behavior class that handles input testing and demonstration.
+ *
+ * Tests various input scenarios and prints results to console.
+ */
+class InputTestBehaviour: public Behaviour
 {
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
-    {
-        std::cout << "SDL_Init failed: " << SDL_GetError() << std::endl;
-        return 1;
-    }
+   public:
+	InputTestBehaviour() : inputManager(nullptr)
+	{
+	}
 
-#if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
-    // Disable compositor bypass
-    if (!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0"))
-    {
-        std::cout << "SDL can not disable compositor bypass!" << std::endl;
-        return 0;
-    }
-#endif
-    SDL_Window *window =
-        SDL_CreateWindow("Basic C++ SDL project", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-    if (!window)
-    {
-        std::cout << "Window could not be created!" << std::endl << "SDL_Error: " << SDL_GetError() << std::endl;
-        SDL_Quit();
-        return 1;
-    }
+	~InputTestBehaviour() override = default;
 
-    bool running = true;
+	void onAwake() override
+	{
+		inputManager = InputManager::getInstance();
 
-    InputManager *input = InputManager::getInstance();
-    std::cout << "\nTry the following:\n" << std::endl;
-    std::cout << "- Press W and A to see if they are currently held" << std::endl;
-    std::cout << "- Press the left mouse button and the right mouse button to see if "
-                 "they are currently held and if the right mouse button was "
-                 "pressed"
-              << std::endl;
-    std::cout << "- Move the mouse to see if it moved this frame and is close "
-                 "to the top left corner (x < 20 && y < 20)"
-              << std::endl;
-    std::cout << "- Scroll the mouse wheel to see if the wheel delta is not 0" << std::endl;
-    std::cout << "- Press the escape key to quit" << std::endl;
+		std::cout << "\nTry the following:\n" << std::endl;
+		std::cout << "- Press W and A to see if they are currently held"
+				  << std::endl;
+		std::cout
+			<< "- Press the left mouse button and the right mouse button "
+			   "to see if "
+			   "they are currently held and if the right mouse button was "
+			   "pressed"
+			<< std::endl;
+		std::cout << "- Move the mouse to see if it moved this frame and is "
+					 "close "
+					 "to the top left corner (x < 20 && y < 20)"
+				  << std::endl;
+		std::cout << "- Scroll the mouse wheel to see if the wheel delta is "
+					 "not 0"
+				  << std::endl;
+		std::cout << "- Press the escape key to quit" << std::endl;
+	}
 
-    while (running)
-    {
-        input->update();
+	void update(float deltaTime, GameWorld* world) override
+	{
+		(void)deltaTime;
+		(void)world;
 
-        // ================================ GAME CODE CHECK
-        // ================================
-        {
+		if ( inputManager == nullptr )
+		{
+			return;
+		}
 
-            if (input->isKeyDown(KeyCode::W) && input->isKeyDown(KeyCode::A))
-            {
-                std::cout << "W and A are currently held (game code check)" << std::endl;
-            }
-            // =================================================================================
-            if (input->isMouseDown(MouseButton::LEFT) && input->wasMousePressed(MouseButton::RIGHT))
-            {
-                std::cout << "Left mouse button is currently held and right "
-                             "mouse button was pressed (game code check)"
-                          << std::endl;
-            }
-            // =================================================================================
-            if (input->mouseMovedThisFrame() && input->mouseX() < 20 && input->mouseY() < 20)
-            {
-                std::cout << "Mouse moved this frame and is close to the top "
-                             "left corner (game code check)"
-                          << std::endl;
-            }
-            // =================================================================================
-            if (input->wheelDeltaX() != 0 || input->wheelDeltaY() != 0)
-            {
-                std::cout << "Mouse wheel delta: (" << input->wheelDeltaX() << ", " << input->wheelDeltaY() << ")" << std::endl;
-            }
-            // =================================================================================
-            if (input->wasKeyPressed(KeyCode::ESCAPE))
-            {
-                std::cout << "Escape key was pressed (game code check)" << std::endl;
-                running = false;
-            }
-        }
+		// ================================ GAME CODE CHECK
+		// ================================
+		{
+			if ( inputManager->isKeyDown(KeyCode::W) &&
+				 inputManager->isKeyDown(KeyCode::A) )
+			{
+				std::cout << "W and A are currently held (game code check)"
+						  << std::endl;
+			}
+			// =================================================================================
+			if ( inputManager->isMouseDown(MouseButton::LEFT) &&
+				 inputManager->wasMousePressed(MouseButton::RIGHT) )
+			{
+				std::cout << "Left mouse button is currently held and right "
+							 "mouse button was pressed (game code check)"
+						  << std::endl;
+			}
+			// =================================================================================
+			if ( inputManager->mouseMovedThisFrame() &&
+				 inputManager->mouseX() < 20 && inputManager->mouseY() < 20 )
+			{
+				std::cout << "Mouse moved this frame and is close to the top "
+							 "left corner (game code check)"
+						  << std::endl;
+			}
+			// =================================================================================
+			if ( inputManager->wheelDeltaX() != 0 ||
+				 inputManager->wheelDeltaY() != 0 )
+			{
+				std::cout << "Mouse wheel delta: ("
+						  << inputManager->wheelDeltaX() << ", "
+						  << inputManager->wheelDeltaY() << ")" << std::endl;
+			}
+			// =================================================================================
+			if ( inputManager->wasKeyPressed(KeyCode::ESCAPE) )
+			{
+				std::cout << "Escape key was pressed (game code check)"
+						  << std::endl;
+				inputManager->signalQuit();
+			}
+		}
+	}
 
-        // OS quit button was pressed
-        if (input->quitRequested())
-        {
-            running = false;
-        }
+   private:
+	InputManager* inputManager;
+};
 
-        SDL_Delay(16);
-    }
+#undef main
 
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return 0;
+int main(int argc, char** argv)
+{
+	(void)argc;
+	(void)argv;
+
+	ApplicationSpecifications spec = {};
+	spec.networkingOptions.port = 8080;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.mode = EngineMode::CLIENT;
+	spec.networkingOptions.tickRate = 60;
+	spec.renderBackend = RenderBackend::SDL;
+	spec.windowOptions = {"Basic C++ SDL project", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.maxFrameTime = 0.1;  // 100ms max frame time
+
+	std::unique_ptr<Game> game = std::make_unique<Game>();
+
+	// Create a minimal scene for the input test
+	auto inputScene = std::make_unique<Scene>("InputScene");
+
+	// Create a GameObject for input handling
+	auto inputHandler = std::make_unique<GameObject>();
+	inputHandler->setName("InputHandler");
+	inputHandler->addComponent<InputTestBehaviour>();
+
+	inputScene->addGameObject(std::move(inputHandler));
+
+	game->addScene(std::move(inputScene));
+	game->setApplicationSpecifications(spec);
+
+	return SpelMotorEntry::main(std::move(game));
 }

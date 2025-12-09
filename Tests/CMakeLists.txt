@@ -12,13 +12,12 @@ add_executable(engine_tests
         Core/ServerLoopTest.cpp
         Core/ClientLoopTest.cpp
         Core/TimerTest.cpp
+        Component/Profiler/ProfilerTest.cpp
         Component/tests_TestComponents.cpp
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
         Component/GridComponentTest.cpp
-        Component/UIObject/tests_uiobjects.cpp
-        GameObject/tests_game_object.cpp
         Scene/SceneManagerTest.cpp
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp

@@ -30,8 +30,9 @@ void PlayerControllerBehaviour::onStart()
 	}
 }
 
-void PlayerControllerBehaviour::update(float deltaTime)
+void PlayerControllerBehaviour::update(float deltaTime, GameWorld* world)
 {
+	(void)world;  // Not used in this implementation
 	if ( inputManager == nullptr || transform == nullptr )
 	{
 		return;
@@ -66,25 +67,25 @@ void PlayerControllerBehaviour::handleInput(float deltaTime)
 	if ( inputManager->isKeyDown(KeyCode::W) ||
 		 inputManager->isKeyDown(KeyCode::UP_ARROW) )
 	{
-		newPos.setY(newPos.y() - movementSpeed * deltaTime);
+		newPos.setY(newPos.y - movementSpeed * deltaTime);
 		isMoving = true;
 	}
 	if ( inputManager->isKeyDown(KeyCode::S) ||
 		 inputManager->isKeyDown(KeyCode::DOWN_ARROW) )
 	{
-		newPos.setY(newPos.y() + movementSpeed * deltaTime);
+		newPos.setY(newPos.y + movementSpeed * deltaTime);
 		isMoving = true;
 	}
 	if ( inputManager->isKeyDown(KeyCode::A) ||
 		 inputManager->isKeyDown(KeyCode::LEFT_ARROW) )
 	{
-		newPos.setX(newPos.x() - movementSpeed * deltaTime);
+		newPos.setX(newPos.x - movementSpeed * deltaTime);
 		isMoving = true;
 	}
 	if ( inputManager->isKeyDown(KeyCode::D) ||
 		 inputManager->isKeyDown(KeyCode::RIGHT_ARROW) )
 	{
-		newPos.setX(newPos.x() + movementSpeed * deltaTime);
+		newPos.setX(newPos.x + movementSpeed * deltaTime);
 		isMoving = true;
 	}
 
@@ -103,8 +104,8 @@ void PlayerControllerBehaviour::updateAnimation()
 	}
 
 	Vector2 currentPos = transform->getPosition();
-	float dx = currentPos.x() - lastPosition.x();
-	float dy = currentPos.y() - lastPosition.y();
+	float dx = currentPos.x - lastPosition.x;
+	float dy = currentPos.y - lastPosition.y;
 	float absDx = std::abs(dx);
 	float absDy = std::abs(dy);
 	float totalMovement = absDx + absDy;

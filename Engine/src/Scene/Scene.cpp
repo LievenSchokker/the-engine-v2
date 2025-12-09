@@ -1,13 +1,11 @@
 #include "Scene/Scene.h"
 
 #include "Behaviour/Behaviour.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
+#include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Component/ComponentManager.h"
-#include "Component/GridComponent.h"
-#include "Component/ShapeRenderer.h"
-#include "Component/SpriteComponent.h"
-#include "Component/TilemapComponent.h"
 #include "GameObject/GameObject.h"
-#include "Rendering/RenderQueue.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
@@ -197,92 +195,72 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(float deltaTime)
+void Scene::update(double deltaTime, GameWorld* world)
 {
 	if ( !active )
 	{
 		return;
 	}
 
-	/// Update all GameObject's behaviours:
 	for ( auto& gameObject : gameObjects )
 	{
-		/// Only behaviours on active GameObjects should be updated.
 		if ( !gameObject->getIsActive() ) continue;
 
-		/// Iterate over all enabled behaviours.
 		for ( const auto& behaviour : gameObject->getEnabledBehaviours() )
 		{
-			/// Only update
 			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
 				continue;
-			behaviour->update(deltaTime);
+			behaviour->update(deltaTime, world);
 		}
 	}
 
 	processDestroyQueue();
 }
 
-void Scene::collectRenderCommands(RenderQueue& queue) const
-{
-	if ( !active )
-	{
-		return;
-	}
-
-	std::vector<ShapeRenderCommand> debugCommands;
-	for ( const auto& gameObject : gameObjects )
-	{
-		if ( !gameObject->getIsActive() )
-		{
-			continue;
-		}
-
-		// Collect ShapeRenderer commands
-		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
-		if ( shapeRenderer != nullptr )
-		{
-			const auto command = shapeRenderer->buildRenderCommand();
-			if ( command.has_value() )
-			{
-				queue.shapes.emplace_back(*command);
-			}
-		}
-
-		// Collect SpriteComponent commands
-		auto* spriteComponent = gameObject->getComponent<SpriteComponent>();
-		if ( spriteComponent != nullptr )
-		{
-			const auto command = spriteComponent->buildRenderCommand();
-			if ( command.has_value() )
-			{
-				queue.sprites.emplace_back(*command);
-			}
-		}
-
-		// Collect TilemapComponent commands
-		auto* tilemapComponent = gameObject->getComponent<TilemapComponent>();
-		if ( tilemapComponent != nullptr )
-		{
-			const auto tilemapCommands =
-				tilemapComponent->buildRenderCommands();
-			queue.shapes.insert(queue.shapes.end(), tilemapCommands.begin(),
-					   tilemapCommands.end());
-		}
-
-		// Collect GridComponent debug render commands
-		auto* gridComponent = gameObject->getComponent<GridComponent>();
-		if ( gridComponent != nullptr && gridComponent->isDebugRenderEnabled() )
-		{
-			const auto gridCommands = gridComponent->buildDebugRenderCommands();
-			debugCommands.insert(debugCommands.end(), gridCommands.begin(),
-								 gridCommands.end());
-		}
-	}
-
-	// Append deferred debug overlays after regular render commands.
-	queue.shapes.insert(queue.shapes.end(), debugCommands.begin(), debugCommands.end());
-}
+//
+// void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
+// {
+// 	if ( !active ) {
+// 		return;
+// 	}
+//
+// 	std::vector<ShapeRenderCommand> debugCommands;
+// 	for ( const auto& gameObject : gameObjects ) {
+// 		if ( !gameObject->getIsActive() ) {
+// 			continue;
+// 		}
+//
+// 		// Collect ShapeRenderer commands
+// 		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
+// 		if ( shapeRenderer != nullptr ) {
+// 			const auto command = shapeRenderer->buildRenderCommand();
+// 			if ( command.has_value() ) {
+// 				out.emplace_back(*command);
+// 			}
+// 		}
+//
+// 		// Collect TilemapComponent commands
+// 		auto* tilemapComponent = gameObject->getComponent<TilemapComponent>();
+// 		if ( tilemapComponent != nullptr ) {
+// 			const auto tilemapCommands =
+// 				tilemapComponent->buildRenderCommands();
+// 			out.insert(out.end(), tilemapCommands.begin(),
+// 					   tilemapCommands.end());
+// 		}
+//
+// 		// Collect GridComponent debug render commands
+// 		auto* gridComponent = gameObject->getComponent<GridComponent>();
+// 		if ( gridComponent != nullptr &&
+// 			 gridComponent->isDebugRenderEnabled() ) {
+// 			const auto gridCommands = gridComponent->buildDebugRenderCommands();
+// 			debugCommands.insert(debugCommands.end(), gridCommands.begin(),
+// 								 gridCommands.end());
+// 		}
+// 	}
+//
+// 	// Append deferred debug overlays after regular render commands.
+// 	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
+// }
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
 {
@@ -312,6 +290,29 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
 
 		/// Start may only be called once per behaviour
 		if ( !behaviour->getHasStarted() ) behaviour->start();
+	}
+}
+
+void Scene::collectRenderCommands(RenderQueue& queue) const
+{
+	if ( !active )
+	{
+		return;
+	}
+
+	// Collect commands from RenderComponents
+	for ( auto* component : getAllComponentsOfType<RenderComponent>() )
+	{
+		if ( component == nullptr ) continue;
+		component->fillRenderQueue(queue);
+	}
+
+	// Collect commands from UserInterfaceRenderComponents
+	for ( auto* component :
+		  getAllComponentsOfType<UserInterfaceRenderComponent>() )
+	{
+		if ( component == nullptr ) continue;
+		component->fillUserInterfaceRenderQueue(queue);
 	}
 }
 
@@ -362,9 +363,4 @@ void Scene::destroyAllGameObjects()
 	}
 
 	gameObjects.clear();
-}
-
-const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const
-{
-	return gameObjects;
 }
