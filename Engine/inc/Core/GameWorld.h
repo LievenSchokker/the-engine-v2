@@ -1,4 +1,5 @@
 #pragma once
+#include "Events/EventDispatcher.h"
 
 
 class Server;
@@ -19,7 +20,7 @@ public:
     IPhysicsWorld* physics = nullptr;
     IRenderer* renderer = nullptr;
     InputManager* input = nullptr;
-
+	EventDispatcher* dispatcher = nullptr;
     Client* client = nullptr;
     Server* server = nullptr;
 

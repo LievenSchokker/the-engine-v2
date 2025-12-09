@@ -22,7 +22,7 @@ class Component
         Component() :gameObject(nullptr), transform(nullptr) {};
         virtual ~Component() = 0;
 
-      /**
+      /**a
       * @brief Sets the GameObject that this component lives on.
       * Also sets the @c transform field to the GameObject's Transform.
       * @param object Pointer to the GameObject to associate with this component.

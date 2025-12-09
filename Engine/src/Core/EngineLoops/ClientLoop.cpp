@@ -27,6 +27,8 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  gameWorld(std::make_unique<GameWorld>()),
 	  specifications(game->getApplicationSpecifications()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
+	  eventDispatcher(std::make_unique<EventDispatcher>()),
+	  eventQueue(std::make_unique<EventQueue>()),
 	  inputManager(nullptr)
 {
 	clockFunction = []()
@@ -36,6 +38,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	if (specifications.renderBackend == RenderBackend::SDL)
 	{
 		sdlContext = std::make_unique<SdlContext>();
+		sdlEventProcessor = std::make_unique<SDLEventProcessor>();
 		//TODO SDL Injection layer
 		clockFunction = []()
 		{
@@ -50,10 +53,11 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	std::string scene = scenePtr->getName();
 
 	inputManager = InputManager::getInstance();
-	inputManager->initialize(eventDispatcher);
+	inputManager->initialize(*eventDispatcher.get());
 
 	sceneManager->addScene(std::move(scenePtr));
 	sceneManager->setActiveScene(scene);
+	gameWorld->dispatcher = eventDispatcher.get();
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -67,7 +71,7 @@ void ClientLoop::start()
 
 void ClientLoop::initializeEvents()
 {
-	eventDispatcher.subscribe<KeyPressedEvent>(
+	eventDispatcher->subscribe<KeyPressedEvent>(
 		[this](const KeyPressedEvent& event)
 		{
 			if (event.keyCode == SDLK_ESCAPE && !event.isRepeat)
@@ -76,15 +80,16 @@ void ClientLoop::initializeEvents()
 			}
 		});
 
-	renderer->setupEvents(eventDispatcher);
+	std::cout << "Setting up events" << std::endl;
+	renderer->setupEvents(*eventDispatcher.get());
 }
 
 void ClientLoop::update(double deltaTime)
 {
 	inputManager->beginFrame();
 
-	sdlEventProcessor.pollEvents(eventQueue);
-	eventQueue.processAll(eventDispatcher);
+	sdlEventProcessor->pollEvents(*eventQueue.get());
+	eventQueue->processAll(*eventDispatcher.get());
 
 	inputManager->endFrame();
 
@@ -108,8 +113,8 @@ void ClientLoop::initializeNetworking()
 
 void ClientLoop::shutdown()
 {
-	eventDispatcher.unsubscribe(windowCloseHandle);
-	eventDispatcher.unsubscribe(windowResizeHandle);
+	eventDispatcher->unsubscribe(windowCloseHandle);
+	eventDispatcher->unsubscribe(windowResizeHandle);
 
 	InputManager::shutdown();
 	renderer.release();
@@ -130,14 +135,4 @@ SceneManager* ClientLoop::getSceneManager()
 {
 	if (sceneManager) return sceneManager.get();
 	return nullptr;
-}
-
-EventDispatcher& ClientLoop::getEventDispatcher()
-{
-	return eventDispatcher;
-}
-
-EventQueue& ClientLoop::getEventQueue()
-{
-	return eventQueue;
 }

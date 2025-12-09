@@ -17,6 +17,7 @@ void RenderSystem::setupEvents(EventDispatcher& dispatcher) const
 {
 	if (renderer != nullptr)
 	{
+		std::cout << "Renderer is not a nullptr" << std::endl;
 		renderer->setupEvents(dispatcher);
 	}
 }

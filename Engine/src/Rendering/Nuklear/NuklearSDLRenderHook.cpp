@@ -3,6 +3,7 @@
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
 #include "Events/ApplicationEvents.h"
+#include "Events/UserInterfaceEvent.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
@@ -46,11 +47,11 @@ void NuklearSDLRenderHook::initialize()
 		nuklearContext->style.window.header.active = nk_style_item_color(
 			nk_rgba(0, 0, 0, 0));
 	}
-
 }
 
 void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 {
+	std::cout << "setupEvents in userInterfaceHook" << std::endl;
 	eventDispatcher = &dispatcher;
 	subscriptions.push_back(dispatcher.subscribe<MouseButtonPressedEvent>(
 			[this](const MouseButtonPressedEvent& event)
@@ -67,6 +68,15 @@ void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 			}
 			)
 		);
+
+	subscriptions.push_back(dispatcher.subscribe<MouseMovedEvent>(
+			[this](const MouseMovedEvent& event)
+			{
+				mouseX = event.x;
+				mouseY = event.y;
+			}
+			)
+		);
 }
 
 void NuklearSDLRenderHook::unSubscribeEvent(EventDispatcher& dispatcher)
@@ -79,8 +89,27 @@ void NuklearSDLRenderHook::unSubscribeEvent(EventDispatcher& dispatcher)
 }
 
 void NuklearSDLRenderHook::handleMouseClick(
-	const MouseButtonPressedEvent& event) const
+	const MouseButtonPressedEvent& event)
 {
+	int idx = -1;
+	switch (event.button)
+	{
+		case MouseButton::LEFT:
+			idx = 0;
+			break;
+		case MouseButton::MIDDLE:
+			idx = 1;
+			break;
+		case MouseButton::RIGHT:
+			idx = 2;
+			break;
+	}
+	if (idx >= 0)
+	{
+		pendingMouseDown[idx] = true;
+		clickX[idx] = event.x;
+		clickY[idx] = event.y;
+	}
 	switch (event.button)
 	{
 		case MouseButton::LEFT:
@@ -99,8 +128,28 @@ void NuklearSDLRenderHook::handleMouseClick(
 }
 
 void NuklearSDLRenderHook::handleMouseReleased(
-	const MouseButtonReleasedEvent& event) const
+	const MouseButtonReleasedEvent& event)
 {
+	int idx = -1;
+	switch (event.button)
+	{
+		case MouseButton::LEFT:
+			idx = 0;
+			break;
+		case MouseButton::MIDDLE:
+			idx = 1;
+			break;
+		case MouseButton::RIGHT:
+			idx = 2;
+			break;
+	}
+	if (idx >= 0)
+	{
+		pendingMouseDown[idx] = true;
+		clickX[idx] = event.x;
+		clickY[idx] = event.y;
+	}
+
 	switch (event.button)
 	{
 		case MouseButton::LEFT:
@@ -120,6 +169,27 @@ void NuklearSDLRenderHook::handleMouseReleased(
 
 void NuklearSDLRenderHook::beginFrame()
 {
+	nk_input_begin(nuklearContext);
+	nk_input_motion(nuklearContext, mouseX, mouseY);
+
+	const nk_buttons buttons[] = {NK_BUTTON_LEFT, NK_BUTTON_MIDDLE,
+	                              NK_BUTTON_RIGHT};
+	for (int i = 0; i < 3; i++)
+	{
+		if (pendingMouseDown[i])
+		{
+			nk_input_button(nuklearContext, buttons[i], clickX[i], clickY[i],
+			                1);
+			pendingMouseDown[i] = false;
+		}
+		if (pendingMouseUp[i])
+		{
+			nk_input_button(nuklearContext, buttons[i], clickX[i], clickY[i],
+			                0);
+			pendingMouseUp[i] = false;
+		}
+	}
+
 	commandQueue.clear();
 	panelIndices.clear();
 	panelElementIndices.clear();
@@ -128,7 +198,20 @@ void NuklearSDLRenderHook::beginFrame()
 
 void NuklearSDLRenderHook::presentFrame()
 {
+	nk_input_end(nuklearContext);
 	flushCommands();
+
+	if (nk_begin(nuklearContext, "Test Window", nk_rect(50, 50, 200, 150),
+	             NK_WINDOW_BORDER | NK_WINDOW_TITLE))
+	{
+		nk_layout_row_dynamic(nuklearContext, 30, 1);
+		if (nk_button_label(nuklearContext, "Test Button"))
+		{
+			std::cout << "Button clicked!" << std::endl;
+		}
+	}
+	nk_end(nuklearContext);
+
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
 }
 
@@ -223,6 +306,9 @@ void NuklearSDLRenderHook::renderElement(const UIRenderCommand& command)
 		case UICommandType::Text:
 			renderText(command);
 			break;
+		case UICommandType::Button:
+			renderButton(command);
+			break;
 
 		case UICommandType::ProgressBar:
 			renderProgressBar(command);
@@ -303,7 +389,6 @@ void NuklearSDLRenderHook::renderProgressBar(const UIRenderCommand& command)
 
 void NuklearSDLRenderHook::renderSeparator(const UIRenderCommand& command)
 {
-	// Use a small but visible height for the separator
 	nk_layout_row_dynamic(nuklearContext, 15, 1);
 
 	struct nk_rect bounds = nk_widget_bounds(nuklearContext);
@@ -411,6 +496,50 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
 		}
 	}
 	nk_end(nuklearContext);
+}
+
+void NuklearSDLRenderHook::renderButton(const UIRenderCommand& command)
+{
+	if (!command.interactable)
+	{
+		// Render disabled style
+		nk_widget_disable_begin(nuklearContext);
+	}
+
+	// Apply custom colors
+	struct nk_style_button originalStyle = nuklearContext->style.button;
+
+	nuklearContext->style.button.normal = nk_style_item_color(
+		nk_rgba(command.normalColor.r, command.normalColor.g,
+		        command.normalColor.b, command.normalColor.a));
+	nuklearContext->style.button.hover = nk_style_item_color(
+		nk_rgba(command.hoverColor.r, command.hoverColor.g,
+		        command.hoverColor.b, command.hoverColor.a));
+	nuklearContext->style.button.active = nk_style_item_color(
+		nk_rgba(command.pressedColor.r, command.pressedColor.g,
+		        command.pressedColor.b, command.pressedColor.a));
+	nuklearContext->style.button.text_normal =
+		nk_rgba(command.textColor.r, command.textColor.g,
+		        command.textColor.b, command.textColor.a);
+	nuklearContext->style.button.text_hover = nuklearContext->style.button.
+		text_normal;
+	nuklearContext->style.button.text_active = nuklearContext->style.button.
+		text_normal;
+
+	if (nk_button_label(nuklearContext, command.text.c_str()))
+	{
+		if (command.interactable && eventDispatcher)
+		{
+			eventDispatcher->dispatch(UIButtonClickedEvent{command.buttonId});
+		}
+	}
+
+	nuklearContext->style.button = originalStyle;
+
+	if (!command.interactable)
+	{
+		nk_widget_disable_end(nuklearContext);
+	}
 }
 
 void NuklearSDLRenderHook::close()

@@ -28,60 +28,58 @@ class InputManager;
  *
  * @see ServerLoop, IEngineLoop
  */
-class ClientLoop : public IEngineLoop
+class ClientLoop: public IEngineLoop
 {
-    using ClockFunction = std::function<double()>;
+	using ClockFunction = std::function<double()>;
 
 public:
-    /**
-     * @brief Constructs a client loop with rendering and networking support
-     *
-     * Defers window creation to start() for two-phase initialization—this
-     * allows the engine to configure additional settings between construction
-     * and the window becoming visible.
-     *
-     * @param applicationSpecifications Client configuration (resolution, server address)
-     */
+	/**
+	 * @brief Constructs a client loop with rendering and networking support
+	 *
+	 * Defers window creation to start() for two-phase initialization—this
+	 * allows the engine to configure additional settings between construction
+	 * and the window becoming visible.
+	 *
+	 * @param applicationSpecifications Client configuration (resolution, server address)
+	 */
 	explicit ClientLoop(std::unique_ptr<Game> game);
-    ~ClientLoop() override;
+	~ClientLoop() override;
 
-    GameWorld* getGameWorld() override;
-    SceneManager* getSceneManager() override;
-    ClockFunction getClock() override;
-    void start() override;
-    void initializeEvents();
-    void update(double deltaTime) override;
-    void fixedUpdate(double deltaTime) override;
-    void shutdown() override;
+	GameWorld* getGameWorld() override;
+	SceneManager* getSceneManager() override;
+	ClockFunction getClock() override;
+	void start() override;
+	void initializeEvents();
+	void update(double deltaTime) override;
+	void fixedUpdate(double deltaTime) override;
+	void shutdown() override;
 
-	EventDispatcher& getEventDispatcher();
-	EventQueue& getEventQueue();
 private:
-    /**
-     * @brief Establishes connection to the game server
-     *
-     * Separated from start() to allow future flexibility in connection
-     * timing (e.g., connecting after a menu, reconnecting after disconnect).
-     */
-    void initializeNetworking();
+	/**
+	 * @brief Establishes connection to the game server
+	 *
+	 * Separated from start() to allow future flexibility in connection
+	 * timing (e.g., connecting after a menu, reconnecting after disconnect).
+	 */
+	void initializeNetworking();
 
 
 	// Event system
-	EventDispatcher eventDispatcher;
-	EventQueue eventQueue;
-	SDLEventProcessor sdlEventProcessor;
+	std::unique_ptr<EventDispatcher> eventDispatcher;
+	std::unique_ptr<EventQueue> eventQueue;
+	std::unique_ptr<SDLEventProcessor> sdlEventProcessor;
 
 	// Event subscription handles
 	SubscriptionHandle windowCloseHandle;
 	SubscriptionHandle windowResizeHandle;
 
 	std::unique_ptr<Game> game;
-    ApplicationSpecifications specifications;
-    std::unique_ptr<GameWorld> gameWorld;
-    std::unique_ptr<SceneManager> sceneManager;
-    std::unique_ptr<Client> client;
-    std::unique_ptr<RenderSystem> renderer;
-    std::unique_ptr<SdlContext> sdlContext;
-    InputManager* inputManager;
-    ClockFunction clockFunction;
+	ApplicationSpecifications specifications;
+	std::unique_ptr<GameWorld> gameWorld;
+	std::unique_ptr<SceneManager> sceneManager;
+	std::unique_ptr<Client> client;
+	std::unique_ptr<RenderSystem> renderer;
+	std::unique_ptr<SdlContext> sdlContext;
+	InputManager* inputManager;
+	ClockFunction clockFunction;
 };

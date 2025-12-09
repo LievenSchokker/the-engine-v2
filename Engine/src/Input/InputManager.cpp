@@ -33,6 +33,7 @@ void InputManager::initialize(EventDispatcher& dispatcher)
         return;
     }
 
+
     keyPressedHandle = dispatcher.subscribe<KeyPressedEvent>(
         [this](const KeyPressedEvent& e) {
             onKeyPressed(e);

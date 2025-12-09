@@ -4,6 +4,7 @@
 #include "Rendering/Color.h"
 #include "Component/UIObject/Alignment.h"
 
+#include <functional>
 #include <vector>
 
 constexpr uint32_t NO_PARENT = 0;
@@ -17,6 +18,7 @@ enum class UICommandType
 	Spacer,
 	Image,
 	Chart,
+	Button,
 };
 
 
@@ -78,6 +80,13 @@ struct UIRenderCommand
 	float chartMin = 0.0f;
 	float chartMax = 1.0f;
 	int chartHeight = 50;
+
+	uint32_t buttonId = 0;
+	bool interactable = true;
+	Color normalColor = Color(50, 50, 50, 255);
+	Color hoverColor = Color(70, 70, 70, 255);
+	Color pressedColor = Color(30, 30, 30, 255);
+	Color textColor = Color::white();
 
 	/**
 	 * @brief Composite key for depth sorting.

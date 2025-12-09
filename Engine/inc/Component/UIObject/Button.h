@@ -1,17 +1,32 @@
 #pragma once
-#include "Component/UIObject/UIObject.h"
+#include "UIObject.h"
 
+#include <string>
 
-class Button: public UIObject
+class Button : public UIObject
 {
-   public:
-	explicit Button(int width = 0, int height = 0, bool interactable = false);
+public:
+	explicit Button(
+		float x = 0,
+		float y = 0,
+		float width = 100,
+		float height = 30,
+		std::string text = "Button"
+	);
 
-	void setInteractable(bool newInteractable);
-	bool getInteractable() const;
+	void fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const override;
 
-	void onClick();
+	std::string getText() const;
+	bool isInteractable() const;
+	uint32_t getButtonId() const;
 
-   private:
-	bool interactable;
+	void setText(const std::string& newText);
+	void setInteractable(bool enabled);
+
+private:
+	static uint32_t nextButtonId;
+
+	uint32_t buttonId;
+	std::string text;
+	bool interactable = true;
 };

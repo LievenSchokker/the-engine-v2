@@ -281,8 +281,10 @@ bool SDLRenderer::ensureSolidQuadTexture()
 
 void SDLRenderer::setupEvents(EventDispatcher& dispatcher)
 {
+	std::cout << "setupEvents in SDL" << std::endl;
 	if (userInterfaceHook != nullptr)
 	{
+		std::cout << "setupEvents in userInterfaceHook" << std::endl;
 		userInterfaceHook->setupEvents(dispatcher);
 	}
 }

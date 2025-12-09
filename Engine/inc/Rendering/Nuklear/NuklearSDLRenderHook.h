@@ -40,11 +40,9 @@ public:
 	 */
 	void initialize() override;
 	void setupEvents(EventDispatcher& dispatcher) override;
-	void handleKeyPressedEvent(const KeyPressedEvent& event);
-	void handleKeyReleasedEvent(const KeyReleasedEvent& event);
 	void unSubscribeEvent(EventDispatcher& dispatcher);
-	void handleMouseClick(const MouseButtonPressedEvent& event) const;
-	void handleMouseReleased(const MouseButtonReleasedEvent& event) const;
+	void handleMouseClick(const MouseButtonPressedEvent& event);
+	void handleMouseReleased(const MouseButtonReleasedEvent& event);
 
 	/**
 	 * @brief Processes input and builds UI for this frame.
@@ -96,6 +94,7 @@ private:
 	void flushCommands();
 	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
+	void renderButton(const UIRenderCommand& command);
 	void renderElement(const UIRenderCommand& command);
 	void renderChart(const UIRenderCommand& command);
 	void renderProgressBar(const UIRenderCommand& command);
@@ -109,6 +108,12 @@ private:
 	SDL_Renderer* sdlRenderer;
 	nk_context* nuklearContext;
 	EventDispatcher* eventDispatcher;
+	bool pendingMouseDown[3] = {false, false, false};  // LEFT, MIDDLE, RIGHT
+	bool pendingMouseUp[3] = {false, false, false};
+	int clickX[3] = {0, 0, 0};
+	int clickY[3] = {0, 0, 0};
+	int mouseX;
+	int mouseY;
 
 	std::vector<UIRenderCommand> commandQueue;
 
