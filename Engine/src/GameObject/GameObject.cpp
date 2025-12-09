@@ -174,6 +174,7 @@ void GameObject::setIsStatic(bool value)
 void GameObject::setScene(Scene& newScene)
 {
     scene = &newScene;
+    sceneId = scene->getSceneId(*this);
 }
 
 

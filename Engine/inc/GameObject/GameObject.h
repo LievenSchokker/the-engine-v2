@@ -258,6 +258,8 @@ public:
 	 */
 	bool getIsDestroyed() const;
 
+    void setSceneId() const;
+
 private:
 	std::unique_ptr<ComponentManager> componentManager;
 	std::unique_ptr<Transform> transform;
@@ -265,6 +267,7 @@ private:
 	std::string name;
 	int layer;
 	std::string tag;
+    int sceneId;
 
 	bool isActive;
 	bool isStatic;

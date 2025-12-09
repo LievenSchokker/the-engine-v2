@@ -12,6 +12,7 @@
 #include "../../inc/Rendering/RenderQueue/RenderQueue.h"
 
 #include <algorithm>
+#include <filesystem>
 #include <iostream>
 #include <utility>
 
@@ -39,10 +40,8 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 		return false;
 	}
 
-	bool isGameObjectActive = gameObject->getIsActive();
-
-	gameObjects.emplace_back(std::move(gameObject));
-    GameObject* addedObject = gameObjects.back().get();
+    addGameObjectInternal(std::move(gameObject));
+    GameObject* addedObject = gameObject.get();
     addedObject->setScene(*this);
 
     if (active)
@@ -61,9 +60,7 @@ bool Scene::removeGameObject(const std::string& name)
 					   [&](const std::unique_ptr<GameObject>& gameObject) {
 						   if ( gameObject->getName() == name ) {
 							   if ( active && gameObject->getIsActive() )
-							       {
-								   // TODO: call gameobject on stop
-							       /// GO does not have (and shouldn't have) an onStop, but we can destroy the object:
+							   {
 							       gameObject->destroy();
 							       gameObject->onSceneDestroy();
 							   }
@@ -72,8 +69,10 @@ bool Scene::removeGameObject(const std::string& name)
 						   return false;
 					   });
 
-	if ( it != gameObjects.end() ) {
-		gameObjects.erase(it, gameObjects.end());
+	if ( it != gameObjects.end() )
+	{
+        GameObject* gameObject = it->get();
+	    removeGameObjectInternal(gameObject);
 		return true;
 	}
 
@@ -102,17 +101,18 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 		return nullptr;
 	}
 
+    GameObject* gameObject = it->get();
+
 	// Call onStop if scene is active
-	if ( active && it->get()->getIsActive())
+	if (active && gameObject != nullptr)
 	{
-		// TODO: call gameobject on stop
-	    /// GO does not have (and shouldn't have) an onStop, but we can deactivate all behaviours:
-	    it->get()->setBehavioursEnabled(false);
+	    gameObject->setBehavioursEnabled(false);
 	}
 
 	// Move ownership and remove from vector
 	auto result = std::move(*it);
-	gameObjects.erase(it);
+    removeGameObjectInternal(gameObject);
+
 	return result;
 }
 
@@ -152,8 +152,6 @@ void Scene::onStop()
 	active = false;
 	for ( auto& gameObject : gameObjects )
 	{
-		// TODO: call gameobject on stop
-	    /// GO does not have (and shouldn't have) an onStop, but we can deactivate all behaviours:
         gameObject->setBehavioursEnabled(false);
 	}
 }
@@ -164,9 +162,8 @@ void Scene::onPause()
 		return;
 	}
 
-	for ( auto& gameObject : gameObjects ) {
-		// TODO: call gameobject on pause
-	    /// GO does not have (and shouldn't have) an onPause, but we can deactivate all behaviours:
+	for ( auto& gameObject : gameObjects )
+	{
 	    gameObject->setBehavioursEnabled(false);
 	}
 }
@@ -177,9 +174,8 @@ void Scene::onResume()
 		return;
 	}
 
-	for ( auto& gameObject : gameObjects ) {
-		// TODO: call gameobject on resume
-	    /// GO does not have (and shouldn't have) an onResume, but we can reactivate all behaviours:
+	for ( auto& gameObject : gameObjects )
+	{
 	    gameObject->setBehavioursEnabled(true);
 
 	}
@@ -307,22 +303,8 @@ void Scene::processDestroyQueue()
 {
     for (GameObject* gameObject : destroyQueue)
     {
-
         gameObject->onSceneDestroy();
-
-        /// Remove the GameObject from the stored gameObjects,
-        /// Destroys the GameObject stored in the unqiue ptr automatically.
-        gameObjects.erase(
-            std::remove_if(
-                gameObjects.begin(),
-                gameObjects.end(),
-                [gameObject](const std::unique_ptr<GameObject>& ptr) {
-                    return ptr.get() == gameObject;
-                }
-            ),
-
-            gameObjects.end()
-        );
+        removeGameObjectInternal(gameObject);
     }
 
     /// Clear the queue when all queued objects have been deleted.
@@ -347,4 +329,65 @@ void Scene::destroyAllGameObjects()
     }
 
     gameObjects.clear();
+}
+
+
+int Scene::getSceneId(const GameObject& gameObject) const
+{
+    auto it = gameObjectIds.find(&gameObject);
+    if (it == gameObjectIds.end())
+        return -1;
+
+    return it->second;
+}
+
+
+GameObject* Scene::getGameObjectById(int id) const
+{
+    for (const auto& obj : gameObjects)
+    {
+        if (getSceneId(*obj) == id)
+            return obj.get();
+    }
+    return nullptr;
+}
+
+
+bool Scene::removeGameObjectInternal(GameObject* gameObject)
+{
+    if (gameObject == nullptr)
+        return false;
+
+    auto it = std::find_if(
+        gameObjects.begin(),
+        gameObjects.end(),
+        [gameObject](const std::unique_ptr<GameObject>& ptr) {
+            return ptr.get() == gameObject;
+        }
+    );
+
+    if (it == gameObjects.end())
+        return false;
+
+    gameObjectIds.erase(gameObject);
+    gameObjects.erase(it);
+
+    return true;
+}
+
+bool Scene::addGameObjectInternal(std::unique_ptr<GameObject> gameObject)
+{
+    if (!gameObject)
+        return false;
+
+    GameObject* goRaw = gameObject.get();
+
+    gameObjects.emplace_back(std::move(gameObject));
+
+    gameObjectIds[goRaw] = currentGameObjectId;
+    currentGameObjectId++;
+
+
+
+    return true;
 }

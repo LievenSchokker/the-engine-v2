@@ -1,4 +1,7 @@
 #pragma once
+#include <map>
+
+#include "Game.h"
 #include "Core/GameWorld.h"
 
 class GameObject;
@@ -165,11 +168,21 @@ class Scene
         template <class T>
         std::vector<T*> getAllComponentsOfType() const;
 
+        int getSceneId(const GameObject& gameObject) const;
+        GameObject* getGameObjectById(int id) const;
+
+
     private:
+        bool removeGameObjectInternal(GameObject* gameObject);
+        bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
+
         std::string name;
         std::vector<std::unique_ptr<GameObject> > gameObjects;
-        std::vector<GameObject *> destroyQueue;
+        std::map<const GameObject*, int> gameObjectIds;
+        int currentGameObjectId;
+        std::vector<GameObject*> destroyQueue;
         bool active = false;
+
 };
 
 #include "Scene.inl"
