@@ -1,3 +1,4 @@
+#include "Game.h"
 #include "Animation/AnimationClip.h"
 #include "Animation/AnimationCurve.h"
 #include "Animation/AnimationTrack.h"
@@ -66,9 +67,10 @@ TEST_F(AnimatorTest, Pause)
 
 TEST_F(AnimatorTest, Stop)
 {
+	std::unique_ptr<GameWorld> world = std::make_unique<GameWorld>();
 	AnimationClip clip("TestClip", false);
 	animator->play(&clip);
-	animator->update(0.5f);	 // Advance time
+	animator->update(0.5f, world.get());	 // Advance time
 
 	animator->stop();
 
@@ -87,6 +89,7 @@ TEST_F(AnimatorTest, TimeScale)
 
 TEST_F(AnimatorTest, UpdateAdvancesTime)
 {
+	std::unique_ptr<GameWorld> world = std::make_unique<GameWorld>();
 	AnimationClip clip("TestClip", false);
 	AnimationCurve curve(EasingType::Linear);
 	Vector2 fromPos{0.0f, 0.0f};
@@ -98,26 +101,28 @@ TEST_F(AnimatorTest, UpdateAdvancesTime)
 
 	animator->play(&clip);
 
-	animator->update(0.5f);
+	animator->update(0.5f, world.get());
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 0.5f);
 
-	animator->update(0.5f);
+	animator->update(0.5f, world.get());
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 1.0f);
 }
 
 TEST_F(AnimatorTest, TimeScaleAffectsUpdate)
 {
+	std::unique_ptr<GameWorld> world = std::make_unique<GameWorld>();
 	AnimationClip clip("TestClip", false);
 	animator->play(&clip);
 	animator->setTimeScale(2.0f);
 
-	animator->update(0.5f);
+	animator->update(0.5f, world.get());
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(),
 					1.0f);	// Should advance 2x faster
 }
 
 TEST_F(AnimatorTest, LoopingClip)
 {
+	std::unique_ptr<GameWorld> world = std::make_unique<GameWorld>();
 	AnimationClip clip("TestClip", true);
 	AnimationCurve curve(EasingType::Linear);
 	Vector2 fromPos{0.0f, 0.0f};
@@ -128,7 +133,7 @@ TEST_F(AnimatorTest, LoopingClip)
 	clip.addTrack(track);
 
 	animator->play(&clip);
-	animator->update(1.5f);	 // Go past end
+	animator->update(1.5f, world.get());	 // Go past end
 
 	// Should loop back
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 0.5f);
@@ -137,6 +142,7 @@ TEST_F(AnimatorTest, LoopingClip)
 
 TEST_F(AnimatorTest, NonLoopingClipStops)
 {
+	std::unique_ptr<GameWorld> world = std::make_unique<GameWorld>();
 	AnimationClip clip("TestClip", false);
 	AnimationCurve curve(EasingType::Linear);
 	Vector2 fromPos{0.0f, 0.0f};
@@ -147,7 +153,7 @@ TEST_F(AnimatorTest, NonLoopingClipStops)
 	clip.addTrack(track);
 
 	animator->play(&clip);
-	animator->update(1.5f);	 // Go past end
+	animator->update(1.5f,  world.get());	 // Go past end
 
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 1.0f);	// Clamped to length
 	EXPECT_FALSE(animator->getIsPlaying());				// Should stop

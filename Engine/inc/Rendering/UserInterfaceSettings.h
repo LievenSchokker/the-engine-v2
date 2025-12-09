@@ -5,7 +5,7 @@
 
 struct UserInterfaceSettings
 {
-    constexpr UserInterfaceSettings() = default;
+	constexpr UserInterfaceSettings() = default;
 
-    Color MenuBackGroundColor;
+	Color MenuBackGroundColor;
 };

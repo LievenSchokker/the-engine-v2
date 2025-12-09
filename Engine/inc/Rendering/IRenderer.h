@@ -18,6 +18,8 @@
  */
 
 #pragma once
+#include "RenderCommand.h"
+#include "Scene/Scene.h"
 
 
 class string;
@@ -32,7 +34,7 @@ struct WindowOptions;
 
 class IRenderer
 {
-   public:
+public:
 	virtual ~IRenderer() = default;
 
 	/**
@@ -55,13 +57,24 @@ class IRenderer
 	virtual void beginFrame(const Color& clearColor) = 0;
 
 	/**
+	 * @brief execute's the handling of the  rendercommand.
+	 *
+	 * @return void
+	 * This will execute a single render command. It is important that
+	 * beginFrame is called before execution.
+	 * Otherwise this would draw on top of an old frame.
+	 *
+	 */
+	virtual void execute(const RenderCommand& command) = 0;
+
+	/**
 	 * @brief Presents the current frame to the screen
 	 *
 	 *
 	 * @pre Window must be open
 	 * @see open()
 	 */
-	virtual void presentFrame() = 0;
+	virtual void endFrame() = 0;
 
 	/**
 	 * @brief Closes the rendering window and releases associated resources
@@ -74,6 +87,14 @@ class IRenderer
 	 */
 	virtual void close() = 0;
 
+	/**
+	 * @brief Presents the current frame to the screen
+	 *
+	 * Sets the new list of data to the renderingUI. Which will then be used
+	 * in rendering
+	 * @param commands The list of UIRenderCommands to be send for rendering
+	 */
+	virtual void submitUI(const std::vector<UIRenderCommand>& commands) = 0;
 	/**
 	 * @brief Checks if the rendering window is currently open
 	 *
@@ -93,18 +114,6 @@ class IRenderer
 	 */
 	virtual void setTitle(const std::string& title) = 0;
 
-	/**
-	 * @brief Draw a filled circle with the given configuration.
-	 */
-	virtual void drawCircle(const Vector2& center, double radius,
-							const Color& color, const Vector2& scale) = 0;
 
-	/**
-	 * @brief Draw a filled rectangle with the given configuration.
-	 */
-	virtual void drawRectangle(const Vector2& center, const Vector2& size,
-							   double rotationDegrees, const Color& color,
-							   const Vector2& scale) = 0;
-
-    virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
+	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
 };

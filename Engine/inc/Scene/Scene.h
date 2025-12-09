@@ -1,12 +1,15 @@
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
+
+#include "Core/GameWorld.h"
 
 class GameObject;
 class Behaviour;
 struct ShapeRenderCommand;
+
+#include <memory>
+#include <string>
+#include <vector>
 
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.
@@ -16,7 +19,7 @@ struct ShapeRenderCommand;
  */
 class Scene
 {
-   public:
+public:
 	/**
 	 * @brief Create a scene with the given identifier.
 	 *
@@ -114,8 +117,9 @@ class Scene
 	 * @brief Update all game objects when the scene is active.
 	 *
 	 * @param deltaTime Seconds elapsed since the previous update.
+	 * @param world
 	 */
-	void update(float deltaTime);
+	void update(double deltaTime, GameWorld* world);
 
 	/**
 	 * @brief Collect render commands for active objects in this scene.
@@ -125,63 +129,49 @@ class Scene
 	void collectRenderCommands(std::vector<ShapeRenderCommand>& out) const;
 
 	/**
-	 * @brief initialises the @c behaviours by calling their awake(), onEnable()
-	 * and start() methods in the correct order.
+	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
 	 *
 	 * @param behaviours the behaviours that need to be initialised.
 	 */
 	void initialiseBehaviours(const std::vector<Behaviour*>& behaviours);
 
 	/**
-	 * @brief Adds the provided GameObject to the @c destroyQueue vector, in
-	 * order to delete and destroy the object when @c processDestroyQueue is
-	 * called.
+	 * @brief Adds the provided GameObject to the @c destroyQueue vector, in order to delete and destroy the object when @c processDestroyQueue is called.
 	 * @param gameObject the GameObject to destroy
 	 */
 	void queueDestroy(GameObject* gameObject);
 
 	/**
-	 * @brief processes the destroy queue by destroying and deleting all
-	 * GameObjects inside it, This function calls @c
-	 * GameObject::onSceneDestroy() for each GameObject inside the @c
-	 * destroyQueue, then attempts to remove the GameObject from the stored @c
-	 * gameObjects vector to delete it, then clears the @c destroyQueue vector
-	 * to begin the next frame clean.
+	 * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
+	 * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
+	 * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
 	 *
 	 * This function is called at the end of each scene::update() call.
 	 */
 	void processDestroyQueue();
 
 	/**
-	 * Checks whether the given object is in the @c destroyQueue vector in order
-	 * to be destroyed.
+	 * Checks whether the given object is in the @c destroyQueue vector in order to be destroyed.
 	 * @param gameObject GameObject to check
 	 * @return true if the GameObject is in the vector, false otherwise.
 	 */
 	bool isInDestroyQueue(GameObject* gameObject);
 
 	/**
-	 * Destroys all GameObjects in this scene and clears the @c gameObjects
-	 * vector.
+	 * Destroys all GameObjects in this scene and clears the @c gameObjects vector.
 	 *
-	 * Calls GameObject::onSceneDestroy() on each GameObject inside @c
-	 * gameObjects, then clears the entire vector to remove the GameObjects from
-	 * memory.
+	 * Calls GameObject::onSceneDestroy() on each GameObject inside @c gameObjects, then clears the entire vector to remove the GameObjects from memory.
 	 */
 	void destroyAllGameObjects();
 
-	/**
-	 * @brief Gets all GameObjects in this scene for iteration.
-	 *
-	 * Used by systems to find and update components.
-	 *
-	 * @return Const reference to the vector of GameObjects
-	 */
-	const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
+	template <class T>
+	std::vector<T*> getAllComponentsOfType() const;
 
-   private:
+private:
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 	std::vector<GameObject*> destroyQueue;
 	bool active = false;
 };
+
+#include "Scene.inl"

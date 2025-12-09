@@ -2,14 +2,14 @@
 
 
 #include "nuklear.h"
-#include <SDL_video.h>
-#include <unordered_map>
-#include <queue>
 
 #include "Input/InputManager.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/SDL/SDLRenderer.h"
 
+#include <queue>
+#include <unordered_map>
+#include <SDL_video.h>
 
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.
@@ -97,15 +97,20 @@ public:
 	* reserved size of 250 elements.
 	*
 	*/
-	void submit(UIRenderCommand command) override;
+	void process(const std::vector<UIRenderCommand>& commands) override;
 
 private:
 	void flushCommands();
 	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
 	void renderElement(const UIRenderCommand& command);
+	void renderChart(const UIRenderCommand& command);
+	void renderProgressBar(const UIRenderCommand& command);
+	void renderSeparator(const UIRenderCommand& command);
+	void renderImage(const UIRenderCommand& command);
+	void renderSpacer(const UIRenderCommand& command);
 	void renderText(const UIRenderCommand& command);
-	
+
 	InputManager* inputManager;
 	SDL_Window* sdlWindow;
 	SDL_Renderer* sdlRenderer;

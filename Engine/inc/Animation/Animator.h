@@ -104,7 +104,7 @@ class Animator: public Behaviour
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	void update(float deltaTime) override;
+	void update(float deltaTime, GameWorld* world) override;
 
    private:
 	AnimationClip* currentClip;

@@ -4,7 +4,7 @@
 
 #include "Component/ComponentManager.h"
 #include "GameObject/GameObject.h"
-#include "Component/Component.h"
+#include "../../inc/Component/BaseComponentTypes/Component.h"
 #include "Behaviour/Behaviour.h"
 
 

@@ -34,10 +34,10 @@ namespace engine_tests
     }
 
 
-    void TestBehaviourBase::update(float deltaTime)
+    void TestBehaviourBase::update(float deltaTime, GameWorld* gameWorld)
     {
 		(void)deltaTime;  // Not used in tests
-		Behaviour::update(deltaTime);
+		Behaviour::update(deltaTime, gameWorld);
 		updateCalled = true;
     }
 
