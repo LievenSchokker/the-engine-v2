@@ -29,9 +29,6 @@ bool Agent::addAgentModule(float desiredWeight, Args&&... args)
     /// The ModuleData has ownership over the actual Module (stored in unique_ptr)
     moduleDatas.push_back(std::move(moduleData));
 
-    /// Initialise a module right after adding it.
-    added->getModule()->initialise();
-
     return true;
 }
 

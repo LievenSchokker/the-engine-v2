@@ -228,6 +228,8 @@ public:
 	 */
 	void setScene(Scene& newScene);
 
+    Scene* getScene() const;
+
 	void setBehavioursEnabled(bool value) const;
 
 	/**
@@ -258,7 +260,7 @@ public:
 	 */
 	bool getIsDestroyed() const;
 
-    void setSceneId() const;
+    int getSceneId() const;
 
 private:
 	std::unique_ptr<ComponentManager> componentManager;

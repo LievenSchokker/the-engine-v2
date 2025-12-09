@@ -349,6 +349,7 @@ GameObject* Scene::getGameObjectById(int id) const
         if (getSceneId(*obj) == id)
             return obj.get();
     }
+
     return nullptr;
 }
 

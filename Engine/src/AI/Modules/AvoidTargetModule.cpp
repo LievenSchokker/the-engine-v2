@@ -4,14 +4,34 @@
 
 
 #include "AI/Modules/AvoidTargetModule.h"
+
+#include "AI/Agent.h"
 #include "Component/Transform.h"
+#include "GameObject/GameObject.h"
+
+
+void AvoidTargetModule::initialise()
+{
+    if (target != nullptr)
+    {
+        targetGameObjectId = target->getGameObject()->getSceneId();
+    }
+
+    agentScene = agent.getGameObject()->getScene();
+}
 
 
 Vector2 AvoidTargetModule::compute()
 {
-    /// Return if target is MIA
     if (target == nullptr)
         return Vector2::zero();
+
+    GameObject* targetObject = agentScene->getGameObjectById(targetGameObjectId);
+
+    if (targetObject == nullptr)
+        return Vector2::zero();
+
+    target = targetObject->getTransform();
 
     /// Return if avoidRadius is not set
     if (avoidRadius <= 0)
@@ -25,9 +45,12 @@ Vector2 AvoidTargetModule::compute()
     return -(target->getPosition() - agentTransform.getPosition()).normalised();
 }
 
+
 void AvoidTargetModule::setFollowTarget(const Transform& newTarget)
 {
     target = &newTarget;
+    agentScene = agent.getGameObject()->getScene();
+    targetGameObjectId = target->getGameObject()->getSceneId();
 }
 
 

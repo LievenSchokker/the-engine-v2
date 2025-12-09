@@ -24,7 +24,7 @@ class BaseAgentModule
         /**
          * @brief Method used to initialise this module.
          *
-         * Gets called immediatly after adding the module to the agent, only once.
+         * Gets called in the Agent's onAwake() method to ensure world references can be retrieved correctly.
          */
         virtual void initialise() {}
 

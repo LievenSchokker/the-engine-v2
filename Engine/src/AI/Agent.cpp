@@ -13,6 +13,11 @@ void Agent::onAwake()
     {
         setEnabled(false);
     }
+
+    for (auto& moduleData  :  moduleDatas)
+    {
+        moduleData->getModule()->initialise();
+    }
 }
 
 
