@@ -53,6 +53,7 @@ public:
 	*/
 	template <class T, class... Args>
 	T* addComponent(Args&&... args);
+
 	/**
 	* @brief Retrieves a component of type T from this GameObject's @c componentManager.
 	*
@@ -64,6 +65,8 @@ public:
 	template <typename T>
 	T* getComponent() const;
 
+	template <typename T>
+	std::vector<T*> getComponents() const;
 
 	/**
 	* @brief Attempts to retrieve a component of type T from this GameObject's @c componentManager.

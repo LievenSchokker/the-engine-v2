@@ -28,6 +28,8 @@ public:
 		std::string title = ""
 		);
 
+	UIPanelObject(float x, float y, float width, float height,
+	              std::string title, uint32_t panelID);
 	void fillUserInterfaceRenderQueue(
 		IUserInterfaceRenderQueueWriter& queue) const override;
 

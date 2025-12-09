@@ -51,7 +51,6 @@ void NuklearSDLRenderHook::initialize()
 
 void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 {
-	std::cout << "setupEvents in userInterfaceHook" << std::endl;
 	eventDispatcher = &dispatcher;
 	subscriptions.push_back(dispatcher.subscribe<MouseButtonPressedEvent>(
 			[this](const MouseButtonPressedEvent& event)
@@ -200,17 +199,6 @@ void NuklearSDLRenderHook::presentFrame()
 {
 	nk_input_end(nuklearContext);
 	flushCommands();
-
-	if (nk_begin(nuklearContext, "Test Window", nk_rect(50, 50, 200, 150),
-	             NK_WINDOW_BORDER | NK_WINDOW_TITLE))
-	{
-		nk_layout_row_dynamic(nuklearContext, 30, 1);
-		if (nk_button_label(nuklearContext, "Test Button"))
-		{
-			std::cout << "Button clicked!" << std::endl;
-		}
-	}
-	nk_end(nuklearContext);
 
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
 }

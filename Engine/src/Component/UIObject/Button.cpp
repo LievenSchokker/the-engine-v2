@@ -2,6 +2,8 @@
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 #include "Rendering/UIRenderCommand.h"
 
+#include <iostream>
+
 uint32_t Button::nextButtonId = 1;
 
 Button::Button(
@@ -15,6 +17,7 @@ Button::Button(
 	, buttonId(nextButtonId++)
 	, text(std::move(text))
 {
+	std::cout << "Button created with id: " << buttonId << ", text: " << this->text << std::endl;
 }
 
 void Button::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const

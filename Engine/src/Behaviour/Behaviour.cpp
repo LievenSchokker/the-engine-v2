@@ -4,9 +4,10 @@
 
 #include "Behaviour/Behaviour.h"
 
+#include "Core/GameWorld.h"
+
 
 Behaviour::~Behaviour() = default;
-
 
 void Behaviour::awake()
 {
@@ -74,4 +75,24 @@ bool Behaviour::getHasAwakened() const
 bool Behaviour::getHasStarted() const
 {
     return hasStarted;
+}
+
+
+void Behaviour::setWorld(GameWorld* world)
+{
+	cachedWorld = world;
+	if (world)
+	{
+		dispatcher = world->dispatcher;
+	}
+}
+
+GameWorld* Behaviour::getWorld() const
+{
+	return cachedWorld;
+}
+
+bool Behaviour::hasSubscriptions() const
+{
+	return !subscriptions->empty();
 }

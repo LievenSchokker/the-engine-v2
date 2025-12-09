@@ -18,6 +18,8 @@
 #include <iostream>
 #include <ostream>
 #include "Networking/Server/Server.h"
+#include "Physics/IPhysicsWorld.h"
+#include "Physics/Box2D/Box2DPhysicsWorld.h"
 
 //TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
@@ -29,7 +31,8 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
 	  eventDispatcher(std::make_unique<EventDispatcher>()),
 	  eventQueue(std::make_unique<EventQueue>()),
-	  inputManager(nullptr)
+	  inputManager(nullptr),
+	  physicsWorld(std::make_unique<Box2DPhysicsWorld>())
 {
 	clockFunction = []()
 	{
@@ -58,6 +61,8 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	sceneManager->addScene(std::move(scenePtr));
 	sceneManager->setActiveScene(scene);
 	gameWorld->dispatcher = eventDispatcher.get();
+	gameWorld->sceneManager = sceneManager.get();
+	gameWorld->physics = physicsWorld.get();
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -66,6 +71,7 @@ void ClientLoop::start()
 {
 	initializeNetworking();
 	initializeEvents();
+	physicsWorld->start();
 }
 
 
@@ -99,6 +105,7 @@ void ClientLoop::update(double deltaTime)
 
 void ClientLoop::fixedUpdate(double deltaTime)
 {
+	physicsWorld->fixedUpdate();
 	client->poll();
 	sceneManager->update(deltaTime, gameWorld.get());
 }
@@ -113,6 +120,7 @@ void ClientLoop::initializeNetworking()
 
 void ClientLoop::shutdown()
 {
+	physicsWorld->shutdown();
 	eventDispatcher->unsubscribe(windowCloseHandle);
 	eventDispatcher->unsubscribe(windowResizeHandle);
 

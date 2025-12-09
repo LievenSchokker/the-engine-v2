@@ -202,7 +202,10 @@ void Scene::update(double deltaTime, GameWorld* world)
 			if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
 				continue;
 			behaviour->update(deltaTime, world);
+			behaviour->setWorld(world);
+			behaviour->update(deltaTime, world);
 		}
+
 	}
 
 	processDestroyQueue();

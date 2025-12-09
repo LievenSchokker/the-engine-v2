@@ -80,6 +80,7 @@ private:
 	std::unique_ptr<Client> client;
 	std::unique_ptr<RenderSystem> renderer;
 	std::unique_ptr<SdlContext> sdlContext;
+	std::unique_ptr<IPhysicsWorld> physicsWorld;
 	InputManager* inputManager;
 	ClockFunction clockFunction;
 };
