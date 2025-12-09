@@ -1,27 +1,26 @@
 #include "Networking/Server/Server.h"
-#include "Networking/TransportGNS.h"
-#include "Networking/Connection/Connection.h"
-#include "Networking/Connection/ConnectionStatus.h"
-#include "Networking/Messages/MessageReader.h"
-#include "Networking/Messages/MessageWriter.h"
-#include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/ConnectionMessage.h"
-#include "Networking/Messages/MessageTypes.h"
-#include "Networking/Messages/IncomingRawMessage.h"
-#include "Networking/Messages/OutgoingRawMessage.h"
-#include "Networking/SendMode.h"
-#include "Networking/TransportResult.h"
-
-
-#include <iostream>
 
 #include "Core/ApplicationSpecifications.h"
+#include "Networking/Connection/Connection.h"
+#include "Networking/Connection/ConnectionStatus.h"
+#include "Networking/Messages/Concretes/ConnectionMessage.h"
+#include "Networking/Messages/IMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
+#include "Networking/Messages/MessageReader.h"
+#include "Networking/Messages/MessageTypes.h"
+#include "Networking/Messages/MessageWriter.h"
+#include "Networking/Messages/OutgoingRawMessage.h"
+#include "Networking/SendMode.h"
+#include "Networking/TransportGNS.h"
+#include "Networking/TransportResult.h"
 
+#include <iostream>
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport))
-    , status(ServerStatus::Stopping)
+    , status(ServerStatus::Stopping),
+    messageDispatcher(nullptr)
 {
     if (serverConnectionInformation.port == 0)
     {
@@ -30,10 +29,12 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
     setupInformation = serverConnectionInformation;
 }
 
+
 Server::~Server()
 {
     stop();
 }
+
 
 ServerStatus Server::start()
 {
@@ -63,10 +64,12 @@ ServerStatus Server::start()
     return status;
 }
 
+
 void Server::update() const
 {
     transport->poll();
 }
+
 
 ServerStatus Server::stop()
 {
@@ -79,6 +82,7 @@ ServerStatus Server::stop()
     }
     return status;
 }
+
 
 void Server::onConnectionChanged(const Connection& connection)
 {
@@ -102,6 +106,7 @@ void Server::onConnectionChanged(const Connection& connection)
         break;
     }
 }
+
 
 void Server::onMessage(const IncomingRawMessage& rawMessage)
 {
@@ -138,6 +143,7 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
     }
 }
 
+
 void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 {
     switch (message->getStatus())
@@ -151,6 +157,7 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
         break;
     }
 }
+
 
 bool Server::sendMessage(const int clientId, const IMessage& message, const SendMode& mode) const
 {
@@ -168,10 +175,12 @@ bool Server::sendMessage(const int clientId, const IMessage& message, const Send
     return transport->send(outgoing) == TransportResult::SUCCESS;
 }
 
+
 bool Server::sendMessage(const int clientId, const IMessage& message) const
 {
     return sendMessage(clientId, message, SendMode::Unreliable);
 }
+
 
 bool Server::broadcastMessage(const IMessage& message) const
 {
@@ -187,6 +196,7 @@ bool Server::broadcastMessage(const IMessage& message) const
 
     return allSucceeded;
 }
+
 
 bool Server::broadcastMessage(const IMessage& message, const int excludeClientId) const
 {
@@ -206,6 +216,7 @@ bool Server::broadcastMessage(const IMessage& message, const int excludeClientId
     return allSucceeded;
 }
 
+
 void Server::kickClient(const int clientId)
 {
     ConnectionMessage disconnectMessage;
@@ -223,6 +234,13 @@ void Server::kickClient(const int clientId)
         connectedClients.erase(clientId);
     }
 }
+
+
+void Server::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+{
+	messageDispatcher = std::move(dispatcher);
+}
+
 
 ServerConnectionInformation Server::convertApplicationSettings(const ApplicationSpecifications& specifications)
 {

@@ -1,5 +1,5 @@
 #include "Networking/Messages/MessageReader.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/MessageTypes.h"
 #include <iostream>
@@ -41,11 +41,11 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
 
     switch (messageType)
     {
-    case MessageTypes::ConnectionMessage:
-        message = std::make_unique<ConnectionMessage>();
-        break;
-    default:
-        return nullptr;
+        case MessageTypes::ConnectionMessage:
+            message = std::make_unique<ConnectionMessage>();
+            break;
+        default:
+            return nullptr;
     }
 
     return message;
