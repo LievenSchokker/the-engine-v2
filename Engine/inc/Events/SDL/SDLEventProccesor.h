@@ -3,6 +3,7 @@
 #include "Events/EventQueue.h"
 #include "Events/Event.h"
 #include "Events/IEventProccesor.h"
+#include "Input/MouseButton.h"
 
 #include <SDL.h>
 #include <functional>
@@ -44,6 +45,7 @@ public:
 private:
 	template <typename Handler>
 	bool processEvents(Handler handler);
+	MouseButton MouseButtonAdaption(Uint8 button);
 
 	std::function<void(const SDL_Event&)> unhandledCallback;
 

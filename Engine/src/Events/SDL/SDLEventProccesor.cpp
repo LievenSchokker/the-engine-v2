@@ -1,5 +1,6 @@
 #include "Events/SDL/SDLEventProccesor.h"
 
+#include "Component/UIObject/Button.h"
 #include "Events/ApplicationEvents.h"
 
 
@@ -110,7 +111,7 @@ bool SDLEventProcessor::processEvents(Handler handler)
 
 			case SDL_MOUSEBUTTONDOWN:
 				handler(MouseButtonPressedEvent{
-					sdlEvent.button.button,
+					MouseButtonAdaption(sdlEvent.button.button),
 					sdlEvent.button.x,
 					sdlEvent.button.y,
 					sdlEvent.button.clicks
@@ -119,7 +120,7 @@ bool SDLEventProcessor::processEvents(Handler handler)
 
 			case SDL_MOUSEBUTTONUP:
 				handler(MouseButtonReleasedEvent{
-					sdlEvent.button.button,
+					MouseButtonAdaption(sdlEvent.button.button),
 					sdlEvent.button.x,
 					sdlEvent.button.y
 				});
@@ -152,4 +153,19 @@ bool SDLEventProcessor::processEvents(Handler handler)
 	}
 
 	return true;
+}
+
+MouseButton SDLEventProcessor::MouseButtonAdaption(Uint8 button)
+{
+	switch (button)
+	{
+		case SDL_BUTTON_LEFT:
+			return MouseButton::LEFT;
+		case SDL_BUTTON_MIDDLE:
+			return MouseButton::MIDDLE;
+		case SDL_BUTTON_RIGHT:
+			return MouseButton::RIGHT;
+		default:
+			return MouseButton::RIGHT;
+	}
 }
