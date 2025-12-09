@@ -25,14 +25,6 @@ public:
 	virtual void initialize() = 0;
 
 	/**
-	 * @brief Feeds input state to the UI library.
-	 *
-	 * Called before beginFrame to ensure UI has current input state.
-	 *
-	 */
-	virtual void updateInput() = 0;
-
-	/**
 	 * @brief Starts a new UI frame.
 	 *
 	 * Called at the start of each frame before any UI drawing.

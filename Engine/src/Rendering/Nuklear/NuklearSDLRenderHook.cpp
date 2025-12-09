@@ -1,4 +1,3 @@
-// Rendering/Nuklear/NuklearSDLRenderHook.cpp
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 
 #include "nuklear.h"
@@ -32,6 +31,22 @@ NuklearSDLRenderHook::~NuklearSDLRenderHook()
 void NuklearSDLRenderHook::initialize()
 {
 	nuklearContext = nk_sdl_init(sdlWindow, sdlRenderer);
+	if (nuklearContext)
+	{
+		struct nk_font_atlas* atlas;
+		nk_sdl_font_stash_begin(&atlas);
+		nk_sdl_font_stash_end();
+
+		nuklearContext->style.window.fixed_background = nk_style_item_color(
+			nk_rgba(0, 0, 0, 255));
+		nuklearContext->style.window.header.normal = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nuklearContext->style.window.header.hover = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+		nuklearContext->style.window.header.active = nk_style_item_color(
+			nk_rgba(0, 0, 0, 0));
+	}
+
 }
 
 void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
@@ -54,8 +69,17 @@ void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 		);
 }
 
+void NuklearSDLRenderHook::unSubscribeEvent(EventDispatcher& dispatcher)
+{
+	for (auto& handle : subscriptions)
+	{
+		dispatcher.unsubscribe(handle);
+	}
+	subscriptions.clear();
+}
+
 void NuklearSDLRenderHook::handleMouseClick(
-	const MouseButtonPressedEvent& event)
+	const MouseButtonPressedEvent& event) const
 {
 	switch (event.button)
 	{
@@ -75,7 +99,7 @@ void NuklearSDLRenderHook::handleMouseClick(
 }
 
 void NuklearSDLRenderHook::handleMouseReleased(
-	const MouseButtonReleasedEvent& event)
+	const MouseButtonReleasedEvent& event) const
 {
 	switch (event.button)
 	{
@@ -96,7 +120,6 @@ void NuklearSDLRenderHook::handleMouseReleased(
 
 void NuklearSDLRenderHook::beginFrame()
 {
-	updateInput();
 	commandQueue.clear();
 	panelIndices.clear();
 	panelElementIndices.clear();

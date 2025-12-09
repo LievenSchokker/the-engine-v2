@@ -29,21 +29,7 @@ public:
 	 * needs direct access to them for texture creation and rendering.
 	 */
 	NuklearSDLRenderHook(SDL_Window* window, SDL_Renderer* renderer);
-	~NuklearSDLRenderHook();
-
-	/**
-	 * @brief Translates engine input state into Nuklear input events.
-	 *
-	 * This is a workaround for the fact that SDL events can only be polled once,
-	 * but both InputManager and Nuklear need them. Rather than fighting over
-	 * SDL_PollEvent, we let InputManager own event polling and then convert
-	 * its processed state into Nuklear's expected format.
-	 *
-	 * @note This approach loses text input (SDL_TEXTINPUT events) since InputManager
-	 *       only tracks key states, not character input. Text fields won't work
-	 *       until InputManager gains text input support.
-	 */
-	void updateInput() override;
+	~NuklearSDLRenderHook() override;
 
 	/**
 	 * @brief Sets up Nuklear context and fonts.
@@ -57,8 +43,8 @@ public:
 	void handleKeyPressedEvent(const KeyPressedEvent& event);
 	void handleKeyReleasedEvent(const KeyReleasedEvent& event);
 	void unSubscribeEvent(EventDispatcher& dispatcher);
-	void handleMouseClick(const MouseButtonPressedEvent& event);
-	void handleMouseReleased(const MouseButtonReleasedEvent& event);
+	void handleMouseClick(const MouseButtonPressedEvent& event) const;
+	void handleMouseReleased(const MouseButtonReleasedEvent& event) const;
 
 	/**
 	 * @brief Processes input and builds UI for this frame.
