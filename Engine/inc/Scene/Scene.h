@@ -1,13 +1,12 @@
 #pragma once
-#include <map>
 
-#include "Game.h"
 #include "Core/GameWorld.h"
 
 class GameObject;
 class Behaviour;
 struct ShapeRenderCommand;
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>

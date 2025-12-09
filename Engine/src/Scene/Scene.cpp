@@ -40,8 +40,8 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 		return false;
 	}
 
-    addGameObjectInternal(std::move(gameObject));
     GameObject* addedObject = gameObject.get();
+    addGameObjectInternal(std::move(gameObject));
     addedObject->setScene(*this);
 
     if (active)
