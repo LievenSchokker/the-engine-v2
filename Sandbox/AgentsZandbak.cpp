@@ -7,6 +7,7 @@
 #include "AI/Modules/AvoidTargetModule.h"
 #include "AI/Modules/FollowTargetModule.h"
 #include "AI/Modules/WanderModule.h"
+#include "AI/Navigation/NavigationGrid.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
@@ -55,9 +56,14 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     /// Construct and return scne
     auto scene = std::make_unique<Scene>("AgentsZandbak");
 
+
+    auto gridGO = std::make_unique<GameObject>();
+    auto grid = gridGO->addComponent<NavigationGrid>();
+    grid->generateGrid({100, 100}, {7, 7});
+
     scene->addGameObject(std::move(avoidEnemy));
     scene->addGameObject(std::move(player));
     scene->addGameObject(std::move(followEnemy));
-
+    scene->addGameObject(std::move(gridGO));
     return std::move(scene);
 }

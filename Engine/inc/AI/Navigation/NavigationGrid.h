@@ -7,9 +7,9 @@
 #include "Component/BaseComponentTypes/Component.h"
 #include "Math/Vector2.h"
 #include "AI/Navigation/NavigationCell.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
 
-
-class NavigationGrid : public Component
+class NavigationGrid : public RenderComponent
 {
     public:
         explicit NavigationGrid() : cellSize(1,1){};
@@ -35,6 +35,9 @@ class NavigationGrid : public Component
 
         int getWidth() const;
         int getHeight() const;
+
+        void fillRenderQueue(IRenderQueueWriter &queue) const override;
+
 
     private:
         int width;
