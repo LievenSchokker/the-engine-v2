@@ -3,6 +3,7 @@
 
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
+#include "Events/ApplicationEvents.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
@@ -15,72 +16,82 @@ NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
 	: inputManager(InputManager::getInstance())
 	  , sdlWindow(window)
 	  , sdlRenderer(renderer)
-	  , nuklearContext(nullptr)
+	  , nuklearContext(nullptr),
+	  eventDispatcher(nullptr)
 {
+}
+
+NuklearSDLRenderHook::~NuklearSDLRenderHook()
+{
+	if (eventDispatcher != nullptr)
+	{
+		unSubscribeEvent(*eventDispatcher);
+	}
 }
 
 void NuklearSDLRenderHook::initialize()
 {
 	nuklearContext = nk_sdl_init(sdlWindow, sdlRenderer);
-	if (nuklearContext)
-	{
-		struct nk_font_atlas* atlas;
-		nk_sdl_font_stash_begin(&atlas);
-		nk_sdl_font_stash_end();
-
-		nuklearContext->style.window.fixed_background = nk_style_item_color(
-			nk_rgba(0, 0, 0, 255));
-		nuklearContext->style.window.header.normal = nk_style_item_color(
-			nk_rgba(0, 0, 0, 0));
-		nuklearContext->style.window.header.hover = nk_style_item_color(
-			nk_rgba(0, 0, 0, 0));
-		nuklearContext->style.window.header.active = nk_style_item_color(
-			nk_rgba(0, 0, 0, 0));
-	}
-
-	commandQueue.reserve(256);
-	rootPanels.reserve(16);
-	panelIndices.reserve(32);
-	panelElementIndices.reserve(32);
 }
 
-void NuklearSDLRenderHook::updateInput()
+void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 {
-	if (!nuklearContext || !inputManager) return;
+	eventDispatcher = &dispatcher;
+	subscriptions.push_back(dispatcher.subscribe<MouseButtonPressedEvent>(
+			[this](const MouseButtonPressedEvent& event)
+			{
+				this->handleMouseClick(event);
+			}
+			)
+		);
 
-	nk_input_begin(nuklearContext);
+	subscriptions.push_back(dispatcher.subscribe<MouseButtonReleasedEvent>(
+			[this](const MouseButtonReleasedEvent& event)
+			{
+				this->handleMouseReleased(event);
+			}
+			)
+		);
+}
 
-	const int mx = inputManager->mouseX();
-	const int my = inputManager->mouseY();
-	nk_input_motion(nuklearContext, mx, my);
+void NuklearSDLRenderHook::handleMouseClick(
+	const MouseButtonPressedEvent& event)
+{
+	switch (event.button)
+	{
+		case MouseButton::LEFT:
+			nk_input_button(nuklearContext, NK_BUTTON_LEFT, event.x, event.y,
+			                1);
+			break;
+		case MouseButton::MIDDLE:
+			nk_input_button(nuklearContext, NK_BUTTON_MIDDLE, event.x, event.y,
+			                1);
+			break;
+		case MouseButton::RIGHT:
+			nk_input_button(nuklearContext, NK_BUTTON_RIGHT, event.x, event.y,
+			                1);
+			break;
+	}
+}
 
-	if (inputManager->wasMousePressed(MouseButton::LEFT))
-		nk_input_button(
-			nuklearContext, NK_BUTTON_LEFT, mx, my, 1);
-	if (inputManager->wasMouseReleased(MouseButton::LEFT))
-		nk_input_button(
-			nuklearContext, NK_BUTTON_LEFT, mx, my, 0);
-
-	if (inputManager->wasMousePressed(MouseButton::MIDDLE))
-		nk_input_button(
-			nuklearContext, NK_BUTTON_MIDDLE, mx, my, 1);
-	if (inputManager->wasMouseReleased(MouseButton::MIDDLE))
-		nk_input_button(
-			nuklearContext, NK_BUTTON_MIDDLE, mx, my, 0);
-
-	if (inputManager->wasMousePressed(MouseButton::RIGHT))
-		nk_input_button(
-			nuklearContext, NK_BUTTON_RIGHT, mx, my, 1);
-	if (inputManager->wasMouseReleased(MouseButton::RIGHT))
-		nk_input_button(
-			nuklearContext, NK_BUTTON_RIGHT, mx, my, 0);
-
-	nk_input_scroll(nuklearContext, nk_vec2(
-		                static_cast<float>(inputManager->wheelDeltaX()),
-		                static_cast<float>(inputManager->wheelDeltaY())
-		                ));
-
-	nk_input_end(nuklearContext);
+void NuklearSDLRenderHook::handleMouseReleased(
+	const MouseButtonReleasedEvent& event)
+{
+	switch (event.button)
+	{
+		case MouseButton::LEFT:
+			nk_input_button(nuklearContext, NK_BUTTON_LEFT, event.x, event.y,
+			                0);
+			break;
+		case MouseButton::MIDDLE:
+			nk_input_button(nuklearContext, NK_BUTTON_MIDDLE, event.x, event.y,
+			                0);
+			break;
+		case MouseButton::RIGHT:
+			nk_input_button(nuklearContext, NK_BUTTON_RIGHT, event.x, event.y,
+			                0);
+			break;
+	}
 }
 
 void NuklearSDLRenderHook::beginFrame()

@@ -29,6 +29,7 @@ public:
 	 * needs direct access to them for texture creation and rendering.
 	 */
 	NuklearSDLRenderHook(SDL_Window* window, SDL_Renderer* renderer);
+	~NuklearSDLRenderHook();
 
 	/**
 	 * @brief Translates engine input state into Nuklear input events.
@@ -52,6 +53,12 @@ public:
 	 * always succeed so the object can be safely destroyed.
 	 */
 	void initialize() override;
+	void setupEvents(EventDispatcher& dispatcher);
+	void handleKeyPressedEvent(const KeyPressedEvent& event);
+	void handleKeyReleasedEvent(const KeyReleasedEvent& event);
+	void unSubscribeEvent(EventDispatcher& dispatcher);
+	void handleMouseClick(const MouseButtonPressedEvent& event);
+	void handleMouseReleased(const MouseButtonReleasedEvent& event);
 
 	/**
 	 * @brief Processes input and builds UI for this frame.
@@ -115,6 +122,7 @@ private:
 	SDL_Window* sdlWindow;
 	SDL_Renderer* sdlRenderer;
 	nk_context* nuklearContext;
+	EventDispatcher* eventDispatcher;
 
 	std::vector<UIRenderCommand> commandQueue;
 
@@ -126,4 +134,6 @@ private:
 
 	/// @brief list of index's that have no panel
 	std::vector<uint32_t> rootPanels;
+
+	std::vector<SubscriptionHandle> subscriptions;
 };
