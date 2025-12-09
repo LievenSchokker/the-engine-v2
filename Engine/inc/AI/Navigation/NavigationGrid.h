@@ -5,26 +5,40 @@
 #pragma once
 
 #include "Component/BaseComponentTypes/Component.h"
-class NavigationCell;
-struct Vector2;
+#include "Math/Vector2.h"
+#include "AI/Navigation/NavigationCell.h"
 
 
 class NavigationGrid : public Component
 {
     public:
-        NavigationGrid() = default;
+        explicit NavigationGrid() : cellSize(1,1){};
         ~NavigationGrid() override = default;
 
-        void initialise(Vector2 dimensions);
+        void generateGrid(Vector2 gridDimensions, Vector2 cellSize);
+
         bool isWalkable(Vector2 cellPosition) const;
         void setWalkable(Vector2 cellPosition, bool value);
-        float getCellWeight(Vector2 cellPosition);
+
+        int getCellWeight(Vector2 cellPosition);
         void setCellWeight(Vector2 cellPosition, float weight);
 
+        Vector2 getCellSize() const;
+        void setCellSize(Vector2 size);
+
         bool isValidCell(Vector2 cellPosition) const;
+
+        Vector2 worldToCellPosition(Vector2 worldPos) const;
+        Vector2 cellToWorldPosition(Vector2 cellPos) const;
+
+        const std::vector<NavigationCell>& getCells() const;
+
+        int getWidth() const;
+        int getHeight() const;
 
     private:
         int width;
         int height;
+        Vector2 cellSize;
         std::vector<NavigationCell> cells;
 };

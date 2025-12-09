@@ -7,6 +7,6 @@
 
 struct NavigationCell
 {
-    bool walkable = false;
+    bool walkable = true;
     int weight = 0;
 };

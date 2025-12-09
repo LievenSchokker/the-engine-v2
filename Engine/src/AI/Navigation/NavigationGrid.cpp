@@ -8,11 +8,13 @@
 #include "Math/Vector2.h"
 
 
-void NavigationGrid::initialise(Vector2 dimensions)
+void NavigationGrid::generateGrid(Vector2 dimensions, Vector2 cellsSize)
 {
-    width = dimensions.x;
-    height = dimensions.y;
+    width = static_cast<int>(dimensions.x);
+    height = static_cast<int>(dimensions.y);
     cells.resize(width * height);
+
+    cellSize = cellsSize;
 }
 
 bool NavigationGrid::isWalkable(Vector2 cellPosition) const
@@ -23,13 +25,14 @@ bool NavigationGrid::isWalkable(Vector2 cellPosition) const
     return cells[cellPosition.y * width + cellPosition.x].walkable;
 }
 
-float NavigationGrid::getCellWeight(Vector2 cellPosition)
+int NavigationGrid::getCellWeight(Vector2 cellPosition)
 {
     if (!isValidCell(cellPosition))
-        return false;
+        return 0;
 
     return cells[cellPosition.y * width + cellPosition.x].weight;
 }
+
 
 void NavigationGrid::setWalkable(Vector2 cellPosition, bool value)
 {
@@ -38,6 +41,7 @@ void NavigationGrid::setWalkable(Vector2 cellPosition, bool value)
 
      cells[cellPosition.y * width + cellPosition.x].walkable = value;
 }
+
 
 void NavigationGrid::setCellWeight(Vector2 cellPosition, float weight)
 {
@@ -48,7 +52,58 @@ void NavigationGrid::setCellWeight(Vector2 cellPosition, float weight)
 }
 
 
+Vector2 NavigationGrid::getCellSize() const
+{
+    return cellSize;
+}
+
+
+void NavigationGrid::setCellSize(Vector2 size)
+{
+    cellSize = size;
+}
+
+
+Vector2 NavigationGrid::worldToCellPosition(Vector2 worldPos) const
+{
+    int x = int(worldPos.x / cellSize.x);
+    int y = int(worldPos.y / cellSize.y);
+
+    x = std::clamp(x, 0, width - 1);
+    y = std::clamp(y, 0, height - 1);
+
+    return Vector2{static_cast<float>(x), static_cast<float>(y) };
+}
+
+
+Vector2 NavigationGrid::cellToWorldPosition(Vector2 cellPos) const
+{
+    float worldX = cellPos.x * cellSize.x + cellSize.x * 0.5f;
+    float worldY = cellPos.y * cellSize.y + cellSize.y * 0.5f;
+
+    return Vector2{ worldX, worldY };
+}
+
+const std::vector<NavigationCell> &NavigationGrid::getCells() const
+{
+    return cells;
+}
+
+
 bool NavigationGrid::isValidCell(Vector2 position) const
 {
-    return position.x >= 0 && position.y >= 0 && position.x < width && position.y < height;
+    int x = static_cast<int>(position.x);
+    int y = static_cast<int>(position.y);
+
+    return x >= 0 && y >= 0 && x < width && y < height;
+}
+
+int NavigationGrid::getWidth() const
+{
+    return width;
+}
+
+int NavigationGrid::getHeight() const
+{
+    return height;
 }
