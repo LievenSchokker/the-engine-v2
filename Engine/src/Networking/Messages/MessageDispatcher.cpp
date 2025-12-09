@@ -16,7 +16,6 @@ namespace spelmotor_networking
         }
     }
 
-
     bool MessageDispatcher::registerMessageHandler(MessageTypes type, std::unique_ptr<IMessageHandler> handler)
     {
         auto result = messageHandlers.emplace(type, std::move(handler));

@@ -1,14 +1,13 @@
 #pragma once
 
 
-#include <cstdint>
-#include <memory>
-#include <unordered_map>
+#include "Networking/MessageHandlers/IMessageHandler.h"
 
 enum class MessageTypes : uint8_t;
 class IMessage;
-class IMessageHandler;
 
+#include <memory>
+#include <unordered_map>
 
 namespace spelmotor_networking
 {
