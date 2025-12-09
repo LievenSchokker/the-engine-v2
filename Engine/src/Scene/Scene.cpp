@@ -335,6 +335,7 @@ void Scene::destroyAllGameObjects()
 int Scene::getSceneId(const GameObject& gameObject) const
 {
     auto it = gameObjectIds.find(&gameObject);
+
     if (it == gameObjectIds.end())
         return -1;
 
@@ -387,8 +388,6 @@ bool Scene::addGameObjectInternal(std::unique_ptr<GameObject> gameObject)
 
     gameObjectIds[goRaw] = currentGameObjectId;
     currentGameObjectId++;
-
-
 
     return true;
 }
