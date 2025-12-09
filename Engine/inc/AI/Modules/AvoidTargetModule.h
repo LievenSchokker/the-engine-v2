@@ -44,7 +44,8 @@ class AvoidTargetModule final : public BaseAgentModule
         void setAvoidRadius(float radius);
 
     private:
-        /// Target to avoid.
+        /// The target to avoid, internally used.
+        /// Is retrieved every frame from the scene using the @c targetGameObjectId
         const Transform* target = nullptr;
         int targetGameObjectId = 0;
         Scene* agentScene = nullptr;

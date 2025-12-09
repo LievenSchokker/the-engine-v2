@@ -44,6 +44,7 @@ class FollowTargetModule final : public BaseAgentModule
 
     private:
         /// The target to follow, internally used.
+        /// Is retrieved every frame from the scene using the @c targetGameObjectId
         const Transform* followTarget = nullptr;
         int targetGameObjectId = 0;
         Scene* agentScene = nullptr;
