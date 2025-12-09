@@ -37,7 +37,7 @@ public:
 	 * Initializes the @c transform and @c componentManager.
 	 */
 	GameObject();
-
+	GameObject(const std::string& goName);
 
 	/**
 	 * @brief Destructor. Cleans up all components and resources.

@@ -23,6 +23,19 @@ GameObject::GameObject()
     scene = nullptr;
 }
 
+GameObject::GameObject(const std::string& goName)
+{
+    componentManager = std::make_unique<ComponentManager>(this);
+    transform = std::make_unique<Transform>();
+    name = goName;
+    layer = 0;
+    tag = "";
+    isActive = true;
+    isStatic = false;
+    isDestroyed = false;
+    scene = nullptr;
+}
+
 
 GameObject::~GameObject()
 {
