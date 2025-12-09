@@ -5,10 +5,10 @@
 #pragma once
 
 #include "Component/BaseComponentTypes/Component.h"
+#include "Math/Vector2.h"
+#include "AI/Navigation/BoundingBox.h"
 
 class Collider;
-struct Vector2;
-class BoundingBox;
 
 /**
  * @brief This component can be put on GameObjects that have a Collider component to mark their surface area as unwalkable for navigation
@@ -29,9 +29,14 @@ class NavigationObstacle : public Component
 
         /**
          * @brief Sets the offset which is used to compute the BoundingBox of this obstacle.
-         * @param offset
+         *
+         *  First Vector
+         *
+         * @param boundsOffset pair of Vector2;
+         * First element is the offset to the min size of the bounds,
+         * Second element is the offset to the max size of the bounds
          */
-        void setBoundsOffset(Vector2 offset);
+        void setBoundsOffset(std::pair<Vector2, Vector2> boundsOffset);
 
         /**
          * @brief allows obstacles to be carved by setting a predefined bounds instead of using the collider component to create it.
@@ -43,7 +48,7 @@ class NavigationObstacle : public Component
 
     private:
         Collider* collider;
-        Vector2 offset;
+        std::pair<Vector2, Vector2>  boundingBoxOffset;
         bool useManualBoundingBox;
-        Vector2 manualSize;
+        BoundingBox manualBounds;
 };

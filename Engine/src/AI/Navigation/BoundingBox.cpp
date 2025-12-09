@@ -1,8 +1,9 @@
 //
 // Created by samle on 08/12/2025.
 //
-#include "BoundingBox.h"
+#include "AI/Navigation/BoundingBox.h"
 #include "Math/Vector2.h"
+
 
 
 Vector2 BoundingBox::size() const

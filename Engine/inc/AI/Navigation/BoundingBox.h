@@ -5,11 +5,13 @@
 #pragma once
 
 
-struct Vector2;
-
+#include "Math/Vector2.h"
 
 struct BoundingBox
 {
+    BoundingBox(Vector2 minSize, Vector2 maxSize) : min(minSize), max(maxSize) {};
+    ~BoundingBox() = default;
+
     Vector2 min;
     Vector2 max;
 

@@ -34,7 +34,7 @@ float NavigationGrid::getCellWeight(Vector2 cellPosition)
 void NavigationGrid::setWalkable(Vector2 cellPosition, bool value)
 {
     if (!isValidCell(cellPosition))
-        return false;
+        return ;
 
      cells[cellPosition.y * width + cellPosition.x].walkable = value;
 }

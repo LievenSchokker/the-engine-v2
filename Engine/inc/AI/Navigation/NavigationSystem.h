@@ -3,7 +3,8 @@
 //
 
 #pragma once
-
+#include <vector>
+class NavigationObstacle;
 class NavigationGrid;
 class IPathFinder;
 class PathResult;
@@ -18,10 +19,12 @@ class NavigationSystem
         NavigationSystem() = default;
         ~NavigationSystem() = default;
 
-        static PathResult findPath(Vector2 start, Vector2 end);
+        PathResult computePath(Vector2 start, Vector2 end) const;
+        NavigationGrid* bakeNavigationGrid(Vector2 gridSize, std::vector<NavigationObstacle> navObstacles);
         void setPathFinder(std::unique_ptr<IPathFinder> pathFinder);
+        void setNavigationGrid(const NavigationGrid& navigationGrid);
 
     private:
-        NavigationGrid* navigationGrid;
-        std::unique_ptr<IPathFinder> pathFinder;
+        const NavigationGrid* navigationGrid = nullptr;
+        std::unique_ptr<IPathFinder> pathFinder = nullptr;
 };
