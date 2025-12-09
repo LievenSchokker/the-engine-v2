@@ -279,6 +279,14 @@ bool SDLRenderer::ensureSolidQuadTexture()
 	return true;
 }
 
+void SDLRenderer::setupEvents(EventDispatcher& dispatcher)
+{
+	if (userInterfaceHook != nullptr)
+	{
+		userInterfaceHook->setupEvents(dispatcher);
+	}
+}
+
 void SDLRenderer::destroySolidQuadTexture()
 {
 	if (solidQuadTexture != nullptr) {

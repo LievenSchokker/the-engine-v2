@@ -99,6 +99,7 @@ public:
 	 */
 	virtual void setTitle(const std::string& title) = 0;
 
+	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 
 	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
 };

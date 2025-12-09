@@ -68,12 +68,15 @@ void ClientLoop::start()
 void ClientLoop::initializeEvents()
 {
 	eventDispatcher.subscribe<KeyPressedEvent>(
-		[this](const KeyPressedEvent& event) {
+		[this](const KeyPressedEvent& event)
+		{
 			if (event.keyCode == SDLK_ESCAPE && !event.isRepeat)
 			{
 				shutdown();
 			}
 		});
+
+	renderer->setupEvents(eventDispatcher);
 }
 
 void ClientLoop::update(double deltaTime)

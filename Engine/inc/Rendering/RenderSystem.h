@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Events/EventDispatcher.h"
 #include "External/SdlContext.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/Color.h"
@@ -29,6 +30,8 @@ public:
 	 */
 	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
 
+
+	void setupEvents(EventDispatcher& dispatcher) const;
 	/**
 	 * @brief Executes a full render frame: collect, sort, draw, present.
 	 *
@@ -40,7 +43,6 @@ public:
 	void update(float deltaTime, Scene& scene);
 
 	void setClearColor(const Color& color);
-
 private:
 	std::unique_ptr<IRenderer> renderer;
 	RenderQueue queue;

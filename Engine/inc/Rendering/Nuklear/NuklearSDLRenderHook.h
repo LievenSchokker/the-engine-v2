@@ -39,7 +39,7 @@ public:
 	 * always succeed so the object can be safely destroyed.
 	 */
 	void initialize() override;
-	void setupEvents(EventDispatcher& dispatcher);
+	void setupEvents(EventDispatcher& dispatcher) override;
 	void handleKeyPressedEvent(const KeyPressedEvent& event);
 	void handleKeyReleasedEvent(const KeyReleasedEvent& event);
 	void unSubscribeEvent(EventDispatcher& dispatcher);

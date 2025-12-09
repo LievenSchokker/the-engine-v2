@@ -7,7 +7,10 @@
 
 
 #pragma once
+
+
 #include "UIRenderCommand.h"
+#include "Events/EventDispatcher.h"
 
 struct UserInterfaceSettings;
 
@@ -51,4 +54,6 @@ public:
 	 *
 	 */
 	virtual void close() = 0;
+
+	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 };

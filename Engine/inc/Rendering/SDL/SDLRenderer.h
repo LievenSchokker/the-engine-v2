@@ -137,6 +137,8 @@ class SDLRenderer: public IRenderer
 					   const Vector2& scale);
 
 
+	void setupEvents(EventDispatcher& dispatcher) override;
+
     std::unique_ptr<IUIRenderHook> userInterfaceHook;
 
     bool ensureSolidQuadTexture();
