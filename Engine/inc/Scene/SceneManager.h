@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Rendering/Color.h"
-#include "Rendering/RenderQueue.h"
+#include "../Rendering/Color.h"
+#include "../Rendering/RenderQueue/RenderQueue.h"
 #include "Scene.h"
-
-class GameWorld;
+#include "Rendering/IRenderer.h"
 
 #include <memory>
 #include <string>
@@ -19,7 +18,7 @@ class GameWorld;
 class SceneManager
 {
    public:
-	SceneManager();
+	SceneManager() = default;
 
 	/**
 	 * @brief Register a scene owned by the manager.
@@ -125,14 +124,7 @@ class SceneManager
 	 *
 	 * @param deltaTime Seconds elapsed since the previous update call.
 	 */
-	void update(float deltaTime);
-
-	/**
-	 * @brief Populate a render queue with the active scene's primitives.
-	 *
-	 * The queue is cleared before filling to avoid stale commands.
-	 */
-	void buildRenderQueue(RenderQueue& queue) const;
+	void update(float deltaTime, GameWorld* world);
 
 	/**
 	 * @brief Change the clear color used at the start of each frame.
@@ -144,9 +136,7 @@ class SceneManager
 	 */
 	Color getClearColor() const;
 
-    void setWorld(const GameWorld& world);
    private:
-    const GameWorld* gameWorld = nullptr;
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;

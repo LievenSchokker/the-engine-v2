@@ -21,7 +21,7 @@ class SimpleMoveBehaviour : public Behaviour
         void onAwake() override;
         void onEnable() override;
         void onStart() override;
-        void update(float deltaTime) override;
+        void update(float deltaTime, GameWorld* world) override;
         void onDisable() override;
 
         void move();

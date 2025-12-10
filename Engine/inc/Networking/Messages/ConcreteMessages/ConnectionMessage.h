@@ -1,8 +1,6 @@
 #pragma once
 
-
-#include "IMessage.h"
-#include "MessageTypes.h"
+#include "Networking/Messages/IMessage.h"
 #include "Networking/Connection/ConnectionStatus.h"
 
 

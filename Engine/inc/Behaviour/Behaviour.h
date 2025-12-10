@@ -1,12 +1,9 @@
-//
-// Created by samle on 10/11/2025.
-//
-
 #pragma once
 
-#include "Component/Component.h"
 
+#include "Component/BaseComponentTypes/Component.h"
 
+class GameWorld;
 /**
  * @brief This class serves as an abstract component that custom behaviour can derive from.
  *
@@ -14,15 +11,17 @@
  *
  * Behaviour differs from Component because they can be enabled and disabled, and implement lifetime functions.
  */
-class Behaviour : public Component
+class Behaviour: virtual public Component
 {
-    public:
-        Behaviour() :
-         isEnabled(true),  hasAwakened(false), hasStarted(false) {}
+public:
+	Behaviour() :
+		isEnabled(true), hasAwakened(false), hasStarted(false)
+	{
+	}
 
-        /**
-         * @brief Pure virtual destructor makes this class Abstract.
-         */
+	/**
+	 * @brief Pure virtual destructor makes this class Abstract.
+	 */
         virtual ~Behaviour() = 0;
 
         /**
@@ -68,7 +67,7 @@ class Behaviour : public Component
          *
          * @param deltaTime Time elapsed since last update in seconds
          */
-        virtual void update(float deltaTime) {};
+        virtual void update(float deltaTime, GameWorld* world) {};
 
         /**
          * @brief fixedUpdate is called at regular and fixed intervals as part of the engine's physics loop.

@@ -11,7 +11,7 @@
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/TransportGNS.h"
 #include "Rendering/IRenderer.h"
-#include "Rendering/RenderQueue.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
@@ -39,38 +39,44 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		{
 			return SDL_GetTicks() / 1000.0;
 		};
-		renderer = std::make_unique<SDLRenderer>(*backendContext);
+		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*sdlContext);
+		sdlRenderer->open(specifications.windowOptions);
+		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
 
 		// Audio
 		auto audioBackend = std::make_unique<AudioBackendSDL>();
 		audioManager = std::make_unique<AudioManager>();
 		audioManager->initialize(std::move(audioBackend));
+		
 	}
+	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
+	std::string scene = scenePtr->getName();
+
+	sceneManager->addScene(std::move(scenePtr));
+	sceneManager->setActiveScene(scene);
 
 	inputManager = InputManager::getInstance();
+
 }
 
 ClientLoop::~ClientLoop() = default;
 
 void ClientLoop::start()
 {
-	renderer->open(specifications.windowOptions);
 	initializeNetworking();
 }
 
 void ClientLoop::update(double deltaTime)
 {
 	inputManager->update();
+	renderer->update(deltaTime, *sceneManager->getActiveScene());
 	RenderQueue renderQueue;
-	sceneManager->buildRenderQueue(renderQueue);
-	renderer->presentFrame();
-	client->poll();
 }
 
 void ClientLoop::fixedUpdate(double deltaTime)
 {
 	client->poll();
-	sceneManager->update(deltaTime);
+	sceneManager->update(deltaTime, gameWorld.get());
 	if (inputManager->quitRequested())
 	{
 		shutdown();
@@ -88,7 +94,7 @@ void ClientLoop::initializeNetworking()
 void ClientLoop::shutdown()
 {
 	InputManager::shutdown();
-	renderer->close();
+	renderer.release();
 	client->disconnect();
 }
 

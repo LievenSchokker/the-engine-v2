@@ -3,14 +3,12 @@
 #include "Core/GameWorld.h"
 #include "External/IBackendContext.h"
 #include "Rendering/RenderQueue.h"
+#include "Audio/AudioManager.h"
+#include "Physics/IPhysicsWorld.h"
 
 class Game;
 class IEngineLoop;
 class ApplicationClock;
-
-#include "ApplicationSpecifications.h"
-#include "Audio/AudioManager.h"
-#include "Physics/IPhysicsWorld.h"
 
 #include <atomic>
 #include <functional>

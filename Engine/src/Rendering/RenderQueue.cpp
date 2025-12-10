@@ -1,27 +1,33 @@
-#include "../../inc/Rendering/RenderQueue.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 
-#include "../../inc/Rendering/IRenderer.h"
-
-void executeRenderQueue(IRenderer& renderer, const RenderQueue& queue)
+void RenderQueue::push(RenderCommand command)
 {
-	renderer.beginFrame(queue.clearColor);
+	worldQueue.push(command);
+}
 
-	for ( const auto& command : queue.shapes ) {
-		switch ( command.type ) {
-			case ShapeRenderType::Circle:
-				renderer.drawCircle(command.position, command.radius,
-									command.color, command.scale);
-				break;
-			case ShapeRenderType::Rectangle:
-				renderer.drawRectangle(command.position, command.size,
-									   command.rotationDegrees, command.color,
-									   command.scale);
-				break;
-			case ShapeRenderType::None:
-			default:
-				break;
-		}
-	}
+void RenderQueue::push(UIRenderCommand command)
+{
+	uiQueue.push(command);
+}
 
-	renderer.presentFrame();
+void RenderQueue::sortAll()
+{
+	worldQueue.sort();
+	uiQueue.sort();
+}
+
+void RenderQueue::clearAll()
+{
+	worldQueue.clear();
+	uiQueue.clear();
+}
+
+RenderQueueBase<RenderCommand>& RenderQueue::world()
+{
+	return worldQueue;
+}
+
+RenderQueueBase<UIRenderCommand>& RenderQueue::ui()
+{
+	return uiQueue;
 }

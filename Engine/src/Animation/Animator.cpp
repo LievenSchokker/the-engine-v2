@@ -84,7 +84,7 @@ float Animator::getCurrentTime() const
 	return currentTime;
 }
 
-void Animator::update(float deltaTime)
+void Animator::update(float deltaTime, GameWorld* world)
 {
 	// Only update if playing and has a clip
 	// GameObject active check is handled by Behaviour's getIsActiveAndEnabled()
