@@ -119,6 +119,7 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
 
     const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
+    std::cout << "MESSAGE RECEIVED" << std::endl;
     if (!message)
     {
         std::cerr << "Failed to parse message from client " << rawMessage.connectionID << std::endl;

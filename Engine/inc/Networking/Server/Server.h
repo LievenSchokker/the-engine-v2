@@ -9,7 +9,6 @@
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/NetworkSpawnManager.h"
-#include "Networking/Context/NetworkContext.h"
 #include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/Server/ServerStatus.h"
 
@@ -165,7 +164,6 @@ private:
      *          or kicks, enabling appropriate cleanup logic for each scenario.
      */
     void handleConnectionMessage(int clientId, ConnectionMessage* message);
-    NetworkContext& getNetworkContext() { return *networkContext; }
 private:
     /// @brief Abstracted transport layer for testing and multi-backend support
     std::unique_ptr<ITransport> transport;
@@ -180,10 +178,6 @@ private:
     std::unordered_set<int> connectedClients;
 
     std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
-
-    std::unique_ptr<NetworkContext> networkContext;
-
-    NetworkSpawnManager* spawnManage;
 
     ClientConnectedCallback onClientConnected;
     ClientDisconnectedCallback onClientDisconnected;

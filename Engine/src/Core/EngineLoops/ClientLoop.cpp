@@ -20,16 +20,13 @@
 
 //TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-	: sceneManager(std::make_unique<SceneManager>()),
-	  game(std::move(spel)),
-	  gameWorld(std::make_unique<GameWorld>()),
+	: game(std::move(spel)),
 	  specifications(game->getApplicationSpecifications()),
+	  gameWorld(std::make_unique<GameWorld>()),
+	  sceneManager(std::make_unique<SceneManager>()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
+
 {
-	clockFunction = []()
-	{
-		return 1.0;
-	};
 	if (specifications.renderBackend == RenderBackend::SDL)
 	{
 		sdlContext = std::make_unique<SdlContext>();
@@ -42,6 +39,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
 	}
+
 	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
 	std::string scene = scenePtr->getName();
 

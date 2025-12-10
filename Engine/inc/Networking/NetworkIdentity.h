@@ -69,7 +69,7 @@ public:
      * @param payload Serialized arguments
      * @param length Payload size
      */
-    void dispatchAction(uint32_t componentId, const std::string& action);
+    void dispatchAction(uint32_t componentId, const std::string& action) const;
 
     GameWorld* getWorld();
 private:
