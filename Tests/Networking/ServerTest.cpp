@@ -1,5 +1,3 @@
-#pragma once
-
 #include <gtest/gtest.h>
 #include <memory>
 #include <vector>
@@ -10,7 +8,7 @@
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
 #include "Networking/Connection/ConnectionMode.h"
-#include "Networking/Messages/Concretes/ConnectionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/TransportResult.h"

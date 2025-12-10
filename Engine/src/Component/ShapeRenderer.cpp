@@ -1,7 +1,8 @@
 #include "Component/ShapeRenderer.h"
 
 #include "Component/Transform.h"
-#include "GameObject/Vector2Utils.h"
+#include "Math/Vector2.h"
+#include "Math/Vector2Utils.h"
 
 #include <algorithm>
 
@@ -18,17 +19,21 @@ ShapeRenderer& ShapeRenderer::setColor(const Color& newColor)
 
 ShapeRenderer& ShapeRenderer::setCircle(float newRadius)
 {
-	type = ShapeRenderType::Circle;
+	type = RenderCommandType::Circle;
 	radius = std::max(newRadius, kEpsilon);
 	return *this;
 }
 
 ShapeRenderer& ShapeRenderer::setRectangle(Vector2 newSize)
 {
-	type = ShapeRenderType::Rectangle;
-	size.x = std::max(newSize.x, kEpsilon);
-	size.y = std::max(newSize.y, kEpsilon);
-	return *this;
+    type = RenderCommandType::Rectangle;
+
+    constexpr float kEpsilon = 0.0001f;
+
+    size.x = std::max(newSize.x, kEpsilon);
+    size.y = std::max(newSize.y, kEpsilon);
+
+    return *this;
 }
 
 Color ShapeRenderer::getColor() const
@@ -46,23 +51,23 @@ Vector2 ShapeRenderer::getSize() const
 	return size;
 }
 
-ShapeRenderType ShapeRenderer::getShapeType() const
+RenderCommandType ShapeRenderer::getShapeType() const
 {
 	return type;
 }
 
-std::optional<ShapeRenderCommand> ShapeRenderer::buildRenderCommand() const
+void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 {
 	const Transform* transform = getTransform();
-	if ( transform == nullptr || type == ShapeRenderType::None ) {
-		return std::nullopt;
+	if ( transform == nullptr || type == RenderCommandType::None ) {
+		return;
 	}
 
 	const Vector2 position = transform->getPosition();
 	const double rotation = transform->getRotationAngle();
 	const Vector2 scale = Vector2Utils::sanitizeScale(transform->getScale());
 
-	ShapeRenderCommand command;
+	RenderCommand command;
 	command.type = type;
 	command.position = position;
 	command.size = size;
@@ -70,6 +75,7 @@ std::optional<ShapeRenderCommand> ShapeRenderer::buildRenderCommand() const
 	command.rotationDegrees = rotation;
 	command.scale = scale;
 	command.color = color;
-
-	return command;
+	command.layer = layer;
+	command.orderInLayer = orderInLayer;
+	queue.push(command);
 }

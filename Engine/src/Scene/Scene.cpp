@@ -1,10 +1,15 @@
 #include "Scene/Scene.h"
 
+#include "../../inc/Component/ComponentManager.h"
+#include "../../inc/Component/GridComponent.h"
+#include "../../inc/Component/ShapeRenderer.h"
+#include "../../inc/Component/TilemapComponent.h"
+#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
 #include "Component/ShapeRenderer.h"
-#include "Rendering/RenderQueue.h"
+#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
@@ -15,6 +20,12 @@
 Scene::Scene(std::string name) : name(std::move(name))
 {
 }
+
+Scene::~Scene()
+{
+    destroyAllGameObjects();
+}
+
 
 const std::string& Scene::getName() const
 {
@@ -28,6 +39,7 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
         return false;
     }
 
+<<<<<<< HEAD
     gameObject->setScene(*this);
 
     // Get raw pointer BEFORE moving
@@ -40,6 +52,17 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
         // Use rawPtr instead of the moved-from gameObject
         initialiseBehaviours(rawPtr->getAllBehaviours());
     }
+=======
+	gameObjects.emplace_back(std::move(gameObject));
+    GameObject* addedObject = gameObjects.back().get();
+    addedObject->setScene(*this);
+
+    if (active)
+	{
+	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
+	    initialiseBehaviours(addedObject->getAllBehaviours());
+	}
+>>>>>>> origin/development
 
     return true;
 }
@@ -176,12 +199,14 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(float deltaTime)
+void Scene::update(double deltaTime, GameWorld* world)
 {
-	if ( !active ) {
+	if (!active)
+	{
 		return;
 	}
 
+<<<<<<< HEAD
     /// Update all GameObject's behaviours:
     for ( auto& gameObject : gameObjects )
     {
@@ -219,7 +244,67 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
             }
         }
     }
+=======
+	for (auto& gameObject : gameObjects)
+	{
+		if (!gameObject->getIsActive())
+			continue;
+
+		for (const auto& behaviour : gameObject->getEnabledBehaviours())
+		{
+			if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
+				continue;
+			behaviour->update(deltaTime, world);
+		}
+	}
+
+	processDestroyQueue();
+>>>>>>> origin/development
 }
+//
+// void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
+// {
+// 	if ( !active ) {
+// 		return;
+// 	}
+//
+// 	std::vector<ShapeRenderCommand> debugCommands;
+// 	for ( const auto& gameObject : gameObjects ) {
+// 		if ( !gameObject->getIsActive() ) {
+// 			continue;
+// 		}
+//
+// 		// Collect ShapeRenderer commands
+// 		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
+// 		if ( shapeRenderer != nullptr ) {
+// 			const auto command = shapeRenderer->buildRenderCommand();
+// 			if ( command.has_value() ) {
+// 				out.emplace_back(*command);
+// 			}
+// 		}
+//
+// 		// Collect TilemapComponent commands
+// 		auto* tilemapComponent = gameObject->getComponent<TilemapComponent>();
+// 		if ( tilemapComponent != nullptr ) {
+// 			const auto tilemapCommands =
+// 				tilemapComponent->buildRenderCommands();
+// 			out.insert(out.end(), tilemapCommands.begin(),
+// 					   tilemapCommands.end());
+// 		}
+//
+// 		// Collect GridComponent debug render commands
+// 		auto* gridComponent = gameObject->getComponent<GridComponent>();
+// 		if ( gridComponent != nullptr &&
+// 			 gridComponent->isDebugRenderEnabled() ) {
+// 			const auto gridCommands = gridComponent->buildDebugRenderCommands();
+// 			debugCommands.insert(debugCommands.end(), gridCommands.begin(),
+// 								 gridCommands.end());
+// 		}
+// 	}
+//
+// 	// Append deferred debug overlays after regular render commands.
+// 	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
+// }
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
 {
@@ -290,7 +375,29 @@ void Scene::processDestroyQueue()
     destroyQueue.clear();
 }
 
+<<<<<<< HEAD
 void Scene::setWorld(GameWorld* world)
 {
     gameWorld = world;
 }
+=======
+bool Scene::isInDestroyQueue(GameObject *obj)
+{
+    if (obj == nullptr)
+        return false;
+
+    return std::find(destroyQueue.begin(), destroyQueue.end(), obj)
+            != destroyQueue.end();
+}
+
+
+void Scene::destroyAllGameObjects()
+{
+    for ( auto& gameObject : gameObjects )
+    {
+        gameObject->onSceneDestroy();
+    }
+
+    gameObjects.clear();
+}
+>>>>>>> origin/development

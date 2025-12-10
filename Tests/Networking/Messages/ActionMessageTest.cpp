@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
+<<<<<<< HEAD
 #include "../../../Engine/inc/Networking/Messages/Concretes/ActionMessage.h"
+=======
+#include "Networking/Messages/ConcreteMessages/ActionMessage.h"
+>>>>>>> origin/development
 
 class ActionMessageTest : public ::testing::Test
 {

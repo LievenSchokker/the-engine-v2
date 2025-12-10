@@ -1,7 +1,7 @@
+// Rendering/Nuklear/NuklearSDLRenderHook.cpp
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 
-#include <iostream>
-#include <ostream>
+#include <algorithm>
 
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
@@ -9,153 +9,369 @@
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
 
-//This is a nuklear specefic thing.
-//Need to expose some sort of thing that Nuklear can use to store its context.
-namespace
-{
-struct nk_context ctx;
-}
-
+#include <iostream>
+#include <algorithm>
 
 NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
                                            SDL_Renderer* renderer)
-	: inputManager(InputManager::getInstance()), sdlWindow(window),
-	  sdlRenderer(renderer), nkCtx(nullptr)
+	: inputManager(InputManager::getInstance())
+	  , sdlWindow(window)
+	  , sdlRenderer(renderer)
+	  , nuklearContext(nullptr)
 {
 }
 
 void NuklearSDLRenderHook::initialize()
 {
-	std::cout << "Nuklear init..." << std::endl;
-	nkCtx = nk_sdl_init(sdlWindow, sdlRenderer);
-	if (nkCtx != nullptr) {
+	nuklearContext = nk_sdl_init(sdlWindow, sdlRenderer);
+	if (nuklearContext)
+	{
 		struct nk_font_atlas* atlas;
 		nk_sdl_font_stash_begin(&atlas);
 		nk_sdl_font_stash_end();
 
-		nkCtx->style.window.fixed_background = nk_style_item_color(
+		// Transparent backgrounds
+		nuklearContext->style.window.fixed_background = nk_style_item_color(
+			nk_rgba(0, 0, 0, 255));
+		nuklearContext->style.window.header.normal = nk_style_item_color(
 			nk_rgba(0, 0, 0, 0));
-		nkCtx->style.window.fixed_background = nk_style_item_color(
+		nuklearContext->style.window.header.hover = nk_style_item_color(
 			nk_rgba(0, 0, 0, 0));
-		nkCtx->style.window.header.normal = nk_style_item_color(
-			nk_rgba(0, 0, 0, 0));
-		nkCtx->style.window.header.hover = nk_style_item_color(
-			nk_rgba(0, 0, 0, 0));
-		nkCtx->style.window.header.active = nk_style_item_color(
+		nuklearContext->style.window.header.active = nk_style_item_color(
 			nk_rgba(0, 0, 0, 0));
 	}
+
+	//This basicly prevents constant reallocation for small UI's
+	//We might need to discuss if we care about custom memory solutions but for now this is fine
+	commandQueue.reserve(256);
+	rootPanels.reserve(16);
+	panelIndices.reserve(32);
+	panelElementIndices.reserve(32);
 }
 
-//Let me be  clear I DO NOT LIKE THIS.
-//TODO Propper EventHandling so this can be fixed.
 void NuklearSDLRenderHook::updateInput()
 {
-	if (!nkCtx) return;
-	if (!inputManager) return;
+	if (!nuklearContext || !inputManager) return;
 
-	nk_input_begin(nkCtx);
+	nk_input_begin(nuklearContext);
 
 	const int mx = inputManager->mouseX();
 	const int my = inputManager->mouseY();
-	nk_input_motion(nkCtx, mx, my);
+	nk_input_motion(nuklearContext, mx, my);
 
-	if (inputManager->wasMousePressed(MouseButton::LEFT)) nk_input_button(
-		nkCtx, NK_BUTTON_LEFT, mx, my, 1);
-	if (inputManager->wasMouseReleased(MouseButton::LEFT)) nk_input_button(
-		nkCtx, NK_BUTTON_LEFT, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::LEFT))
+		nk_input_button(
+			nuklearContext, NK_BUTTON_LEFT, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::LEFT))
+		nk_input_button(
+			nuklearContext, NK_BUTTON_LEFT, mx, my, 0);
 
-	if (inputManager->wasMousePressed(MouseButton::MIDDLE)) nk_input_button(
-		nkCtx, NK_BUTTON_MIDDLE, mx, my, 1);
-	if (inputManager->wasMouseReleased(MouseButton::MIDDLE)) nk_input_button(
-		nkCtx, NK_BUTTON_MIDDLE, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::MIDDLE))
+		nk_input_button(
+			nuklearContext, NK_BUTTON_MIDDLE, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::MIDDLE))
+		nk_input_button(
+			nuklearContext, NK_BUTTON_MIDDLE, mx, my, 0);
 
-	if (inputManager->wasMousePressed(MouseButton::RIGHT)) nk_input_button(
-		nkCtx, NK_BUTTON_RIGHT, mx, my, 1);
-	if (inputManager->wasMouseReleased(MouseButton::RIGHT)) nk_input_button(
-		nkCtx, NK_BUTTON_RIGHT, mx, my, 0);
+	if (inputManager->wasMousePressed(MouseButton::RIGHT))
+		nk_input_button(
+			nuklearContext, NK_BUTTON_RIGHT, mx, my, 1);
+	if (inputManager->wasMouseReleased(MouseButton::RIGHT))
+		nk_input_button(
+			nuklearContext, NK_BUTTON_RIGHT, mx, my, 0);
 
-	nk_input_scroll(nkCtx, nk_vec2(
+	nk_input_scroll(nuklearContext, nk_vec2(
 		                static_cast<float>(inputManager->wheelDeltaX()),
 		                static_cast<float>(inputManager->wheelDeltaY())
 		                ));
 
-	nk_input_key(nkCtx, NK_KEY_SHIFT,
-	             inputManager->isKeyDown(KeyCode::LEFT_SHIFT) || inputManager->
-	             isKeyDown(KeyCode::RIGHT_SHIFT));
-	nk_input_key(nkCtx, NK_KEY_CTRL,
-	             inputManager->isKeyDown(KeyCode::LEFT_CONTROL) || inputManager
-	             ->isKeyDown(KeyCode::RIGHT_CONTROL));
-	nk_input_key(nkCtx, NK_KEY_DEL, inputManager->isKeyDown(KeyCode::DELETE));
-	nk_input_key(nkCtx, NK_KEY_ENTER, inputManager->isKeyDown(KeyCode::RETURN));
-	nk_input_key(nkCtx, NK_KEY_TAB, inputManager->isKeyDown(KeyCode::TAB));
-	nk_input_key(nkCtx, NK_KEY_BACKSPACE,
-	             inputManager->isKeyDown(KeyCode::BACKSPACE));
-	nk_input_key(nkCtx, NK_KEY_UP, inputManager->isKeyDown(KeyCode::UP_ARROW));
-	nk_input_key(nkCtx, NK_KEY_DOWN,
-	             inputManager->isKeyDown(KeyCode::DOWN_ARROW));
-	nk_input_key(nkCtx, NK_KEY_LEFT,
-	             inputManager->isKeyDown(KeyCode::LEFT_ARROW));
-	nk_input_key(nkCtx, NK_KEY_RIGHT,
-	             inputManager->isKeyDown(KeyCode::RIGHT_ARROW));
-
-	bool ctrl = inputManager->isKeyDown(KeyCode::LEFT_CONTROL) || inputManager->
-	            isKeyDown(KeyCode::RIGHT_CONTROL);
-	nk_input_key(nkCtx, NK_KEY_COPY,
-	             ctrl && inputManager->isKeyDown(KeyCode::C));
-	nk_input_key(nkCtx, NK_KEY_PASTE,
-	             ctrl && inputManager->isKeyDown(KeyCode::V));
-	nk_input_key(nkCtx, NK_KEY_CUT,
-	             ctrl && inputManager->isKeyDown(KeyCode::X));
-	nk_input_key(nkCtx, NK_KEY_TEXT_UNDO,
-	             ctrl && inputManager->isKeyDown(KeyCode::Z));
-	nk_input_key(nkCtx, NK_KEY_TEXT_REDO,
-	             ctrl && inputManager->isKeyDown(KeyCode::Y));
-	nk_input_key(nkCtx, NK_KEY_TEXT_SELECT_ALL,
-	             ctrl && inputManager->isKeyDown(KeyCode::A));
-	nk_input_key(nkCtx, NK_KEY_TEXT_LINE_START,
-	             inputManager->isKeyDown(KeyCode::HOME));
-	nk_input_key(nkCtx, NK_KEY_TEXT_LINE_END,
-	             inputManager->isKeyDown(KeyCode::END));
-
-	nk_input_end(nkCtx);
+	nk_input_end(nuklearContext);
 }
 
 void NuklearSDLRenderHook::beginFrame()
 {
-	updateInput();
-	render();
-}
-
-
-void NuklearSDLRenderHook::render() const
-{
-	//Small example of Nuklear working
-	//TODO Make this an actual canvas that can add and remove UIObjects.
-	if (nk_begin(nkCtx, "Test Window", nk_rect(50, 50, 230, 250),
-	             NK_WINDOW_NO_SCROLLBAR)) {
-		nk_layout_row_dynamic(nkCtx, 30, 1);
-
-		nk_layout_row_dynamic(nkCtx, 30, 2);
-		static int option = 0;
-		if (nk_option_label(nkCtx, "Easy", option == 0)) option = 0;
-		if (nk_option_label(nkCtx, "Hard", option == 1)) option = 1;
-
-		nk_layout_row_dynamic(nkCtx, 25, 1);
-		static float value = 0.5f;
-		nk_slider_float(nkCtx, 0, &value, 1.0f, 0.1f);
-	}
-	nk_end(nkCtx);
+    updateInput();
+    commandQueue.clear();
+    panelIndices.clear();
+    panelElementIndices.clear();
+    rootPanels.clear();
 }
 
 void NuklearSDLRenderHook::presentFrame()
 {
+	flushCommands();
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
+}
+
+void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands)
+{
+	for (auto command : commands)
+	{
+		commandQueue.push_back(std::move(command));
+	}
+}
+
+
+void NuklearSDLRenderHook::flushCommands() {
+	std::sort(rootPanels.begin(), rootPanels.end());
+
+	for (uint32_t id : rootPanels) {
+		renderPanel(id);
+	}
+	/// Sort pannels so panels are always infront of the queue
+	std::stable_partition(commandQueue.begin(), commandQueue.end(),
+		[](const UIRenderCommand& cmd) {
+			return cmd.type == UICommandType::Panel;
+		});
+
+	size_t originalSize = commandQueue.size();
+
+	for (size_t i = 0; i < originalSize; ++i) {
+		const auto& commandIterator = commandQueue[i];
+		if (commandIterator.type == UICommandType::Panel) {
+			panelIndices[commandIterator.panelId] = i;
+			if (commandIterator.parentId == NO_PARENT) {
+				rootPanels.push_back(commandIterator.panelId);
+			} else {
+				panelElementIndices[commandIterator.parentId].push_back(i);
+			}
+		} else {
+			/// If no panelIndeices is found create default panel
+			if (panelIndices.find(commandIterator.panelId) == panelIndices.end()) {
+				createDefaultPanel(commandIterator.panelId);
+			}
+			panelElementIndices[commandIterator.panelId].push_back(i);
+		}
+	}
+
+	for (uint32_t id : rootPanels) {
+		renderPanel(id);
+	}
+}
+
+void NuklearSDLRenderHook::createDefaultPanel(uint32_t panelId)
+{
+	//TODO estimate a panel size for each component that does not have panel yet
+	UIRenderCommand panel;
+	panel.type = UICommandType::Panel;
+	panel.panelId = panelId;
+	panel.parentId = NO_PARENT;
+	panel.x = 0;
+	panel.y = 0;
+	panel.width = 200;
+	panel.height = 200;
+	panel.hasBorder = false;
+	panel.hasTitle = false;
+	panel.rowHeight = 30.0f;
+	panel.columns = 1;
+
+	size_t index = commandQueue.size();
+	commandQueue.push_back(std::move(panel));
+	panelIndices[panelId] = index;
+	rootPanels.push_back(panelId);
+}
+
+void NuklearSDLRenderHook::renderElement(const UIRenderCommand& command)
+{
+	switch (command.type)
+	{
+		case UICommandType::Panel:
+			renderPanel(command.panelId);
+			break;
+
+		case UICommandType::Text:
+			renderText(command);
+			break;
+
+		case UICommandType::ProgressBar:
+			renderProgressBar(command);
+			break;
+
+		case UICommandType::Separator:
+			renderSeparator(command);
+			break;
+
+		case UICommandType::Spacer:
+			renderSpacer(command);
+			break;
+
+		case UICommandType::Image:
+			renderImage(command);
+			break;
+
+		case UICommandType::Chart:
+		{
+			renderChart(command);
+			break;
+		}
+
+		default:
+			break;
+	}
+}
+
+void NuklearSDLRenderHook::renderChart(const UIRenderCommand& command)
+{
+	if (nk_chart_begin(nuklearContext, NK_CHART_LINES, command.chartData.size(), command.chartMin, command.chartMax))
+	{
+		for (float value : command.chartData)
+		{
+			nk_chart_push(nuklearContext, value);
+		}
+		nk_chart_end(nuklearContext);
+	}
+}
+
+void NuklearSDLRenderHook::renderProgressBar(const UIRenderCommand& command)
+{
+	// Save original style
+	struct nk_style_progress originalStyle = nuklearContext->style.progress;
+
+	// Convert our colors to nuklear colors
+	nk_color barColor = nk_rgba(
+		command.barColor.r,
+		command.barColor.g,
+		command.barColor.b,
+		command.barColor.a
+	);
+
+	nk_color bgColor = nk_rgba(
+		command.backgroundColor.r,
+		command.backgroundColor.g,
+		command.backgroundColor.b,
+		command.backgroundColor.a
+	);
+
+	nuklearContext->style.progress.normal = nk_style_item_color(bgColor);
+	nuklearContext->style.progress.hover = nk_style_item_color(bgColor);
+	nuklearContext->style.progress.active = nk_style_item_color(bgColor);
+
+	nuklearContext->style.progress.cursor_normal = nk_style_item_color(barColor);
+	nuklearContext->style.progress.cursor_hover = nk_style_item_color(barColor);
+	nuklearContext->style.progress.cursor_active = nk_style_item_color(barColor);
+
+	nk_size value = static_cast<nk_size>(command.progress * 100.0f);
+	nk_size max = 100;
+	nk_progress(nuklearContext, &value, max, NK_FIXED);
+
+	nuklearContext->style.progress = originalStyle;
+}
+
+void NuklearSDLRenderHook::renderSeparator(const UIRenderCommand& command)
+{
+	// Use a small but visible height for the separator
+	nk_layout_row_dynamic(nuklearContext, 15, 1);
+
+	struct nk_rect bounds = nk_widget_bounds(nuklearContext);
+	struct nk_command_buffer* canvas = nk_window_get_canvas(nuklearContext);
+
+	nk_stroke_line(
+		canvas,
+		bounds.x,
+		bounds.y + bounds.h / 2,
+		bounds.x + bounds.w,
+		bounds.y + bounds.h / 2,
+		1.0f,
+		nk_rgb(100, 100, 100)
+	);
+
+	// Consume the widget space
+	nk_label(nuklearContext, "", NK_TEXT_LEFT);
+
+	// Restore standard row height for following elements
+	nk_layout_row_dynamic(nuklearContext, 20, 1);
+}
+void NuklearSDLRenderHook::renderImage(const UIRenderCommand& command)
+{
+	// TODO: Implement when texture/asset system
+}
+void NuklearSDLRenderHook::renderSpacer(const UIRenderCommand& command)
+{
+	nk_layout_row_dynamic(nuklearContext, command.spacerHeight, 1);
+	nk_spacing(nuklearContext, 1);
+}
+
+void NuklearSDLRenderHook::renderText(const UIRenderCommand& command)
+{
+	nk_flags align = {};
+
+	//set the alignment flag.
+	if (command.alignment == Alignment::Center)
+	{
+		align = NK_TEXT_CENTERED;
+	}
+	else if (command.alignment == Alignment::Right)
+	{
+		align = NK_TEXT_RIGHT;
+	}
+	else
+	{
+		align = NK_TEXT_LEFT;
+	}
+
+	/// convert our color to nuklear color
+	nk_color color = nk_rgba(
+		command.color.r,
+		command.color.g,
+		command.color.b,
+		command.color.a);
+
+	/// Label is the nuklear equivalent of text.
+	nk_label_colored(
+		nuklearContext,
+		command.text.c_str(),
+		align,
+		color);
+}
+
+void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
+{
+	auto panelIterator = panelIndices.find(panelId);
+	if (panelIterator == panelIndices.end()) return;
+
+	const auto& panel = commandQueue[panelIterator->second];
+
+	nk_flags flags = NK_WINDOW_NO_SCROLLBAR;
+	if (panel.hasBorder) flags |= NK_WINDOW_BORDER;
+	if (panel.hasTitle) flags |= NK_WINDOW_TITLE;
+
+	char windowId[32];
+
+	/// Always generate a pannel Id snprintf is a cheap call
+	/// This is what this does btw:
+	/// Composes a string with the same text that would be printed
+	/// if format was used on printf, but instead of being printed,
+	/// the content is stored as a C string in the buffer pointed
+	/// by s (taking n as the maximum buffer capacity to fill).
+	snprintf(windowId, sizeof(windowId), "##%u", panelId);
+
+	/// Nuklear needs a pannel ID we use the title or if it's
+	/// empty the generated one based on ID
+	const char* name = panel.title.empty() ? windowId : panel.title.c_str();
+
+	if (nk_begin(nuklearContext, name,
+	             nk_rect(panel.x, panel.y, panel.width, panel.height), flags))
+	{
+		nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
+
+		//We render each element that belongs to panel!
+		auto elementIterator = panelElementIndices.find(panelId);
+		if (elementIterator != panelElementIndices.end())
+		{
+			for (size_t elementIndex : elementIterator->second)
+			{
+				renderElement(commandQueue[elementIndex]);
+			}
+		}
+	}
+	nk_end(nuklearContext);
 }
 
 void NuklearSDLRenderHook::close()
 {
-	if (nkCtx) {
+	if (nuklearContext)
+	{
 		nk_sdl_shutdown();
-		nkCtx = nullptr;
+		nuklearContext = nullptr;
 	}
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 #include "Networking/Messages/MessageDispatcherFactory.h"
 
@@ -21,6 +22,21 @@ MessageDispatcherFactory::createServerDispatcher(
 	NetworkIdentityRegistry& registry)
 {
 	auto dispatcher = std::make_unique<MessageDispatcher>();
+=======
+#include "Networking/Messages/MessageDispatcherFactory.h"
+#include "Networking/Messages/MessageDispatcher.h"
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
+#include "Networking/MessageHandlers/IMessageHandler.h"
+#include "Networking/MessageHandlers/ConnectionMessageHandler.h"
+#include "Scene/SceneManager.h"
+
+
+namespace spelmotor_networking
+{
+    std::unique_ptr<MessageDispatcher> MessageDispatcherFactory::createMessageDispatcher(ConnectionMode mode, GameWorld& context)
+    {
+        std::unique_ptr<MessageDispatcher> dispatcher = std::make_unique<MessageDispatcher>();
+>>>>>>> origin/development
 
 	dispatcher->registerMessageHandler(
 	   MessageTypes::ActionMessage,
@@ -29,6 +45,7 @@ MessageDispatcherFactory::createServerDispatcher(
 	return dispatcher;
 }
 
+<<<<<<< HEAD
 std::unique_ptr<MessageDispatcher>
 MessageDispatcherFactory::createClientDispatcher(
 	GameWorld& world,
@@ -62,3 +79,5 @@ MessageDispatcherFactory::createClientDispatcher(
 	return dispatcher;
 }
 }
+=======
+>>>>>>> origin/development

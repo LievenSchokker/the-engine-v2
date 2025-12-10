@@ -2,7 +2,7 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "Component/Component.h"
+#include "../../inc/Component/BaseComponentTypes/Component.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 #include "Scene/Scene.h"

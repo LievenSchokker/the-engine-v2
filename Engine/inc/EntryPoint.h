@@ -1,5 +1,6 @@
 #pragma once
 
+<<<<<<< HEAD
 #include "Core/ApplicationSpecifications.h"
 #include "Core/SpelMotor.h"
 
@@ -12,10 +13,19 @@
 #include "Demo/PlayerMovement.h"
 #include "Networking/NetworkPrefabRegistry.h"
 
+=======
+
+#include "Game.h"
+#include "Core/SpelMotor.h"
+
+/// This has been added because sometimes SDL causes main to be redefined.
+/// Which then causes linking error's
+>>>>>>> origin/development
 #undef main
 
 namespace SpelMotorEntry
 {
+<<<<<<< HEAD
     inline void registerNetworkPrefabs()
     {
         auto& registry = NetworkPrefabRegistry::instance();
@@ -89,4 +99,12 @@ namespace SpelMotorEntry
         engine.run();
         return 0;
     }
+=======
+inline int main(std::unique_ptr<Game> game)
+{
+	SpelMotor engine(std::move(game));
+	engine.start();
+	return 0;
+>>>>>>> origin/development
+}
 }

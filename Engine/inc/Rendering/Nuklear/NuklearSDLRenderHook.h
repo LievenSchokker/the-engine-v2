@@ -1,10 +1,15 @@
 #pragma once
 
-#include <SDL_video.h>
+
+#include "nuklear.h"
 
 #include "Input/InputManager.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/SDL/SDLRenderer.h"
+
+#include <queue>
+#include <unordered_map>
+#include <SDL_video.h>
 
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.
@@ -64,7 +69,7 @@ public:
 	 * Currently it contains some hard coded UI examples but after UIobject has been added
 	 * This will render the whole canvas layer.
 	 */
-	void render() const;
+	void render();
 
 	/**
 	 * @brief Submits Nuklear draw commands to SDL.
@@ -83,16 +88,42 @@ public:
 	 */
 	void close() override;
 
+	/**
+	* @brief submits a render command to the internal queue.
+	*
+	* Adds another command to the internal queue of the UIrenderer.
+	* The whole queue will be flushed each frame. Expected usages is about 250 UI elements
+	* More then that could slow down the engine since the internal queue has a
+	* reserved size of 250 elements.
+	*
+	*/
+	void process(const std::vector<UIRenderCommand>& commands) override;
+
 private:
-	/// Cached to avoid repeated singleton lookups each frame.
+	void flushCommands();
+	void createDefaultPanel(uint32_t panelId);
+	void renderPanel(uint32_t panelId);
+	void renderElement(const UIRenderCommand& command);
+	void renderChart(const UIRenderCommand& command);
+	void renderProgressBar(const UIRenderCommand& command);
+	void renderSeparator(const UIRenderCommand& command);
+	void renderImage(const UIRenderCommand& command);
+	void renderSpacer(const UIRenderCommand& command);
+	void renderText(const UIRenderCommand& command);
+
 	InputManager* inputManager;
-
-	/// Needed by Nuklear for window size queries and event context.
 	SDL_Window* sdlWindow;
-
-	/// Needed by Nuklear for texture and draw call submission.
 	SDL_Renderer* sdlRenderer;
+	nk_context* nuklearContext;
 
-	/// Nuklear's core state. Null until initialize() succeeds.
-	struct nk_context* nkCtx;
+	std::vector<UIRenderCommand> commandQueue;
+
+	/// @brief Maps panel ID → index in commandQueue where that panel's data lives.
+	std::unordered_map<uint32_t, size_t> panelIndices;
+
+	/// @brief Maps panel ID → list of indices of elements that belong to that panel.
+	std::unordered_map<uint32_t, std::vector<size_t>> panelElementIndices;
+
+	/// @brief list of index's that have no panel
+	std::vector<uint32_t> rootPanels;
 };

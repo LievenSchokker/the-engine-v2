@@ -6,6 +6,7 @@
 #include "Component/ComponentManager.h"
 #include "Component/Transform.h"
 #include "GameObject/ScenePlaceholder.h"
+#include "Scene/Scene.h"
 
 GameObject::GameObject()
 {
@@ -73,7 +74,8 @@ void GameObject::destroy()
     isDestroyed = true;
     setActive(false);
 
-    /// TEMP if statement, remove when scene is implemented!
+    componentManager->disableAllBehaviours();
+
     if (scene != nullptr)
         scene->queueDestroy(this);
 }

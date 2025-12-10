@@ -1,9 +1,14 @@
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
 #include "External/SdlContext.h"
-#include "GameObject/Vector2Utils.h"
+#include "Math/Vector2Utils.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
+<<<<<<< HEAD
+=======
+#include "Rendering/RenderCommand.h"
+>>>>>>> origin/development
 
 #include <algorithm>
 #include <cassert>
@@ -107,7 +112,7 @@ void SDLRenderer::beginFrame(const Color& clearColor)
 	}
 
 	SDL_SetRenderDrawColor(renderer, clearColor.r, clearColor.g, clearColor.b,
-	                       clearColor.a);
+						   clearColor.a);
 
 	SDL_RenderClear(renderer);
 
@@ -116,7 +121,16 @@ void SDLRenderer::beginFrame(const Color& clearColor)
 	}
 }
 
-void SDLRenderer::presentFrame()
+
+void SDLRenderer::submitUI(const std::vector<UIRenderCommand>& commands)
+{
+	if (userInterfaceHook != nullptr)
+	{
+		userInterfaceHook->process(commands);
+	}
+}
+
+void SDLRenderer::endFrame()
 {
 	if (renderer == nullptr) {
 		return;
@@ -127,7 +141,30 @@ void SDLRenderer::presentFrame()
 	}
 
 	SDL_RenderPresent(renderer);
-	SDL_RenderClear(renderer);
+}
+
+void SDLRenderer::execute(const RenderCommand& command)
+{
+	if (renderer == nullptr) {
+		return;
+	}
+
+	switch (command.type)
+	{
+		case RenderCommandType::Circle:
+			drawCircle(command.position, command.radius,
+					   command.color, command.scale);
+			break;
+
+		case RenderCommandType::Rectangle:
+			drawRectangle(command.position, command.size,
+						  command.rotationDegrees, command.color,
+						  command.scale);
+			break;
+
+		case RenderCommandType::None:
+			break;
+	}
 }
 
 void SDLRenderer::setTitle(const std::string& title)
@@ -203,8 +240,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 	const double halfWidth = width * 0.5;
 	const double halfHeight = height * 0.5;
 	SDL_FRect rect{static_cast<float>(center.x - halfWidth),
-	               static_cast<float>(center.y - halfHeight),
-	               static_cast<float>(width), static_cast<float>(height)};
+				   static_cast<float>(center.y - halfHeight),
+				   static_cast<float>(width), static_cast<float>(height)};
 
 	if (std::abs(rotationDegrees) < kRotationThresholdDegrees) {
 		SDL_RenderCopyF(renderer, solidQuadTexture, nullptr, &rect);

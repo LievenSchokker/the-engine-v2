@@ -1,13 +1,10 @@
-//
-// Created by thijs on 24-11-2025.
-//
-
-
 #pragma once
-#include "Component/Component.h"
 
 
-class RigidBody: public Component
+#include "Behaviour/Behaviour.h"
+
+
+class RigidBody: public Behaviour
 {
 public:
 	bool isDynamic = true;

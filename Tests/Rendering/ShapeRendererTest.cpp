@@ -3,18 +3,20 @@
 #include "GameObject/GameObject.h"
 #include "Rendering/Color.h"
 #include "Rendering/IRenderer.h"
-#include "Rendering/RenderQueue.h"
+#include "Rendering/RenderCommand.h"
+#include "Rendering/RenderSystem.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Scene/Scene.h"
-#include "Scene/SceneManager.h"
+#include "Rendering/RenderSystem.h"
 
 #include <gtest/gtest.h>
 
-namespace
+struct FakeRenderer : public IRenderer
 {
-struct FakeRenderer: public IRenderer {
-	void open(const WindowOptions&) override
-	{
-	}
+	void open(const WindowOptions&) override {}
+	void close() override { isWindowOpen = false; }
+	bool isOpen() override { return isWindowOpen; }
+	void setTitle(const std::string&) override {}
 
 	void beginFrame(const Color& color) override
 	{
@@ -22,140 +24,194 @@ struct FakeRenderer: public IRenderer {
 		++beginCalls;
 	}
 
-	void presentFrame() override
+	void endFrame() override
 	{
-		++presentCalls;
+		++endCalls;
 	}
 
-	void close() override
+
+	void submitUI(const std::vector<UIRenderCommand>& commands) override
 	{
-		isWindowOpen = false;
+		// Empty stub for testing
 	}
 
-	bool isOpen() override
+	void execute(const RenderCommand& command) override
 	{
-		return isWindowOpen;
+		executedCommands.push_back(command);
+
+		switch (command.type)
+		{
+			case RenderCommandType::Circle:
+				++circleCalls;
+				break;
+			case RenderCommandType::Rectangle:
+				++rectangleCalls;
+				break;
+			default:
+				break;
+		}
 	}
 
-	void setTitle(const std::string&) override
-	{
-	}
-
-	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override
-	{
-
-	}
-
-	void drawCircle(const Vector2& center, double radius, const Color& color,
-					const Vector2& scale) override
-	{
-		++circleCalls;
-		lastCircleCenter = center;
-		lastCircleRadius = radius;
-		lastCircleColor = color;
-		lastCircleScale = scale;
-	}
-
-	void drawRectangle(const Vector2& center, const Vector2& size,
-					   double rotationDegrees, const Color& color,
-					   const Vector2& scale) override
-	{
-		++rectangleCalls;
-		lastRectCenter = center;
-		lastRectSize = size;
-		lastRectRotation = rotationDegrees;
-		lastRectColor = color;
-		lastRectScale = scale;
-	}
+	// Add this - missing from your FakeRenderer
+	void setUIRenderHook(std::unique_ptr<IUIRenderHook>) override {}
 
 	bool isWindowOpen = true;
 	int beginCalls = 0;
-	int presentCalls = 0;
+	int endCalls = 0;
 	int circleCalls = 0;
 	int rectangleCalls = 0;
 	Color lastClearColor = Color::black();
-	Vector2 lastCircleCenter{};
-	double lastCircleRadius = 0.0;
-	Color lastCircleColor = Color::black();
-	Vector2 lastCircleScale{};
-	Vector2 lastRectCenter{};
-	Vector2 lastRectSize{};
-	double lastRectRotation = 0.0;
-	Color lastRectColor = Color::black();
-	Vector2 lastRectScale{};
+	std::vector<RenderCommand> executedCommands;
 };
-}  // namespace
 
-// Check that SceneManager correctly renders a GameObject with a circle
-// ShapeRenderer
-TEST(ShapeRendererTest, RendersCircleShapeThroughSceneManager)
+
+// Test that ShapeRenderer fills queue with circle command
+TEST(ShapeRendererTest, FillsQueueWithCircleCommand)
 {
-	// Arrange
-	FakeRenderer renderer;
-	SceneManager manager;
-	manager.setClearColor(Color::black());
+    // Arrange
+    Scene scene("TestScene");
+    scene.onStart();
 
-	auto scene = std::make_unique<Scene>("ShapeScene");
-	auto circle = std::make_unique<GameObject>();
-	circle->getTransform()->setPosition({42.0, 24.0});
-	circle->getTransform()->setScale({1.0, 1.0});
-	circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(
-		Color::blue());
-	scene->addGameObject(std::move(circle));
+    auto circle = std::make_unique<GameObject>();
+    circle->getTransform()->setPosition({42.0, 24.0});
+    circle->getTransform()->setScale({1.0, 1.0});
+    circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(Color::blue());
+    scene.addGameObject(std::move(circle));
 
-	manager.addScene(std::move(scene));
-	manager.setActiveScene("ShapeScene");
+    // Act
+    RenderQueue queue;
+    for (auto* comp : scene.getAllComponentsOfType<RenderComponent>())
+    {
+        comp->fillRenderQueue(queue);
+    }
 
-	// Act
-	RenderQueue queue;
-	manager.buildRenderQueue(queue);
-	executeRenderQueue(renderer, queue);
-
-	// Assert - Verify frame lifecycle was called
-	EXPECT_EQ(renderer.beginCalls, 1);
-	EXPECT_EQ(renderer.presentCalls, 1);
-
-	// Assert - Verify circle was drawn, not rectangle
-	EXPECT_EQ(renderer.circleCalls, 1);
-	EXPECT_EQ(renderer.rectangleCalls, 0);
-
-	// Assert - Verify circle properties were passed correctly
-	EXPECT_DOUBLE_EQ(renderer.lastCircleRadius, 25.0);
-	EXPECT_EQ(renderer.lastCircleColor.b, Color::blue().b);
+    // Assert
+    const auto& commands = queue.world().getCommands();
+    ASSERT_EQ(commands.size(), 1);
+    EXPECT_EQ(commands[0].type, RenderCommandType::Circle);
+    EXPECT_DOUBLE_EQ(commands[0].radius, 25.0);
+    EXPECT_DOUBLE_EQ(commands[0].position.x, 42.0);
+    EXPECT_DOUBLE_EQ(commands[0].position.y, 24.0);
+    EXPECT_EQ(commands[0].color.b, Color::blue().b);
 }
 
-// Check that SceneManager correctly renders a GameObject with a rectangle
-// ShapeRenderer
-TEST(ShapeRendererTest, RendersRectangleShapeThroughSceneManager)
+
+// Test that ShapeRenderer fills queue with rectangle command
+TEST(ShapeRendererTest, FillsQueueWithRectangleCommand)
 {
-	// Arrange
-	FakeRenderer renderer;
-	SceneManager manager;
-	manager.setClearColor(Color::black());
+    // Arrange
+    Scene scene("TestScene");
+    scene.onStart();
 
-	auto scene = std::make_unique<Scene>("RectScene");
-	auto rect = std::make_unique<GameObject>();
-	rect->getTransform()->setPosition({10.0, 12.0});
-	rect->getTransform()->setRotationAngle(33.0);
-	rect->getTransform()->setScale({1.0, 1.0});
-	rect->addComponent<ShapeRenderer>()
-		->setRectangle({80.0, 40.0})
-		.setColor(Color::yellow());
-	scene->addGameObject(std::move(rect));
+    auto rect = std::make_unique<GameObject>();
+    rect->getTransform()->setPosition({10.0, 12.0});
+    rect->getTransform()->setRotationAngle(33.0);
+    rect->getTransform()->setScale({1.0, 1.0});
+    rect->addComponent<ShapeRenderer>()->setRectangle({80.0, 40.0}).setColor(Color::yellow());
+    scene.addGameObject(std::move(rect));
 
-	manager.addScene(std::move(scene));
-	manager.setActiveScene("RectScene");
+    // Act
+    RenderQueue queue;
+    for (auto* comp : scene.getAllComponentsOfType<RenderComponent>())
+    {
+        comp->fillRenderQueue(queue);
+    }
 
-	// Act
-	RenderQueue queue;
-	manager.buildRenderQueue(queue);
-	executeRenderQueue(renderer, queue);
+    // Assert
+    const auto& commands = queue.world().getCommands();
+    ASSERT_EQ(commands.size(), 1);
+    EXPECT_EQ(commands[0].type, RenderCommandType::Rectangle);
+    EXPECT_DOUBLE_EQ(commands[0].size.x, 80.0);
+    EXPECT_DOUBLE_EQ(commands[0].size.y, 40.0);
+    EXPECT_DOUBLE_EQ(commands[0].rotationDegrees, 33.0);
+    EXPECT_EQ(commands[0].color.g, Color::yellow().g);
+}
 
-	// Assert - Verify rectangle was drawn, not circle
-	EXPECT_EQ(renderer.rectangleCalls, 1);
-	EXPECT_EQ(renderer.circleCalls, 0);
 
-	// Assert - Verify rectangle properties were passed correctly
-	EXPECT_DOUBLE_EQ(renderer.lastRectRotation, 33.0);
-	EXPECT_EQ(renderer.lastRectColor.g, Color::yellow().g);
+// Test RenderSystem executes commands through renderer
+TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
+{
+    // Arrange
+	auto fakeRenderer = std::make_unique<FakeRenderer>();
+	FakeRenderer* rendererPtr = fakeRenderer.get();
+	RenderSystem renderSystem{std::move(fakeRenderer)};
+
+
+    Scene scene("TestScene");
+    scene.onStart();
+
+    auto circle = std::make_unique<GameObject>();
+    circle->getTransform()->setPosition({42.0, 24.0});
+    circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(Color::blue());
+    scene.addGameObject(std::move(circle));
+
+    // Act
+    renderSystem.update(0.016f, scene);
+
+    // Assert
+    EXPECT_EQ(rendererPtr->beginCalls, 1);
+    EXPECT_EQ(rendererPtr->endCalls, 1);
+    EXPECT_EQ(rendererPtr->circleCalls, 1);
+    EXPECT_EQ(rendererPtr->rectangleCalls, 0);
+
+    ASSERT_EQ(rendererPtr->executedCommands.size(), 1);
+    EXPECT_EQ(rendererPtr->executedCommands[0].type, RenderCommandType::Circle);
+    EXPECT_DOUBLE_EQ(rendererPtr->executedCommands[0].radius, 25.0);
+}
+
+
+// Test RenderSystem respects layer ordering
+TEST(RenderSystemTest, SortsCommandsByLayer)
+{
+    // Arrange
+	auto fakeRenderer = std::make_unique<FakeRenderer>();
+	FakeRenderer* rendererPtr = fakeRenderer.get();
+	RenderSystem renderSystem{std::move(fakeRenderer)};
+
+    Scene scene("TestScene");
+    scene.onStart();
+
+    // Add objects in wrong order (layer 2, then layer 1)
+    auto backObject = std::make_unique<GameObject>();
+    backObject->addComponent<ShapeRenderer>()->setCircle(10.0).setLayer(2);
+    scene.addGameObject(std::move(backObject));
+
+    auto frontObject = std::make_unique<GameObject>();
+    frontObject->addComponent<ShapeRenderer>()->setRectangle({20.0, 20.0}).setLayer(1);
+    scene.addGameObject(std::move(frontObject));
+
+    // Act
+    renderSystem.update(0.016f, scene);
+
+    // Assert - Layer 1 should render before Layer 2
+    ASSERT_EQ(rendererPtr->executedCommands.size(), 2);
+    EXPECT_EQ(rendererPtr->executedCommands[0].layer, 1);
+    EXPECT_EQ(rendererPtr->executedCommands[1].layer, 2);
+}
+
+
+// Test inactive GameObjects are not rendered
+TEST(RenderSystemTest, SkipsInactiveGameObjects)
+{
+	auto fakeRenderer = std::make_unique<FakeRenderer>();
+	FakeRenderer* rendererPtr = fakeRenderer.get();
+	RenderSystem renderSystem{std::move(fakeRenderer)};
+
+    Scene scene("TestScene");
+    scene.onStart();
+
+    auto activeObj = std::make_unique<GameObject>();
+    activeObj->addComponent<ShapeRenderer>()->setCircle(10.0);
+    scene.addGameObject(std::move(activeObj));
+
+    auto inactiveObj = std::make_unique<GameObject>();
+    inactiveObj->addComponent<ShapeRenderer>()->setCircle(20.0);
+    inactiveObj->setActive(false);
+    scene.addGameObject(std::move(inactiveObj));
+
+    // Act
+    renderSystem.update(0.016f, scene);
+
+    // Assert
+    EXPECT_EQ(rendererPtr->executedCommands.size(), 1);
 }

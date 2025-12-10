@@ -146,23 +146,12 @@ bool SceneManager::isPaused() const
 	return paused;
 }
 
-void SceneManager::update(float deltaTime)
+void SceneManager::update(float deltaTime, GameWorld* world)
 {
-	if ( activeScene != nullptr && !paused ) {
-		activeScene->update(deltaTime);
+	if (activeScene != nullptr && !paused)
+	{
+		activeScene->update(deltaTime, world);
 	}
-}
-
-void SceneManager::buildRenderQueue(RenderQueue& queue) const
-{
-	queue.clear();
-	queue.clearColor = clearColor;
-
-	if ( activeScene == nullptr || paused ) {
-		return;
-	}
-
-	activeScene->collectRenderCommands(queue.shapes);
 }
 
 void SceneManager::setClearColor(const Color& color)

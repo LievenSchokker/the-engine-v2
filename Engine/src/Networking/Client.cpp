@@ -9,12 +9,21 @@
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
+<<<<<<< HEAD
+=======
+#include "Networking/Messages/MessageDispatcherFactory.h"
+>>>>>>> origin/development
 
 #include <iostream>
 
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
+<<<<<<< HEAD
 	: transport(std::move(injectedTransport))
+=======
+    : transport(std::move(injectedTransport)),
+    gameWorld(nullptr)
+>>>>>>> origin/development
 {
 	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 
@@ -23,19 +32,34 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
 		onMessageReceived(message);
 	});
 
+<<<<<<< HEAD
 	transport->setOnConnectionChanged([this](const Connection& connection)
 	{
 		onConnectionChanged(connection);
 	});
+=======
+    transport->setOnConnectionChanged([this](const Connection& connection)
+    {
+        onConnectionChanged(connection);
+    });
+
+    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *gameWorld);
+>>>>>>> origin/development
 }
+
 
 Client::~Client()
 {
 	disconnect();
 }
 
+<<<<<<< HEAD
 bool Client::connectToServer(
 	const ServerConnectionInformation& serverInformartion) const
+=======
+
+bool Client::connectToServer(const ServerConnectionInformation&  serverInformartion) const
+>>>>>>> origin/development
 {
 	if (transport->connectByIPAdress(serverInformartion.ip.c_str(),
 	                                 serverInformartion.port) !=
@@ -48,6 +72,7 @@ bool Client::connectToServer(
 	return true;
 }
 
+
 void Client::disconnect()
 {
 	if (currentConnection.connectionStatus == ConnectionStatus::Connected)
@@ -58,6 +83,7 @@ void Client::disconnect()
 	transport->closeOpenSocket();
 	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
+
 
 bool Client::sendMessage(const IMessage& message) const
 {
@@ -76,15 +102,18 @@ bool Client::sendMessage(const IMessage& message) const
 	return result == TransportResult::SUCCESS;
 }
 
+
 void Client::poll() const
 {
 	transport->poll();
 }
 
+
 bool Client::isConnected() const
 {
 	return currentConnection.connectionStatus == ConnectionStatus::Connected;
 }
+
 
 void Client::onConnectionChanged(const Connection& connection)
 {
@@ -107,6 +136,7 @@ void Client::onConnectionChanged(const Connection& connection)
 	}
 }
 
+<<<<<<< HEAD
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
 	const std::unique_ptr<IMessage> message = MessageReader::readMessage(
@@ -123,6 +153,24 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 
 void Client::injectMessageDispatcher(
 	std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+=======
+
+void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
+{
+    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+
+    if (message == nullptr)
+    {
+        std::cerr << "Failed to parse message" << std::endl;
+        return;
+    }
+
+    messageDispatcher->processMessage(std::move(message));
+}
+
+
+void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+>>>>>>> origin/development
 {
 	messageDispatcher = std::move(dispatcher);
 }

@@ -1,9 +1,16 @@
+<<<<<<< HEAD
+=======
+#include "Game.h"
+>>>>>>> origin/development
 #include "Core/SpelMotor.h"
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
+<<<<<<< HEAD
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
+=======
+>>>>>>> origin/development
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Networking/Server/Server.h"
 #include "Networking/Client.h"
@@ -12,6 +19,7 @@
 #include <iostream>
 #include <chrono>
 
+<<<<<<< HEAD
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Scene/SceneManager.h"
 #include "Networking/Messages/Concretes/WelcomeMessage.h"
@@ -56,6 +64,28 @@ SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
 		                                  std::make_unique<TransportGNS>());
 
 		gameWorld.server = server.get();
+=======
+#include "Core/IEngineLoop.h"
+#include "Core/EngineLoopFactory.h"
+#include "Scene/SceneManager.h"
+
+SpelMotor::SpelMotor(std::unique_ptr<Game> game)
+	:
+	running(false),
+	specifications(game->getApplicationSpecifications()),
+	coreSystemLoop(
+		EngineLoopFactory::createEngineLoop(std::move(game))),
+	coreClock(std::make_unique<ApplicationClock>(coreSystemLoop->getClock(),
+	                                             specifications.
+	                                             networkingOptions.tickRate,
+	                                             specifications.
+	                                             maxFrameTime))
+{
+	if (coreSystemLoop == nullptr)
+	{
+		throw std::runtime_error(
+			"Core System Loop is null double check your applicationSpecifications.");
+>>>>>>> origin/development
 	}
 
 	gameWorld.sceneManager = sceneManager.get();
@@ -66,6 +96,7 @@ SpelMotor::SpelMotor(ApplicationSpecifications applicationSpecifications)
 }
 
 SpelMotor::~SpelMotor()
+<<<<<<< HEAD
 {
 	shutdown();
 }
@@ -88,6 +119,20 @@ void SpelMotor::run()
 }
 
 void SpelMotor::runClient()
+=======
+{
+	shutdown();
+}
+
+void SpelMotor::start()
+{
+	coreClock->start();
+	coreSystemLoop->start();
+	run();
+}
+
+void SpelMotor::run()
+>>>>>>> origin/development
 {
 	renderer->open(specifications.windowOptions);
 
@@ -106,6 +151,7 @@ void SpelMotor::runClient()
 
 	while (running)
 	{
+<<<<<<< HEAD
 		timer->tick();
 		client->poll();
 		InputManager::getInstance()->update();
@@ -253,4 +299,21 @@ SceneManager* SpelMotor::getSceneManager()
 {
 	if (sceneManager) return sceneManager.get();
 	return nullptr;
+=======
+		coreClock->tick();
+
+		while (coreClock->shouldFixedUpdate())
+		{
+			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
+			coreClock->consumeFixedUpdate();
+		}
+
+		coreSystemLoop->update(coreClock->getDeltaTime());
+	}
+}
+
+void SpelMotor::shutdown() const
+{
+	coreSystemLoop->shutdown();
+>>>>>>> origin/development
 }

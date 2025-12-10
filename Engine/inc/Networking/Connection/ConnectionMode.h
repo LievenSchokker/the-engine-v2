@@ -1,5 +1,6 @@
 #pragma once
 
+
 /**
  * @brief Specifies the role of a network participant.
  */

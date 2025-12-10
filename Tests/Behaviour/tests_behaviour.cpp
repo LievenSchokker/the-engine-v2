@@ -34,7 +34,26 @@ namespace engine_tests
         EXPECT_TRUE(b.getHasStarted());
     }
 
-    TEST(BehaviourTests, SetEnabledCallsHooks) {
+    TEST(BehaviourTests, SetEnabledCallsHooks)
+    {
+        GameObject go;
+        TestBehaviourOne* b = go.addComponent<TestBehaviourOne>();
+
+        EXPECT_TRUE(b->getIsEnabled());
+
+        b->setEnabled(false);
+        EXPECT_FALSE(b->getIsEnabled());
+        EXPECT_TRUE(b->disableCalled);
+
+        b->setEnabled(true);
+        EXPECT_TRUE(b->getIsEnabled());
+        EXPECT_TRUE(b->enableCalled);
+    }
+
+
+    /// setEnabled(true) should return if gameObject is nullptr
+    TEST(BehaviourTests, EnableBehaviourWithMissingGameObjectFails)
+    {
         TestBehaviourOne b;
 
         EXPECT_TRUE(b.getIsEnabled());
@@ -44,8 +63,26 @@ namespace engine_tests
         EXPECT_TRUE(b.disableCalled);
 
         b.setEnabled(true);
-        EXPECT_TRUE(b.getIsEnabled());
-        EXPECT_TRUE(b.enableCalled);
+        EXPECT_FALSE(b.getIsEnabled());
+        EXPECT_FALSE(b.enableCalled);
+    }
+
+    TEST(BehaviourTests, EnableBehaviourWithDestroyedGameObjectFails)
+    {
+        GameObject go;
+        TestBehaviourOne* b = go.addComponent<TestBehaviourOne>();
+
+        EXPECT_TRUE(b->getIsEnabled());
+
+        b->setEnabled(false);
+        EXPECT_FALSE(b->getIsEnabled());
+        EXPECT_TRUE(b->disableCalled);
+
+        /// Destory the GO, which should prevent behaviour.setEnabled(true) from executing.
+        go.destroy();
+        b->setEnabled(true);
+        EXPECT_FALSE(b->getIsEnabled());
+        EXPECT_FALSE(b->enableCalled);
     }
 
     TEST(BehaviourTests, SetEnabledDoesNotCallHooksWhenNotChanged) {

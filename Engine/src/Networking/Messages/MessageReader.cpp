@@ -1,20 +1,28 @@
 #include "Networking/Messages/MessageReader.h"
-#include "Networking/Messages/Concretes/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
+<<<<<<< HEAD
 #include "Networking/Messages/MessageTypes.h"
 #include "Networking/Messages/Concretes/ActionMessage.h"
 #include "Networking/Messages/Concretes/ObjectDestroyMessage.h"
 #include "Networking/Messages/Concretes/SpawnMessage.h"
 #include "Networking/Messages/Concretes/StateSyncMessage.h"
 #include "Networking/Messages/Concretes/WelcomeMessage.h"
+=======
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
+#include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
+>>>>>>> origin/development
 
 #include <iostream>
 #include <cstring>
 
+<<<<<<< HEAD
 
 
 std::unique_ptr<IMessage> MessageReader::readMessage(
 	const IncomingRawMessage rawMessage)
+=======
+std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage rawMessage)
+>>>>>>> origin/development
 {
 	if (rawMessage.length < sizeof(uint8_t)) {
 		return nullptr;
@@ -42,6 +50,7 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
 {
 	std::unique_ptr<IMessage> message;
 
+<<<<<<< HEAD
 	switch (messageType) {
 		case MessageTypes::ConnectionMessage:
 			message = std::make_unique<ConnectionMessage>();
@@ -61,6 +70,16 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
 		case MessageTypes::StateSyncMessage:
 			message = std::make_unique<StateSyncMessage>();
 			break;
+=======
+    switch (messageType)
+    {
+        case MessageTypes::ConnectionMessage:
+            message = std::make_unique<ConnectionMessage>();
+            break;
+        default:
+            return nullptr;
+    }
+>>>>>>> origin/development
 
 		default:
 			return nullptr;

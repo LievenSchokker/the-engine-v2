@@ -4,7 +4,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 
-#include "Assets/SDLAssetTypes/SDLImage.h"
+#include "Assets/SDLImage.h"
 #include "Assets/AssetManager.h"
 
 
