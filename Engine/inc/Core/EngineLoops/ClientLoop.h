@@ -4,7 +4,6 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Core/IEngineLoop.h"
 #include "External/IBackendContext.h"
-#include "External/SdlContext.h"
 #include "Rendering/RenderSystem.h"
 
 class Game;

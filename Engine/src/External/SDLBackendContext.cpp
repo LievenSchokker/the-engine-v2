@@ -2,6 +2,7 @@
 
 #include "SDL.h"
 
+#include <string>
 #include <stdexcept>
 
 int SDLBackendContext::referenceCount = 0;

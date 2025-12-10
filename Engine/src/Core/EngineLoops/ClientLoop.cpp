@@ -39,7 +39,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		{
 			return SDL_GetTicks() / 1000.0;
 		};
-		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*sdlContext);
+		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*backendContext);
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
 

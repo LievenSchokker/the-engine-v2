@@ -7,11 +7,11 @@ SoundSource::SoundSource(AudioManager* audioManagerPtr)
 {
 }
 
-bool SoundSource::loadSound(const std::string& newpath)
+bool SoundSource::loadSound(const std::string& newPath)
 {
 	if ( !audioManager ) return false;
 
-	path = newpath;
+	path = newPath;
 	return audioManager->loadSound(path);
 }
 

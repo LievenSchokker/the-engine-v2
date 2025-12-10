@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Audio/AudioManager.h"
-#include "Behaviour/Behaviour.h"
+#include "Component/BaseComponentTypes/Component.h"
 
 #include <string>
 
@@ -20,10 +20,10 @@ class SoundSource: public Component
 
 	/**
 	 * @brief Loads a sound effect through the AudioManager.
-	 * @param newpath File path to the sound asset.
+	 * @param newPath File path to the sound asset.
 	 * @return True if loading succeeded.
 	 */
-	bool loadSound(const std::string& newpath);
+	bool loadSound(const std::string& newPath);
 
 
 	/**

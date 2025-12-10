@@ -1,7 +1,6 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "External/IBackendContext.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
-#include "External/SdlContext.h"
 #include "Math/Vector2Utils.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"

@@ -2,7 +2,6 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "External/IBackendContext.h"
-#include "Rendering/RenderQueue.h"
 #include "Audio/AudioManager.h"
 #include "Physics/IPhysicsWorld.h"
 

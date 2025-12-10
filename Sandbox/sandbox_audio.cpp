@@ -7,8 +7,6 @@
 #include "GameObject/GameObject.h"
 #include "Input/InputManager.h"
 #include "Rendering/Color.h"
-#include "Rendering/RenderBackend.h"
-#include "Rendering/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Scene/SceneManager.h"
@@ -47,9 +45,6 @@ std::unique_ptr<GameObject> createRectangle()
 // --------------------------- MAIN -----------------------------
 int main()
 {
-	// Debug memory (Windows)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
 	// --- SDL INIT ---
 	if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS) != 0 )
 	{
@@ -79,13 +74,11 @@ int main()
 	// auto music = std::make_unique<MusicSource>(audioManager.get());
 	MusicSource* music = new MusicSource(audioManager.get());
 	music->setLoop(true);
-	music->loadMusic(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\music_jam.wav)");
+	music->loadMusic("Sandbox/Assets/music_jam.wav");
 	music->play();
 
 	auto effect = std::make_unique<SoundSource>(audioManager.get());
-	effect->loadSound(
-		R"(C:\Users\thijs\content\minor\project\the-engineV2\Sandbox\assets\audio_effect_voice.wav)");
+	effect->loadSound("Sandbox/Assets/audio_effect_pigeons_flying.wav");
 
 	// --- MAIN LOOP ---
 	bool running = true;
