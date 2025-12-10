@@ -22,14 +22,11 @@ add_library(engine STATIC
 target_include_directories(engine PUBLIC
         ${CMAKE_SOURCE_DIR}/Engine/inc
         ${CMAKE_SOURCE_DIR}/Engine/third-party
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${GAMENETWORKINGSOCKETS_INCLUDE_DIRS}
 )
 
 target_link_libraries(engine PUBLIC
-        SDL2::SDL2
-        SDL2_image::SDL2_image
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+        $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
         GameNetworkingSockets::GameNetworkingSockets
         box2d
 )

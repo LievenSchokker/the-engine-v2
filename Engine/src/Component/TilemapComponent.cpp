@@ -10,7 +10,7 @@
 
 TilemapComponent::TilemapComponent() : tileSize(0.0, 0.0)
 {
-	tileSize = {32.0, 32.0}; // Default tile size
+	tileSize = {32.0, 32.0};  // Default tile size
 }
 
 void TilemapComponent::setTilemapAsset(TilemapAsset* asset)
@@ -36,39 +36,43 @@ void TilemapComponent::setTileColor(int tileId, const Color& color)
 Color TilemapComponent::getTileColor(int tileId) const
 {
 	auto it = tileColors.find(tileId);
-	if (it != tileColors.end())
+	if ( it != tileColors.end() )
 	{
 		return it->second;
 	}
 	else
 	{
 		std::cout << "[TilemapComponent] Tile color not set for tile ID: "
-			<< tileId << ", returning default white" << std::endl;
+				  << tileId << ", returning default white" << std::endl;
 		return Color::white();
 	}
 }
 
 void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 {
-	if (tilemapAsset == nullptr || !tilemapAsset->isLoaded())
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
 	{
 		return;
 	}
 
 	const Transform* transform = getTransform();
-	if (transform == nullptr)
+	if ( transform == nullptr )
 	{
 		return;
 	}
 
-	const Vector2 origin = transform->getPosition();
+	// Use world transforms to respect parent-child hierarchy
+	const Vector2 origin = transform->getWorldPosition();
+	const double rotation = transform->getWorldRotation();
+	const Vector2 worldScale =
+		Vector2Utils::sanitizeScale(transform->getWorldScale());
 	const int width = tilemapAsset->getWidth();
 	const int height = tilemapAsset->getHeight();
 
 	// Build a render command for each non-empty tile
-	for (int y = 0; y < height; ++y)
+	for ( int y = 0; y < height; ++y )
 	{
-		for (int x = 0; x < width; ++x)
+		for ( int x = 0; x < width; ++x )
 		{
 			int tileId = tilemapAsset->getTile(x, y);
 
@@ -86,8 +90,8 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			command.type = RenderCommandType::Rectangle;
 			command.position = tileCenter;
 			command.size = tileSize;
-			command.rotationDegrees = 0.0;
-			command.scale = Vector2Utils::sanitizeScale(transform->getScale());
+			command.rotationDegrees = rotation;
+			command.scale = worldScale;
 			command.color = getTileColor(tileId);
 			command.layer = layer;
 			command.orderInLayer = orderInLayer;
@@ -98,13 +102,13 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 
 Vector2 TilemapComponent::worldToCell(Vector2 worldPos) const
 {
-	if (tilemapAsset == nullptr || !tilemapAsset->isLoaded())
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
 	{
 		return {0.0, 0.0};
 	}
 
 	const Transform* transform = getTransform();
-	if (transform == nullptr)
+	if ( transform == nullptr )
 	{
 		return {0.0, 0.0};
 	}
@@ -125,13 +129,13 @@ Vector2 TilemapComponent::worldToCell(Vector2 worldPos) const
 
 Vector2 TilemapComponent::cellToWorld(Vector2 cell) const
 {
-	if (tilemapAsset == nullptr || !tilemapAsset->isLoaded())
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
 	{
 		return {0.0, 0.0};
 	}
 
 	const Transform* transform = getTransform();
-	if (transform == nullptr)
+	if ( transform == nullptr )
 	{
 		return {0.0, 0.0};
 	}
@@ -148,13 +152,13 @@ Vector2 TilemapComponent::cellToWorld(Vector2 cell) const
 
 int TilemapComponent::getTileAt(Vector2 cell) const
 {
-	if (tilemapAsset == nullptr || !tilemapAsset->isLoaded())
+	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
 	{
 		return 0;
 	}
 
 	return tilemapAsset->getTile(static_cast<int>(cell.x),
-	                             static_cast<int>(cell.y));
+								 static_cast<int>(cell.y));
 }
 
 int TilemapComponent::getTileAtWorld(Vector2 worldPos) const
@@ -170,7 +174,7 @@ bool TilemapComponent::hasTileAt(Vector2 cell) const
 
 int TilemapComponent::getGridWidth() const
 {
-	if (tilemapAsset == nullptr)
+	if ( tilemapAsset == nullptr )
 	{
 		return 0;
 	}
@@ -179,7 +183,7 @@ int TilemapComponent::getGridWidth() const
 
 int TilemapComponent::getGridHeight() const
 {
-	if (tilemapAsset == nullptr)
+	if ( tilemapAsset == nullptr )
 	{
 		return 0;
 	}
@@ -190,7 +194,6 @@ bool TilemapComponent::isReady() const
 {
 	return tilemapAsset != nullptr && tilemapAsset->isLoaded();
 }
-
 
 void TilemapComponent::setLayer(uint8_t l)
 {

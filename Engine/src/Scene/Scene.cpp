@@ -1,15 +1,9 @@
 #include "Scene/Scene.h"
 
 #include "../../inc/Component/ComponentManager.h"
-#include "../../inc/Component/GridComponent.h"
-#include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Component/TilemapComponent.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
-#include "Component/ShapeRenderer.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
