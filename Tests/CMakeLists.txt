@@ -23,6 +23,7 @@ add_executable(engine_tests
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp
         Networking/SerializationTest.cpp
+        Networking/Messages/MessageDispatcherTest.cpp
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
