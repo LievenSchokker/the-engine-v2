@@ -11,18 +11,26 @@
 #include "Networking/Server/Server.h"
 
 ServerLoop::ServerLoop(std::unique_ptr<Game> game)
-	: specifications(game->getApplicationSpecifications())
-	  , gameWorld(std::make_unique<GameWorld>())
-	  , sceneManager(std::make_unique<SceneManager>())
-	  , server(std::make_unique<Server>(
-		  Server::convertApplicationSettings(specifications),
-		  std::make_unique<TransportGNS>()))
+    : specifications(game->getApplicationSpecifications())
+      , serverRegistry(std::make_unique<NetworkIdentityRegistry>())
+      , sceneManager(std::make_unique<SceneManager>())
+      , server(std::make_unique<Server>(
+          Server::convertApplicationSettings(specifications),
+          std::make_unique<TransportGNS>())),
+         spawnManager(nullptr)
+      , gameWorld(std::make_unique<GameWorld>())
 {
-	clockFunction = []()
-	{
-		using namespace std::chrono;
-		return duration<double>(steady_clock::now().time_since_epoch()).count();
-	};
+    std::unique_ptr<Scene> scenePtr = game->getFirstScene();
+    std::string sceneName = scenePtr->getName();
+
+    spawnManager = std::make_unique<NetworkSpawnManager>(
+        server.get(),
+        scenePtr.get(),
+        serverRegistry.get()
+    );
+
+    sceneManager->addScene(std::move(scenePtr));
+    sceneManager->setActiveScene(sceneName);
 }
 
 ServerLoop::~ServerLoop() = default;
@@ -49,6 +57,7 @@ void ServerLoop::start()
 
 void ServerLoop::update(double deltaTime)
 {
+
 }
 
 void ServerLoop::fixedUpdate(double deltaTime)

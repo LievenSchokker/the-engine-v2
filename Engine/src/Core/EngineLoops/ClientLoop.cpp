@@ -25,7 +25,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  gameWorld(std::make_unique<GameWorld>()),
 	  sceneManager(std::make_unique<SceneManager>()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
-
 {
 	if (specifications.renderBackend == RenderBackend::SDL)
 	{

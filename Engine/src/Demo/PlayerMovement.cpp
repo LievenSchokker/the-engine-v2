@@ -37,10 +37,13 @@ void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
     });
 }
 
-void update(float deltaTime, GameWorld* world)
+void PlayerMovement::update(float deltaTime, GameWorld* world)
 {
+    if (hasAuthority())
+    {
+        handleInput();
+    }
 }
-
 void PlayerMovement::handleInput()
 {
     auto* world = getWorld();
