@@ -1,17 +1,15 @@
-
 #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkBuilder.h"
 
 bool NetworkIdentity::hasAuthority()
 {
-	auto* world = getWorld();
-	if (!world) return false;
+	if (!gameWorld) return false;
 
-	if (world->isServer())
+	if (gameWorld->isServer())
 	{
 		return true;
 	}
-	return ownerId == world->localClientId;
+	return ownerId == gameWorld->localClientId;
 }
 
 void NetworkIdentity::onNetworkSpawn()
@@ -25,7 +23,7 @@ void NetworkIdentity::onNetworkSpawn()
 		{
 			netBehaviour->world = gameWorld;
 			netBehaviour->componentNetworkId = static_cast<uint32_t>(
-			   networkBehaviours.size());
+				networkBehaviours.size());
 			netBehaviour->identity = this;
 			networkBehaviours.push_back(netBehaviour);
 
@@ -39,8 +37,10 @@ void NetworkIdentity::onNetworkSpawn()
 
 void NetworkIdentity::onNetworkDespawn()
 {
-	for (auto* behaviour : networkBehaviours) {
-		if (behaviour) {
+	for (auto* behaviour : networkBehaviours)
+	{
+		if (behaviour)
+		{
 			behaviour->onNetworkDespawn();
 		}
 	}
@@ -56,15 +56,14 @@ void NetworkIdentity::deserialize(CerealReadArchive& archive)
 }
 
 void NetworkIdentity::dispatchAction(uint32_t componentId,
-									 const std::string& action) const
+                                     const std::string& action) const
 {
 	if (componentId >= networkBehaviours.size())
 	{
 		return;
 	}
 
-	NetworkBehaviour* behaviour = networkBehaviours[componentId];
-	if (behaviour)
+	if (NetworkBehaviour* behaviour = networkBehaviours[componentId])
 	{
 		behaviour->executeAction(action);
 	}
@@ -72,5 +71,5 @@ void NetworkIdentity::dispatchAction(uint32_t componentId,
 
 GameWorld* NetworkIdentity::getWorld()
 {
-    return gameWorld;
+	return gameWorld;
 }

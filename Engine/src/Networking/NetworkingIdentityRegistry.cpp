@@ -27,7 +27,6 @@ void NetworkIdentityRegistry::registerIdentity(NetworkIdentity* identity)
 	}
 
 	uint32_t netId = identity->getNetId();
-	std::cout << "Registering identity netId=" << netId << std::endl;
 
 	if (netId == 0) {
 		return;

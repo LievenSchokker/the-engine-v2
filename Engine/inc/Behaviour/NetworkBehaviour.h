@@ -46,12 +46,12 @@ public:
      *
      * Uses NetworkContext/ProgramType to determine runtime mode.
      */;
-    bool isClient();
+    bool isClient() const;
 
     /**
      * @brief Returns true if executing on a client.
      */
-	bool isServer();
+	bool isServer() const;
     /**
      * @brief Returns true if local machine has authority over this object.
      *
@@ -168,9 +168,6 @@ private:
 
     /// Commands are client→server calls
     std::unordered_map<std::string, ActionCallback> commands;
-
-    /// RPCs are server→client calls
-    std::unordered_map<std::string, ActionCallback> rpcs;
 
     /// Unique identifier for this component type on the GameObject
     /// Used in ActionMessage routing (networkComponentIdentity field)

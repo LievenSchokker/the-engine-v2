@@ -18,8 +18,6 @@ public:
 
     NetworkBuilder& command(const std::string& name, Callback callback);
 
-    NetworkBuilder& clientRpc(const std::string& name, Callback callback);
-
 private:
     NetworkBehaviour& target;
 };

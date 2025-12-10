@@ -7,10 +7,3 @@ NetworkBuilder& NetworkBuilder::command(const std::string& name,
 	target.commands[name] = std::move(callback);
 	return *this;
 }
-
-NetworkBuilder& NetworkBuilder::clientRpc(const std::string& name,
-                                          Callback callback)
-{
-	target.rpcs[name] = std::move(callback);
-	return *this;
-}

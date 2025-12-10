@@ -4,12 +4,12 @@
 
 NetworkBehaviour::NetworkBehaviour() = default;
 
-bool NetworkBehaviour::isServer()
+bool NetworkBehaviour::isServer() const
 {
     return world && world->isServer();
 }
 
-bool NetworkBehaviour::isClient()
+bool NetworkBehaviour::isClient() const
 {
     return world && world->isClient();
 }
@@ -27,23 +27,11 @@ GameWorld* NetworkBehaviour::getWorld()
 
 void NetworkBehaviour::executeAction(const std::string& actionKey)
 {
-	// Check commands map (client → server)
-	auto cmdIt = commands.find(actionKey);
-	if (cmdIt != commands.end())
+	auto commandEntry = commands.find(actionKey);
+
+	if (commandEntry != commands.end())
 	{
 		ReadArchive emptyArchive(nullptr, 0);
-		cmdIt->second(emptyArchive);  // <-- Actually call the callback!
-		return;
+		commandEntry->second(emptyArchive);
 	}
-
-	// Check RPCs map (server → client)
-	auto rpcIt = rpcs.find(actionKey);
-	if (rpcIt != rpcs.end())
-	{
-		ReadArchive emptyArchive(nullptr, 0);
-		rpcIt->second(emptyArchive);
-		return;
-	}
-
-	std::cerr << "[NetworkBehaviour] Unknown action: " << actionKey << std::endl;
 }

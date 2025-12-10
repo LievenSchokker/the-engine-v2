@@ -39,6 +39,7 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 	}
 
 	auto gameObject = prefabLibrary->instantiate(assetId);
+
 	if (!gameObject)
 	{
 		std::cerr << "[NetworkSpawnManager] Failed to instantiate assetId=" <<
@@ -60,13 +61,13 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 	identity->gameWorld = gameWorld;
 	identity->onNetworkSpawn();
 
-	if (identityRegistry && identity)
+	if (identityRegistry)
 	{
 		identityRegistry->registerIdentity(identity);
 	}
 
-	GameObject* rawPtr = gameObject.get();
-	spawnedObjects[networkId] = rawPtr;
+	GameObject* gameObjectPointer = gameObject.get();
+	spawnedObjects[networkId] = gameObjectPointer;
 	objectAssets[networkId] = assetId;
 
 	if (ownerId >= 0)
@@ -80,13 +81,11 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 
 	if (server)
 	{
-		SpawnMessage msg = createSpawnMessage(identity, assetId);
-		std::cout << "[NetworkSpawnManager] Broadcasting SpawnMessage netId="
-			<< msg.netId << " assetId=" << msg.assetId << std::endl;
-		server->broadcastMessage(msg);
+		SpawnMessage message = createSpawnMessage(identity, assetId);
+		server->broadcastMessage(message);
 	}
 
-	return rawPtr;
+	return gameObjectPointer;
 }
 
 GameObject* NetworkSpawnManager::spawnPlayer(int clientId,
@@ -155,12 +154,12 @@ void NetworkSpawnManager::syncExistingObjects(int clientId)
 {
 	if (!server) return;
 
-	for (const auto& [netId, obj] : spawnedObjects)
+	for (const auto& [networkIdentity, gameObject] : spawnedObjects)
 	{
-		auto* identity = obj->getComponent<NetworkIdentity>();
+		auto* identity = gameObject->getComponent<NetworkIdentity>();
 		if (!identity) continue;
 
-		uint32_t assetId = objectAssets[netId];
+		const uint32_t assetId = objectAssets[networkIdentity];
 		SpawnMessage message = createSpawnMessage(identity, assetId);
 		server->sendMessage(clientId, message);
 	}
@@ -193,36 +192,20 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 
 void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
 {
-	std::cout << "[handleSpawnMessage] Start - netId=" << message.netId
-		<< " assetId=" << message.assetId << std::endl;
-
-	std::cout << "[handleSpawnMessage] prefabLibrary pointer: " << prefabLibrary
-		<< std::endl;
-
 	if (!prefabLibrary)
 	{
-		std::cerr << "[handleSpawnMessage] No PrefabLibrary!" << std::endl;
 		return;
 	}
-
-	std::cout << "[handleSpawnMessage] prefabLibrary->size() = " <<
-		prefabLibrary->size() << std::endl;
-
-	std::cout << "[handleSpawnMessage] Instantiating prefab..." << std::endl;
 	auto gameObject = prefabLibrary->instantiate(message.assetId);
 	if (!gameObject)
 	{
-		std::cerr << "[handleSpawnMessage] Failed to instantiate" << std::endl;
 		return;
 	}
 
-	std::cout << "[handleSpawnMessage] Setting transform..." << std::endl;
 	gameObject->getTransform()->setPosition(message.position);
 	gameObject->getTransform()->setRotationAngle(message.rotation);
 	gameObject->getTransform()->setScale(message.scale);
 
-	std::cout << "[handleSpawnMessage] Getting/adding NetworkIdentity..." <<
-		std::endl;
 	auto* identity = gameObject->getComponent<NetworkIdentity>();
 	if (!identity)
 	{
@@ -233,29 +216,23 @@ void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
 	identity->networkId = message.netId;
 	identity->ownerId = message.ownerId;
 	identity->gameWorld = gameWorld;
-	std::cout << "[handleSpawnMessage] Registering identity..." << std::endl;
+
 	if (identityRegistry && identity)
 	{
 		identityRegistry->registerIdentity(identity);
 	}
 
-	std::cout << "[handleSpawnMessage] Storing references..." << std::endl;
 	GameObject* rawPtr = gameObject.get();
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
-	std::cout << "[handleSpawnMessage] Adding to scene..." << std::endl;
 	if (!scene)
 	{
-		std::cerr << "[handleSpawnMessage] Scene is null!" << std::endl;
 		return;
 	}
 	scene->addGameObject(std::move(gameObject));
 
-	std::cout << "[handleSpawnMessage] Calling onNetworkSpawn..." << std::endl;
 	identity->onNetworkSpawn();
-
-	std::cout << "[handleSpawnMessage] Complete!" << std::endl;
 }
 
 GameObject* NetworkSpawnManager::getObjectByNetId(uint32_t netId) const
