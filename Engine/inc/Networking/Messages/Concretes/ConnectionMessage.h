@@ -1,13 +1,6 @@
 #pragma once
 
-
-<<<<<<<< HEAD:Engine/inc/Networking/Messages/ConcreteMessages/ConnectionMessage.h
-#include "../IMessage.h"
-#include "MessageTypes.h"
-========
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/MessageTypes.h"
->>>>>>>> origin/development:Engine/inc/Networking/Messages/Concretes/ConnectionMessage.h
 #include "Networking/Connection/ConnectionStatus.h"
 
 

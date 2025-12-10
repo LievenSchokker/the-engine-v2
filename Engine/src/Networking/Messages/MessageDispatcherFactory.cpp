@@ -1,6 +1,6 @@
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Networking/Messages/MessageDispatcher.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include "Networking/MessageHandlers/IMessageHandler.h"
 #include "Networking/MessageHandlers/ConnectionMessageHandler.h"
 #include "Scene/SceneManager.h"

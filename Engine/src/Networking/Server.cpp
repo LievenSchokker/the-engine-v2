@@ -7,7 +7,7 @@
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/MessageReader.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"

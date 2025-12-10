@@ -1,13 +1,13 @@
 #pragma once
 
 
-#include "../IMessage.h"
 
 #include <string>
 #include <vector>
 #include <cstdint>
 
 #include "Networking/Serialization/Serialization.h"
+#include "Networking/Messages/IMessage.h"
 
 /**
  * @class ActionMessage
@@ -53,7 +53,7 @@ public:
      *
      */
     bool deserialize(const std::byte* data, size_t length);
-    
+
     MessageTypes getMessageType() const override;
 
     /**
