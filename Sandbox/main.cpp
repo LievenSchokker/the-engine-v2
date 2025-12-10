@@ -1,34 +1,27 @@
-<<<<<<< HEAD
 //
 // Created by Lieven Schokker on 07/11/2025.
 //
 
 #include "EntryPoint.h"
 #include "Scene/SceneManager.h"
-=======
+
 
 #include <iostream>
-
 #include "EntryPoint.h"
 #include "Component/Profiler/Profiler.h"
 #include "Component/UIElement/UIPanelElement.h"
 #include "Component/UIElement/UIProgressBar.h"
 #include "Component/UIElement/UISpacer.h"
->>>>>>> origin/development
 
 #undef main
 
 int main(int argc, char** argv)
 {
-<<<<<<< HEAD
-    SceneManager sceneManager = SceneManager();
 
-    return SpelMotorEntry::main(argc, argv);
-=======
+    SceneManager sceneManager = SceneManager();
 	ApplicationSpecifications spec = {};
 	spec.networkingOptions.port = 8080;
 	spec.networkingOptions.serverIP = "127.0.0.1";
-	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
 	spec.windowOptions = {"GameEngine", 700, 700};
@@ -44,5 +37,4 @@ int main(int argc, char** argv)
 	spel->addScene(std::move(scene));
 	spel->setApplicationSpecifications(spec);
 	return SpelMotorEntry::main(std::move(spel));
->>>>>>> origin/development
 }

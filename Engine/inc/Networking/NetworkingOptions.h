@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-#include <string>
-
-#include "Core/EngineMode.h"
-
-=======
 #pragma once
 
 
@@ -11,7 +5,6 @@
 #include "Core/EngineMode.h"
 
 
->>>>>>> origin/development
 struct NetworkingOptions
 {
     EngineMode mode;

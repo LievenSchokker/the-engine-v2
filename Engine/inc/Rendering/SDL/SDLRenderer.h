@@ -25,10 +25,7 @@
 
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/IRenderer.h"
-<<<<<<< HEAD
-=======
 #include "Rendering/RenderCommand.h"
->>>>>>> origin/development
 
 #include <SDL.h>
 #include <memory>
@@ -140,11 +137,6 @@ class SDLRenderer: public IRenderer
 					   const Vector2& scale);
 
 
-<<<<<<< HEAD
-    void render(const RenderQueue& queue) override;
-   private:
-=======
->>>>>>> origin/development
     std::unique_ptr<IUIRenderHook> userInterfaceHook;
 
     bool ensureSolidQuadTexture();

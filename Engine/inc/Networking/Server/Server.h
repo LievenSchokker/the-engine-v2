@@ -1,8 +1,4 @@
 #pragma once
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/development
 
 #include <memory>
 #include <unordered_set>
@@ -16,10 +12,7 @@
 #include "Networking/Context/NetworkContext.h"
 #include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/Server/ServerStatus.h"
-<<<<<<< HEAD
-=======
-#include "Networking/Messages/MessageDispatcherFactory.h"
->>>>>>> origin/development
+
 
 class TransportGNS;
 class IMessage;
@@ -28,10 +21,7 @@ class ConnectionMessage;
 struct ServerConnectionInformation;
 struct IncomingRawMessage;
 struct Connection;
-<<<<<<< HEAD
-=======
-class MessageDispatcher;
->>>>>>> origin/development
+
 
 enum class ConnectionStatus : uint8_t;
 
@@ -100,11 +90,8 @@ public:
      */
     void kickClient(int clientId);
 
-<<<<<<< HEAD
     void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
-=======
-	void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
->>>>>>> origin/development
+
 
     /**
      * @brief Sends message with explicit delivery guarantees
@@ -142,17 +129,14 @@ public:
      */
     bool broadcastMessage(const IMessage& message, int excludeClientId) const;
 
-<<<<<<< HEAD
     using ClientConnectedCallback = std::function<void(int clientId)>;
     using ClientDisconnectedCallback = std::function<void(int clientId)>;
 
     void setClientConnectedCallback(ClientConnectedCallback callback);
     void setClientDisconnectedCallback(ClientDisconnectedCallback callback);
 
-=======
     static ServerConnectionInformation convertApplicationSettings(const ApplicationSpecifications& specifications);
 private:
->>>>>>> origin/development
     /**
      * @brief Deserializes and routes incoming messages
      *
@@ -194,7 +178,6 @@ private:
 
     /// @brief Fast lookup set for validating message sources and broadcast targets
     std::unordered_set<int> connectedClients;
-<<<<<<< HEAD
 
     std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
 
@@ -206,8 +189,3 @@ private:
     ClientDisconnectedCallback onClientDisconnected;
 
 };
-
-=======
-    std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
-};
->>>>>>> origin/development

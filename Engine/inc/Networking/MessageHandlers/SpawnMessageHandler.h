@@ -1,15 +1,19 @@
 #pragma once
 
-#include "IMessageHandler.h"
+#include "BaseMessageHandler.h"
+#include "Networking/Messages/ConcreteMessages/SpawnMessage.h"
 
 class NetworkSpawnManager;
 
-class SpawnMessageHandler: public IMessageHandler
+class SpawnMessageHandler : public BaseMessageHandler<SpawnMessage>
 {
 public:
-	explicit SpawnMessageHandler(NetworkSpawnManager& spawnManager);
-	void handle(const IMessage& message) override;
+    SpawnMessageHandler(GameWorld& world, NetworkSpawnManager& spawnManager);
+    ~SpawnMessageHandler() override = default;
+
+protected:
+    void handleMessageInternal() override;
 
 private:
-	NetworkSpawnManager& spawnManager;
+    NetworkSpawnManager& spawnManager;
 };

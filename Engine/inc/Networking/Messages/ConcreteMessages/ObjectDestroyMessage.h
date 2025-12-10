@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include <cstdint>
 
 /**

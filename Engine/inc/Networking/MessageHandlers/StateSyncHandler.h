@@ -1,23 +1,19 @@
 #pragma once
 
-#include "IMessageHandler.h"
-#include "Networking/NetworkingIdentityRegistry.h"
-#include "Networking/Messages/IMessage.h"
+#include "BaseMessageHandler.h"
+#include "Networking/Messages/ConcreteMessages/StateSyncMessage.h"
 
-class NetworkContext;
+class NetworkIdentityRegistry;
 
-/**
- * @brief Handles incoming StateSyncMessage on clients.
- *
- * Applies received transform state to all non-owned networked objects.
- */
-class StateSyncMessageHandler : public IMessageHandler
+class StateSyncMessageHandler : public BaseMessageHandler<StateSyncMessage>
 {
 public:
-	StateSyncMessageHandler(NetworkContext& context, NetworkIdentityRegistry& registry);
-	void handle(const IMessage& message) override;
+    StateSyncMessageHandler(GameWorld& world, NetworkIdentityRegistry& registry);
+    ~StateSyncMessageHandler() override = default;
+
+protected:
+    void handleMessageInternal() override;
 
 private:
-	NetworkContext& context;
-	NetworkIdentityRegistry& registry;
+    NetworkIdentityRegistry& registry;
 };

@@ -37,12 +37,8 @@ void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
     });
 }
 
-void PlayerMovement::update()
+void update(float deltaTime, GameWorld* world)
 {
-    if (isClient() && hasAuthority())
-    {
-        handleInput();
-    }
 }
 
 void PlayerMovement::handleInput()

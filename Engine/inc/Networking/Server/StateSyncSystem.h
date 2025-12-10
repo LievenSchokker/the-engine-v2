@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Networking/Messages/Concretes/StateSyncMessage.h"
+#include "Networking/Messages/ConcreteMessages/StateSyncMessage.h"
 #include "Networking/NetworkingIdentityRegistry.h"
 
 class Server;

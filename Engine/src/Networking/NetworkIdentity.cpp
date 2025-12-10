@@ -2,7 +2,7 @@
 #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkBuilder.h"
 
-bool NetworkIdentity::hasAuthority() const
+bool NetworkIdentity::hasAuthority()
 {
 	auto* world = getWorld();
 	if (!world) return false;
@@ -59,4 +59,9 @@ void NetworkIdentity::dispatchAction(uint32_t componentId,
 	{
 		behaviour->executeAction(action);
 	}
+}
+
+GameWorld* NetworkIdentity::getWorld()
+{
+    return gameWorld;
 }

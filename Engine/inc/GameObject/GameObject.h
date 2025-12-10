@@ -255,24 +255,6 @@ public:
 	 */
 	bool getIsDestroyed() const;
 
-private:
-	std::unique_ptr<ComponentManager> componentManager;
-	std::unique_ptr<Transform> transform;
-	Scene* scene;
-	std::string name;
-	int layer;
-	std::string tag;
-
-<<<<<<< HEAD
-        /**
-         * Checks whether this GameObject has been queued to be destroyed.
-         *
-         * Use this to determine if a GameObject is still present in memory, but should be removed at the end of the frame.
-         * @return the value of @c isDestroyed, set true in @c destroy() method.
-         */
-        bool getIsDestroyed() const;
-
-        Scene* getScene() const { return scene; }
     private:
         std::unique_ptr<ComponentManager> componentManager;
         std::unique_ptr<Transform> transform;
@@ -284,11 +266,6 @@ private:
         bool isActive;
         bool isStatic;
         bool isDestroyed;
-=======
-	bool isActive;
-	bool isStatic;
-	bool isDestroyed;
->>>>>>> origin/development
 };
 
 #include "GameObjectImplementation.inl"

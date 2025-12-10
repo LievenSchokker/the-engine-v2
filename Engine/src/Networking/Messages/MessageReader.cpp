@@ -1,97 +1,60 @@
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/IncomingRawMessage.h"
-<<<<<<< HEAD
-#include "Networking/Messages/MessageTypes.h"
-#include "Networking/Messages/Concretes/ActionMessage.h"
-#include "Networking/Messages/Concretes/ObjectDestroyMessage.h"
-#include "Networking/Messages/Concretes/SpawnMessage.h"
-#include "Networking/Messages/Concretes/StateSyncMessage.h"
-#include "Networking/Messages/Concretes/WelcomeMessage.h"
-=======
 #include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
->>>>>>> origin/development
 
 #include <iostream>
 #include <cstring>
 
-<<<<<<< HEAD
-
-
-std::unique_ptr<IMessage> MessageReader::readMessage(
-	const IncomingRawMessage rawMessage)
-=======
 std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage rawMessage)
->>>>>>> origin/development
 {
-	if (rawMessage.length < sizeof(uint8_t)) {
-		return nullptr;
-	}
+    if (rawMessage.length < sizeof(uint8_t))
+    {
+        return nullptr;
+    }
 
-	MessageTypes messageType = readMessageHeader(rawMessage);
+    MessageTypes messageType = readMessageHeader(rawMessage);
 
-	std::unique_ptr<IMessage> message = createMessage(messageType);
+    std::unique_ptr<IMessage> message = createMessage(messageType);
 
-	if (message == nullptr) {
-		return nullptr;
-	}
+    if (message == nullptr)
+    {
+        return nullptr;
+    }
 
-	const std::byte* payloadData = rawMessage.data + sizeof(uint8_t);
-	size_t payloadLength = rawMessage.length - sizeof(uint8_t);
+    const std::byte* payloadData = rawMessage.data + sizeof(uint8_t);
+    size_t payloadLength = rawMessage.length - sizeof(uint8_t);
 
-	if (message->deserialize(payloadData, payloadLength)) {
-		return message;
-	} else {
-		return nullptr;
-	}
+    if (message->deserialize(payloadData, payloadLength))
+    {
+        return message;
+    }
+    else
+    {
+        return nullptr;
+    }
 }
 
 std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
 {
-	std::unique_ptr<IMessage> message;
+    std::unique_ptr<IMessage> message;
 
-<<<<<<< HEAD
-	switch (messageType) {
-		case MessageTypes::ConnectionMessage:
-			message = std::make_unique<ConnectionMessage>();
-			break;
-		case MessageTypes::ActionMessage:
-			message = std::make_unique<ActionMessage>();
-			break;
-		case MessageTypes::SpawnMessage:
-			message = std::make_unique<SpawnMessage>();
-			break;
-		case MessageTypes::ObjectDestroyMessage:
-			message = std::make_unique<ObjectDestroyMessage>();
-			break;
-		case MessageTypes::WelcomeMessage:
-			message = std::make_unique<WelcomeMessage>();
-			break;
-		case MessageTypes::StateSyncMessage:
-			message = std::make_unique<StateSyncMessage>();
-			break;
-=======
     switch (messageType)
     {
-        case MessageTypes::ConnectionMessage:
-            message = std::make_unique<ConnectionMessage>();
-            break;
-        default:
-            return nullptr;
+    case MessageTypes::ConnectionMessage:
+        message = std::make_unique<ConnectionMessage>();
+        break;
+    default:
+        return nullptr;
     }
->>>>>>> origin/development
 
-		default:
-			return nullptr;
-	}
-
-	return message;
+    return message;
 }
 
 MessageTypes MessageReader::readMessageHeader(const IncomingRawMessage& message)
 {
-	const std::byte* data = message.data;
-	MessageTypes messageType;
-	std::memcpy(&messageType, data, sizeof(uint8_t));
-	return messageType;
+    const std::byte* data = message.data;
+    MessageTypes messageType;
+    std::memcpy(&messageType, data, sizeof(uint8_t));
+    return messageType;
 }

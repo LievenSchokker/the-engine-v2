@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "NetworkingIdentityRegistry.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 class GameObject;
 class Scene;

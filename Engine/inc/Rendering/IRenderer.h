@@ -18,12 +18,8 @@
  */
 
 #pragma once
-<<<<<<< HEAD
-#include "RenderQueue.h"
-=======
 #include "RenderCommand.h"
 #include "Scene/Scene.h"
->>>>>>> origin/development
 
 
 class string;
@@ -119,18 +115,5 @@ public:
 	virtual void setTitle(const std::string& title) = 0;
 
 
-<<<<<<< HEAD
-	/**
-	 * @brief Draw a filled rectangle with the given configuration.
-	 */
-	virtual void drawRectangle(const Vector2& center, const Vector2& size,
-							   double rotationDegrees, const Color& color,
-							   const Vector2& scale) = 0;
-
-    virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
-
-    virtual void render(const RenderQueue& queue) = 0;
-=======
 	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
->>>>>>> origin/development
 };

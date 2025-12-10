@@ -1,21 +1,19 @@
 #pragma once
 
 #include "BaseMessageHandler.h"
-#include "Networking/Messages/Concretes/ActionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ActionMessage.h"
 
-class NetworkContext;
 class NetworkIdentityRegistry;
 
-class ActionMessageHandler: public BaseMessageHandler<ActionMessage>
+class ActionMessageHandler : public BaseMessageHandler<ActionMessage>
 {
 public:
-	ActionMessageHandler(NetworkContext& context,
-	                     NetworkIdentityRegistry& registry);
-	~ActionMessageHandler() override = default;
+    ActionMessageHandler(GameWorld& world, NetworkIdentityRegistry& registry);
+    ~ActionMessageHandler() override = default;
 
 protected:
-	void handleMessageInternal(const ActionMessage& message) override;
+    void handleMessageInternal() override;
 
 private:
-	NetworkIdentityRegistry& identityRegistry;
+    NetworkIdentityRegistry& identityRegistry;
 };

@@ -1,4 +1,4 @@
-#include "Networking/Messages/Concretes/ActionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ActionMessage.h"
 #include "Networking/Serialization/Serialization.h"
 
 ActionMessage::ActionMessage() : networkComponentIdentity(0)

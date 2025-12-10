@@ -17,24 +17,19 @@ add_executable(engine_tests
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
-<<<<<<< HEAD
         GameObject/tests_game_object.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
-=======
         Component/GridComponentTest.cpp
         Scene/SceneManagerTest.cpp
         Networking/Messages/ActionMessageTest.cpp
->>>>>>> origin/development
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp
         Networking/SerializationTest.cpp
         Networking/Messages/MessageDispatcherTest.cpp
         Networking/ServerTest.cpp
-<<<<<<< HEAD
-=======
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
         Math/TestsVector2.cpp
@@ -45,7 +40,6 @@ add_executable(engine_tests
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
->>>>>>> origin/development
 )
 
 target_link_libraries(engine_tests PRIVATE

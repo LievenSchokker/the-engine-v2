@@ -142,20 +142,7 @@ public:
 	 */
 	void queueDestroy(GameObject* gameObject);
 
-<<<<<<< HEAD
-    /**
-    * @brief Sets the GameWorld reference for this scene.
-    * Called by SceneManager when scene is added.
-    */
-    void setWorld(GameWorld* world);
 
-    /**
-     * @brief Gets the GameWorld for accessing engine systems.
-     */
-    GameWorld* getWorld() const { return gameWorld; }
-
-   private:
-=======
 	/**
 	 * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
 	 * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
@@ -183,7 +170,6 @@ public:
 	std::vector<T*> getAllComponentsOfType() const;
 
 private:
->>>>>>> origin/development
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 	std::vector<GameObject*> destroyQueue;

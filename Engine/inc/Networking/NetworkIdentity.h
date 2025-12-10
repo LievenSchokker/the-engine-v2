@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Component/Component.h"
+#include "../Component/BaseComponentTypes/Component.h"
 #include <cstdint>
 #include <vector>
 
 class NetworkBehaviour;
-
+class GameWorld;
 /**
  * @brief Identifies a GameObject on the network and manages its NetworkBehaviours.
  *
@@ -21,7 +21,7 @@ class NetworkIdentity : public Component
 {
 public:
     NetworkIdentity() = default;
-    ~NetworkIdentity() override = default;
+    ~NetworkIdentity() = default;
 
     /**
      * @brief Unique network identifier assigned at spawn.
@@ -45,6 +45,7 @@ public:
      */
     bool hasAuthority() const;
 
+    bool hasAuthority();
     /**
      * @brief Called by NetworkSpawnManager when spawned on network.
      *
@@ -70,7 +71,9 @@ public:
      */
     void dispatchAction(uint32_t componentId, const std::string& action);
 
+    GameWorld* getWorld();
 private:
+    GameWorld* gameWorld;
     uint32_t networkId = 0;
     int ownerId = -1;
 

@@ -1,21 +1,13 @@
 #include "Scene/Scene.h"
 
-#include "../../inc/Component/ComponentManager.h"
-#include "../../inc/Component/GridComponent.h"
-#include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Component/TilemapComponent.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
+#include "Component/GridComponent.h"
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
-#include "Component/ComponentManager.h"
-#include "Component/ShapeRenderer.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
 #include <utility>
 
-#include "Behaviour/Behaviour.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -34,25 +26,13 @@ const std::string& Scene::getName() const
 
 bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
-    if (gameObject == nullptr) {
-        std::cerr << "Error: Attempted to add a null game object\n";
-        return false;
-    }
+	if ( gameObject == nullptr ) {
+		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
+		return false;
+	}
 
-<<<<<<< HEAD
-    gameObject->setScene(*this);
+	bool isGameObjectActive = gameObject->getIsActive();
 
-    // Get raw pointer BEFORE moving
-    GameObject* rawPtr = gameObject.get();
-
-    gameObjects.emplace_back(std::move(gameObject));
-
-    if (active)
-    {
-        // Use rawPtr instead of the moved-from gameObject
-        initialiseBehaviours(rawPtr->getAllBehaviours());
-    }
-=======
 	gameObjects.emplace_back(std::move(gameObject));
     GameObject* addedObject = gameObjects.back().get();
     addedObject->setScene(*this);
@@ -62,9 +42,8 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
 	    initialiseBehaviours(addedObject->getAllBehaviours());
 	}
->>>>>>> origin/development
 
-    return true;
+	return true;
 }
 
 bool Scene::removeGameObject(const std::string& name)
@@ -131,7 +110,6 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 
 void Scene::onStart()
 {
-    std::cout << "Scene::onStart called for " << name << std::endl;
 	if ( active ) {
 		return;
 	}
@@ -206,45 +184,6 @@ void Scene::update(double deltaTime, GameWorld* world)
 		return;
 	}
 
-<<<<<<< HEAD
-    /// Update all GameObject's behaviours:
-    for ( auto& gameObject : gameObjects )
-    {
-        /// Only behaviours on active GameObjects should be updated.
-        if (!gameObject->getIsActive())
-            continue;
-
-        /// Iterate over all enabled behaviours.
-        for (const auto& behaviour : gameObject->getEnabledBehaviours())
-        {
-            /// Only update
-            if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
-                continue;
-            behaviour->update();
-        }
-    }
-
-    processDestroyQueue();
-}
-
-void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
-{
-    if (!active) return;
-    for (const auto& gameObject : gameObjects)
-    {
-        if (!gameObject->getIsActive()) continue;
-
-        auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
-        if (shapeRenderer)
-        {
-            auto cmd = shapeRenderer->buildRenderCommand();
-            if (cmd.has_value())
-            {
-                out.push_back(cmd.value());
-            }
-        }
-    }
-=======
 	for (auto& gameObject : gameObjects)
 	{
 		if (!gameObject->getIsActive())
@@ -259,64 +198,22 @@ void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 	}
 
 	processDestroyQueue();
->>>>>>> origin/development
 }
-//
-// void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
-// {
-// 	if ( !active ) {
-// 		return;
-// 	}
-//
-// 	std::vector<ShapeRenderCommand> debugCommands;
-// 	for ( const auto& gameObject : gameObjects ) {
-// 		if ( !gameObject->getIsActive() ) {
-// 			continue;
-// 		}
-//
-// 		// Collect ShapeRenderer commands
-// 		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
-// 		if ( shapeRenderer != nullptr ) {
-// 			const auto command = shapeRenderer->buildRenderCommand();
-// 			if ( command.has_value() ) {
-// 				out.emplace_back(*command);
-// 			}
-// 		}
-//
-// 		// Collect TilemapComponent commands
-// 		auto* tilemapComponent = gameObject->getComponent<TilemapComponent>();
-// 		if ( tilemapComponent != nullptr ) {
-// 			const auto tilemapCommands =
-// 				tilemapComponent->buildRenderCommands();
-// 			out.insert(out.end(), tilemapCommands.begin(),
-// 					   tilemapCommands.end());
-// 		}
-//
-// 		// Collect GridComponent debug render commands
-// 		auto* gridComponent = gameObject->getComponent<GridComponent>();
-// 		if ( gridComponent != nullptr &&
-// 			 gridComponent->isDebugRenderEnabled() ) {
-// 			const auto gridCommands = gridComponent->buildDebugRenderCommands();
-// 			debugCommands.insert(debugCommands.end(), gridCommands.begin(),
-// 								 gridCommands.end());
-// 		}
-// 	}
-//
-// 	// Append deferred debug overlays after regular render commands.
-// 	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
-// }
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
 {
+    /// First call awake on all behaviours:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
             continue;
 
+        /// Awake may only be called once per behaviour
         if (!behaviour->getHasAwakened())
             behaviour->awake();
     }
 
+    /// Then call onEnable on all enabled behaviours on active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
@@ -326,6 +223,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
             behaviour->onEnable();
     }
 
+    /// Lastly call start on all enabled behaviours on Active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
@@ -334,6 +232,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
         if (!behaviour->getIsActiveAndEnabled())
             continue;
 
+        /// Start may only be called once per behaviour
         if (!behaviour->getHasStarted())
             behaviour->start();
     }
@@ -341,6 +240,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
 
 void Scene::queueDestroy(GameObject *obj)
 {
+    /// Check if the object is already in the destroyQueue.
     for (auto* queued : destroyQueue)
     {
         if (queued == obj)
@@ -358,7 +258,8 @@ void Scene::processDestroyQueue()
 
         gameObject->onSceneDestroy();
 
-
+        /// Remove the GameObject from the stored gameObjects,
+        /// Destroys the GameObject stored in the unqiue ptr automatically.
         gameObjects.erase(
             std::remove_if(
                 gameObjects.begin(),
@@ -372,15 +273,10 @@ void Scene::processDestroyQueue()
         );
     }
 
+    /// Clear the queue when all queued objects have been deleted.
     destroyQueue.clear();
 }
 
-<<<<<<< HEAD
-void Scene::setWorld(GameWorld* world)
-{
-    gameWorld = world;
-}
-=======
 bool Scene::isInDestroyQueue(GameObject *obj)
 {
     if (obj == nullptr)
@@ -400,4 +296,3 @@ void Scene::destroyAllGameObjects()
 
     gameObjects.clear();
 }
->>>>>>> origin/development

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include <cstdint>
 #include <vector>
 
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 
 /**
  * @brief Message sent when a networked object is spawned.

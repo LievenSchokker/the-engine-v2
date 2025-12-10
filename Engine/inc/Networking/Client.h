@@ -1,23 +1,15 @@
 #pragma once
-<<<<<<< HEAD
-#include <memory>
-#include "Connection/Connection.h"
-#include "Server/Server.h"
-class NetworkContext;
 
 namespace spelmotor_networking
 {
     class MessageDispatcher;
 }
-=======
 
 #include "Connection/Connection.h"
 #include "Core/GameWorld.h"
 #include "Server/ServerInformation.h"
 #include "Networking/Messages/MessageDispatcher.h"
-
 #include <memory>
->>>>>>> origin/development
 
 class ITransport;
 class TransportGNS;
@@ -25,10 +17,7 @@ class IMessage;
 class NetworkContext;
 
 struct IncomingRawMessage;
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/development
 /**
  * @brief Network client for connecting to and communicating with a server.
  *
@@ -48,24 +37,13 @@ public:
      */
     ~Client();
 
-<<<<<<< HEAD
-        /**
-         * @brief Initiates a connection to a server.
-         * @param serverInformartion
-         * @return True if the connection attempt was initiated successfully,
-         *         false otherwise.
-         */
-        bool connectToServer(const ServerConnectionInformation&  serverInformartion) const;
-=======
     /**
      * @brief Initiates a connection to a server.
-     * @param serverInformartion The server port to connect to.
-     * @param serverIP The server IP address as a null-terminated string.
+     * @param serverInformartion
      * @return True if the connection attempt was initiated successfully,
      *         false otherwise.
      */
     bool connectToServer(const ServerConnectionInformation&  serverInformartion) const;
->>>>>>> origin/development
 
     /**
      * @brief Disconnects from the server.
@@ -94,28 +72,19 @@ public:
     bool isConnected() const;
 
     void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
-private:
-    /**
-     * @brief Callback invoked when a message is received from the server.
-     * @param rawMessage The incoming raw message data.
-     */
-    void onMessageReceived(const IncomingRawMessage& rawMessage) const;
 
-<<<<<<< HEAD
-        NetworkContext& getNetworkContext() { return *networkContext; }
     private:
         /**
          * @brief Callback invoked when a message is received from the server.
          * @param rawMessage The incoming raw message data.
          */
         void onMessageReceived(const IncomingRawMessage &rawMessage) const;
-=======
+
     /**
      * @brief Callback invoked when the connection state changes.
      * @param connection The connection whose state changed.
      */
     void onConnectionChanged(const Connection& connection);
->>>>>>> origin/development
 
     std::unique_ptr<GameWorld> gameWorld;
 

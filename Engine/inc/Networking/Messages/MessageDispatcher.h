@@ -2,23 +2,13 @@
 
 
 #include "Networking/MessageHandlers/IMessageHandler.h"
-<<<<<<< HEAD
-
-#include <cstdint>
-#include <memory>
-#include <unordered_map>
-
-
-enum class MessageTypes : uint8_t;
-class IMessage;
-=======
 
 enum class MessageTypes : uint8_t;
 class IMessage;
 
 #include <memory>
 #include <unordered_map>
->>>>>>> origin/development
+
 
 namespace spelmotor_networking
 {

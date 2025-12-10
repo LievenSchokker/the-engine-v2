@@ -3,23 +3,24 @@
 #include "Networking/NetworkIdentity.h"
 #include "GameObject/GameObject.h"
 #include <iostream>
-#include <thread>
 
-ActionMessageHandler::ActionMessageHandler(NetworkContext& context, NetworkIdentityRegistry& registry)
-    : BaseMessageHandler<ActionMessage>(context)
+ActionMessageHandler::ActionMessageHandler(GameWorld& world, NetworkIdentityRegistry& registry)
+    : BaseMessageHandler<ActionMessage>(world)
     , identityRegistry(registry)
 {
 }
 
-void ActionMessageHandler::handleMessageInternal(const ActionMessage& message)
+void ActionMessageHandler::handleMessageInternal()
 {
-    if (!message.validate())
+    const ActionMessage* message = getMessage();
+
+    if (!message->validate())
     {
         std::cerr << "[ActionMessageHandler] Invalid message\n";
         return;
     }
 
-    uint32_t netId = message.getGameObjectIdentity();
+    uint32_t netId = message->getGameObjectIdentity();
 
     NetworkIdentity* identity = identityRegistry.findByNetId(netId);
     if (!identity)
@@ -28,9 +29,9 @@ void ActionMessageHandler::handleMessageInternal(const ActionMessage& message)
         return;
     }
 
-	std::cout << "Handling action message from netId=" << netId << std::endl;
+    std::cout << "Handling action message from netId=" << netId << std::endl;
     identity->dispatchAction(
-        message.getComponentIdentity(),
-        message.getAction()
+        message->getComponentIdentity(),
+        message->getAction()
     );
 }

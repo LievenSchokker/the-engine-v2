@@ -1,4 +1,4 @@
-#include "Networking/Messages/Concretes/SpawnMessage.h"
+#include "Networking/Messages/ConcreteMessages/SpawnMessage.h"
 #include "Networking/Serialization/Serialization.h"
 
 std::vector<std::byte> SpawnMessage::serialize() const

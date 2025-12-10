@@ -2,7 +2,7 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "../../inc/Component/BaseComponentTypes/Component.h"
+#include "Component/BaseComponentTypes/Component.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 #include "Scene/Scene.h"
@@ -33,15 +33,15 @@ const Transform* Component::getTransform() const
 }
 
 
-GameWorld* Component::getWorld() const
-{
-    if (gameObject)
-    {
-        Scene* scene = gameObject->getScene();
-        if (scene)
-        {
-            return scene->getWorld();
-        }
-    }
-    return nullptr;
-}
+// GameWorld* Component::getWorld() const
+// {
+//     if (gameObject)
+//     {
+//         Scene* scene = gameObject->getScene();
+//         if (scene)
+//         {
+//             return scene->getWorld();
+//         }
+//     }
+//     return nullptr;
+// }

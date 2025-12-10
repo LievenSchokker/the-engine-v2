@@ -87,8 +87,6 @@ public:
      */
     uint32_t getTick() const;
 
-
-    MessageTypes getMessageType() const override;
     /// @name Mutators
     /// @{
     /**

@@ -15,7 +15,6 @@ bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 
         return false;
     }
-    scene->setWorld(gameWorld);
 
     scenes.emplace(name, std::move(scene));
     return true;

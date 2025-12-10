@@ -7,25 +7,15 @@
 #include "Physics/Components/RigidBody.h"
 
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
-<<<<<<< HEAD
-	: tickRate(newTickRate)
-=======
     : worldId{}, tickRate(newTickRate)
->>>>>>> origin/development
 {
 }
 
 
 void Box2DPhysicsWorld::start()
 {
-<<<<<<< HEAD
-	worldId = {};
-	b2WorldDef worldDef = b2DefaultWorldDef();
-	worldDef.gravity = {0.0f, 30.0f};
-=======
     b2WorldDef worldDef = b2DefaultWorldDef();
     worldDef.gravity = {0.0f, 30.0f};
->>>>>>> origin/development
 
     b2WorldId box2dWorldId = b2CreateWorld(&worldDef);
     worldId = box2dWorldId;

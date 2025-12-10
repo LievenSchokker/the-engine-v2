@@ -1,4 +1,4 @@
-#include "Networking/Messages/Concretes/ObjectDestroyMessage.h"
+#include "Networking/Messages/ConcreteMessages/ObjectDestroyMessage.h"
 #include "Networking/Serialization/Serialization.h"
 
 std::vector<std::byte> ObjectDestroyMessage::serialize() const

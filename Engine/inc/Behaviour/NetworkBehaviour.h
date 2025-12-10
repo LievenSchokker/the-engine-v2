@@ -2,7 +2,7 @@
 
 
 #include "Behaviour/Behaviour.h"
-#include "Networking/Messages/Concretes/ActionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ActionMessage.h"
 #include "Networking/Serialization/Serialization.h"
 #include "Networking/Connection/ConnectionStatus.h"
 #include "Networking/NetworkIdentity.h"
@@ -31,6 +31,7 @@ class NetworkBehaviour : public Behaviour
 {
 public:
     NetworkBehaviour();
+    bool isServer();
     ~NetworkBehaviour() override = default;
 
     /**
@@ -47,6 +48,7 @@ public:
      * Uses NetworkContext/ProgramType to determine runtime mode.
      */
     bool isServer() const;
+    bool isClient();
 
     /**
      * @brief Returns true if executing on a client.
@@ -60,6 +62,7 @@ public:
      * On client: true only if this client owns the object
      */
     bool hasAuthority() const;
+    GameWorld* getWorld();
 
     /**
      * @brief Override to register Commands and RPCs using the NetworkBuilder.
@@ -160,7 +163,10 @@ protected:
     virtual void readStream(ReadArchive& archive) {}
     uint32_t componentNetworkId = 0;
 
+
+
 private:
+    GameWorld* world = nullptr;
     using ActionCallback = std::function<void(ReadArchive&)>;
 
     /// Commands are client→server calls

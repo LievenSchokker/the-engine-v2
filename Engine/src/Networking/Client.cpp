@@ -9,151 +9,113 @@
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
-<<<<<<< HEAD
-=======
 #include "Networking/Messages/MessageDispatcherFactory.h"
->>>>>>> origin/development
 
 #include <iostream>
 
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
-<<<<<<< HEAD
-	: transport(std::move(injectedTransport))
-=======
     : transport(std::move(injectedTransport)),
     gameWorld(nullptr)
->>>>>>> origin/development
 {
-	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
+    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 
-	transport->setOnMessageReceived([this](const IncomingRawMessage& message)
-	{
-		onMessageReceived(message);
-	});
+    transport->setOnMessageReceived([this](const IncomingRawMessage& message)
+    {
+        onMessageReceived(message);
+    });
 
-<<<<<<< HEAD
-	transport->setOnConnectionChanged([this](const Connection& connection)
-	{
-		onConnectionChanged(connection);
-	});
-=======
     transport->setOnConnectionChanged([this](const Connection& connection)
     {
         onConnectionChanged(connection);
     });
 
     messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *gameWorld);
->>>>>>> origin/development
 }
 
 
 Client::~Client()
 {
-	disconnect();
+    disconnect();
 }
 
-<<<<<<< HEAD
-bool Client::connectToServer(
-	const ServerConnectionInformation& serverInformartion) const
-=======
 
 bool Client::connectToServer(const ServerConnectionInformation&  serverInformartion) const
->>>>>>> origin/development
 {
-	if (transport->connectByIPAdress(serverInformartion.ip.c_str(),
-	                                 serverInformartion.port) !=
-	    TransportResult::SUCCESS)
-	{
-		std::cerr << "Failed to connect to " << serverInformartion.ip << ":" <<
-			serverInformartion.port << std::endl;
-		return false;
-	}
-	return true;
+    if (transport->connectByIPAdress(serverInformartion.ip.c_str(), serverInformartion.port) != TransportResult::SUCCESS)
+    {
+        std::cerr << "Failed to connect to " << serverInformartion.ip << ":" << serverInformartion.port << std::endl;
+        return false;
+    }
+    return true;
 }
 
 
 void Client::disconnect()
 {
-	if (currentConnection.connectionStatus == ConnectionStatus::Connected)
-	{
-		transport->
-			disconnectFromSocket(currentConnection.transportConnectionId);
-	}
-	transport->closeOpenSocket();
-	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
+    if (currentConnection.connectionStatus == ConnectionStatus::Connected)
+    {
+        transport->disconnectFromSocket(currentConnection.transportConnectionId);
+    }
+    transport->closeOpenSocket();
+    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
 
 
 bool Client::sendMessage(const IMessage& message) const
 {
-	if (currentConnection.connectionStatus != ConnectionStatus::Connected)
-	{
-		return false;
-	}
+    if (currentConnection.connectionStatus != ConnectionStatus::Connected)
+    {
+        return false;
+    }
 
-	OutgoingRawMessage outgoing = MessageWriter::writeMessage(
-		message,
-		currentConnection.transportConnectionId,
-		SendMode::ReliableOrdered
-		);
+    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+        message,
+        currentConnection.transportConnectionId,
+        SendMode::ReliableOrdered
+    );
 
-	TransportResult result = transport->send(outgoing);
-	return result == TransportResult::SUCCESS;
+    TransportResult result = transport->send(outgoing);
+    return result == TransportResult::SUCCESS;
 }
 
 
 void Client::poll() const
 {
-	transport->poll();
+    transport->poll();
 }
 
 
 bool Client::isConnected() const
 {
-	return currentConnection.connectionStatus == ConnectionStatus::Connected;
+    return currentConnection.connectionStatus == ConnectionStatus::Connected;
 }
 
 
 void Client::onConnectionChanged(const Connection& connection)
 {
-	currentConnection = connection;
+    currentConnection = connection;
 
-	switch (connection.connectionStatus)
-	{
-		case ConnectionStatus::Connected:
-			break;
+    switch (connection.connectionStatus)
+    {
+    case ConnectionStatus::Connected:
+        std::cout << "Connected to server" << std::endl;
+        break;
 
-		case ConnectionStatus::Connecting:
-			break;
+    case ConnectionStatus::Connecting:
+        std::cout << "Connecting..." << std::endl;
+        break;
 
-		case ConnectionStatus::Error:
-			disconnect();
-			break;
+    case ConnectionStatus::Error:
+        disconnect();
+        std::cout << "Disconnected from server" << std::endl;
+        break;
 
-		default:
-			break;
-	}
+    default:
+        break;
+    }
 }
 
-<<<<<<< HEAD
-void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
-{
-	const std::unique_ptr<IMessage> message = MessageReader::readMessage(
-		rawMessage);
-
-	if (!message)
-	{
-		std::cerr << "Failed to parse message" << std::endl;
-		return;
-	}
-
-	messageDispatcher->processMessage(*message);
-}
-
-void Client::injectMessageDispatcher(
-	std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
-=======
 
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
@@ -170,7 +132,6 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 
 
 void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
->>>>>>> origin/development
 {
-	messageDispatcher = std::move(dispatcher);
+    messageDispatcher = std::move(dispatcher);
 }

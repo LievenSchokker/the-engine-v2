@@ -7,15 +7,9 @@
 
 struct ApplicationSpecifications
 {
-<<<<<<< HEAD
-    NetworkingOptions networkingOptions;
-    WindowOptions windowOptions;
-    RenderBackend renderBackend;
-};
-=======
 	NetworkingOptions networkingOptions;
 	WindowOptions windowOptions;
 	RenderBackend renderBackend;
 	double maxFrameTime;
 };
->>>>>>> origin/development
+

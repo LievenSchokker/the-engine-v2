@@ -1,18 +1,16 @@
 #include "Networking/MessageHandlers/SpawnMessageHandler.h"
-
+#include "Networking/NetworkSpawnManager.h"
 #include <iostream>
 
-#include "Networking/NetworkSpawnManager.h"
-#include "Networking/Messages/Concretes/SpawnMessage.h"
-
-SpawnMessageHandler::SpawnMessageHandler(NetworkSpawnManager& spawnManager)
-    : spawnManager(spawnManager)
+SpawnMessageHandler::SpawnMessageHandler(GameWorld& world, NetworkSpawnManager& spawnManager)
+    : BaseMessageHandler<SpawnMessage>(world)
+    , spawnManager(spawnManager)
 {
 }
 
-void SpawnMessageHandler::handle(const IMessage& message)
+void SpawnMessageHandler::handleMessageInternal()
 {
     std::cout << "Received spawn message" << std::endl;
-    const auto& spawnMsg = static_cast<const SpawnMessage&>(message);
-    spawnManager.handleSpawnMessage(spawnMsg);
+    const SpawnMessage* spawnMsg = getMessage();
+    spawnManager.handleSpawnMessage(*spawnMsg);
 }

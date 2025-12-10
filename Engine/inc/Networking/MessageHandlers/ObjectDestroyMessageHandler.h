@@ -1,13 +1,19 @@
 #pragma once
-#include "IMessageHandler.h"
 
+#include "BaseMessageHandler.h"
+#include "Networking/Messages/ConcreteMessages/ObjectDestroyMessage.h"
 
-class ObjectDestroyMessageHandler: public IMessageHandler
+class NetworkSpawnManager;
+
+class ObjectDestroyMessageHandler : public BaseMessageHandler<ObjectDestroyMessage>
 {
 public:
-	ObjectDestroyMessageHandler(NetworkSpawnManager& spawnManager);
-	void handle(const IMessage& message) override;
+    ObjectDestroyMessageHandler(GameWorld& world, NetworkSpawnManager& spawnManager);
+    ~ObjectDestroyMessageHandler() override = default;
+
+protected:
+    void handleMessageInternal() override;
 
 private:
-	NetworkSpawnManager& spawnManager;
+    NetworkSpawnManager& spawnManager;
 };

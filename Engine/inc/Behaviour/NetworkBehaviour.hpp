@@ -1,4 +1,5 @@
 #include "NetworkBehaviour.h"
+#include "Core/GameWorld.h"
 
 template<typename... Args>
 void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
@@ -8,7 +9,7 @@ void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
 		return;
 	}
 
-	auto* world = getWorld();
+	//auto* world = getWorld();
 	if (!world)
 	{
 		return;

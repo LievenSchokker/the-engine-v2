@@ -1,18 +1,14 @@
-
-
-
-#include "Behaviour/NetworkBehaviour.h"
-#include "Networking/Messages/Concretes/ObjectDestroyMessage.h"
 #include "Networking/MessageHandlers/ObjectDestroyMessageHandler.h"
+#include "Networking/NetworkSpawnManager.h"
+#include "Behaviour/NetworkBehaviour.h"
 
-ObjectDestroyMessageHandler::ObjectDestroyMessageHandler(NetworkSpawnManager& spawnManager)
-    : spawnManager(spawnManager)
+ObjectDestroyMessageHandler::ObjectDestroyMessageHandler(GameWorld& world, NetworkSpawnManager& spawnManager)
+    : BaseMessageHandler<ObjectDestroyMessage>(world)
+    , spawnManager(spawnManager)
 {
 }
 
-void ObjectDestroyMessageHandler::handle(const IMessage& message)
+void ObjectDestroyMessageHandler::handleMessageInternal()
 {
-    const auto& destroyMsg = static_cast<const ObjectDestroyMessage&>(message);
-    // Client-side: just remove from tracking and destroy
-    // The spawnManager needs a client-side despawn method
+    const ObjectDestroyMessage* destroyMsg = getMessage();
 }

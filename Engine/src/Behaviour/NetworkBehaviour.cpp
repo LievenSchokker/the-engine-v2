@@ -1,14 +1,16 @@
 #include "Behaviour/NetworkBehaviour.h"
 
+#include "Core/GameWorld.h"
+
 NetworkBehaviour::NetworkBehaviour() = default;
 
-bool NetworkBehaviour::isServer() const
+bool NetworkBehaviour::isServer()
 {
     auto* world = getWorld();
     return world && world->isServer();
 }
 
-bool NetworkBehaviour::isClient() const
+bool NetworkBehaviour::isClient()
 {
     auto* world = getWorld();
     return world && world->isClient();
@@ -18,6 +20,11 @@ bool NetworkBehaviour::hasAuthority() const
 {
     if (!identity) return false;
     return identity->hasAuthority();
+}
+
+GameWorld* NetworkBehaviour::getWorld()
+{
+    return world;
 }
 
 void NetworkBehaviour::executeAction(const std::string& actionKey)
