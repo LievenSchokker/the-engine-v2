@@ -1,7 +1,7 @@
 #include "Networking/PrefabLibrary.h"
+
+#include "Component/NetworkIdentity.h"
 #include "GameObject/GameObject.h"
-#include "../../inc/Component/NetworkIdentity.h"
-#include "Behaviour/NetworkBehaviour.h"
 
 #include <iostream>
 
@@ -14,35 +14,22 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
     }
 
     uint32_t assetId = nextAssetId++;
+    std::string name = prefab->getName();
 
-    // Check if this prefab has any NetworkBehaviours
-    bool hasNetworkBehaviour = false;
-    for (const auto& component : prefab->getComponentManager()->getComponents())
+    // Check if has NetworkIdentity (is a network prefab)
+    if (prefab->getComponent<NetworkIdentity>())
     {
-        if (dynamic_cast<NetworkBehaviour*>(component.get()))
-        {
-            hasNetworkBehaviour = true;
-            break;
-        }
-    }
-
-    // Auto-add NetworkIdentity if it has NetworkBehaviours but no identity
-    auto* identity = prefab->getComponent<NetworkIdentity>();
-    if (hasNetworkBehaviour && !identity)
-    {
-        identity = prefab->addComponent<NetworkIdentity>();
+        networkPrefabIds.push_back(assetId);
     }
 
     // Store name mapping
-    std::string name = prefab->getName();
     if (!name.empty())
     {
         nameToId[name] = assetId;
     }
 
     std::cout << "[PrefabLibrary] Added prefab '" << name
-              << "' with assetId=" << assetId
-              << (hasNetworkBehaviour ? " (networked)" : "") << std::endl;
+              << "' with assetId=" << assetId << std::endl;
 
     prefabsById[assetId] = std::move(prefab);
     return assetId;
@@ -62,21 +49,13 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
         nextAssetId = assetId + 1;
     }
 
-    // Check for NetworkBehaviours
-    bool hasNetworkBehaviour = false;
+    std::string name = prefab->getName();
 
-    auto* identity = prefab->getComponent<NetworkIdentity>();
-    if (hasNetworkBehaviour && !identity)
-    {
-        identity = prefab->addComponent<NetworkIdentity>();
-    }
-
-    if (identity)
+    if (prefab->getComponent<NetworkIdentity>())
     {
         networkPrefabIds.push_back(assetId);
     }
 
-    std::string name = prefab->getName();
     if (!name.empty())
     {
         nameToId[name] = assetId;
@@ -138,12 +117,12 @@ const std::vector<uint32_t>& PrefabLibrary::getNetworkPrefabIds() const
 
 bool PrefabLibrary::contains(uint32_t assetId) const
 {
-    return prefabsById.contains(assetId);
+    return prefabsById.find(assetId) != prefabsById.end();
 }
 
 bool PrefabLibrary::contains(const std::string& name) const
 {
-    return nameToId.contains(name);
+    return nameToId.find(name) != nameToId.end();
 }
 
 size_t PrefabLibrary::size() const
