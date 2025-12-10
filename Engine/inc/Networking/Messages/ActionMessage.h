@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include "IMessage.h"
+
 #include <string>
 #include <vector>
 #include <cstdint>
@@ -17,7 +19,7 @@
  *
  *
  */
-class ActionMessage {
+class ActionMessage : public IMessage {
 public:
 
     //Need default construction for deserialization.
