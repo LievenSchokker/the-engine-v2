@@ -3,7 +3,7 @@
 
 #include "BaseMessageHandler.h"
 #include "Networking/Connection/ConnectionMode.h"
-#include "Networking/Messages/Concretes/ConnectionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 
 
 class ConnectionMessageHandler : public BaseMessageHandler<ConnectionMessage>

@@ -3,7 +3,7 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
-#include "Networking/Messages/Concretes/ConnectionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/MessageReader.h"
