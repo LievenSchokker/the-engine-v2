@@ -357,3 +357,9 @@ void Scene::destroyAllGameObjects()
 
     gameObjects.clear();
 }
+
+
+NavigationSystem* Scene::getNavigationSystem() const
+{
+    return navigationSystem.get();
+}

@@ -18,7 +18,7 @@ struct Vector2;
 class NavigationSystem
 {
     public:
-        NavigationSystem() = default;
+        NavigationSystem();
         ~NavigationSystem() = default;
 
         std::unique_ptr<GameObject> bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles);

@@ -4,30 +4,33 @@
 
 
 #include "AI/Navigation/NavigationSystem.h"
-#include "AI/Navigation/NavigationGrid.h"
-#include "AI/Navigation/NavigationCell.h"
-#include "AI/Navigation/NavigationObstacle.h"
 
+#include "AI/Navigation/AStarPathFinder.h"
+#include "AI/Navigation/NavigationGrid.h"
+#include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/IPathFinder.h"
 #include "AI/Navigation/PathResult.h"
 #include "Component/GridComponent.h"
+
+
+NavigationSystem::NavigationSystem()
+{
+    pathFinder = std::make_unique<AStarPathFinder>();
+}
+
 
 PathResult NavigationSystem::computePath(Vector2 start, Vector2 end) const
 {
     if (pathFinder == nullptr || navigationGrid == nullptr)
         return PathResult{ std::vector<Vector2>{} };
 
+    start = navigationGrid->worldToCellPosition(start);
+    end = navigationGrid->worldToCellPosition(end);
     return pathFinder->findPath(*navigationGrid, start, end);
 }
 
 std::unique_ptr<GameObject> NavigationSystem::bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles)
 {
-    /// Creates a GO with the grid component
-    /// Lets the grid generate; a WxH grid of navCells, stored by the component
-    /// Gets all obstacles and converts their bounds to cell positions
-    /// Marks all cells unwalkable that are within the bounds
-    /// Should store the grid component so computePath can get the correct cells
-
     std::unique_ptr<GameObject> gridObject = std::make_unique<GameObject>("NavigationGrid");
     navigationGrid = gridObject->addComponent<NavigationGrid>();
 

@@ -88,7 +88,7 @@ class Component
         * @brief Returns the Transform of the GameObject this component belongs to.
         * @return Pointer to the associated GameObject's Transform.
         */
-        const Transform* getTransform() const;
+         Transform* getTransform() const;
 
     protected:
         /// The @c GameObject this component is attached to, a component is always attached to a GameObject

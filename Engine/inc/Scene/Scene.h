@@ -166,6 +166,9 @@ class Scene
         template <class T>
         std::vector<T*> getAllComponentsOfType() const;
 
+
+        NavigationSystem* getNavigationSystem() const;
+
     private:
         std::string name;
         std::vector<std::unique_ptr<GameObject> > gameObjects;

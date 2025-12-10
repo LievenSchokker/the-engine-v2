@@ -5,6 +5,8 @@
 
 #include "AI/Navigation/NavigationGrid.h"
 
+#include <iostream>
+
 #include "AI/Navigation/CardinalDirections.h"
 #include "AI/Navigation/CompassDirections.h"
 #include "AI/Navigation/NavigationCell.h"

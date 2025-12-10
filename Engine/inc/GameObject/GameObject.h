@@ -227,6 +227,7 @@ public:
 	 * @param newScene new owning scene of this GameObject
 	 */
 	void setScene(Scene& newScene);
+        Scene& getScene() const;
 
 	void setBehavioursEnabled(bool value) const;
 

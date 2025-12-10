@@ -44,5 +44,5 @@ struct PathResult
     bool isValid() const;
 
     private:
-        const std::vector<Vector2> path;
+        std::vector<Vector2> path;
 };

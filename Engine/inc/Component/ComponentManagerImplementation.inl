@@ -8,6 +8,8 @@
 #include "GameObject/GameObject.h"
 
 #include <algorithm>
+#include <iostream>
+#include <ostream>
 #include <type_traits>
 
 
@@ -27,6 +29,7 @@ T* ComponentManager::addComponent(Args&&... args)
 	auto iterator = getComponentIterator<T>();
 	if (iterator != components.end())
 	{
+	    std::cout << " GO already has T" << std::endl;
 		return dynamic_cast<T*>(iterator->get());
 	}
 

@@ -190,6 +190,11 @@ void GameObject::setScene(Scene& newScene)
 }
 
 
+Scene& GameObject::getScene() const
+{
+    return *scene;
+}
+
 void GameObject::setBehavioursEnabled(const bool value) const
 {
     if (value)

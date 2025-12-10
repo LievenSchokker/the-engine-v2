@@ -26,9 +26,19 @@ struct AStarNode
 
 struct CompareAStarNodes
 {
+    Vector2 goal;
+
+    CompareAStarNodes(const Vector2& goal) : goal(goal) {}
+
     bool operator()(const AStarNode& a, const AStarNode& b) const
     {
-        return a.fCost() > b.fCost();
+        int fA = a.fCost();
+        int fB = b.fCost();
+
+        if (fA == fB)
+            return Vector2::distance(a.position, goal) > Vector2::distance(b.position, goal);
+
+        return fA > fB;
     }
 };
 
@@ -40,8 +50,8 @@ PathResult AStarPathFinder::findPath(const NavigationGrid& grid, Vector2 start, 
         /// Return empty result if start or end is not valid
         return PathResult{{}};
     }
-
-    std::priority_queue<AStarNode, std::vector<AStarNode>, CompareAStarNodes> openSet;
+    CompareAStarNodes comparator(end);
+    std::priority_queue<AStarNode, std::vector<AStarNode>, CompareAStarNodes> openSet(comparator);
     std::unordered_map<Vector2, AStarNode, Vector2Hash> traversalHistory;
     std::unordered_set<Vector2, Vector2Hash> visited;
 
@@ -80,10 +90,12 @@ PathResult AStarPathFinder::findPath(const NavigationGrid& grid, Vector2 start, 
             if (!grid.isWalkable(neighbour))
                 continue;
 
+            float cellCost     = grid.getCellWeight(neighbour);
+
             AStarNode neighbourNode;
             neighbourNode.position = neighbour;
             neighbourNode.parentPosition = currentNode.position;
-            neighbourNode.gCost = currentNode.gCost + grid.getCellWeight(neighbour);
+            neighbourNode.gCost = currentNode.gCost + calculateMovementCost(grid, currentNode.position, neighbour);
             neighbourNode.hCost = calculateHeuristic(neighbour, end);
 
             auto it = traversalHistory.find(neighbourNode.position);
@@ -128,6 +140,19 @@ int AStarPathFinder::calculateHeuristic(Vector2 from, Vector2 to) const
             return Vector2::distance(from, to);
     }
 }
+
+float AStarPathFinder::calculateMovementCost(const NavigationGrid &grid, Vector2 from, Vector2 to) const
+{
+    Vector2 delta = to - from;
+    bool isDiagonal = (std::abs(delta.x) > 0 && std::abs(delta.y) > 0);
+
+    float movementCost = isDiagonal ? 1.41421356f : 1.0f;
+
+    float cellCost = static_cast<float>(grid.getCellWeight(to));
+
+    return movementCost + cellCost;
+}
+
 
 AStarOptions AStarPathFinder::getAStarOptions() const
 {

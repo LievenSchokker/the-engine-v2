@@ -30,6 +30,7 @@ class AStarPathFinder final : public IPathFinder
 
         PathResult findPath(const NavigationGrid& grid, Vector2 start, Vector2 end) const override;
         int calculateHeuristic(Vector2 from, Vector2 to) const;
+        float calculateMovementCost(const NavigationGrid& grid, Vector2 from, Vector2 to) const;
 
         void setAStarOptions(const AStarOptions& options);
         AStarOptions getAStarOptions() const;
