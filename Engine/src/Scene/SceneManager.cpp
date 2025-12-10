@@ -6,6 +6,7 @@
 
 #include "Component/Transform.h"
 #include "../../inc/Component/NetworkIdentity.h"
+#include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkSpawnManager.h"
 
 void SceneManager::configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnMgr)
@@ -65,49 +66,40 @@ void SceneManager::processForServer(Scene& scene)
 
     if (networkObjects.empty())
     {
-        std::cout << "[SceneManager] No network objects found in scene" << std::endl;
         return;
     }
 
-    for (GameObject* obj : networkObjects)
-    {
-        std::string name = obj->getName();
-        Vector2 position = obj->getTransform()->getPosition();
+	for (GameObject* obj : networkObjects)
+	{
+		std::string name = obj->getName();
+		Vector2 position = obj->getTransform()->getPosition();
 
-        std::cout << "[SceneManager] Server: Processing '" << name
-                  << "' at (" << position.x << ", " << position.y << ")" << std::endl;
+		// Extract from scene
+		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+		if (!extracted) continue;
 
-        // Extract from scene
-        std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
-        if (!extracted) continue;
+		// Store spawn info before moving
+		Vector2 spawnPosition = extracted->getTransform()->getPosition();
 
-        // Store spawn info before moving
-        Vector2 spawnPosition = extracted->getTransform()->getPosition();
+		// Reset position for prefab template
+		extracted->getTransform()->setPosition({0, 0});
 
-        // Reset position for prefab template
-        extracted->getTransform()->setPosition({0, 0});
+		// Add NetworkIdentity if missing (required for network prefabs)
+		if (!extracted->getComponent<NetworkIdentity>())
+		{
+			extracted->addComponent<NetworkIdentity>();
+		}
 
-        // Register as prefab
-        uint32_t assetId = prefabLibrary.add(std::move(extracted));
+		// Register as prefab
+		uint32_t assetId = prefabLibrary.add(std::move(extracted));
 
-        std::cout << "[SceneManager] Registered prefab '" << name
-                  << "' with assetId=" << assetId << std::endl;
 
-        // Auto-spawn server-owned objects
-        if (spawnManager)
-        {
-            GameObject* spawned = spawnManager->spawnObject(assetId, spawnPosition, -1);
-            if (spawned)
-            {
-                std::cout << "[SceneManager] Auto-spawned '" << name
-                          << "' at (" << spawnPosition.x << ", " << spawnPosition.y << ")"
-                          << std::endl;
-            }
-        }
-    }
-
-    std::cout << "[SceneManager] Server processing complete. Registered "
-              << prefabLibrary.getNetworkPrefabIds().size() << " prefabs" << std::endl;
+		// Auto-spawn server-owned objects
+		if (spawnManager)
+		{
+			GameObject* spawned = spawnManager->spawnObject(assetId, spawnPosition, -1);
+		}
+	}
 }
 
 void SceneManager::processForClient(Scene& scene)
@@ -124,27 +116,26 @@ void SceneManager::processForClient(Scene& scene)
 
     if (toRemove.empty())
     {
-        std::cout << "[SceneManager] No network objects to remove" << std::endl;
         return;
     }
 
     for (GameObject* obj : toRemove)
     {
         std::string name = obj->getName();
-
-        std::cout << "[SceneManager] Client: Removing '" << name
-                  << "' (awaiting server spawn)" << std::endl;
-
         scene.removeGameObject(obj);
     }
-
-    std::cout << "[SceneManager] Client processing complete. Removed "
-              << toRemove.size() << " objects" << std::endl;
 }
 
 bool SceneManager::hasNetworkBehaviour(const GameObject& obj) const
 {
-    return false;
+	for (const auto& component : obj.getComponentManager()->getComponents())
+	{
+		if (dynamic_cast<NetworkBehaviour*>(component.get()))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 bool SceneManager::hasNetworkIdentity(const GameObject& obj) const
