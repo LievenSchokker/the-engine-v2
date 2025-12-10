@@ -125,9 +125,9 @@ void NavigationGrid::fillRenderQueue(IRenderQueueWriter &queue) const
             Vector2 worldPos = cellToWorldPosition(Vector2{float(x), float(y)});
             worldPos = worldPos - (cellSize * 0.5f); // adjust center to top-left
 
-            cmd.position = worldPos + Vector2{spacing * 0.5f, spacing * 0.5f}; // offset for spacing
+            cmd.position = worldPos; // top-left corner of cell
             cmd.size = cellSize - Vector2{spacing, spacing}; // shrink the rectangle a little
-            cmd.color = cell.walkable ? Color::green() : Color::red();
+            cmd.color = cell.walkable ? Color::fromRGBA(0, 200, 0, 75) : Color::lightRed();
             cmd.layer = 100; // debug overlay layer
 
             queue.push(cmd);

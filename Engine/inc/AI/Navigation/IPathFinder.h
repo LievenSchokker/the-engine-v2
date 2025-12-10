@@ -3,7 +3,10 @@
 //
 
 #pragma once
+#include <vector>
+
 #include "Math/Vector2.h"
+struct NavigationCell;
 struct PathResult;
 
 class IPathFinder

@@ -1,4 +1,5 @@
 #pragma once
+#include "AI/Navigation/NavigationSystem.h"
 #include "Core/GameWorld.h"
 
 class GameObject;
@@ -170,6 +171,8 @@ class Scene
         std::vector<std::unique_ptr<GameObject> > gameObjects;
         std::vector<GameObject *> destroyQueue;
         bool active = false;
+
+        std::unique_ptr<NavigationSystem> navigationSystem;
 };
 
 #include "Scene.inl"

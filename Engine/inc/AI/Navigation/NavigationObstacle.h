@@ -36,7 +36,7 @@ class NavigationObstacle : public Component
          * First element is the offset to the min size of the bounds,
          * Second element is the offset to the max size of the bounds
          */
-        void setBoundsOffset(std::pair<Vector2, Vector2> boundsOffset);
+        void setBoundsOffset(Vector2 boundsOffset);
 
         /**
          * @brief allows obstacles to be carved by setting a predefined bounds instead of using the collider component to create it.
@@ -44,11 +44,11 @@ class NavigationObstacle : public Component
          * Note; If using manual size, offset gets added on top of the predefined size.
          * @bounds Bounds to be used to mark the obstacle on the grid.
          */
-        void useManualBounds(BoundingBox bounds);
+        void useManualBounds(Vector2 size);
 
     private:
         Collider* collider;
-        std::pair<Vector2, Vector2>  boundingBoxOffset;
+        Vector2 boundingBoxOffset;
         bool useManualBoundingBox;
         BoundingBox manualBounds;
 };

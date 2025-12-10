@@ -20,7 +20,7 @@ PathResult NavigationSystem::computePath(Vector2 start, Vector2 end) const
     return pathFinder->findPath(navigationGrid->getCells(), start, end);
 }
 
-std::unique_ptr<GameObject> NavigationSystem::bakeNavigationGrid(Vector2 gridSize, std::vector<NavigationObstacle> navObstacles)
+std::unique_ptr<GameObject> NavigationSystem::bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles)
 {
     /// Creates a GO with the grid component
     /// Lets the grid generate; a WxH grid of navCells, stored by the component
@@ -31,12 +31,12 @@ std::unique_ptr<GameObject> NavigationSystem::bakeNavigationGrid(Vector2 gridSiz
     std::unique_ptr<GameObject> gridObject = std::make_unique<GameObject>("NavigationGrid");
     navigationGrid = gridObject->addComponent<NavigationGrid>();
 
-    navigationGrid->generateGrid(gridSize, Vector2::one());
+    navigationGrid->generateGrid(gridSize, cellSize);
 
-    for (NavigationObstacle& obstacle : navObstacles)
+    for (NavigationObstacle* obstacle : navObstacles)
     {
-        Vector2 minCell = navigationGrid->worldToCellPosition(obstacle.getBounds().min);
-        Vector2 maxCell = navigationGrid->worldToCellPosition(obstacle.getBounds().max);
+        Vector2 minCell = navigationGrid->worldToCellPosition(obstacle->getBounds().min);
+        Vector2 maxCell = navigationGrid->worldToCellPosition(obstacle->getBounds().max);
 
 
         for (int y = minCell.y; y <= maxCell.y; ++y)

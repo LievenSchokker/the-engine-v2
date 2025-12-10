@@ -10,6 +10,7 @@
 #include "Component/ComponentManager.h"
 #include "Component/ShapeRenderer.h"
 #include "../../inc/Rendering/RenderQueue/RenderQueue.h"
+#include "AI/Navigation/NavigationObstacle.h"
 
 #include <algorithm>
 #include <iostream>
@@ -19,6 +20,7 @@
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
+
 }
 
 Scene::~Scene()
@@ -122,6 +124,12 @@ void Scene::onStart()
 		return;
 	}
 
+    /// Init navigation stuff hihi.
+    navigationSystem = std::make_unique<NavigationSystem>();
+    auto obstacles = getAllComponentsOfType<NavigationObstacle>();
+    auto gridObject = navigationSystem->bakeNavigationGrid({100, 100}, {7,7 }, obstacles);
+    addGameObject(std::move(gridObject));
+
 	active = true;
 
     /// Store all behaviours in this scene object:
@@ -141,6 +149,7 @@ void Scene::onStart()
 
     /// Initialise all the behaviours by calling their lifetime functions in the correct order.
     initialiseBehaviours(allBehaviours);
+
 }
 
 void Scene::onStop()
