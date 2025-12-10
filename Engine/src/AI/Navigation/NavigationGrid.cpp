@@ -4,6 +4,9 @@
 
 
 #include "AI/Navigation/NavigationGrid.h"
+
+#include "AI/Navigation/CardinalDirections.h"
+#include "AI/Navigation/CompassDirections.h"
 #include "AI/Navigation/NavigationCell.h"
 #include "Math/Vector2.h"
 
@@ -107,6 +110,38 @@ int NavigationGrid::getHeight() const
 {
     return height;
 }
+
+std::vector<Vector2> NavigationGrid::getNeighbours4D(Vector2 cellPos) const
+{
+    std::vector<Vector2> validNeighbours;
+
+    for (Vector2 direction : CardinalDirections::getDirections())
+    {
+        Vector2 neighbour = cellPos + direction;
+
+        if (isValidCell(neighbour))
+            validNeighbours.push_back(neighbour);
+    }
+
+    return validNeighbours;
+}
+
+
+std::vector<Vector2> NavigationGrid::getNeighbours8D(Vector2 cellPos) const
+{
+    std::vector<Vector2> validNeighbours;
+
+    for (Vector2 direction : CompassDirections::getDirections())
+    {
+        Vector2 neighbour = cellPos + direction;
+
+        if (isValidCell(neighbour))
+            validNeighbours.push_back(neighbour);
+    }
+
+    return validNeighbours;
+}
+
 
 void NavigationGrid::fillRenderQueue(IRenderQueueWriter &queue) const
 {
