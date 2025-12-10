@@ -15,18 +15,12 @@ void StateSyncMessageHandler::handleMessageInternal()
 {
     const StateSyncMessage* syncMsg = getMessage();
 
-    std::cout << "[Client] Received StateSync with "
-              << syncMsg->objects.size() << " objects" << std::endl;
-
     for (const auto& objState : syncMsg->objects)
     {
-        std::cout << "[Client] Processing netId=" << objState.netId
-                  << " pos=(" << objState.posX << ", " << objState.posY << ")" << std::endl;
 
         NetworkIdentity* identity = registry.findByNetId(objState.netId);
         if (!identity)
         {
-            std::cout << "[Client] Identity not found for netId=" << objState.netId << std::endl;
             continue;
         }
 
@@ -38,7 +32,5 @@ void StateSyncMessageHandler::handleMessageInternal()
 
         transform->setPosition({objState.posX, objState.posY});
         transform->setRotationAngle(objState.rotation);
-
-        std::cout << "[Client] Applied position!" << std::endl;
     }
 }
