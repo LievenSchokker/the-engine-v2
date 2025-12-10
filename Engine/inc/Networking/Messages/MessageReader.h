@@ -1,7 +1,7 @@
 #pragma once
 
 #include "IncomingRawMessage.h"
-#include "MessageTypes.h"
+#include "ConcreteMessages/MessageTypes.h"
 
 
 #include <memory>

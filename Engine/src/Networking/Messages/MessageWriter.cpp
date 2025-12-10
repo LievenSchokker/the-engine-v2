@@ -1,6 +1,6 @@
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "../../../inc/Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
 

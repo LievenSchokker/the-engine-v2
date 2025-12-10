@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "IMessage.h"
+#include "../IMessage.h"
 
 #include <string>
 #include <vector>

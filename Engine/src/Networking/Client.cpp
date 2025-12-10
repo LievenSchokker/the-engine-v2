@@ -5,10 +5,10 @@
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "../../inc/Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "../../inc/Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
 

@@ -1,7 +1,7 @@
 #include "Networking/Messages/MessageReader.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "../../../inc/Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "../../../inc/Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include <iostream>
 #include <cstring>
 

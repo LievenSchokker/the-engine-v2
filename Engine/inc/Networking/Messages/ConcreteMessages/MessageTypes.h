@@ -7,5 +7,5 @@
 enum class MessageTypes : uint8_t
 {
     ConnectionMessage = 0,
-	ActionMessage = 0,
+	ActionMessage = 1,
 };
