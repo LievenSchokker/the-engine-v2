@@ -52,6 +52,14 @@ public:
 	*/
 	void setScale(Vector2 newScale);
 
+
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Transform;
+	}
+
+	void serialize(CerealWriteArchive& archive) const override;
+	void deserialize(CerealReadArchive& archive) override;
 private:
 	Vector2 position;
 	double rotationAngle;

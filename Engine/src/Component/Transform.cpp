@@ -30,3 +30,40 @@ void Transform::setScale(const Vector2 newScale) {
     scale = newScale;
 }
 
+
+void Transform::serialize(CerealWriteArchive& archive) const
+{
+	// Position
+	float posX = static_cast<float>(position.x);
+	float posY = static_cast<float>(position.y);
+	archive.process(posX);
+	archive.process(posY);
+
+	// Rotation
+	double rotation = rotationAngle;
+	archive.process(rotation);
+
+	// Scale
+	float scaleX = static_cast<float>(scale.x);
+	float scaleY = static_cast<float>(scale.y);
+	archive.process(scaleX);
+	archive.process(scaleY);
+}
+
+void Transform::deserialize(CerealReadArchive& archive)
+{
+	// Position
+	float posX, posY;
+	archive.process(posX);
+	archive.process(posY);
+	position = {posX, posY};
+
+	// Rotation
+	archive.process(rotationAngle);
+
+	// Scale
+	float scaleX, scaleY;
+	archive.process(scaleX);
+	archive.process(scaleY);
+	scale = {scaleX, scaleY};
+}

@@ -32,16 +32,10 @@ const Transform* Component::getTransform() const
     return transform;
 }
 
+ComponentType Component::getComponentType() const
+{
+	return ComponentType::Unknown;
+}
+void Component::deserialize(CerealReadArchive& archive){}
+void Component::serialize(CerealWriteArchive& archive) const{}
 
-// GameWorld* Component::getWorld() const
-// {
-//     if (gameObject)
-//     {
-//         Scene* scene = gameObject->getScene();
-//         if (scene)
-//         {
-//             return scene->getWorld();
-//         }
-//     }
-//     return nullptr;
-// }

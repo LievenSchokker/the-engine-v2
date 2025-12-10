@@ -112,6 +112,14 @@ public:
 	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
 
+
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::TilemapComponent;
+	}
+
+	void serialize(CerealWriteArchive& archive) const override;
+	void deserialize(CerealReadArchive& archive) override;
 private:
 	TilemapAsset* tilemapAsset = nullptr;
 	Vector2 tileSize;

@@ -79,3 +79,57 @@ void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 	command.orderInLayer = orderInLayer;
 	queue.push(command);
 }
+
+
+void ShapeRenderer::serialize(CerealWriteArchive& archive) const
+{
+	// Shape type
+	uint8_t shapeType = static_cast<uint8_t>(type);
+	archive.process(shapeType);
+
+	// Color (RGBA)
+	uint8_t r = color.r, g = color.g, b = color.b, a = color.a;
+	archive.process(r);
+	archive.process(g);
+	archive.process(b);
+	archive.process(a);
+
+	// Dimensions
+	float rad = radius;
+	float sizeX = size.x;
+	float sizeY = size.y;
+	archive.process(rad);
+	archive.process(sizeX);
+	archive.process(sizeY);
+
+	// Layer info
+	uint8_t lay = layer;
+	int8_t order = orderInLayer;
+	archive.process(lay);
+	archive.process(order);
+}
+
+void ShapeRenderer::deserialize(CerealReadArchive& archive)
+{
+	// Shape type
+	uint8_t shapeType;
+	archive.process(shapeType);
+	type = static_cast<RenderCommandType>(shapeType);
+
+	// Color (RGBA)
+	uint8_t r, g, b, a;
+	archive.process(r);
+	archive.process(g);
+	archive.process(b);
+	archive.process(a);
+	color = Color(r, g, b, a);
+
+	// Dimensions
+	archive.process(radius);
+	archive.process(size.x);
+	archive.process(size.y);
+
+	// Layer info
+	archive.process(layer);
+	archive.process(orderInLayer);
+}
