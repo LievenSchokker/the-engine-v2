@@ -111,27 +111,18 @@ int NavigationGrid::getHeight() const
     return height;
 }
 
-std::vector<Vector2> NavigationGrid::getNeighbours4D(Vector2 cellPos) const
+
+std::vector<Vector2> NavigationGrid::getNeighbours(Vector2 cellPos, bool diagonalNeighbours) const
 {
     std::vector<Vector2> validNeighbours;
 
-    for (Vector2 direction : CardinalDirections::getDirections())
-    {
-        Vector2 neighbour = cellPos + direction;
+    std::vector<Vector2> directions;
+    if (diagonalNeighbours)
+        directions = CompassDirections::getDirections();
+    else
+        directions = CardinalDirections::getDirections();
 
-        if (isValidCell(neighbour))
-            validNeighbours.push_back(neighbour);
-    }
-
-    return validNeighbours;
-}
-
-
-std::vector<Vector2> NavigationGrid::getNeighbours8D(Vector2 cellPos) const
-{
-    std::vector<Vector2> validNeighbours;
-
-    for (Vector2 direction : CompassDirections::getDirections())
+    for (Vector2 direction : directions)
     {
         Vector2 neighbour = cellPos + direction;
 

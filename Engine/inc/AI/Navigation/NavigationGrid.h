@@ -38,8 +38,7 @@ class NavigationGrid : public RenderComponent
 
         void fillRenderQueue(IRenderQueueWriter &queue) const override;
 
-        std::vector<Vector2> getNeighbours4D(Vector2 cellPos) const;
-        std::vector<Vector2> getNeighbours8D(Vector2 cellPos) const;
+        std::vector<Vector2> getNeighbours(Vector2 cellPos, bool diagonalNeighbours) const;
 
         NavigationCell& getNavigationCell(Vector2 positionInGrid);
 

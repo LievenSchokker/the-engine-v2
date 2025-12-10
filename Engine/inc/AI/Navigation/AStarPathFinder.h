@@ -6,6 +6,7 @@
 #pragma once
 
 
+#include "HeuristicType.h"
 #include "AI/Navigation/IPathFinder.h"
 #include "Math/Vector2.h"
 
@@ -14,18 +15,25 @@ enum class HeuristicType;
 struct PathResult;
 
 
+struct AStarOptions
+{
+    bool useOrdinalDirections = true;
+    HeuristicType heuristic = HeuristicType::EUCLIDIAN;
+};
+
+
 class AStarPathFinder final : public IPathFinder
 {
     public:
-        explicit AStarPathFinder(HeuristicType heuristicType) : heuristic(heuristicType) {}
+        explicit AStarPathFinder() : astarOptions({}) {}
         ~AStarPathFinder() override = default;
 
         PathResult findPath(const NavigationGrid& grid, Vector2 start, Vector2 end) const override;
         int calculateHeuristic(Vector2 from, Vector2 to) const;
 
-        HeuristicType getHeuristicType() const;
-        void setHeuristicType(HeuristicType heuristic);
+        void setAStarOptions(const AStarOptions& options);
+        AStarOptions getAStarOptions() const;
 
     private:
-        HeuristicType heuristic;
+        AStarOptions astarOptions;
 };

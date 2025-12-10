@@ -6,15 +6,12 @@
 #include "AI/Navigation/AStarPathFinder.h"
 
 #include <filesystem>
-#include <map>
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
 
-#include "AI/Navigation/CompassDirections.h"
-#include "AI/Navigation/HeuristicType.h"
 #include "AI/Navigation/PathResult.h"
-#include "AI/Navigation/NavigationCell.h"
+
 
 struct AStarNode
 {
@@ -44,8 +41,8 @@ PathResult AStarPathFinder::findPath(const NavigationGrid& grid, Vector2 start, 
         return PathResult{{}};
     }
 
-    std::priority_queue<AStarNode, std::vector<AStarNode>, CompareAStarNodes> openSet; /// This gets filled by the algorithm on the go, after adding the start node
-    std::unordered_map<Vector2, AStarNode, Vector2Hash> traversalHistory; /// Vector2 is the position in the grid, AStarNode is the node on that position. Use its parent to get the 'next'  path element.
+    std::priority_queue<AStarNode, std::vector<AStarNode>, CompareAStarNodes> openSet;
+    std::unordered_map<Vector2, AStarNode, Vector2Hash> traversalHistory;
     std::unordered_set<Vector2, Vector2Hash> visited;
 
 
@@ -75,7 +72,7 @@ PathResult AStarPathFinder::findPath(const NavigationGrid& grid, Vector2 start, 
             break;
         }
 
-        for (Vector2 neighbour : grid.getNeighbours8D(currentNode.position))
+        for (Vector2 neighbour : grid.getNeighbours(currentNode.position, astarOptions.useOrdinalDirections))
         {
             if (visited.contains(neighbour))
                 continue;
@@ -119,30 +116,27 @@ PathResult AStarPathFinder::findPath(const NavigationGrid& grid, Vector2 start, 
 
 int AStarPathFinder::calculateHeuristic(Vector2 from, Vector2 to) const
 {
-    switch (heuristic)
+    switch (astarOptions.heuristic)
     {
         case HeuristicType::MANHATTEN:
-            break;
+            return std::abs(from.x - to.x) + std::abs(from.y - to.y);
         case HeuristicType::EUCLIDIAN:
-            break;
+            return Vector2::distance(from, to);
         case HeuristicType::CHEBYSHEV:
-            break;
+            return std::max(std::abs(to.x - from.x), std::abs(to.y - from.y));
         default:
-            break;
+            return Vector2::distance(from, to);
     }
-
-    return 0;
 }
 
-
-HeuristicType AStarPathFinder::getHeuristicType() const
+AStarOptions AStarPathFinder::getAStarOptions() const
 {
-    return heuristic;
+    return astarOptions;
 }
 
-void AStarPathFinder::setHeuristicType(HeuristicType heuristicType)
+void AStarPathFinder::setAStarOptions(const AStarOptions &options)
 {
-    heuristic = heuristicType;
+    astarOptions = options;
 }
 
 
