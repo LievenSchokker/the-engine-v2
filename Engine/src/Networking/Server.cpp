@@ -242,6 +242,15 @@ void Server::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::Messa
 	messageDispatcher = std::move(dispatcher);
 }
 
+void Server::setClientConnectedCallback(ClientConnectedCallback callback)
+{
+    onClientConnected = std::move(callback);
+}
+
+void Server::setClientDisconnectedCallback(ClientDisconnectedCallback callback)
+{
+    onClientDisconnected = std::move(callback);
+}
 
 ServerConnectionInformation Server::convertApplicationSettings(const ApplicationSpecifications& specifications)
 {

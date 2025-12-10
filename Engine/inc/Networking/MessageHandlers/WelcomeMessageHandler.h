@@ -1,21 +1,20 @@
 #pragma once
 
-#include "Networking/MessageHandlers/IMessageHandler.h"
-#include "Networking/Messages/Concretes/WelcomeMessage.h"
-#include "Core/GameWorld.h"
-#include <iostream>
 
-class WelcomeMessageHandler : public IMessageHandler
+#include "BaseMessageHandler.h"
+#include "Networking/Messages/ConcreteMessages/WelcomeMessage.h"
+
+class WelcomeMessageHandler : public BaseMessageHandler<WelcomeMessage>
 {
 public:
-    explicit WelcomeMessageHandler(GameWorld& world) : gameWorld(world) {}
+    explicit WelcomeMessageHandler(GameWorld& world)
+        : BaseMessageHandler<WelcomeMessage>(world) {}
 
-    void handle(const IMessage& message) override
+    ~WelcomeMessageHandler() override = default;
+
+protected:
+    void handleMessageInternal() override
     {
-        const auto& welcome = static_cast<const WelcomeMessage&>(message);
-        gameWorld.localClientId = welcome.getClientId();
+        gameWorld->localClientId = getMessage()->getClientId();
     }
-
-private:
-    GameWorld& gameWorld;
 };

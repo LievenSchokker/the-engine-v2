@@ -10,13 +10,11 @@
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
 #include "Networking/Messages/MessageDispatcherFactory.h"
-
 #include <iostream>
 
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
-    : transport(std::move(injectedTransport)),
-    gameWorld(nullptr)
+    : transport(std::move(injectedTransport))
 {
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 
@@ -29,8 +27,7 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
     {
         onConnectionChanged(connection);
     });
-
-    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *gameWorld);
+    messageDispatcher = nullptr;
 }
 
 

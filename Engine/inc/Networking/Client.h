@@ -14,8 +14,6 @@ namespace spelmotor_networking
 class ITransport;
 class TransportGNS;
 class IMessage;
-class NetworkContext;
-
 struct IncomingRawMessage;
 
 /**
@@ -85,8 +83,6 @@ public:
      * @param connection The connection whose state changed.
      */
     void onConnectionChanged(const Connection& connection);
-
-    std::unique_ptr<GameWorld> gameWorld;
 
 	///< The underlying network transport.
     std::unique_ptr<ITransport> transport;

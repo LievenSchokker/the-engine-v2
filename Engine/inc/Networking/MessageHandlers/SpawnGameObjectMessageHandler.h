@@ -2,7 +2,7 @@
 
 
 #include "BaseMessageHandler.h"
-#include "Networking/Context/NetworkContext.h"
+#include "Networking/Client.h"
 
 
 class SpawnGameObjectMessageHandler: public BaseMessageHandler<

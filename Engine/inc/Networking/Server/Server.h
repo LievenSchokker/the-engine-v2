@@ -6,6 +6,7 @@
 
 #include "ServerInformation.h"
 #include "Core/ApplicationSpecifications.h"
+#include "Networking/Client.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/NetworkSpawnManager.h"
@@ -133,7 +134,6 @@ public:
 
     void setClientConnectedCallback(ClientConnectedCallback callback);
     void setClientDisconnectedCallback(ClientDisconnectedCallback callback);
-
     static ServerConnectionInformation convertApplicationSettings(const ApplicationSpecifications& specifications);
 private:
     /**
@@ -164,7 +164,7 @@ private:
      *          or kicks, enabling appropriate cleanup logic for each scenario.
      */
     void handleConnectionMessage(int clientId, ConnectionMessage* message);
-private:
+
     /// @brief Abstracted transport layer for testing and multi-backend support
     std::unique_ptr<ITransport> transport;
 
@@ -181,5 +181,5 @@ private:
 
     ClientConnectedCallback onClientConnected;
     ClientDisconnectedCallback onClientDisconnected;
-
+    NetworkSpawnManager* spawnManager;
 };

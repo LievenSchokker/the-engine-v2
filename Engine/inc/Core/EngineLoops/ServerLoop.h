@@ -5,6 +5,7 @@
 #include "Core/GameWorld.h"
 #include "Core/IEngineLoop.h"
 #include "Networking/NetworkingIdentityRegistry.h"
+#include "Networking/Server/StateSyncSystem.h"
 
 class Game;
 class SceneManager;
@@ -49,19 +50,20 @@ public:
 	SceneManager* getSceneManager() override;
 	ClockFunction getClock() override;
 	void start() override;
-	void update(double deltaTime) override;
+    void initializeNetworking();
+    void update(double deltaTime) override;
 	void fixedUpdate(double deltaTime) override;
 	void shutdown() override;
 
 private:
 	/// Stored to allow runtime access to configuration (e.g., for network settings)
-	ApplicationSpecifications specifications;
+    ApplicationSpecifications specifications;
     std::unique_ptr<NetworkIdentityRegistry> serverRegistry;
-	std::unique_ptr<SceneManager> sceneManager;
+    std::unique_ptr<SceneManager> sceneManager;
     std::unique_ptr<Server> server;
-	std::unique_ptr<NetworkSpawnManager> spawnManager;
-	std::unique_ptr<GameWorld> gameWorld;
-	std::unique_ptr<Client> game;
-	ClockFunction clockFunction;
-	uint32_t currentTick = 0;
+    std::unique_ptr<NetworkSpawnManager> spawnManager;
+    std::unique_ptr<StateSyncSystem> stateSync;  // Add this
+    std::unique_ptr<GameWorld> gameWorld;
+    ClockFunction clockFunction;
+    uint32_t currentTick = 0;
 };
