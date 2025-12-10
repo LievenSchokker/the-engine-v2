@@ -5,6 +5,7 @@
 #pragma once
 
 
+#include "AI/Agent.h"
 #include "AI/ModuleData.h"
 #include "Modules/BaseAgentModule.h"
 
