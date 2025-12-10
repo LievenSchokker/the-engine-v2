@@ -53,6 +53,8 @@ public:
      *
      */
     bool deserialize(const std::byte* data, size_t length);
+    
+    MessageTypes getMessageType() const override;
 
     /**
      * @brief Checks whether this message represents a coherent, executable action.

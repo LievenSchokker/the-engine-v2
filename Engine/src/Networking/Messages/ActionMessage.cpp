@@ -1,4 +1,4 @@
-#include "Networking/Messages/ActionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ActionMessage.h"
 #include "Networking/Serialization/Serialization.h"
 
 ActionMessage::ActionMessage(uint32_t componentId, uint32_t objectId, std::string action, uint32_t tickRate)
@@ -36,6 +36,11 @@ bool ActionMessage::deserialize(const std::byte* data, const size_t length)
     {
         return false;
     }
+}
+
+MessageTypes ActionMessage::getMessageType() const
+{
+    return MessageTypes::ActionMessage;
 }
 
 bool ActionMessage::validate() const
