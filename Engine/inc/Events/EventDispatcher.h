@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <cstdint>
 #include <algorithm>
+#include <iostream>
+#include <ostream>
 
 
 /** * @brief Central event dispatcher for type-safe event handling

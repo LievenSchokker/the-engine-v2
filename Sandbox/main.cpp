@@ -5,6 +5,7 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
+#include "Component/Profiler/Profiler.h"
 #include "Component/UIObject/Button.h"
 #include "Component/UIObject/UIPanelObject.h"
 #include "Events/EventQueue.h"
@@ -32,12 +33,13 @@ public:
         rng.seed(rd());
     }
 
+	void onStart() override
+    {
+    	subscribe<UIButtonClickedEvent>(&ObjectSpawnerBehaviour::onButtonClicked);
+    }
+
 	void update(float deltaTime, GameWorld* world) override
     {
-    	if (!hasSubscriptions())
-    	{
-    		subscribe<UIButtonClickedEvent>(&ObjectSpawnerBehaviour::onButtonClicked);
-    	}
     }
 
 private:

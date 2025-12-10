@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "SubscriptionScope.h"
+#include "../Events/SubscriptionScope.h"
 #include "../Component/BaseComponentTypes/Component.h"
 #include "Events/EventDispatcher.h"
 
@@ -21,8 +21,7 @@ class Behaviour: virtual public Component
 {
 public:
 	Behaviour() : dispatcher(nullptr),
-	              isEnabled(true), hasAwakened(false), hasStarted(false),
-	subscriptions(std::make_unique<SubscriptionScope>())
+	              isEnabled(true), hasAwakened(false), hasStarted(false)
 	{
 	}
 
@@ -145,28 +144,57 @@ public:
 	*/
 	bool getHasStarted() const;
 
-
+	/**
+	* #brief set the reference to the world of this behaviour. Get's updated in scene.update()
+	*
+	*/
 	void setWorld(GameWorld* world);
+
+	/**
+	* #brief get the reference to the world of this behaviour.
+	*
+	* @return a raw pointer to the gameWorld. (Owned by clientLoop)
+	*
+	*/
 	GameWorld* getWorld() const;
+
+	/**
+	* #brief check's if this behaviour has any subscriptions.
+	*
+	* @return true if it has a subscription else false.
+	*
+	*/
 	bool hasSubscriptions() const;
+
+
 protected:
 	/**
 	 * @brief Subscribe to an event with automatic cleanup on destruction.
 	 *
 	 * Usage:
-	 *   subscribe<UIButtonClickedEvent>(world->dispatcher, [this](const UIButtonClickedEvent& e) {
-	 *       handleClick(e);
-	 *   });
+	 * subscribe<UIButtonClickedEvent>(&ObjectSpawnerBehaviour::onButtonClicked);
+	 *
 	 */
 	template <class EventType, class T>
 	void subscribe(void (T::*method)(const EventType&) const);
 
+	/**
+	 * @brief Subscribe to an event with automatic cleanup on destruction.
+	 *
+	 * This is the non-const alternative of the same method
+	 * Usage:
+	 * subscribe<UIButtonClickedEvent>(&ObjectSpawnerBehaviour::onButtonClicked);
+	 *
+	 */
 	template <class EventType, class T>
 	void subscribe(void (T::*method)(const EventType&));
+
 private:
 	EventDispatcher* dispatcher;
-	GameWorld* cachedWorld = nullptr;
-	std::unique_ptr<SubscriptionScope> subscriptions;
+	GameWorld* contextWorld = nullptr;
+
+	/// A RAII Wrapper for subscription handles. (This automatically manages subscription's)
+	SubscriptionScope subscriptions;
 	/// Enabled components are Updated, disabled Beahviours are not.
 	bool isEnabled;
 
