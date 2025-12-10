@@ -43,13 +43,18 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
     std::string scene = scenePtr->getName();
 
     sceneManager->addScene(std::move(scenePtr));
-    sceneManager->setActiveScene(scene);
+	sceneManager->configureNetworking(ConnectionMode::Client, nullptr);
 
-    spawnManager = std::make_unique<NetworkSpawnManager>(
-        nullptr,
-        sceneManager->getActiveScene(),
-        identityRegistry.get()
-    );
+    sceneManager->setActiveScene(scene);
+	gameWorld->input = InputManager::getInstance();
+	gameWorld->client = client.get();
+	spawnManager = std::make_unique<NetworkSpawnManager>(
+		nullptr,
+		sceneManager->getScene(scene),
+		identityRegistry.get(),
+		&sceneManager->getPrefabLibrary(),
+		gameWorld.get()
+	);
 
 }
 
@@ -74,9 +79,9 @@ void ClientLoop::initializeNetworking()
     }
 
     auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createClientDispatcher(
-        *gameWorld,
-        *spawnManager,
-        *identityRegistry);
+	    *gameWorld,
+	    *spawnManager,
+	    *identityRegistry);
     client->injectMessageDispatcher(std::move(dispatcher));
 }
 

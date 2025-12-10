@@ -31,7 +31,6 @@ class NetworkBehaviour : public Behaviour
 {
 public:
     NetworkBehaviour();
-    bool isServer();
     ~NetworkBehaviour() override = default;
 
     /**
@@ -46,15 +45,13 @@ public:
      * @brief Returns true if executing on the server.
      *
      * Uses NetworkContext/ProgramType to determine runtime mode.
-     */
-    bool isServer() const;
+     */;
     bool isClient();
 
     /**
      * @brief Returns true if executing on a client.
      */
-    bool isClient() const;
-
+	bool isServer();
     /**
      * @brief Returns true if local machine has authority over this object.
      *
@@ -181,6 +178,10 @@ private:
     friend class ActionMessageHandler;
     friend class NetworkSpawnManager;
     friend class NetworkIdentity;
+	friend class NetworkBuilder;
+	friend class ActionMessageHandler;
+	friend class NetworkSpawnManager;
+	friend class NetworkIdentity;
 };
 
 #include "NetworkBehaviour.hpp"

@@ -104,27 +104,55 @@ void SceneManager::processForServer(Scene& scene)
 
 void SceneManager::processForClient(Scene& scene)
 {
-    std::vector<GameObject*> toRemove;
+	// Collect objects to process
+	std::vector<GameObject*> toProcess;
 
-    for (auto& obj : scene.getGameObjects())
-    {
-        if (hasNetworkBehaviour(*obj) && !hasNetworkIdentity(*obj))
-        {
-            toRemove.push_back(obj.get());
-        }
-    }
+	for (auto& obj : scene.getGameObjects())
+	{
+		// Has NetworkBehaviour but NO NetworkIdentity = network prefab template
+		if (hasNetworkBehaviour(*obj) && !hasNetworkIdentity(*obj))
+		{
+			toProcess.push_back(obj.get());
+		}
+	}
 
-    if (toRemove.empty())
-    {
-        return;
-    }
+	if (toProcess.empty())
+	{
+		std::cout << "[SceneManager] No network objects to process" << std::endl;
+		return;
+	}
 
-    for (GameObject* obj : toRemove)
-    {
-        std::string name = obj->getName();
-        scene.removeGameObject(obj);
-    }
+	for (GameObject* obj : toProcess)
+	{
+		std::string name = obj->getName();
+
+		std::cout << "[SceneManager] Client: Processing '" << name
+				  << "' (extracting as prefab, awaiting server spawn)" << std::endl;
+
+		// Extract from scene
+		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+		if (!extracted) continue;
+
+		// Reset position for prefab template
+		extracted->getTransform()->setPosition({0, 0});
+
+		// Add NetworkIdentity if missing
+		if (!extracted->getComponent<NetworkIdentity>())
+		{
+			extracted->addComponent<NetworkIdentity>();
+		}
+
+		// Register as prefab (client needs this to instantiate from SpawnMessage)
+		uint32_t assetId = prefabLibrary.add(std::move(extracted));
+
+		std::cout << "[SceneManager] Client: Registered prefab '" << name
+				  << "' with assetId=" << assetId << std::endl;
+	}
+
+	std::cout << "[SceneManager] Client processing complete. Registered "
+			  << prefabLibrary.size() << " prefabs" << std::endl;
 }
+
 
 bool SceneManager::hasNetworkBehaviour(const GameObject& obj) const
 {

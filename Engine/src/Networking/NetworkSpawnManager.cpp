@@ -7,14 +7,20 @@
 #include "Scene/Scene.h"
 #include "GameObject/GameObject.h"
 #include "Component/Transform.h"
+#include "Networking/PrefabLibrary.h"
 
 #include <iostream>
 
 NetworkSpawnManager::NetworkSpawnManager(Server* server, Scene* scene,
-                                         NetworkIdentityRegistry* registry)
+                                         NetworkIdentityRegistry* registry,
+                                         PrefabLibrary* prefabLibrary,
+                                         GameWorld* gameWorlds)
 	: server(server)
 	  , scene(scene)
 	  , identityRegistry(registry)
+	  , prefabLibrary(prefabLibrary)
+	  , gameWorld(gameWorlds)
+
 {
 }
 
@@ -26,9 +32,17 @@ uint32_t NetworkSpawnManager::generateNetId()
 GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
                                              int ownerId)
 {
-	auto gameObject = NetworkPrefabRegistry::instance().create(assetId);
+	if (!prefabLibrary)
+	{
+		std::cerr << "[NetworkSpawnManager] No PrefabLibrary set" << std::endl;
+		return nullptr;
+	}
+
+	auto gameObject = prefabLibrary->instantiate(assetId);
 	if (!gameObject)
 	{
+		std::cerr << "[NetworkSpawnManager] Failed to instantiate assetId=" <<
+			assetId << std::endl;
 		return nullptr;
 	}
 
@@ -43,6 +57,8 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 	uint32_t networkId = generateNetId();
 	identity->networkId = networkId;
 	identity->ownerId = ownerId;
+	identity->gameWorld = gameWorld;
+	identity->onNetworkSpawn();
 
 	if (identityRegistry && identity)
 	{
@@ -65,7 +81,9 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 	if (server)
 	{
 		SpawnMessage msg = createSpawnMessage(identity, assetId);
-		bool sent = server->broadcastMessage(msg);
+		std::cout << "[NetworkSpawnManager] Broadcasting SpawnMessage netId="
+			<< msg.netId << " assetId=" << msg.assetId << std::endl;
+		server->broadcastMessage(msg);
 	}
 
 	return rawPtr;
@@ -81,7 +99,8 @@ GameObject* NetworkSpawnManager::spawnPlayer(int clientId,
 void NetworkSpawnManager::despawnObject(uint32_t netId)
 {
 	auto it = spawnedObjects.find(netId);
-	if (it == spawnedObjects.end()) {
+	if (it == spawnedObjects.end())
+	{
 		return;
 	}
 
@@ -89,7 +108,7 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 
 	auto* identity = object->getComponent<NetworkIdentity>();
 	if (identity)
-		{
+	{
 		identity->onNetworkDespawn();
 
 		int ownerId = identity->getOwnerId();
@@ -117,13 +136,15 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 void NetworkSpawnManager::despawnClientObjects(int clientId)
 {
 	auto it = clientOwnedObjects.find(clientId);
-	if (it == clientOwnedObjects.end()) {
+	if (it == clientOwnedObjects.end())
+	{
 		return;
 	}
 
 	std::vector<uint32_t> toRemove = it->second;
 
-	for (uint32_t netId : toRemove) {
+	for (uint32_t netId : toRemove)
+	{
 		despawnObject(netId);
 	}
 
@@ -134,7 +155,8 @@ void NetworkSpawnManager::syncExistingObjects(int clientId)
 {
 	if (!server) return;
 
-	for (const auto& [netId, obj] : spawnedObjects) {
+	for (const auto& [netId, obj] : spawnedObjects)
+	{
 		auto* identity = obj->getComponent<NetworkIdentity>();
 		if (!identity) continue;
 
@@ -159,7 +181,8 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 	message.ownerId = identity->getOwnerId();
 
 	const Transform* transform = identity->getTransform();
-	if (transform) {
+	if (transform)
+	{
 		message.position = transform->getPosition();
 		message.rotation = transform->getRotationAngle();
 		message.scale = transform->getScale();
@@ -170,43 +193,76 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 
 void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
 {
-	if (spawnedObjects.contains(message.netId)) {
+	std::cout << "[handleSpawnMessage] Start - netId=" << message.netId
+		<< " assetId=" << message.assetId << std::endl;
+
+	std::cout << "[handleSpawnMessage] prefabLibrary pointer: " << prefabLibrary
+		<< std::endl;
+
+	if (!prefabLibrary)
+	{
+		std::cerr << "[handleSpawnMessage] No PrefabLibrary!" << std::endl;
 		return;
 	}
 
-	auto gameObject = NetworkPrefabRegistry::instance().create(message.assetId);
-	if (!gameObject) {
+	std::cout << "[handleSpawnMessage] prefabLibrary->size() = " <<
+		prefabLibrary->size() << std::endl;
+
+	std::cout << "[handleSpawnMessage] Instantiating prefab..." << std::endl;
+	auto gameObject = prefabLibrary->instantiate(message.assetId);
+	if (!gameObject)
+	{
+		std::cerr << "[handleSpawnMessage] Failed to instantiate" << std::endl;
 		return;
 	}
 
+	std::cout << "[handleSpawnMessage] Setting transform..." << std::endl;
 	gameObject->getTransform()->setPosition(message.position);
 	gameObject->getTransform()->setRotationAngle(message.rotation);
 	gameObject->getTransform()->setScale(message.scale);
 
+	std::cout << "[handleSpawnMessage] Getting/adding NetworkIdentity..." <<
+		std::endl;
 	auto* identity = gameObject->getComponent<NetworkIdentity>();
-	if (!identity) {
+	if (!identity)
+	{
 		identity = gameObject->addComponent<NetworkIdentity>();
 	}
 	identity->networkId = message.netId;
 	identity->ownerId = message.ownerId;
-
-	if (identityRegistry && identity) {
+	identity->networkId = message.netId;
+	identity->ownerId = message.ownerId;
+	identity->gameWorld = gameWorld;
+	std::cout << "[handleSpawnMessage] Registering identity..." << std::endl;
+	if (identityRegistry && identity)
+	{
 		identityRegistry->registerIdentity(identity);
 	}
 
+	std::cout << "[handleSpawnMessage] Storing references..." << std::endl;
 	GameObject* rawPtr = gameObject.get();
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
+	std::cout << "[handleSpawnMessage] Adding to scene..." << std::endl;
+	if (!scene)
+	{
+		std::cerr << "[handleSpawnMessage] Scene is null!" << std::endl;
+		return;
+	}
 	scene->addGameObject(std::move(gameObject));
 
+	std::cout << "[handleSpawnMessage] Calling onNetworkSpawn..." << std::endl;
 	identity->onNetworkSpawn();
+
+	std::cout << "[handleSpawnMessage] Complete!" << std::endl;
 }
 
 GameObject* NetworkSpawnManager::getObjectByNetId(uint32_t netId) const
 {
 	auto it = spawnedObjects.find(netId);
-	if (it != spawnedObjects.end()) {
+	if (it != spawnedObjects.end())
+	{
 		return it->second;
 	}
 	return nullptr;

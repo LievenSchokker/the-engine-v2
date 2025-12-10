@@ -25,8 +25,8 @@ namespace spelmotor_networking
             NetworkIdentityRegistry& registry);
 
         static std::unique_ptr<MessageDispatcher> createClientDispatcher(
-            GameWorld& world,
-            NetworkSpawnManager spawnManager,
-            NetworkIdentityRegistry& registry);
+	        GameWorld& world,
+	        NetworkSpawnManager& spawnManager,
+	        NetworkIdentityRegistry& registry);
     };
 }

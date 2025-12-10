@@ -23,6 +23,7 @@ void NetworkIdentity::onNetworkSpawn()
 	{
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
+			netBehaviour->world = gameWorld;
 			netBehaviour->componentNetworkId = static_cast<uint32_t>(
 			   networkBehaviours.size());
 			netBehaviour->identity = this;

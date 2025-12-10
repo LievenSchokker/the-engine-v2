@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "BaseMessageHandler.h"
 #include "Networking/Messages/ConcreteMessages/SpawnMessage.h"
 
@@ -15,5 +16,6 @@ protected:
     void handleMessageInternal() override;
 
 private:
-    NetworkSpawnManager& spawnManager;
+	GameWorld& world;
+	NetworkSpawnManager& spawnManager;
 };

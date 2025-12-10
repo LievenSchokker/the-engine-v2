@@ -51,8 +51,6 @@ public:
      * Server always has authority over server-owned objects.
      * Clients only have authority over objects they own.
      */
-    bool hasAuthority() const;
-
     bool hasAuthority();
     /**
      * @brief Called by NetworkSpawnManager when spawned on network.

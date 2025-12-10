@@ -6,13 +6,11 @@ NetworkBehaviour::NetworkBehaviour() = default;
 
 bool NetworkBehaviour::isServer()
 {
-    auto* world = getWorld();
     return world && world->isServer();
 }
 
 bool NetworkBehaviour::isClient()
 {
-    auto* world = getWorld();
     return world && world->isClient();
 }
 
@@ -24,7 +22,7 @@ bool NetworkBehaviour::hasAuthority() const
 
 GameWorld* NetworkBehaviour::getWorld()
 {
-    return world;
+	return world;
 }
 
 void NetworkBehaviour::executeAction(const std::string& actionKey)

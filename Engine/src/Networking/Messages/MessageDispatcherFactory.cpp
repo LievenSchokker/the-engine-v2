@@ -31,7 +31,7 @@ namespace spelmotor_networking
     std::unique_ptr<MessageDispatcher>
     MessageDispatcherFactory::createClientDispatcher(
         GameWorld& world,
-        NetworkSpawnManager spawnManager,
+        NetworkSpawnManager& spawnManager,
         NetworkIdentityRegistry& registry)
     {
         auto dispatcher = std::make_unique<MessageDispatcher>();

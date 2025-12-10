@@ -3,14 +3,17 @@
 #include <cstdint>
 #include <unordered_map>
 #include <memory>
+#include <vector>
 
 #include "NetworkingIdentityRegistry.h"
+#include "Core/GameWorld.h"
 #include "Math/Vector2.h"
 
 class GameObject;
 class Scene;
 class Server;
 class NetworkIdentity;
+class PrefabLibrary;
 struct SpawnMessage;
 
 /**
@@ -22,11 +25,23 @@ struct SpawnMessage;
 class NetworkSpawnManager
 {
 public:
-    explicit NetworkSpawnManager(Server* server, Scene* scene, NetworkIdentityRegistry* registry);
+    /**
+     * @brief Constructs a NetworkSpawnManager.
+     *
+     * @param server Server instance for broadcasting (nullptr on client)
+     * @param scene Scene to spawn objects into
+     * @param registry Registry for tracking NetworkIdentities
+     * @param prefabLibrary Library for instantiating prefabs
+     */
+    NetworkSpawnManager(Server* server, Scene* scene,
+                        NetworkIdentityRegistry* registry,
+                        PrefabLibrary* prefabLibrary,
+                        GameWorld* gameWorlds);
+
     /**
      * @brief Spawns a networked object (server-side).
      *
-     * @param assetId Prefab identifier from NetworkPrefabRegistry
+     * @param assetId Prefab identifier from PrefabLibrary
      * @param position Initial world position
      * @param ownerId Client that owns this object (-1 for server)
      * @return Pointer to spawned object, or nullptr on failure
@@ -62,6 +77,7 @@ public:
      * @brief Client-side: handles incoming SpawnMessage.
      */
     void handleSpawnMessage(const SpawnMessage& message);
+
     GameObject* getObjectByNetId(uint32_t netId) const;
 
 private:
@@ -70,16 +86,18 @@ private:
 
     Server* server;
     Scene* scene;
+	GameWorld* gameWorld;
+    NetworkIdentityRegistry* identityRegistry;
+    PrefabLibrary* prefabLibrary;
+
     uint32_t nextNetworkId = 1;
 
-    // netId -> GameObject mapping
+    /// netId -> GameObject mapping
     std::unordered_map<uint32_t, GameObject*> spawnedObjects;
 
-    // netId -> assetId (for syncing to new clients)
+    /// netId -> assetId (for syncing to new clients)
     std::unordered_map<uint32_t, uint32_t> objectAssets;
 
-    // clientId -> list of owned netIds
+    /// clientId -> list of owned netIds
     std::unordered_map<int, std::vector<uint32_t>> clientOwnedObjects;
-
-    NetworkIdentityRegistry* identityRegistry;
 };

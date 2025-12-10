@@ -69,14 +69,26 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
 
 std::unique_ptr<GameObject> PrefabLibrary::instantiate(uint32_t assetId) const
 {
-    auto it = prefabsById.find(assetId);
-    if (it == prefabsById.end())
-    {
-        std::cerr << "[PrefabLibrary] Prefab not found: assetId=" << assetId << std::endl;
-        return nullptr;
-    }
+	std::cout << "[PrefabLibrary::instantiate] Looking for assetId=" << assetId << std::endl;
 
-    return it->second->clone();
+	auto it = prefabsById.find(assetId);
+	if (it == prefabsById.end())
+	{
+		std::cerr << "[PrefabLibrary::instantiate] Not found!" << std::endl;
+		return nullptr;
+	}
+
+	std::cout << "[PrefabLibrary::instantiate] Found, cloning..." << std::endl;
+
+	if (!it->second)
+	{
+		std::cerr << "[PrefabLibrary::instantiate] Prefab is null!" << std::endl;
+		return nullptr;
+	}
+
+	std::cout << "[PrefabLibrary::instantiate] Prefab name: " << it->second->getName() << std::endl;
+
+	return it->second->clone();
 }
 
 std::unique_ptr<GameObject> PrefabLibrary::instantiate(const std::string& name) const
