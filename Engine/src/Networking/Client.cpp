@@ -116,6 +116,7 @@ void Client::onConnectionChanged(const Connection& connection)
 
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
+    std::cout << "RECEIVED NEW MESSAGE" << std::endl;
     std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
     if (message == nullptr)

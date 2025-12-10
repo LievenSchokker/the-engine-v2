@@ -169,6 +169,22 @@ public:
 	template <class T>
 	std::vector<T*> getAllComponentsOfType() const;
 
+    /**
+     * @brief Removes a GameObject by pointer and returns it.
+    */
+    std::unique_ptr<GameObject> extractGameObject(GameObject* obj);
+
+    /**
+     * @brief Removes a GameObject from the scene (destroys it).
+     */
+    void removeGameObject(GameObject* obj);
+
+    /**
+     * @brief Gets mutable access to all GameObjects.
+     */
+    std::vector<std::unique_ptr<GameObject>>& getGameObjects();
+    const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
+
 private:
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;

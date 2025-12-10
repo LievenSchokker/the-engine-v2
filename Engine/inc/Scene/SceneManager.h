@@ -8,6 +8,10 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
+
+#include "Networking/PrefabLibrary.h"
+#include "Networking/Connection/ConnectionMode.h"
 
 /**
  * @brief Coordinates ownership and activation of scenes.
@@ -19,6 +23,26 @@ class SceneManager
 {
    public:
 	SceneManager() = default;
+
+    /**
+     * @brief Configures the SceneManager for networking.
+     * Must be called before setActiveScene() for network processing to work.
+     *
+     * @param mode Server or Client mode
+     * @param spawnManager Required for server to auto-spawn objects (can be nullptr for client)
+     */
+    void configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnManager = nullptr);
+
+    /**
+     * @brief Gets the prefab library.
+     */
+    PrefabLibrary& getPrefabLibrary();
+    const PrefabLibrary& getPrefabLibrary() const;
+
+    /**
+     * @brief Checks if network processing has been configured.
+     */
+    bool isNetworkConfigured() const;
 
 	/**
 	 * @brief Register a scene owned by the manager.
@@ -139,6 +163,38 @@ class SceneManager
     void setWorld(GameWorld* world) { gameWorld = world; }
 
    private:
+
+    /**
+ * @brief Processes a scene for networking based on configured mode.
+ */
+    void processSceneForNetwork(Scene& scene);
+
+    /**
+     * @brief Server: Extract NetworkBehaviour objects as prefabs.
+     */
+    void processForServer(Scene& scene);
+
+    /**
+     * @brief Client: Remove NetworkBehaviour objects.
+     */
+    void processForClient(Scene& scene);
+
+    /**
+     * @brief Checks if a GameObject has any NetworkBehaviour components.
+     */
+    bool hasNetworkBehaviour(const GameObject& obj) const;
+
+    /**
+     * @brief Checks if a GameObject has a NetworkIdentity.
+     */
+    bool hasNetworkIdentity(const GameObject& obj) const;
+
+    bool networkConfigured = false;
+    ConnectionMode networkMode = ConnectionMode::Client;
+    PrefabLibrary prefabLibrary;
+    NetworkSpawnManager* spawnManager = nullptr;
+    std::unordered_set<std::string> processedScenes;
+
     GameWorld* gameWorld = nullptr;
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;

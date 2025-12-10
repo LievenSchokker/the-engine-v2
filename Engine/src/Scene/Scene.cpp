@@ -296,3 +296,38 @@ void Scene::destroyAllGameObjects()
 
     gameObjects.clear();
 }
+
+std::unique_ptr<GameObject> Scene::extractGameObject(GameObject* obj)
+{
+    for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
+    {
+        if (it->get() == obj)
+        {
+            std::unique_ptr<GameObject> extracted = std::move(*it);
+            gameObjects.erase(it);
+            return extracted;
+        }
+    }
+    return nullptr;
+}
+
+void Scene::removeGameObject(GameObject* obj)
+{
+    gameObjects.erase(
+        std::remove_if(gameObjects.begin(), gameObjects.end(),
+            [obj](const std::unique_ptr<GameObject>& ptr) {
+                return ptr.get() == obj;
+            }),
+        gameObjects.end()
+    );
+}
+
+std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects()
+{
+    return gameObjects;
+}
+
+const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const
+{
+    return gameObjects;
+}

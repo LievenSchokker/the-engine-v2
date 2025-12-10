@@ -6,6 +6,11 @@
 #include <iostream>
 #include <cstring>
 
+#include "Networking/Messages/ConcreteMessages/ActionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ObjectDestroyMessage.h"
+#include "Networking/Messages/ConcreteMessages/StateSyncMessage.h"
+#include "Networking/Messages/ConcreteMessages/WelcomeMessage.h"
+
 std::unique_ptr<IMessage> MessageReader::readMessage(const IncomingRawMessage rawMessage)
 {
     if (rawMessage.length < sizeof(uint8_t))
@@ -43,6 +48,18 @@ std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
     {
     case MessageTypes::ConnectionMessage:
         message = std::make_unique<ConnectionMessage>();
+        break;
+    case MessageTypes::WelcomeMessage:
+        message = std::make_unique<WelcomeMessage>();
+        break;
+    case MessageTypes::ActionMessage:
+        message = std::make_unique<ActionMessage>();
+        break;
+    case MessageTypes::ObjectDestroyMessage:
+        message = std::make_unique<ObjectDestroyMessage>();
+        break;
+    case MessageTypes::StateSyncMessage:
+        message = std::make_unique<StateSyncMessage>();
         break;
     default:
         return nullptr;

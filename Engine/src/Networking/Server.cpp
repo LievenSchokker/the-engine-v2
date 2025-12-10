@@ -92,14 +92,20 @@ void Server::onConnectionChanged(const Connection& connection)
     {
     case ConnectionStatus::Connected:
         connectedClients.insert(clientId);
-        std::cout << "Client " << clientId << " connected" << std::endl;
+        if (onClientConnected)
+        {
+            onClientConnected(clientId);
+        }
         break;
 
     case ConnectionStatus::Terminated:
-    	break;
+        break;
     case ConnectionStatus::Error:
         connectedClients.erase(clientId);
-        std::cout << "Client " << clientId << " disconnected" << std::endl;
+        if (onClientDisconnected)
+        {
+            onClientDisconnected(clientId);
+        }
         break;
 
     default:
@@ -110,16 +116,14 @@ void Server::onConnectionChanged(const Connection& connection)
 
 void Server::onMessage(const IncomingRawMessage& rawMessage)
 {
-    // Ignore messages from unknown connections
     if (!connectedClients.contains(rawMessage.connectionID))
     {
         std::cerr << "Message from unknown client " << rawMessage.connectionID << std::endl;
         return;
     }
 
-    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
-    std::cout << "MESSAGE RECEIVED" << std::endl;
     if (!message)
     {
         std::cerr << "Failed to parse message from client " << rawMessage.connectionID << std::endl;
@@ -129,18 +133,23 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
     MessageTypes messageType = message->getMessageType();
     const int clientId = rawMessage.connectionID;
 
-    switch (messageType)
+    if (messageType == MessageTypes::ConnectionMessage)
     {
-    case MessageTypes::ConnectionMessage:
         if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
         {
             handleConnectionMessage(clientId, connMsg);
         }
-        break;
+        return;
+    }
 
-    default:
-        std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
-        break;
+    if (messageDispatcher)
+    {
+        std::cout << "Dispatching message type: " << static_cast<int>(messageType) << std::endl;
+        messageDispatcher->processMessage(std::move(message));
+    }
+    else
+    {
+        std::cerr << "No message dispatcher set!" << std::endl;
     }
 }
 
