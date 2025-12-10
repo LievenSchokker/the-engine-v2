@@ -2,7 +2,7 @@
 #include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/MessageHandlers/IMessageHandler.h"
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 
 using namespace spelmotor_networking;
 
@@ -85,7 +85,7 @@ TEST_F(MessageDispatcherTest, RegisterHandler_AllowsMultipleDifferentTypes)
 
     //act
     bool result1 = dispatcher.registerMessageHandler(MessageTypes::ConnectionMessage, std::move(handler1));
-    bool result2 = dispatcher.registerMessageHandler(MessageTypes::NetworkDebugMessage, std::move(handler2));
+    bool result2 = dispatcher.registerMessageHandler(MessageTypes::ActionMessage, std::move(handler2));
 
     //assert
     EXPECT_TRUE(result1);

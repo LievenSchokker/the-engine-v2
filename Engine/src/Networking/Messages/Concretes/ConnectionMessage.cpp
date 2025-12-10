@@ -1,4 +1,5 @@
-#include "Networking/Messages/Concretes/ConnectionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
+
 
 #include <cstring>
 #include <iostream>

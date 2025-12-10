@@ -1,7 +1,7 @@
 #include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/MessageHandlers/IMessageHandler.h"
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/MessageTypes.h"
+#include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 
 
 namespace spelmotor_networking
