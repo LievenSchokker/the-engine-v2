@@ -103,3 +103,12 @@ struct Vector2
     float x = 0;
     float y = 0;
 };
+
+
+struct Vector2Hash
+{
+    std::size_t operator()(const Vector2& v) const
+    {
+        return std::hash<int>()(v.x) ^ (std::hash<int>()(v.y) << 1);
+    }
+};

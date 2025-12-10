@@ -3,11 +3,12 @@
 //
 
 #pragma once
-#include <vector>
+
 
 #include "Math/Vector2.h"
-struct NavigationCell;
-struct PathResult;
+#include "AI/Navigation/NavigationGrid.h"
+#include "AI/Navigation/PathResult.h"
+
 
 class IPathFinder
 {
@@ -15,5 +16,5 @@ class IPathFinder
         IPathFinder() = default;
         virtual ~IPathFinder() = default;
 
-        virtual PathResult findPath(std::vector<NavigationCell> navigatableCells, Vector2 start, Vector2 end) const = 0;
+        virtual PathResult findPath(const NavigationGrid& grid, Vector2 start, Vector2 end) const = 0;
 };

@@ -20,7 +20,7 @@ class NavigationGrid : public RenderComponent
         bool isWalkable(Vector2 cellPosition) const;
         void setWalkable(Vector2 cellPosition, bool value);
 
-        int getCellWeight(Vector2 cellPosition);
+        int getCellWeight(Vector2 cellPosition) const;
         void setCellWeight(Vector2 cellPosition, float weight);
 
         Vector2 getCellSize() const;
@@ -40,6 +40,8 @@ class NavigationGrid : public RenderComponent
 
         std::vector<Vector2> getNeighbours4D(Vector2 cellPos) const;
         std::vector<Vector2> getNeighbours8D(Vector2 cellPos) const;
+
+        NavigationCell& getNavigationCell(Vector2 positionInGrid);
 
     private:
         int width;

@@ -23,13 +23,11 @@ const std::vector<Vector2> &CompassDirections::getDirections()
 
 const std::vector<Vector2> &CompassDirections::getDirectionsNormalised()
 {
-     std::vector<Vector2> result;
-     result.reserve(directions.size());
+    static std::vector<Vector2> result;
 
-    for (const Vector2 &dir : CompassDirections::getDirections())
-    {
-        result.push_back(dir.normalised());
+    if (result.empty()) {
+        for (const Vector2 &dir : CompassDirections::getDirections())
+            result.push_back(dir.normalised());
     }
-
     return result;
 }

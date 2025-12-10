@@ -17,7 +17,7 @@ PathResult NavigationSystem::computePath(Vector2 start, Vector2 end) const
     if (pathFinder == nullptr || navigationGrid == nullptr)
         return PathResult{ std::vector<Vector2>{} };
 
-    return pathFinder->findPath(navigationGrid->getCells(), start, end);
+    return pathFinder->findPath(*navigationGrid, start, end);
 }
 
 std::unique_ptr<GameObject> NavigationSystem::bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles)

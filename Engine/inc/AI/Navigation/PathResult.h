@@ -15,6 +15,7 @@
  */
 struct PathResult
 {
+    explicit PathResult() = default;
     explicit PathResult(const std::vector<Vector2>& path_) : path(path_) {};
 
     /**
