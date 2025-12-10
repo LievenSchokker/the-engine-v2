@@ -9,4 +9,6 @@ enum class ComponentType : uint32_t
 	ShapeRenderer,
 	TileMap,
 	Grid,
+	NetworkIdentity,
+	PlayerMovement,
 };

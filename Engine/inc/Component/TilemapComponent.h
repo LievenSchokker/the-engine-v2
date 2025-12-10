@@ -115,7 +115,7 @@ public:
 
 	ComponentType getComponentType() const override
 	{
-		return ComponentType::TilemapComponent;
+		return ComponentType::TileMap;
 	}
 
 	void serialize(CerealWriteArchive& archive) const override;

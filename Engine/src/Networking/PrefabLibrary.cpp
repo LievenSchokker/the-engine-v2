@@ -1,7 +1,7 @@
 #include "Networking/PrefabLibrary.h"
 #include "GameObject/GameObject.h"
-#include "Networking/NetworkIdentity.h"
-#include "Networking/NetworkBehaviour.h"
+#include "../../inc/Component/NetworkIdentity.h"
+#include "Behaviour/NetworkBehaviour.h"
 
 #include <iostream>
 
@@ -17,7 +17,7 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
 
     // Check if this prefab has any NetworkBehaviours
     bool hasNetworkBehaviour = false;
-    for (const auto& component : prefab->getComponents())
+    for (const auto& component : prefab->getComponentManager()->getComponents())
     {
         if (dynamic_cast<NetworkBehaviour*>(component.get()))
         {
@@ -31,13 +31,6 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
     if (hasNetworkBehaviour && !identity)
     {
         identity = prefab->addComponent<NetworkIdentity>();
-    }
-
-    // Configure NetworkIdentity with assetId
-    if (identity)
-    {
-        identity->setAssetId(assetId);
-        networkPrefabIds.push_back(assetId);
     }
 
     // Store name mapping
@@ -71,14 +64,6 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
 
     // Check for NetworkBehaviours
     bool hasNetworkBehaviour = false;
-    for (const auto& component : prefab->getComponents())
-    {
-        if (dynamic_cast<NetworkBehaviour*>(component.get()))
-        {
-            hasNetworkBehaviour = true;
-            break;
-        }
-    }
 
     auto* identity = prefab->getComponent<NetworkIdentity>();
     if (hasNetworkBehaviour && !identity)
@@ -88,7 +73,6 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
 
     if (identity)
     {
-        identity->setAssetId(assetId);
         networkPrefabIds.push_back(assetId);
     }
 

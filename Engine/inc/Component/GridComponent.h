@@ -229,7 +229,7 @@ public:
 
 	ComponentType getComponentType() const override
 	{
-		return ComponentType::GridComponent;
+		return ComponentType::Grid;
 	}
 
 	void serialize(CerealWriteArchive& archive) const override;

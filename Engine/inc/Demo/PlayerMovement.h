@@ -19,6 +19,13 @@ public:
     void registerNetworkMethods(NetworkBuilder& builder) override;
     void update(float deltaTime, GameWorld* world) override;
 
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::PlayerMovement;
+	}
+
+	void serialize(CerealWriteArchive& archive) const override;
+	void deserialize(CerealReadArchive& archive) override;
 private:
     void handleInput();
     void applyMovement(float dirX, float dirY);

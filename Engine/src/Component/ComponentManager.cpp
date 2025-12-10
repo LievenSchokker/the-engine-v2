@@ -115,4 +115,27 @@ size_t ComponentManager::getComponentCount() const
     return components.size();
 }
 
+const std::vector<std::unique_ptr<Component>>& ComponentManager::getComponents() const
+{
+	return components;
+}
+
+void ComponentManager::addComponent(std::unique_ptr<Component> component)
+{
+	if (!component) return;
+
+	component->setGameObject(gameObject);
+
+	// Track behaviours
+	if (auto* behaviour = dynamic_cast<Behaviour*>(component.get()))
+	{
+		behaviours.push_back(behaviour);
+		if (behaviour->getIsEnabled())
+		{
+			enabledBehaviours.push_back(behaviour);
+		}
+	}
+
+	components.push_back(std::move(component));
+}
 

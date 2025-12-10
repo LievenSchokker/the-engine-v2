@@ -46,6 +46,14 @@ void NetworkIdentity::onNetworkDespawn()
 	networkBehaviours.clear();
 }
 
+void NetworkIdentity::serialize(CerealWriteArchive& archive) const
+{
+}
+
+void NetworkIdentity::deserialize(CerealReadArchive& archive)
+{
+}
+
 void NetworkIdentity::dispatchAction(uint32_t componentId,
 									 const std::string& action) const
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Component/BaseComponentTypes/Component.h"
+#include "BaseComponentTypes/Component.h"
 #include <cstdint>
 #include <vector>
 
@@ -22,6 +22,14 @@ class NetworkIdentity : public Component
 public:
     NetworkIdentity() = default;
     ~NetworkIdentity() = default;
+
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::NetworkIdentity;
+	}
+
+	void serialize(CerealWriteArchive& archive) const override;
+	void deserialize(CerealReadArchive& archive) override;
 
     /**
      * @brief Unique network identifier assigned at spawn.

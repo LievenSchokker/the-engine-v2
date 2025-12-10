@@ -1,4 +1,5 @@
 #pragma once
+#include "Networking/Serialization/ISerializable.h"
 
 
 class Scene;
@@ -25,7 +26,7 @@ class ScenePlaceholder;
  * tags, layers, and active/static state.
  *
  */
-class GameObject
+class GameObject : public ISerializable
 {
 public:
 	/**
@@ -40,6 +41,21 @@ public:
 	 * @brief Destructor. Cleans up all components and resources.
 	 */
 	~GameObject();
+
+	/**
+	 * @brief Serializes this GameObject and all its components.
+	 */
+	void serialize(CerealWriteArchive& archive) const;
+
+	/**
+	 * @brief Deserializes a GameObject from an archive.
+	 */
+	void deserialize(CerealReadArchive& archive);
+
+	/**
+	 * @brief Creates a deep copy of this GameObject via serialization.
+	 */
+	std::unique_ptr<GameObject> clone() const;
 
 
 	/**

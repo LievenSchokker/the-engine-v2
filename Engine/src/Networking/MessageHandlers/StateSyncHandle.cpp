@@ -1,6 +1,6 @@
 #include "Networking/MessageHandlers/StateSyncHandler.h"
 #include "Networking/NetworkingIdentityRegistry.h"
-#include "Networking/NetworkIdentity.h"
+#include "../../../inc/Component/NetworkIdentity.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 #include <iostream>

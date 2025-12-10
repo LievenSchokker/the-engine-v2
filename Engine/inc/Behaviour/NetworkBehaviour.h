@@ -5,7 +5,7 @@
 #include "Networking/Messages/ConcreteMessages/ActionMessage.h"
 #include "Networking/Serialization/Serialization.h"
 #include "Networking/Connection/ConnectionStatus.h"
-#include "Networking/NetworkIdentity.h"
+#include "../Component/NetworkIdentity.h"
 #include <functional>
 #include <unordered_map>
 #include <string>

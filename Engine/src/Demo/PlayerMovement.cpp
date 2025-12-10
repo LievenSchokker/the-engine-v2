@@ -44,6 +44,18 @@ void PlayerMovement::update(float deltaTime, GameWorld* world)
         handleInput();
     }
 }
+
+void PlayerMovement::serialize(CerealWriteArchive& archive) const
+{
+	float speed = moveSpeed;
+	archive.process(speed);
+}
+
+void PlayerMovement::deserialize(CerealReadArchive& archive)
+{
+	archive.process(moveSpeed);
+}
+
 void PlayerMovement::handleInput()
 {
     auto* world = getWorld();

@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "Component/Transform.h"
-#include "Networking/NetworkIdentity.h"
+#include "../../inc/Component/NetworkIdentity.h"
 #include "Networking/NetworkSpawnManager.h"
 
 void SceneManager::configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnMgr)
@@ -144,13 +144,6 @@ void SceneManager::processForClient(Scene& scene)
 
 bool SceneManager::hasNetworkBehaviour(const GameObject& obj) const
 {
-    for (const auto& component : obj.getComponentManager())
-    {
-        if (dynamic_cast<NetworkBehaviour*>(component.get()))
-        {
-            return true;
-        }
-    }
     return false;
 }
 

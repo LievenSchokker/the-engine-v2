@@ -1,6 +1,6 @@
 #include "Networking/Server/StateSyncSystem.h"
 #include "Networking/Server/Server.h"
-#include "Networking/NetworkIdentity.h"
+#include "../../../inc/Component/NetworkIdentity.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 

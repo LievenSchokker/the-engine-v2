@@ -19,6 +19,10 @@ public:
 	{
 	}
 
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Unknown;
+	}
 	/**
 	 * @brief Pure virtual destructor makes this class Abstract.
 	 */

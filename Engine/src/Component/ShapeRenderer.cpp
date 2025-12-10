@@ -109,6 +109,10 @@ void ShapeRenderer::serialize(CerealWriteArchive& archive) const
 	archive.process(order);
 }
 
+ComponentType ShapeRenderer::getComponentType() const
+{
+	return ComponentType::ShapeRenderer;
+}
 void ShapeRenderer::deserialize(CerealReadArchive& archive)
 {
 	// Shape type

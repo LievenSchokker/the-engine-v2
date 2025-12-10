@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "Networking/NetworkIdentity.h"
+#include "../../inc/Component/NetworkIdentity.h"
 #include "Scene/Scene.h"
 
 NetworkIdentityRegistry::NetworkIdentityRegistry()

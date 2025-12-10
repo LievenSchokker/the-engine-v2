@@ -94,7 +94,7 @@ public:
 	* @return Pointer to the associated GameObject's Transform.
 	*/
 	const Transform* getTransform() const;
-	ComponentType getComponentType() const;
+	virtual ComponentType getComponentType() const = 0;
 	void serialize(CerealWriteArchive& archive) const override;
 	void deserialize(CerealReadArchive& archive) override;
 protected:

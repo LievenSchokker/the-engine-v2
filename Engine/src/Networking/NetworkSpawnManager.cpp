@@ -1,5 +1,5 @@
 #include "Networking/NetworkSpawnManager.h"
-#include "Networking/NetworkIdentity.h"
+#include "../../inc/Component/NetworkIdentity.h"
 #include "Networking/NetworkPrefabRegistry.h"
 #include "Networking/Server/Server.h"
 #include "Networking/Messages/ConcreteMessages/SpawnMessage.h"
