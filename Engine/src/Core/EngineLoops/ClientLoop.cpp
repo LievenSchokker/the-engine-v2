@@ -72,7 +72,6 @@ void ClientLoop::start()
 	initializeNetworking();
 	initializeEvents();
 	physicsWorld->start();
-	sceneManager->getActiveScene()->onStart(gameWorld.get());
 }
 
 

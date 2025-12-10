@@ -87,7 +87,7 @@ public:
 	 * Activates every stored object's components through their component
 	 * manager.
 	 */
-	void onStart(GameWorld* world);
+	void onStart();
 
 	/**
 	 * @brief Stop the scene if it is active.

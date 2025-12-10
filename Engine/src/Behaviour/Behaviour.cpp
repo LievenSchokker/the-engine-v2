@@ -78,21 +78,17 @@ bool Behaviour::getHasStarted() const
 }
 
 
-void Behaviour::setWorld(GameWorld* world)
-{
-	cachedWorld = world;
-	if (world)
-	{
-		dispatcher = world->dispatcher;
-	}
-}
-
-GameWorld* Behaviour::getWorld() const
-{
-	return cachedWorld;
-}
-
 bool Behaviour::hasSubscriptions() const
 {
-	return !subscriptions->empty();
+	return !subscriptions.empty();
+}
+
+void Behaviour::setGameWorld(GameWorld* world)
+{
+	gameWorld = world;
+}
+
+GameWorld* Behaviour::getWorld()
+{
+	return gameWorld;
 }

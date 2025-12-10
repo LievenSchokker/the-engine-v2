@@ -145,27 +145,14 @@ public:
 	bool getHasStarted() const;
 
 	/**
-	* #brief set the reference to the world of this behaviour. Get's updated in scene.update()
-	*
-	*/
-	void setWorld(GameWorld* world);
-
-	/**
-	* #brief get the reference to the world of this behaviour.
-	*
-	* @return a raw pointer to the gameWorld. (Owned by clientLoop)
-	*
-	*/
-	GameWorld* getWorld() const;
-
-	/**
 	* #brief check's if this behaviour has any subscriptions.
 	*
 	* @return true if it has a subscription else false.
 	*
 	*/
 	bool hasSubscriptions() const;
-
+	void setGameWorld(GameWorld* world);
+	GameWorld* getWorld();
 
 protected:
 	/**
@@ -189,9 +176,11 @@ protected:
 	template <class EventType, class T>
 	void subscribe(void (T::*method)(const EventType&));
 
+
+
 private:
 	EventDispatcher* dispatcher;
-	GameWorld* contextWorld = nullptr;
+	GameWorld* gameWorld = nullptr;
 
 	/// A RAII Wrapper for subscription handles. (This automatically manages subscription's)
 	SubscriptionScope subscriptions;
