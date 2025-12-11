@@ -35,6 +35,9 @@ add_executable(engine_tests
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
+        Audio/TestAudioManager.cpp
+        Audio/TestMusicSource.cpp
+        Audio/TestSoundSource.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE

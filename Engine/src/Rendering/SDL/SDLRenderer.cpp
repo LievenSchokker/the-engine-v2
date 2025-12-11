@@ -1,10 +1,10 @@
 #include "Rendering/SDL/SDLRenderer.h"
+#include "External/IBackendContext.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
-#include "External/SdlContext.h"
 #include "Math/Vector2Utils.h"
-#include "Rendering/Window/WindowOptions.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
+#include "Rendering/Window/WindowOptions.h"
 #include "Rendering/RenderCommand.h"
 
 #include <algorithm>
@@ -12,16 +12,13 @@
 #include <cmath>
 #include <iostream>
 
-
 namespace
 {
 constexpr double kRotationThresholdDegrees = 0.01;
 constexpr int kMinWindowDimension = 1;
-}
+}  // namespace
 
-
-SDLRenderer::SDLRenderer(SdlContext& context)
-	: userInterfaceHook(nullptr)
+SDLRenderer::SDLRenderer(IBackendContext& context)
 {
 	assert(context.wasInit(SDL_INIT_VIDEO) &&
 		"SDL video subsystem not initialized");
@@ -34,8 +31,10 @@ SDLRenderer::~SDLRenderer()
 
 void SDLRenderer::open(const WindowOptions& options)
 {
-	if (options.width < kMinWindowDimension ||
-	    options.height < kMinWindowDimension) {
+	// Validate window dimensions
+	if ( options.width < kMinWindowDimension ||
+		 options.height < kMinWindowDimension )
+	{
 		std::cerr << "Invalid window dimensions: " << options.width << "x"
 			<< options.height << " (minimum: " << kMinWindowDimension
 			<< "x" << kMinWindowDimension << ")\n";
@@ -45,7 +44,9 @@ void SDLRenderer::open(const WindowOptions& options)
 	Uint32 flags = SDL_WINDOW_SHOWN;
 
 #if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
-	if (!SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0")) {
+	// Disable compositor bypass
+	if ( !SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0") )
+	{
 		std::cerr << "SDL can not disable compositor bypass!" << std::endl;
 		return;
 	}
@@ -55,7 +56,8 @@ void SDLRenderer::open(const WindowOptions& options)
 	                          SDL_WINDOWPOS_UNDEFINED, options.width,
 	                          options.height, flags);
 
-	if (window == nullptr) {
+	if ( window == nullptr )
+	{
 		std::cerr << "Window could not be created! SDL_Error: "
 			<< SDL_GetError() << "\n";
 		return;
@@ -64,7 +66,8 @@ void SDLRenderer::open(const WindowOptions& options)
 	renderer = SDL_CreateRenderer(
 		window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-	if (renderer == nullptr) {
+	if ( renderer == nullptr )
+	{
 		std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << "\n";
 		SDL_DestroyWindow(window);
 		window = nullptr;
@@ -179,7 +182,8 @@ bool SDLRenderer::isOpen()
 void SDLRenderer::drawCircle(const Vector2& center, double radius,
                              const Color& color, const Vector2& scale)
 {
-	if (renderer == nullptr) {
+	if ( renderer == nullptr )
+	{
 		return;
 	}
 
@@ -187,7 +191,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 	const double scaledRadiusX = std::abs(radius * finalScale.x);
 	const double scaledRadiusY = std::abs(radius * finalScale.y);
 
-	if (scaledRadiusX <= 0.0 || scaledRadiusY <= 0.0) {
+	if ( scaledRadiusX <= 0.0 || scaledRadiusY <= 0.0 )
+	{
 		return;
 	}
 
@@ -198,7 +203,8 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 	const int rx = std::max(1, static_cast<int>(std::round(scaledRadiusX)));
 	const int ry = std::max(1, static_cast<int>(std::round(scaledRadiusY)));
 
-	for (int y = -ry; y <= ry; ++y) {
+	for ( int y = -ry; y <= ry; ++y )
+	{
 		const double normalizedY =
 			static_cast<double>(y) / static_cast<double>(ry);
 		const double span =
@@ -215,7 +221,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
                                 double rotationDegrees, const Color& color,
                                 const Vector2& scale)
 {
-	if (renderer == nullptr) {
+	if ( renderer == nullptr )
+	{
 		return;
 	}
 
@@ -223,11 +230,13 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 	const double width = std::abs(size.x * finalScale.x);
 	const double height = std::abs(size.y * finalScale.y);
 
-	if (width <= 0.0 || height <= 0.0) {
+	if ( width <= 0.0 || height <= 0.0 )
+	{
 		return;
 	}
 
-	if (!ensureSolidQuadTexture()) {
+	if ( !ensureSolidQuadTexture() )
+	{
 		return;
 	}
 
@@ -240,7 +249,8 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 				   static_cast<float>(center.y - halfHeight),
 				   static_cast<float>(width), static_cast<float>(height)};
 
-	if (std::abs(rotationDegrees) < kRotationThresholdDegrees) {
+	if ( std::abs(rotationDegrees) < kRotationThresholdDegrees )
+	{
 		SDL_RenderCopyF(renderer, solidQuadTexture, nullptr, &rect);
 		return;
 	}
@@ -251,24 +261,28 @@ void SDLRenderer::drawRectangle(const Vector2& center, const Vector2& size,
 
 bool SDLRenderer::ensureSolidQuadTexture()
 {
-	if (solidQuadTexture != nullptr) {
+	if ( solidQuadTexture != nullptr )
+	{
 		return true;
 	}
 
-	if (renderer == nullptr) {
+	if ( renderer == nullptr )
+	{
 		return false;
 	}
 
 	solidQuadTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
-	                                     SDL_TEXTUREACCESS_STATIC, 1, 1);
-	if (solidQuadTexture == nullptr) {
+										 SDL_TEXTUREACCESS_STATIC, 1, 1);
+	if ( solidQuadTexture == nullptr )
+	{
 		std::cerr << "SDL_CreateTexture Error: " << SDL_GetError() << "\n";
 		return false;
 	}
 
 	const Uint32 pixel = 0xFFFFFFFF;
-	if (SDL_UpdateTexture(solidQuadTexture, nullptr, &pixel, sizeof(pixel)) !=
-	    0) {
+	if ( SDL_UpdateTexture(solidQuadTexture, nullptr, &pixel, sizeof(pixel)) !=
+		 0 )
+	{
 		std::cerr << "SDL_UpdateTexture Error: " << SDL_GetError() << "\n";
 		SDL_DestroyTexture(solidQuadTexture);
 		solidQuadTexture = nullptr;
@@ -281,7 +295,8 @@ bool SDLRenderer::ensureSolidQuadTexture()
 
 void SDLRenderer::destroySolidQuadTexture()
 {
-	if (solidQuadTexture != nullptr) {
+	if ( solidQuadTexture != nullptr )
+	{
 		SDL_DestroyTexture(solidQuadTexture);
 		solidQuadTexture = nullptr;
 	}

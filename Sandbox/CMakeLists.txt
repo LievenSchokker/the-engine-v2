@@ -3,7 +3,6 @@ project(engineSandbox)
 
 add_executable(engineSandbox
         main.cpp
-        SimpleMoveBehaviour.cpp
 )
 
 target_link_libraries(

@@ -22,17 +22,13 @@
 
 #pragma once
 
-
-#include "Rendering/IUIRenderHook.h"
+#include "External/IBackendContext.h"
 #include "Rendering/IRenderer.h"
+#include "Rendering/IUIRenderHook.h"
 #include "Rendering/RenderCommand.h"
 
 #include <SDL.h>
 #include <memory>
-
-
-class SdlContext;
-
 
 class SDLRenderer: public IRenderer
 {
@@ -51,7 +47,7 @@ class SDLRenderer: public IRenderer
 	 * @throws assertion failure if video subsystem not initialized (debug
 	 * builds)
 	 */
-	explicit SDLRenderer(SdlContext& context);
+	explicit SDLRenderer(IBackendContext& context);
 
 	/**
 	 * @brief Ensures proper cleanup of SDL resources in correct order

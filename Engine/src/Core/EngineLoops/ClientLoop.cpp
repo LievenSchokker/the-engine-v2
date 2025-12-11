@@ -1,13 +1,15 @@
 #include "Core/EngineLoops/ClientLoop.h"
 
-#include "Game.h"
+#include "Audio/SDL/AudioBackendSDL.h"
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
-#include "External/SdlContext.h"
+#include "External/SDLBackendContext.h"
+#include "Game.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
-#include "Networking/TransportGNS.h"
+#include "Networking/Server/Server.h"
 #include "Networking/Server/ServerInformation.h"
+#include "Networking/TransportGNS.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
@@ -16,7 +18,6 @@
 
 #include <iostream>
 #include <ostream>
-#include "Networking/Server/Server.h"
 
 //TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
@@ -32,15 +33,21 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	};
 	if (specifications.renderBackend == RenderBackend::SDL)
 	{
-		sdlContext = std::make_unique<SdlContext>();
+		backendContext = std::make_unique<SDLBackendContext>();
 		//TODO SDL Injection layer
 		clockFunction = []()
 		{
 			return SDL_GetTicks() / 1000.0;
 		};
-		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*sdlContext);
+		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*backendContext);
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
+
+		// Audio
+		auto audioBackend = std::make_unique<AudioBackendSDL>();
+		audioManager = std::make_unique<AudioManager>();
+		audioManager->initialize(std::move(audioBackend));
+		
 	}
 	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
 	std::string scene = scenePtr->getName();
