@@ -24,7 +24,7 @@ void NavigationGrid::generateGrid(Vector2 dimensions, Vector2 cellsSize)
 
 bool NavigationGrid::isWalkable(Vector2 cellPosition) const
 {
-    if (!isValidCell(cellPosition))
+    if (!isInGrid(cellPosition))
         return false;
 
     return cells[cellPosition.y * width + cellPosition.x].walkable;
@@ -32,7 +32,7 @@ bool NavigationGrid::isWalkable(Vector2 cellPosition) const
 
 int NavigationGrid::getCellWeight(Vector2 cellPosition) const
 {
-    if (!isValidCell(cellPosition))
+    if (!isInGrid(cellPosition))
         return 0;
 
     return cells[cellPosition.y * width + cellPosition.x].weight;
@@ -41,7 +41,7 @@ int NavigationGrid::getCellWeight(Vector2 cellPosition) const
 
 void NavigationGrid::setWalkable(Vector2 cellPosition, bool value)
 {
-    if (!isValidCell(cellPosition))
+    if (!isInGrid(cellPosition))
         return ;
 
      cells[cellPosition.y * width + cellPosition.x].walkable = value;
@@ -50,7 +50,7 @@ void NavigationGrid::setWalkable(Vector2 cellPosition, bool value)
 
 void NavigationGrid::setCellWeight(Vector2 cellPosition, float weight)
 {
-    if (!isValidCell(cellPosition))
+    if (!isInGrid(cellPosition))
         return;
 
     cells[cellPosition.y * width + cellPosition.x].weight = weight;
@@ -95,7 +95,7 @@ const std::vector<NavigationCell> &NavigationGrid::getCells() const
 }
 
 
-bool NavigationGrid::isValidCell(Vector2 position) const
+bool NavigationGrid::isInGrid(Vector2 position) const
 {
     int x = static_cast<int>(position.x);
     int y = static_cast<int>(position.y);
@@ -128,7 +128,7 @@ std::vector<Vector2> NavigationGrid::getNeighbours(Vector2 cellPos, bool diagona
     {
         Vector2 neighbour = cellPos + direction;
 
-        if (isValidCell(neighbour))
+        if (isInGrid(neighbour))
             validNeighbours.push_back(neighbour);
     }
 
@@ -168,4 +168,5 @@ void NavigationGrid::fillRenderQueue(IRenderQueueWriter &queue) const
         }
     }
 }
+
 

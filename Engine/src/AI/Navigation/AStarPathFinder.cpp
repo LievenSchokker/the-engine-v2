@@ -43,9 +43,9 @@ struct CompareAStarNodes
 };
 
 
-PathResult AStarPathFinder::findPath(const NavigationGrid& grid, Vector2 start, Vector2 end) const
+PathResult AStarPathFinder::findPath(const IGraph& graph, Vector2 start, Vector2 end) const
 {
-    if (!grid.isValidCell(start) || !grid.isValidCell(end))
+    if (!graph.isValid(start) || !graph.isValid(end))
     {
         /// Return empty result if start or end is not valid
         return PathResult{{}};
@@ -82,20 +82,18 @@ PathResult AStarPathFinder::findPath(const NavigationGrid& grid, Vector2 start, 
             break;
         }
 
-        for (Vector2 neighbour : grid.getNeighbours(currentNode.position, astarOptions.useOrdinalDirections))
+        for (Vector2 neighbour : graph.getNeighbours(currentNode.position))
         {
             if (visited.contains(neighbour))
                 continue;
 
-            if (!grid.isWalkable(neighbour))
+            if (!graph.isValid(neighbour))
                 continue;
-
-            float cellCost     = grid.getCellWeight(neighbour);
 
             AStarNode neighbourNode;
             neighbourNode.position = neighbour;
             neighbourNode.parentPosition = currentNode.position;
-            neighbourNode.gCost = currentNode.gCost + calculateMovementCost(grid, currentNode.position, neighbour);
+            neighbourNode.gCost = currentNode.gCost + graph.getCost(currentNode.position, neighbourNode.position);
             neighbourNode.hCost = calculateHeuristic(neighbour, end);
 
             auto it = traversalHistory.find(neighbourNode.position);

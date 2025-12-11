@@ -4,7 +4,7 @@ project(engineSandbox)
 add_executable(engineSandbox
         main.cpp
         SimpleMoveBehaviour.cpp
-        Behaviours/NavigationTest.cpp
+#        Behaviours/NavigationTest.cpp
         AgentsZandbak.cpp
 )
 

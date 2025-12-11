@@ -53,6 +53,7 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     avoidRenderer->setColor(Color::darkBlue());
 
     Agent* avoidAgent = avoidEnemy->addComponent<Agent>();
+    Agent* avoidAgent2 = avoidEnemy->addComponent<Agent>();
     avoidAgent->setRotationTurnRate(180);
 
     avoidAgent->setMaxSpeed(100);

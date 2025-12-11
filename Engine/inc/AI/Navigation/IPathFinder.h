@@ -16,5 +16,5 @@ class IPathFinder
         IPathFinder() = default;
         virtual ~IPathFinder() = default;
 
-        virtual PathResult findPath(const NavigationGrid& grid, Vector2 start, Vector2 end) const = 0;
+        virtual PathResult findPath(const IGraph& grid, Vector2 start, Vector2 end) const = 0;
 };

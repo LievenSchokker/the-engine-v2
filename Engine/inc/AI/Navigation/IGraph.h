@@ -8,14 +8,12 @@
 #include "Math/Vector2.h"
 
 
-class IGrid
+class IGraph
 {
     public:
-        virtual ~IGrid() = default;
+        virtual ~IGraph() = default;
 
-        virtual std::vector<Vector2> getNeighbours(Vector2 node) = 0;
-        virtual std::vector<Vector2> getNeighbours(Vector2 node, bool includeOrdinalNeighbours) = 0;
-
-        virtual bool isValid(Vector2 node) = 0;
-        virtual float getCost(Vector2 from, Vector2 to) = 0;
+        virtual std::vector<Vector2> getNeighbours(Vector2 node) const = 0;
+        virtual float getCost(Vector2 from, Vector2 to) const = 0;
+        virtual bool isValid(Vector2 node) const = 0;
 };
