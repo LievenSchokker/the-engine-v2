@@ -14,10 +14,6 @@ void SceneManager::configureNetworking(ConnectionMode mode, NetworkSpawnManager*
     networkMode = mode;
     spawnManager = spawnMgr;
     networkConfigured = true;
-
-    std::cout << "[SceneManager] Network configured: "
-              << (mode == ConnectionMode::Host ? "SERVER" : "CLIENT")
-              << std::endl;
 }
 
 PrefabLibrary& SceneManager::getPrefabLibrary()
@@ -37,8 +33,6 @@ bool SceneManager::isNetworkConfigured() const
 
 void SceneManager::processSceneForNetwork(Scene& scene)
 {
-    std::cout << "[SceneManager] Processing scene '" << scene.getName()
-              << "' for networking..." << std::endl;
 
     if (networkMode == ConnectionMode::Host)
     {
@@ -118,16 +112,12 @@ void SceneManager::processForClient(Scene& scene)
 
 	if (toProcess.empty())
 	{
-		std::cout << "[SceneManager] No network objects to process" << std::endl;
 		return;
 	}
 
 	for (GameObject* obj : toProcess)
 	{
 		std::string name = obj->getName();
-
-		std::cout << "[SceneManager] Client: Processing '" << name
-				  << "' (extracting as prefab, awaiting server spawn)" << std::endl;
 
 		// Extract from scene
 		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
@@ -144,13 +134,7 @@ void SceneManager::processForClient(Scene& scene)
 
 		// Register as prefab (client needs this to instantiate from SpawnMessage)
 		uint32_t assetId = prefabLibrary.add(std::move(extracted));
-
-		std::cout << "[SceneManager] Client: Registered prefab '" << name
-				  << "' with assetId=" << assetId << std::endl;
 	}
-
-	std::cout << "[SceneManager] Client processing complete. Registered "
-			  << prefabLibrary.size() << " prefabs" << std::endl;
 }
 
 

@@ -9,7 +9,6 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
 {
     if (!prefab)
     {
-        std::cerr << "[PrefabLibrary] Cannot add null prefab" << std::endl;
         return 0;
     }
 
@@ -28,8 +27,6 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
         nameToId[name] = assetId;
     }
 
-    std::cout << "[PrefabLibrary] Added prefab '" << name
-              << "' with assetId=" << assetId << std::endl;
 
     prefabsById[assetId] = std::move(prefab);
     return assetId;
@@ -39,7 +36,6 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
 {
     if (!prefab)
     {
-        std::cerr << "[PrefabLibrary] Cannot add null prefab" << std::endl;
         return;
     }
 
@@ -61,33 +57,22 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
         nameToId[name] = assetId;
     }
 
-    std::cout << "[PrefabLibrary] Added prefab '" << name
-              << "' with assetId=" << assetId << std::endl;
-
     prefabsById[assetId] = std::move(prefab);
 }
 
 std::unique_ptr<GameObject> PrefabLibrary::instantiate(uint32_t assetId) const
 {
-	std::cout << "[PrefabLibrary::instantiate] Looking for assetId=" << assetId << std::endl;
-
 	auto it = prefabsById.find(assetId);
 	if (it == prefabsById.end())
 	{
-		std::cerr << "[PrefabLibrary::instantiate] Not found!" << std::endl;
 		return nullptr;
 	}
 
-	std::cout << "[PrefabLibrary::instantiate] Found, cloning..." << std::endl;
 
 	if (!it->second)
 	{
-		std::cerr << "[PrefabLibrary::instantiate] Prefab is null!" << std::endl;
 		return nullptr;
 	}
-
-	std::cout << "[PrefabLibrary::instantiate] Prefab name: " << it->second->getName() << std::endl;
-
 	return it->second->clone();
 }
 
@@ -96,7 +81,6 @@ std::unique_ptr<GameObject> PrefabLibrary::instantiate(const std::string& name) 
     auto it = nameToId.find(name);
     if (it == nameToId.end())
     {
-        std::cerr << "[PrefabLibrary] Prefab not found: name=" << name << std::endl;
         return nullptr;
     }
 

@@ -47,16 +47,10 @@ void StateSyncSystem::broadcastState(uint32_t currentTick)
 		);
 	}
 
-	std::cout << "[Server] Broadcasting StateSync with "
-			  << message.objects.size() << " objects" << std::endl;
+
 
 	if (!message.objects.empty())
 	{
-		for (const auto& obj : message.objects)
-		{
-			std::cout << "[Server] Syncing netId=" << obj.netId
-					  << " pos=(" << obj.posX << ", " << obj.posY << ")" << std::endl;
-		}
 		server->broadcastMessage(message);
 	}
 }

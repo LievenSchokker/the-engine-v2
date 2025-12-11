@@ -192,12 +192,9 @@ void GameObject::setBehavioursEnabled(const bool value) const
 
 void GameObject::serialize(CerealWriteArchive& archive) const
 {
-	// 1. Name
 	std::string n = name;
 	archive.process(n);
-	std::cout << "[serialize] Name: " << n << std::endl;
 
-	// 2. Transform
 	Transform* t = getTransform();
 	float posX = t->getPosition().x;
 	float posY = t->getPosition().y;
@@ -211,17 +208,12 @@ void GameObject::serialize(CerealWriteArchive& archive) const
 	archive.process(scaleX);
 	archive.process(scaleY);
 
-	std::cout << "[serialize] Position: " << posX << ", " << posY << std::endl;
-
-	// 3. Count serializable components
 	uint32_t count = 0;
 	for (const auto& comp : componentManager->getComponents())
 	{
 		if (dynamic_cast<Transform*>(comp.get())) continue;
 
 		ComponentType type = comp->getComponentType();
-		std::cout << "[serialize] Found component type: " << static_cast<uint32_t>(type)
-				  << " registered: " << ComponentFactory::instance().isRegistered(type) << std::endl;
 
 		if (ComponentFactory::instance().isRegistered(type))
 		{
@@ -229,9 +221,7 @@ void GameObject::serialize(CerealWriteArchive& archive) const
 		}
 	}
 	archive.process(count);
-	std::cout << "[serialize] Component count: " << count << std::endl;
 
-	// 4. Each component
 	for (const auto& comp : componentManager->getComponents())
 	{
 		if (dynamic_cast<Transform*>(comp.get())) continue;
@@ -245,17 +235,13 @@ void GameObject::serialize(CerealWriteArchive& archive) const
 		uint32_t typeId = static_cast<uint32_t>(type);
 		archive.process(typeId);
 		comp->serialize(archive);
-		std::cout << "[serialize] Wrote component type: " << typeId << std::endl;
 	}
 }
 
 void GameObject::deserialize(CerealReadArchive& archive)
 {
-	// 1. Name
 	archive.process(name);
-	std::cout << "[deserialize] Name: " << name << std::endl;
 
-	// 2. Transform
 	float posX, posY;
 	double rotation;
 	float scaleX, scaleY;
@@ -266,37 +252,28 @@ void GameObject::deserialize(CerealReadArchive& archive)
 	archive.process(scaleX);
 	archive.process(scaleY);
 
-	std::cout << "[deserialize] Position: " << posX << ", " << posY << std::endl;
-
 	getTransform()->setPosition({posX, posY});
 	getTransform()->setRotationAngle(rotation);
 	getTransform()->setScale({scaleX, scaleY});
 
-	// 3. Component count
 	uint32_t count;
 	archive.process(count);
-	std::cout << "[deserialize] Component count: " << count << std::endl;
 
-	// 4. Each component
 	for (uint32_t i = 0; i < count; ++i)
 	{
 		uint32_t typeId;
 		archive.process(typeId);
 		ComponentType type = static_cast<ComponentType>(typeId);
 
-		std::cout << "[deserialize] Creating component type: " << typeId << std::endl;
 
 		auto comp = ComponentFactory::instance().create(type);
 		if (!comp)
 		{
-			std::cerr << "[deserialize] FAILED - Unknown component type: " << typeId << std::endl;
 			break;
 		}
 
-		std::cout << "[deserialize] Component created, deserializing..." << std::endl;
 		comp->deserialize(archive);
 		componentManager->addComponent(std::move(comp));
-		std::cout << "[deserialize] Component added" << std::endl;
 	}
 }
 

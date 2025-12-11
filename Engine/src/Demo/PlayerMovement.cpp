@@ -14,38 +14,25 @@ void PlayerMovement::onStart()
 
 void PlayerMovement::onNetworkSpawn()
 {
-    std::cout << "[PlayerMovement] onNetworkSpawn - isServer: " << isServer()
-              << " isClient: " << isClient()
-              << " hasAuthority: " << hasAuthority() << std::endl;
 }
-
 void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
 {
-	std::cout << "[PlayerMovement] Registering network methods" << std::endl;
-
 	builder.command("MoveUp", [this](ReadArchive&) {
-		std::cout << "[SERVER] MoveUp command received!" << std::endl;
 		applyMovement(0, -1);
 	});
 	builder.command("MoveDown", [this](ReadArchive&) {
-		std::cout << "[SERVER] MoveDown command received!" << std::endl;
 		applyMovement(0, 1);
 	});
 	builder.command("MoveLeft", [this](ReadArchive&) {
-		std::cout << "[SERVER] MoveLeft command received!" << std::endl;
 		applyMovement(-1, 0);
 	});
 	builder.command("MoveRight", [this](ReadArchive&) {
-		std::cout << "[SERVER] MoveRight command received!" << std::endl;
 		applyMovement(1, 0);
 	});
 }
 
 void PlayerMovement::update(float deltaTime, GameWorld* world)
 {
-	std::cout << "[PlayerMovement::update] hasAuthority=" << hasAuthority()
-			  << " isClient=" << isClient() << std::endl;
-
 	if (!hasAuthority())
 	{
 		return;
