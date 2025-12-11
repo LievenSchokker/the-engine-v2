@@ -43,7 +43,7 @@ public:
 	 *
 	 * @param applicationSpecifications Server configuration (tick rate, network settings)
 	 */
-	explicit ServerLoop(std::unique_ptr<Game> game);
+	explicit ServerLoop(const std::unique_ptr<Game>& game);
 	~ServerLoop() override;
 
 	GameWorld* getGameWorld() override;

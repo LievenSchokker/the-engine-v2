@@ -12,7 +12,7 @@
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Networking/Messages/ConcreteMessages/WelcomeMessage.h"
 
-ServerLoop::ServerLoop(std::unique_ptr<Game> game)
+ServerLoop::ServerLoop(const std::unique_ptr<Game>& game)
 	: specifications(game->getApplicationSpecifications())
 	  , serverRegistry(std::make_unique<NetworkIdentityRegistry>())
 	  , sceneManager(std::make_unique<SceneManager>())

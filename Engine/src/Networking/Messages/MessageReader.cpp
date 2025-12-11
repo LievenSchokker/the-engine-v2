@@ -13,7 +13,7 @@
 #include "Networking/Messages/ConcreteMessages/WelcomeMessage.h"
 
 std::unique_ptr<IMessage> MessageReader::readMessage(
-	const IncomingRawMessage rawMessage)
+	const IncomingRawMessage& rawMessage)
 {
 	if (rawMessage.length < sizeof(uint8_t))
 	{
