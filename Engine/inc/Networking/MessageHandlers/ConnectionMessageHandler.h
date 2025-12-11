@@ -6,7 +6,7 @@
 #include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 
 
-class ConnectionMessageHandler : public BaseMessageHandler<ConnectionMessage>
+class ConnectionMessageHandler final: public BaseMessageHandler<ConnectionMessage>
 {
 public:
     explicit ConnectionMessageHandler(ConnectionMode mode, GameWorld& gameWorld)

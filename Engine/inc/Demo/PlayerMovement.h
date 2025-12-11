@@ -11,7 +11,7 @@ class GameWorld;  // Forward declaration
  * Client: Reads input, sends movement commands to server
  * Server: Validates and applies movement, broadcasts to clients
  */
-class PlayerMovement : public NetworkBehaviour
+class PlayerMovement final : public NetworkBehaviour
 {
 public:
     void onStart() override;

@@ -66,7 +66,7 @@ void AnimationClip::updateLength()
 	for ( const auto& track : tracks )
 	{
 		PropertyType prop = track.getProperty();
-		if ( propertyTotalDuration.find(prop) == propertyTotalDuration.end() )
+		if (!propertyTotalDuration.contains(prop) )
 		{
 			propertyTotalDuration[prop] = 0.0f;
 		}

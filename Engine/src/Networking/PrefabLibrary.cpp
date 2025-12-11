@@ -71,9 +71,9 @@ const std::vector<uint32_t>& PrefabLibrary::getNetworkPrefabIds() const
     return networkPrefabIds;
 }
 
-bool PrefabLibrary::contains(uint32_t assetId) const
+bool PrefabLibrary::contains(const uint32_t assetId) const
 {
-    return prefabsById.find(assetId) != prefabsById.end();
+    return prefabsById.contains(assetId);
 }
 
 size_t PrefabLibrary::size() const

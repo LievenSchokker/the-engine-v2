@@ -27,7 +27,7 @@ class InputManager;
  *
  * @see ServerLoop, IEngineLoop
  */
-class ClientLoop: public IEngineLoop
+class ClientLoop final: public IEngineLoop
 {
 	using ClockFunction = std::function<double()>;
 

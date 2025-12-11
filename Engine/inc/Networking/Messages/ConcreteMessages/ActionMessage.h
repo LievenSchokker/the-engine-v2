@@ -20,7 +20,7 @@
  *
  *
  */
-class ActionMessage : public IMessage {
+class ActionMessage final: public IMessage {
 public:
 
     //Need default construction for deserialization.

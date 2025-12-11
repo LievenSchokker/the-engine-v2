@@ -5,7 +5,7 @@
 
 class NetworkIdentityRegistry;
 
-class ActionMessageHandler : public BaseMessageHandler<ActionMessage>
+class ActionMessageHandler final: public BaseMessageHandler<ActionMessage>
 {
 public:
     ActionMessageHandler(GameWorld& world, NetworkIdentityRegistry& registry);

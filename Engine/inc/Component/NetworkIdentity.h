@@ -17,7 +17,7 @@ class GameWorld;
  *
  * This corresponds to your diagram's NetworkIdentity class with netId and ownerId.
  */
-class NetworkIdentity : public Component
+class NetworkIdentity final : public Component
 {
 public:
     NetworkIdentity() = default;
@@ -79,7 +79,7 @@ public:
 
     GameWorld* getWorld();
 private:
-    GameWorld* gameWorld;
+    GameWorld* gameWorld{};
     uint32_t networkId = 0;
     int ownerId = -1;
 
