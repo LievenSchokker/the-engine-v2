@@ -4,9 +4,10 @@
 
 #include "../../inc/Component/NetworkIdentity.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 
 NetworkIdentityRegistry::NetworkIdentityRegistry()
-	: currentScene(nullptr)
+	: gameWorld(nullptr)
 {
 }
 
@@ -15,9 +16,19 @@ NetworkIdentityRegistry::~NetworkIdentityRegistry()
 	clear();
 }
 
-void NetworkIdentityRegistry::setCurrentScene(Scene* scene)
+void NetworkIdentityRegistry::setGameWorld(GameWorld* gameWorld)
 {
-	currentScene = scene;
+	this->gameWorld = gameWorld;
+}
+
+Scene* NetworkIdentityRegistry::getCurrentScene() const
+{
+	if (gameWorld != nullptr)
+	{
+		return gameWorld->sceneManager->getActiveScene();
+	}
+
+	return nullptr;
 }
 
 void NetworkIdentityRegistry::registerIdentity(NetworkIdentity* identity)

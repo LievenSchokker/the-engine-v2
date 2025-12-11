@@ -22,8 +22,7 @@ void NetworkIdentity::onNetworkSpawn()
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
 			netBehaviour->world = gameWorld;
-			netBehaviour->componentNetworkId = static_cast<uint32_t>(
-				networkBehaviours.size());
+			netBehaviour->componentNetworkId = static_cast<uint32_t>(networkBehaviours.size());
 			netBehaviour->identity = this;
 			networkBehaviours.push_back(netBehaviour);
 
@@ -55,7 +54,13 @@ void NetworkIdentity::deserialize(CerealReadArchive& archive)
 {
 }
 
-void NetworkIdentity::dispatchAction(uint32_t componentId,
+int NetworkIdentity::getOwnerId() const
+{
+	return ownerId;
+}
+
+
+void NetworkIdentity::dispatchAction(const uint32_t componentId,
                                      const std::string& action) const
 {
 	if (componentId >= networkBehaviours.size())
@@ -69,7 +74,7 @@ void NetworkIdentity::dispatchAction(uint32_t componentId,
 	}
 }
 
-GameWorld* NetworkIdentity::getWorld()
+GameWorld* NetworkIdentity::getWorld() const
 {
 	return gameWorld;
 }

@@ -21,7 +21,7 @@ class NetworkIdentity final : public Component
 {
 public:
     NetworkIdentity() = default;
-    ~NetworkIdentity() = default;
+    ~NetworkIdentity() override = default;
 
 	ComponentType getComponentType() const override
 	{
@@ -43,15 +43,19 @@ public:
      *
      * Used for authority checks in NetworkBehaviour.
      */
-    int getOwnerId() const { return ownerId; }
+    int getOwnerId() const;
 
     /**
      * @brief Checks if the local machine has authority.
      *
      * Server always has authority over server-owned objects.
      * Clients only have authority over objects they own.
+     *
+     * Authority here does not mean they own the state.
+     * It means they have authority to perform an action on this Behaviour
      */
     bool hasAuthority();
+
     /**
      * @brief Called by NetworkSpawnManager when spawned on network.
      *
@@ -77,7 +81,7 @@ public:
      */
     void dispatchAction(uint32_t componentId, const std::string& action) const;
 
-    GameWorld* getWorld();
+    GameWorld* getWorld() const;
 private:
     GameWorld* gameWorld{};
     uint32_t networkId = 0;

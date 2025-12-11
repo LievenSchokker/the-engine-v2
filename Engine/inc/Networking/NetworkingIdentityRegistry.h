@@ -1,5 +1,7 @@
     #pragma once
 
+#include "Core/GameWorld.h"
+
 #include <cstdint>
 #include <unordered_map>
 #include <vector>
@@ -33,12 +35,12 @@ public:
      * Called when a networked scene loads. The registry needs scene access
      * to find GameObjects during spawn operations.
      */
-    void setCurrentScene(Scene* scene);
+    void setGameWorld(GameWorld* world);
 
     /**
      * @brief Gets the currently associated scene.
      */
-    Scene* getCurrentScene() const { return currentScene; }
+    Scene* getCurrentScene() const;
 
     /**
      * @brief Registers a NetworkIdentity for network message routing.
@@ -122,7 +124,7 @@ private:
     std::unordered_map<int, std::vector<NetworkIdentity*>> identitiesByOwner;
 
     /// Reference to active scene for GameObject access
-    Scene* currentScene = nullptr;
+    GameWorld* gameWorld = nullptr;
 
     /// Helper to update owner index when identity is added/removed
     void addToOwnerIndex(NetworkIdentity* identity);
