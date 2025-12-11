@@ -209,28 +209,20 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 
 void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 {
-	// Client creates from its own prefab library
-	auto gameObject = prefabLibrary->instantiate(message.assetId);
-
-	if (!gameObject)
+	if (!message.gameObject)
 	{
-		std::cerr << "Unknown assetId: " << message.assetId << "\n";
 		return;
 	}
 
-	// Configure with received network state
-	auto* transform = gameObject->getTransform();
-	if (transform)
+	if (!scene)
 	{
-		transform->setPosition(message.position);
-		transform->setRotationAngle(message.rotation);
-		transform->setScale(message.scale);
+		return;
 	}
 
-	auto* identity = gameObject->getComponent<NetworkIdentity>();
+	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
 	if (!identity)
 	{
-		identity = gameObject->addComponent<NetworkIdentity>();
+		identity = message.gameObject->addComponent<NetworkIdentity>();
 	}
 
 	identity->networkId = message.netId;
@@ -242,11 +234,11 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 		identityRegistry->registerIdentity(identity);
 	}
 
-	GameObject* rawPtr = gameObject.get();
+	GameObject* rawPtr = message.gameObject.get();
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
-	scene->addGameObject(std::move(gameObject));
+	scene->addGameObject(std::move(message.gameObject));
 	identity->onNetworkSpawn();
 }
 

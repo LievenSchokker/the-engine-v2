@@ -118,6 +118,11 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
     std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
+	if (message->getMessageType() == MessageTypes::SpawnMessage)
+	{
+		std::cout << rawMessage.length << std::endl;
+	}
+
     if (message == nullptr)
     {
         std::cerr << "Failed to parse message" << std::endl;
