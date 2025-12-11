@@ -58,7 +58,6 @@ public:
 	 * @brief Checks if a prefab exists.
 	 */
 	bool contains(uint32_t assetId) const;
-	bool contains(const std::string& name) const;
 
 	/**
 	 * @brief Gets the total number of registered prefabs.
@@ -68,6 +67,5 @@ public:
 private:
 	uint32_t nextAssetId = 1;
 	std::unordered_map<uint32_t, std::unique_ptr<GameObject>> prefabsById;
-	std::unordered_map<std::string, uint32_t> nameToId;
 	std::vector<uint32_t> networkPrefabIds;
 };
