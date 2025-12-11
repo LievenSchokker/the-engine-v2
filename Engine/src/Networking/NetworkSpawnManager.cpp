@@ -29,12 +29,11 @@ uint32_t NetworkSpawnManager::generateNetId()
 	return nextNetworkId++;
 }
 
-GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
-                                             int ownerId)
+GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vector2 position,
+                                             const int ownerId)
 {
 	if (!prefabLibrary)
 	{
-		std::cerr << "[NetworkSpawnManager] No PrefabLibrary set" << std::endl;
 		return nullptr;
 	}
 
@@ -42,8 +41,6 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 
 	if (!gameObject)
 	{
-		std::cerr << "[NetworkSpawnManager] Failed to instantiate assetId=" <<
-			assetId << std::endl;
 		return nullptr;
 	}
 
@@ -172,12 +169,13 @@ GameObject* NetworkSpawnManager::findByNetId(uint32_t netId) const
 }
 
 SpawnMessage NetworkSpawnManager::createSpawnMessage(
-	NetworkIdentity* identity, uint32_t assetId)
+	const NetworkIdentity* identity, uint32_t assetId) const
 {
 	SpawnMessage message;
 	message.netId = identity->getNetId();
 	message.assetId = assetId;
 	message.ownerId = identity->getOwnerId();
+	message.gameObject = std::move(prefabLibrary->instantiate(assetId));
 
 	const Transform* transform = identity->getTransform();
 	if (transform)
@@ -190,27 +188,20 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 	return message;
 }
 
-void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
+void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 {
 	if (!prefabLibrary)
 	{
 		return;
 	}
-	auto gameObject = prefabLibrary->instantiate(message.assetId);
-	if (!gameObject)
+
+	if (message.gameObject == nullptr)
 	{
 		return;
 	}
 
-	gameObject->getTransform()->setPosition(message.position);
-	gameObject->getTransform()->setRotationAngle(message.rotation);
-	gameObject->getTransform()->setScale(message.scale);
 
-	auto* identity = gameObject->getComponent<NetworkIdentity>();
-	if (!identity)
-	{
-		identity = gameObject->addComponent<NetworkIdentity>();
-	}
+	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
 	identity->networkId = message.netId;
 	identity->ownerId = message.ownerId;
 	identity->networkId = message.netId;
@@ -222,7 +213,7 @@ void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
 		identityRegistry->registerIdentity(identity);
 	}
 
-	GameObject* rawPtr = gameObject.get();
+	GameObject* rawPtr = message.gameObject.get();
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
@@ -230,7 +221,7 @@ void NetworkSpawnManager::handleSpawnMessage(const SpawnMessage& message)
 	{
 		return;
 	}
-	scene->addGameObject(std::move(gameObject));
+	scene->addGameObject(std::move(message.gameObject));
 
 	identity->onNetworkSpawn();
 }

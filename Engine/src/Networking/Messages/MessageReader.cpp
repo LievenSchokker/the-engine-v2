@@ -42,7 +42,7 @@ std::unique_ptr<IMessage> MessageReader::readMessage(
 	}
 }
 
-std::unique_ptr<IMessage> MessageReader::createMessage(MessageTypes messageType)
+std::unique_ptr<IMessage> MessageReader::createMessage(const MessageTypes messageType)
 {
 	std::unique_ptr<IMessage> message;
 

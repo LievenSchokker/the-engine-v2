@@ -4,18 +4,22 @@
 std::vector<std::byte> SpawnMessage::serialize() const
 {
 	WriteArchive archive;
+
+	// Network identity
 	archive.process(netId);
 	archive.process(assetId);
 	archive.process(ownerId);
-	archive.process(sceneId);
-	archive.process(position.x);
-	archive.process(position.y);
-	archive.process(rotation);
-	archive.process(scale.x);
-	archive.process(scale.y);
 
-	uint32_t payloadSize = static_cast<uint32_t>(payload.size());
-	archive.process(payloadSize);
+	//We need a bool to pass into the archive it cannot take in true or false directly
+	if (bool hasGameObject = (gameObject != nullptr))
+	{
+		archive.process(hasGameObject);
+		gameObject->serialize(archive);
+	}
+	else
+	{
+		archive.process(hasGameObject);
+	}
 
 	return archive.getBytes();
 }
@@ -29,16 +33,14 @@ bool SpawnMessage::deserialize(const std::byte* data, size_t length)
 		archive.process(netId);
 		archive.process(assetId);
 		archive.process(ownerId);
-		archive.process(sceneId);
-		archive.process(position.x);
-		archive.process(position.y);
-		archive.process(rotation);
-		archive.process(scale.x);
-		archive.process(scale.y);
 
-		uint32_t payloadSize;
-		archive.process(payloadSize);
-
+		bool hasGameObject = false;
+		archive.process(hasGameObject);
+		if (hasGameObject)
+		{
+			gameObject = std::make_unique<GameObject>();
+			gameObject->deserialize(archive);
+		}
 		return validate();
 	} catch (...) {
 		return false;

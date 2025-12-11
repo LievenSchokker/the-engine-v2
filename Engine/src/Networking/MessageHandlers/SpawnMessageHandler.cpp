@@ -10,6 +10,6 @@ SpawnMessageHandler::SpawnMessageHandler(GameWorld& world, NetworkSpawnManager& 
 
 void SpawnMessageHandler::handleMessageInternal()
 {
-    const SpawnMessage* spawnMsg = getMessage();
-    spawnManager.handleSpawnMessage(*spawnMsg);
+	SpawnMessage* spawnMessage = getMessage();
+    spawnManager.handleSpawnMessage(*spawnMessage);
 }

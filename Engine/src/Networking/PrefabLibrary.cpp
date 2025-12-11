@@ -44,7 +44,7 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
     prefabsById[assetId] = std::move(prefab);
 }
 
-std::unique_ptr<GameObject> PrefabLibrary::instantiate(uint32_t assetId) const
+std::unique_ptr<GameObject> PrefabLibrary::instantiate(const uint32_t assetId) const
 {
 	const auto it = prefabsById.find(assetId);
 	if (it == prefabsById.end())

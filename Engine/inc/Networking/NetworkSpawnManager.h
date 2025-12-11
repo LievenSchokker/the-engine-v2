@@ -76,13 +76,13 @@ public:
     /**
      * @brief Client-side: handles incoming SpawnMessage.
      */
-    void handleSpawnMessage(const SpawnMessage& message);
+    void handleSpawnMessage(SpawnMessage& message);
 
     GameObject* getObjectByNetId(uint32_t netId) const;
 
 private:
     uint32_t generateNetId();
-    SpawnMessage createSpawnMessage(NetworkIdentity* identity, uint32_t assetId);
+	SpawnMessage createSpawnMessage(const NetworkIdentity* identity, uint32_t assetId) const;
 
     Server* server;
     Scene* scene;

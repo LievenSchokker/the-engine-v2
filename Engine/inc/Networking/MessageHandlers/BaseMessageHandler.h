@@ -20,13 +20,20 @@ public:
 
     void handleMessage(std::unique_ptr<IMessage> message) override
     {
-        auto* concrete = dynamic_cast<ConcreteTemplateMessage*>(message.get());
+    	// Transferring ownership of the pointer from IMessage to ConcreteTemplateMessage
+    	// Without making a copy (Since some message's contain unique_ptr's
+    	auto* raw = message.release();
+    	auto* concrete = dynamic_cast<ConcreteTemplateMessage*>(raw);
 
-        if (concrete != nullptr)
-        {
-            internalMessage = std::make_unique<ConcreteTemplateMessage>(*concrete);
-            handleMessageInternal();
-        }
+    	if (concrete != nullptr)
+    	{
+    		internalMessage.reset(concrete);
+    		handleMessageInternal();
+    	}
+    	else
+    	{
+    		delete raw;
+    	}
     }
 
 protected:

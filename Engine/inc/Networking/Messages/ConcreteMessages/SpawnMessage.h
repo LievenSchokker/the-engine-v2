@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameObject/GameObject.h"
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 #include <cstdint>
@@ -18,6 +19,11 @@ struct SpawnMessage final : public IMessage
 public:
     SpawnMessage() = default;
 
+	SpawnMessage(const SpawnMessage&) = delete;
+	SpawnMessage& operator=(const SpawnMessage&) = delete;
+	SpawnMessage(SpawnMessage&&) = default;
+	SpawnMessage& operator=(SpawnMessage&&) = default;
+
     MessageTypes getMessageType() const override
     {
         return MessageTypes::SpawnMessage;
@@ -30,9 +36,8 @@ public:
     uint32_t netId = 0;           ///< Server-assigned network identifier
     uint32_t assetId = 0;         ///< Prefab/asset type for instantiation
     int ownerId = -1;             ///< Owning client (-1 = server)
-    uint64_t sceneId = 0;         ///< Target scene (for multi-scene support)
     Vector2 position{0, 0};       ///< Initial world position
     double rotation = 0;       ///< Initial rotation
     Vector2 scale{1, 1};          ///< Initial scale
-    std::vector<std::byte> payload; ///< Serialized initial state
+    std::unique_ptr<GameObject> gameObject;
 };
