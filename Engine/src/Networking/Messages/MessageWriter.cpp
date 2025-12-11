@@ -11,7 +11,7 @@ OutgoingRawMessage MessageWriter::writeMessage(
 	int connectionId,
 	SendMode sendMode)
 {
-	std::vector<std::byte> payload = message.serialize();
+	const std::vector<std::byte> payload = message.serialize();
 
 	std::vector<std::byte> buffer(sizeof(uint8_t) + payload.size());
 	auto typeValue = static_cast<uint8_t>(message.getMessageType());

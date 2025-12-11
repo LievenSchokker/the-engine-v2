@@ -26,7 +26,7 @@ void NetworkIdentityRegistry::registerIdentity(NetworkIdentity* identity)
 		return;
 	}
 
-	uint32_t netId = identity->getNetId();
+	const uint32_t netId = identity->getNetId();
 
 	if (netId == 0) {
 		return;
@@ -42,10 +42,9 @@ void NetworkIdentityRegistry::unregisterIdentity(NetworkIdentity* identity)
 		return;
 	}
 
-	uint32_t netId = identity->getNetId();
+	const uint32_t netId = identity->getNetId();
 
-	auto it = identitiesByNetId.find(netId);
-	if (it != identitiesByNetId.end()) {
+	if (auto it = identitiesByNetId.find(netId); it != identitiesByNetId.end()) {
 		removeFromOwnerIndex(identity);
 		identitiesByNetId.erase(it);
 	}

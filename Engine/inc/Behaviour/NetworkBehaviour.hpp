@@ -15,7 +15,7 @@ void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
 		return;
 	}
 
-	ActionMessage message(
+	const ActionMessage message(
 		componentNetworkId,
 		identity->getNetId(),
 		name,
@@ -39,7 +39,7 @@ void NetworkBehaviour::callRpc(const std::string& name, Args&&... args)
 		return;
 	}
 
-	ActionMessage message(
+	const ActionMessage message(
 		componentNetworkId,
 		identity->getNetId(),
 		name,

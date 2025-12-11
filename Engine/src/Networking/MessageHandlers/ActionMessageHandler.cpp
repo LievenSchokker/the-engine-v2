@@ -20,9 +20,9 @@ void ActionMessageHandler::handleMessageInternal()
         return;
     }
 
-    uint32_t netId = message->getGameObjectIdentity();
+    const uint32_t netId = message->getGameObjectIdentity();
 
-    NetworkIdentity* identity = identityRegistry.findByNetId(netId);
+    const NetworkIdentity* identity = identityRegistry.findByNetId(netId);
     if (!identity)
     {
         std::cerr << "[ActionMessageHandler] No object with netId=" << netId << "\n";

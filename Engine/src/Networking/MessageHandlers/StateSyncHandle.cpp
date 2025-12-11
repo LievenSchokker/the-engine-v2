@@ -18,13 +18,13 @@ void StateSyncMessageHandler::handleMessageInternal()
     for (const auto& objState : syncMsg->objects)
     {
 
-        NetworkIdentity* identity = registry.findByNetId(objState.netId);
+        const NetworkIdentity* identity = registry.findByNetId(objState.netId);
         if (!identity)
         {
             continue;
         }
 
-        GameObject* go = identity->getGameObject();
+        const GameObject* go = identity->getGameObject();
         if (!go) continue;
 
         Transform* transform = go->getTransform();

@@ -17,7 +17,7 @@ MessageTypes ConnectionMessage::getMessageType() const
 std::vector<std::byte> ConnectionMessage::serialize() const
 {
 	std::vector<std::byte> buffer(sizeof(uint8_t));
-	auto statusValue = static_cast<uint8_t>(status);
+	const auto statusValue = static_cast<uint8_t>(status);
 	std::memcpy(buffer.data(), &statusValue, sizeof(uint8_t));
 
 	return buffer;

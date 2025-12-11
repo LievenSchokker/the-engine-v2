@@ -66,13 +66,13 @@ bool Client::sendMessage(const IMessage& message) const
         return false;
     }
 
-    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
         message,
         currentConnection.transportConnectionId,
         SendMode::ReliableOrdered
     );
 
-    TransportResult result = transport->send(outgoing);
+    const TransportResult result = transport->send(outgoing);
     return result == TransportResult::SUCCESS;
 }
 

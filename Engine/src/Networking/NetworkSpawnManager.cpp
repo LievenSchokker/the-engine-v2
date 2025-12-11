@@ -55,7 +55,7 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 		identity = gameObject->addComponent<NetworkIdentity>();
 	}
 
-	uint32_t networkId = generateNetId();
+	const uint32_t networkId = generateNetId();
 	identity->networkId = networkId;
 	identity->ownerId = ownerId;
 	identity->gameWorld = gameWorld;
@@ -81,7 +81,7 @@ GameObject* NetworkSpawnManager::spawnObject(uint32_t assetId, Vector2 position,
 
 	if (server)
 	{
-		SpawnMessage message = createSpawnMessage(identity, assetId);
+		const SpawnMessage message = createSpawnMessage(identity, assetId);
 		server->broadcastMessage(message);
 	}
 

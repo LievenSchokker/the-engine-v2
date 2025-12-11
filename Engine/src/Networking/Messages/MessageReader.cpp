@@ -20,7 +20,7 @@ std::unique_ptr<IMessage> MessageReader::readMessage(
 		return nullptr;
 	}
 
-	MessageTypes messageType = readMessageHeader(rawMessage);
+	const MessageTypes messageType = readMessageHeader(rawMessage);
 
 	std::unique_ptr<IMessage> message = createMessage(messageType);
 

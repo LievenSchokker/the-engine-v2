@@ -31,7 +31,7 @@ namespace spelmotor_networking
 
     IMessageHandler* MessageDispatcher::getMessageHandler(MessageTypes type)
     {
-        auto messagehHandler = messageHandlers.find(type);
+        const auto messagehHandler = messageHandlers.find(type);
         return messagehHandler != messageHandlers.end() ? messagehHandler->second.get() : nullptr;
     }
 }

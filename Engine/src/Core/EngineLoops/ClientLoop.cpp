@@ -40,7 +40,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
     }
 
     std::unique_ptr<Scene> scenePtr = game->getFirstScene();
-    std::string scene = scenePtr->getName();
+    const std::string scene = scenePtr->getName();
 
     sceneManager->addScene(std::move(scenePtr));
 	sceneManager->configureNetworking(ConnectionMode::Client, nullptr);

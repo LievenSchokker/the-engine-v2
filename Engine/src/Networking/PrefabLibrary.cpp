@@ -9,7 +9,7 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
 {
     if (prefab == nullptr) return 0;
 
-    uint32_t assetId = nextAssetId++;
+    const uint32_t assetId = nextAssetId++;
 
     if (prefab->getComponent<NetworkIdentity>())
     {
@@ -46,7 +46,7 @@ void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
 
 std::unique_ptr<GameObject> PrefabLibrary::instantiate(uint32_t assetId) const
 {
-	auto it = prefabsById.find(assetId);
+	const auto it = prefabsById.find(assetId);
 	if (it == prefabsById.end())
 	{
 		return nullptr;
