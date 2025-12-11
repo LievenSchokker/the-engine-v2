@@ -110,8 +110,8 @@ void NetworkIdentityRegistry::removeFromOwnerIndex(NetworkIdentity* identity)
 	if (ownerIt != identitiesByOwner.end()) {
 		auto& networkIdentitys = ownerIt->second;
 		networkIdentitys.erase(
-			std::remove(networkIdentitys.begin(), networkIdentitys.end(),
-			            identity),
+			std::ranges::remove(networkIdentitys,
+			                    identity).begin(),
 			networkIdentitys.end()
 			);
 

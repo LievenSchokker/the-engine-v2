@@ -114,7 +114,7 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 		if (ownerId >= 0)
 		{
 			auto& owned = clientOwnedObjects[ownerId];
-			owned.erase(std::remove(owned.begin(), owned.end(), netId),
+			owned.erase(std::ranges::remove(owned, netId).begin(),
 			            owned.end());
 		}
 	}
