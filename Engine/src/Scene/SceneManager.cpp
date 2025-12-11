@@ -16,16 +16,6 @@ void SceneManager::configureNetworking(ConnectionMode mode, NetworkSpawnManager*
     networkConfigured = true;
 }
 
-PrefabLibrary& SceneManager::getPrefabLibrary()
-{
-    return prefabLibrary;
-}
-
-const PrefabLibrary& SceneManager::getPrefabLibrary() const
-{
-    return prefabLibrary;
-}
-
 bool SceneManager::isNetworkConfigured() const
 {
     return networkConfigured;
@@ -33,7 +23,6 @@ bool SceneManager::isNetworkConfigured() const
 
 void SceneManager::processSceneForNetwork(Scene& scene)
 {
-
     if (networkMode == ConnectionMode::Host)
     {
         processForServer(scene);
@@ -84,14 +73,9 @@ void SceneManager::processForServer(Scene& scene)
 			extracted->addComponent<NetworkIdentity>();
 		}
 
-		// Register as prefab
-		uint32_t assetId = prefabLibrary.add(std::move(extracted));
-
-
-		// Auto-spawn server-owned objects
 		if (spawnManager)
 		{
-			GameObject* spawned = spawnManager->spawnObject(assetId, spawnPosition, -1);
+			uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
 		}
 	}
 }
@@ -133,7 +117,10 @@ void SceneManager::processForClient(Scene& scene)
 		}
 
 		// Register as prefab (client needs this to instantiate from SpawnMessage)
-		uint32_t assetId = prefabLibrary.add(std::move(extracted));
+		if (spawnManager != nullptr)
+		{
+			uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
+		}
 	}
 }
 

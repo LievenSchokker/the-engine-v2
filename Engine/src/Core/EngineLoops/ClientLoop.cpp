@@ -17,45 +17,45 @@
 #include <iostream>
 
 #include "Networking/NetworkSpawnManager.h"
-
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-    : game(std::move(spel)),
-      specifications(game->getApplicationSpecifications()),
-      gameWorld(std::make_unique<GameWorld>()),
-      sceneManager(std::make_unique<SceneManager>()),
-      client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
-      identityRegistry(std::make_unique<NetworkIdentityRegistry>()),
-      spawnManager(nullptr)
+	: game(std::move(spel)),
+	  specifications(game->getApplicationSpecifications()),
+	  gameWorld(std::make_unique<GameWorld>()),
+	  sceneManager(std::make_unique<SceneManager>()),
+	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
+	  identityRegistry(std::make_unique<NetworkIdentityRegistry>()),
+	  spawnManager(nullptr)
 {
-    if (specifications.renderBackend == RenderBackend::SDL)
-    {
-        sdlContext = std::make_unique<SdlContext>();
-        clockFunction = []()
-        {
-            return SDL_GetTicks() / 1000.0;
-        };
-        std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*sdlContext);
-        sdlRenderer->open(specifications.windowOptions);
-        renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
-    }
+	if (specifications.renderBackend == RenderBackend::SDL)
+	{
+		sdlContext = std::make_unique<SdlContext>();
+		clockFunction = []()
+		{
+			return SDL_GetTicks() / 1000.0;
+		};
+		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*sdlContext);
+		sdlRenderer->open(specifications.windowOptions);
+		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
+	}
 
-    std::unique_ptr<Scene> scenePtr = game->getFirstScene();
-    const std::string scene = scenePtr->getName();
+	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
+	const std::string sceneName = scenePtr->getName();
 
-    sceneManager->addScene(std::move(scenePtr));
-	sceneManager->configureNetworking(ConnectionMode::Client, nullptr);
+	sceneManager->addScene(std::move(scenePtr));
 
-    sceneManager->setActiveScene(scene);
 	gameWorld->input = InputManager::getInstance();
 	gameWorld->client = client.get();
+
 	spawnManager = std::make_unique<NetworkSpawnManager>(
 		nullptr,
-		sceneManager->getScene(scene),
+		sceneManager->getScene(sceneName),
 		identityRegistry.get(),
-		&sceneManager->getPrefabLibrary(),
 		gameWorld.get()
 	);
 
+	sceneManager->configureNetworking(ConnectionMode::Client, spawnManager.get());
+
+	sceneManager->setActiveScene(sceneName);
 }
 
 ClientLoop::~ClientLoop() = default;

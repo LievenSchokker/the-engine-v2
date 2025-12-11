@@ -20,7 +20,7 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
     return assetId;
 }
 
-void PrefabLibrary::add(uint32_t assetId, std::unique_ptr<GameObject> prefab)
+void PrefabLibrary::add(const uint32_t assetId, std::unique_ptr<GameObject> prefab)
 {
     if (!prefab)
     {

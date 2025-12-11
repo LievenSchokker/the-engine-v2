@@ -34,12 +34,6 @@ class SceneManager
     void configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnManager = nullptr);
 
     /**
-     * @brief Gets the prefab library.
-     */
-    PrefabLibrary& getPrefabLibrary();
-    const PrefabLibrary& getPrefabLibrary() const;
-
-    /**
      * @brief Checks if network processing has been configured.
      */
     bool isNetworkConfigured() const;
@@ -191,7 +185,6 @@ class SceneManager
 
     bool networkConfigured = false;
     ConnectionMode networkMode = ConnectionMode::Client;
-    PrefabLibrary prefabLibrary;
     NetworkSpawnManager* spawnManager = nullptr;
     std::unordered_set<std::string> processedScenes;
 

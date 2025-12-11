@@ -2,7 +2,7 @@
 
 #include "Core/GameWorld.h"
 #include "IMessageHandler.h"
-
+#include "Networking/Messages/IMessage.h"
 #include <type_traits>
 
 template <typename ConcreteTemplateMessage>

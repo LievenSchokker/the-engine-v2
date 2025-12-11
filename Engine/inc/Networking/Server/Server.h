@@ -181,5 +181,5 @@ private:
 
     ClientConnectedCallback onClientConnected;
     ClientDisconnectedCallback onClientDisconnected;
-    NetworkSpawnManager* spawnManager;
+    NetworkSpawnManager* spawnManager{};
 };

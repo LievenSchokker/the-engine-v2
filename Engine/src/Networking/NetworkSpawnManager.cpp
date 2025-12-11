@@ -13,12 +13,11 @@
 
 NetworkSpawnManager::NetworkSpawnManager(Server* server, Scene* scene,
                                          NetworkIdentityRegistry* registry,
-                                         PrefabLibrary* prefabLibrary,
                                          GameWorld* gameWorlds)
 	: server(server)
 	  , scene(scene)
 	  , identityRegistry(registry)
-	  , prefabLibrary(prefabLibrary)
+	  , prefabLibrary(std::make_unique<PrefabLibrary>())
 	  , gameWorld(gameWorlds)
 
 {
@@ -169,13 +168,12 @@ GameObject* NetworkSpawnManager::findByNetId(uint32_t netId) const
 }
 
 SpawnMessage NetworkSpawnManager::createSpawnMessage(
-	const NetworkIdentity* identity, uint32_t assetId) const
+	const NetworkIdentity* identity, uint32_t assetId)
 {
 	SpawnMessage message;
 	message.netId = identity->getNetId();
 	message.assetId = assetId;
 	message.ownerId = identity->getOwnerId();
-	message.gameObject = std::move(prefabLibrary->instantiate(assetId));
 
 	const Transform* transform = identity->getTransform();
 	if (transform)
@@ -185,46 +183,82 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 		message.scale = transform->getScale();
 	}
 
+	auto clone = prefabLibrary->instantiate(assetId);
+	if (clone)
+	{
+		auto* cloneIdentity = clone->getComponent<NetworkIdentity>();
+		if (cloneIdentity)
+		{
+			cloneIdentity->networkId = message.netId;
+			cloneIdentity->ownerId = message.ownerId;
+		}
+
+		auto* cloneTransform = clone->getTransform();
+		if (cloneTransform)
+		{
+			cloneTransform->setPosition(message.position);
+			cloneTransform->setRotationAngle(message.rotation);
+			cloneTransform->setScale(message.scale);
+		}
+
+		message.gameObject = std::move(clone);
+	}
+
 	return message;
 }
 
 void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 {
-	if (!prefabLibrary)
+	// Client creates from its own prefab library
+	auto gameObject = prefabLibrary->instantiate(message.assetId);
+
+	if (!gameObject)
 	{
+		std::cerr << "Unknown assetId: " << message.assetId << "\n";
 		return;
 	}
 
-	if (message.gameObject == nullptr)
+	// Configure with received network state
+	auto* transform = gameObject->getTransform();
+	if (transform)
 	{
-		return;
+		transform->setPosition(message.position);
+		transform->setRotationAngle(message.rotation);
+		transform->setScale(message.scale);
 	}
 
+	auto* identity = gameObject->getComponent<NetworkIdentity>();
+	if (!identity)
+	{
+		identity = gameObject->addComponent<NetworkIdentity>();
+	}
 
-	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
-	identity->networkId = message.netId;
-	identity->ownerId = message.ownerId;
 	identity->networkId = message.netId;
 	identity->ownerId = message.ownerId;
 	identity->gameWorld = gameWorld;
 
-	if (identityRegistry && identity)
+	if (identityRegistry)
 	{
 		identityRegistry->registerIdentity(identity);
 	}
 
-	GameObject* rawPtr = message.gameObject.get();
+	GameObject* rawPtr = gameObject.get();
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
-	if (!scene)
-	{
-		return;
-	}
-	scene->addGameObject(std::move(message.gameObject));
-
+	scene->addGameObject(std::move(gameObject));
 	identity->onNetworkSpawn();
 }
+
+uint32_t NetworkSpawnManager::addToPrefabLibrary(std::unique_ptr<GameObject> gameObject)
+{
+	if (prefabLibrary == nullptr)
+	{
+		return -1;
+	}
+	return prefabLibrary->add( std::move(gameObject));
+}
+
 
 GameObject* NetworkSpawnManager::getObjectByNetId(uint32_t netId) const
 {

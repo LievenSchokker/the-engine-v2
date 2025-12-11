@@ -33,10 +33,9 @@ public:
      * @param registry Registry for tracking NetworkIdentities
      * @param prefabLibrary Library for instantiating prefabs
      */
-    NetworkSpawnManager(Server* server, Scene* scene,
-                        NetworkIdentityRegistry* registry,
-                        PrefabLibrary* prefabLibrary,
-                        GameWorld* gameWorlds);
+	NetworkSpawnManager(Server* server, Scene* scene,
+						NetworkIdentityRegistry* registry,
+						GameWorld* gameWorlds);
 
     /**
      * @brief Spawns a networked object (server-side).
@@ -72,11 +71,15 @@ public:
      * @brief Finds a networked object by its network ID.
      */
     GameObject* findByNetId(uint32_t netId) const;
+    SpawnMessage createSpawnMessage(const NetworkIdentity* identity,
+                                    uint32_t assetId);
 
     /**
      * @brief Client-side: handles incoming SpawnMessage.
      */
     void handleSpawnMessage(SpawnMessage& message);
+    uint32_t addToPrefabLibrary(
+	    std::unique_ptr<GameObject> gameObject);
 
     GameObject* getObjectByNetId(uint32_t netId) const;
 
@@ -88,7 +91,7 @@ private:
     Scene* scene;
 	GameWorld* gameWorld;
     NetworkIdentityRegistry* identityRegistry;
-    PrefabLibrary* prefabLibrary;
+    std::unique_ptr<PrefabLibrary> prefabLibrary;
 
     uint32_t nextNetworkId = 1;
 
