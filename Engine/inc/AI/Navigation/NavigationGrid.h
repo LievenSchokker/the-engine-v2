@@ -15,7 +15,7 @@
 class NavigationGrid : public INavigationSurface
 {
     public:
-        explicit NavigationGrid() : width(0), height(0), cellSize(1,1),
+        explicit NavigationGrid(int gridWidth, int gridHeight, Vector2 cellSize) : width(0), height(0), cellSize(1,1),
             graphAdapter(std::make_unique<NavigationGridGraphAdapter>(*this))
         {
 
@@ -49,6 +49,8 @@ class NavigationGrid : public INavigationSurface
 
         const IPathfindingGraph* getPathfindingGraph() const override;
         void bakeSurface(const std::vector<BoundingBox>& obstacles) override;
+        Vector2 toWorldPoint(Vector2 surfacePoint) override;
+        Vector2 toSurfacePoint(Vector2 worldPoint) override;
 
     private:
         int width;

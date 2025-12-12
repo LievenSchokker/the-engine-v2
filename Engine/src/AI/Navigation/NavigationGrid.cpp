@@ -169,3 +169,13 @@ void NavigationGrid::bakeSurface(const std::vector<BoundingBox>& obstacles)
         }
     }
 }
+
+Vector2 NavigationGrid::toSurfacePoint(Vector2 worldPoint)
+{
+    return worldToCellPosition(worldPoint);
+}
+
+Vector2 NavigationGrid::toWorldPoint(Vector2 surfacePoint)
+{
+    return cellToWorldPosition(surfacePoint);
+}

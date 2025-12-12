@@ -23,7 +23,7 @@ class NavigationSystem
         ~NavigationSystem() = default;
 
         void setNavigationSurface(std::unique_ptr<INavigationSurface> navSurface);
-        bool bakeNavigationSurface(const std::vector<BoundingBox>& obstacles) const;
+        void bakeNavigationSurface(const std::vector<BoundingBox>& obstacles) const;
 
         PathResult computePath(const IPathFinder& pathFinder, Vector2 start, Vector2 end) const;
 

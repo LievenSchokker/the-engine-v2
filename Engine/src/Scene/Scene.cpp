@@ -124,11 +124,19 @@ void Scene::onStart()
 		return;
 	}
 
-    /// Init navigation stuff hihi.
+    /// Init navigation stuff hihi ^^.
     navigationSystem = std::make_unique<NavigationSystem>();
+    std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(100, 100, Vector2{ 8.0f,8.0f });
     auto obstacles = getAllComponentsOfType<NavigationObstacle>();
-    auto gridObject = navigationSystem->bakeNavigationSurface({100, 100}, {7,7 }, obstacles);
-    addGameObject(std::move(gridObject));
+    std::vector<BoundingBox> obstacleBounds {};
+    for ( const auto& obstacle : obstacles )
+    {
+        obstacleBounds.push_back(obstacle->getBounds());
+    }
+    navigationSystem->setNavigationSurface(std::move(navGrid));
+    navigationSystem->bakeNavigationSurface(obstacleBounds);
+    ///
+
 
 	active = true;
 

@@ -31,13 +31,13 @@ PathResult NavigationSystem::computePath(const IPathFinder& pathFinder, Vector2 
     return pathFinder.findPath(*graph, start, end);
 }
 
-bool NavigationSystem::bakeNavigationSurface(const std::vector<BoundingBox>& obstacles) const
+void NavigationSystem::bakeNavigationSurface(const std::vector<BoundingBox>& obstacles) const
 {
     if (navigationSurface == nullptr)
-        return false;
+        return;
+
 
     navigationSurface->bakeSurface(obstacles);
-    return true;
 }
 
 

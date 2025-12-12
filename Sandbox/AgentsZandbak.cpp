@@ -17,7 +17,6 @@
 #include "GameObject/GameObject.h"
 #include "Scene/Scene.h"
 #include "AI/Navigation/BoundingBox.h"
-#include "Behaviours/NavigationTest.h"
 
 std::unique_ptr<Scene> AgentsZandbak::getScene()
 {
@@ -60,15 +59,6 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     avoidAgent->addAgentModule<AvoidTargetModule>(100, *player->getTransform(), 200.0f);
     avoidAgent->addAgentModule<WanderModule>(50, 25.0f, 100.0f, 10.0f);
 
-    /// Ball:
-    auto ball = std::make_unique<GameObject>();
-    auto navTest = ball->addComponent<NavigationTest>();
-    auto ballRender = ball->addComponent<ShapeRenderer>();
-    ballRender->setCircle(25);
-    ballRender->setColor(Color(0,0,255));
-    ball->getTransform()->setPosition((Vector2{250, 10}));
-    navTest->setTarget(*player->getTransform());
-    std::cout << " Has: " << ball->getComponent<NavigationTest>() << std::endl;
 
 
     /// Construct and return scne
@@ -78,7 +68,6 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     {
         scene->addGameObject(std::move(obstacle));
     }
-    scene->addGameObject(std::move(ball));
     scene->addGameObject(std::move(avoidEnemy));
     scene->addGameObject(std::move(player));
     scene->addGameObject(std::move(followEnemy));
