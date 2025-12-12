@@ -28,7 +28,7 @@ public:
         prefabs[assetId] = std::move(factory);
     }
 
-    std::unique_ptr<GameObject> create(uint32_t assetId) const
+    std::unique_ptr<GameObject> create(const uint32_t assetId) const
     {
         auto it = prefabs.find(assetId);
         if (it != prefabs.end())
@@ -38,7 +38,7 @@ public:
         return nullptr;
     }
 
-    bool hasAsset(uint32_t assetId) const
+    bool hasAsset(const uint32_t assetId) const
     {
         return prefabs.contains(assetId);
     }

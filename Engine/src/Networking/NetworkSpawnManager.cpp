@@ -77,7 +77,7 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vecto
 
 	if (gameWorld->isServer())
 	{
-		identity->onNetworkInstantiate();
+		identity->onNetworkInstantiate(nextNetworkId++);
 	}
 
     identity->onNetworkSpawn();

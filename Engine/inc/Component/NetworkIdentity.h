@@ -55,7 +55,7 @@ public:
      * It means they have authority to perform an action on this Behaviour
      */
     bool hasAuthority() const;
-    void onNetworkInstantiate();
+    void onNetworkInstantiate(uint32_t nextNetworkId);
 
     /**
      * @brief Called by NetworkSpawnManager when spawned on network.

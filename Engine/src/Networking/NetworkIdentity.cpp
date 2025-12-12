@@ -2,6 +2,8 @@
 #include "Networking/NetworkBuilder.h"
 #include "Networking/NetworkSpawnManager.h"
 
+#include <steam/steamtypes.h>
+
 NetworkIdentity::~NetworkIdentity()
 {
 	if (gameWorld && gameWorld->spawnManager)
@@ -22,20 +24,19 @@ bool NetworkIdentity::hasAuthority() const
 	return ownerId == gameWorld->localClientId;
 }
 
-void NetworkIdentity::onNetworkInstantiate()
+void NetworkIdentity::onNetworkInstantiate(const uint32_t nextNetworkId)
 {
 	if (getWorld()->isServer() == false) return;
 
 	networkBehaviours.clear();
 
 	const auto& allBehaviours = getGameObject()->getAllBehaviours();
-	uint32_t componentId = 0;
 
 	for (Behaviour* behaviour : allBehaviours)
 	{
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
-			netBehaviour->setComponentNetworkId(componentId++);
+			netBehaviour->setComponentNetworkId(nextNetworkId);
 			networkBehaviours.push_back(netBehaviour);
 		}
 	}
