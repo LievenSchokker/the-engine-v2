@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 	// Rows: Down (0-5), Right (6-11), Left (12-17), Up (18-23)
 	auto* playerSprite = player->addComponent<SpriteComponent>();
 	bool playerLoaded = SpritesheetLoader::loadSpritesheet(
-		assetManager.get(), playerSprite, "Sandbox/Assets/player.png", 4, 6, 64,
+		assetManager.get(), playerSprite, "Assets\\player.png", 4, 6, 64,
 		64);
 
 	if ( playerLoaded )
@@ -196,7 +196,7 @@ int main(int argc, char** argv)
 	// Load rat spritesheet (rat.png - 128x32, 4 frames horizontally)
 	auto* ratSprite = rat->addComponent<SpriteComponent>();
 	bool ratLoaded = SpritesheetLoader::loadSpritesheet(
-		assetManager.get(), ratSprite, "Sandbox/Assets/rat.png", 1, 4, 32, 32);
+		assetManager.get(), ratSprite, "Assets\\rat.png", 1, 4, 32, 32);
 
 	if ( ratLoaded )
 	{

@@ -5,9 +5,17 @@ file(GLOB BEHAVIOUR_SOURCES
         "${CMAKE_SOURCE_DIR}/Sandbox/Behaviours/*.cpp"
 )
 
+
 add_executable(engineSandbox
-        sandbox_animation_spritesheets.cpp
+        physics.cpp
         ${BEHAVIOUR_SOURCES}
+)
+
+add_custom_command(
+        TARGET engineSandbox POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/Sandbox/Assets
+        ${CMAKE_CURRENT_BINARY_DIR}/Assets
 )
 
 target_link_libraries(
