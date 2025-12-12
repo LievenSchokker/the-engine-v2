@@ -8,6 +8,7 @@
 
 #include "Behaviour/Behaviour.h"
 #include "Math/Vector2.h"
+#include "Navigation/AStarPathFinder.h"
 
 struct ModuleData;
 enum class ModuleStatus;
@@ -26,6 +27,7 @@ class Agent final : public Behaviour
     public:
         Agent() : currentVelocity(Vector2::zero()), maxSpeed(1), arrivingDistance(10.0f), rotationTurnRate(90)
         {
+            pathFinder = std::make_unique<AStarPathFinder>(HeuristicType::CHEBYSHEV);
         };
 
         ~Agent() override = default;
@@ -159,6 +161,8 @@ class Agent final : public Behaviour
          */
         void setRotationTurnRate(float value);
 
+        bool tryGetPath(Vector2 target) const;
+
     private:
         /// @brief Internal method used by other template methods that attempts to retrieve an BaseAgentModule on this Agent.
         /// Sets the value of @c out param to the ModuleData containing the module @c T
@@ -186,6 +190,9 @@ class Agent final : public Behaviour
 
         /// @brief The rate to turn the agent towards its current velocity with, in degrees (0 -360).
         float rotationTurnRate;
+
+
+        std::unique_ptr<AStarPathFinder> pathFinder;
 };
 
 #include "AI/AgentImplementation.h"

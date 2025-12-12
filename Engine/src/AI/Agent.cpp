@@ -5,6 +5,7 @@
 
 #include "AI/Agent.h"
 #include "Component/Transform.h"
+#include "Scene/Scene.h"
 
 
 void Agent::onAwake()
@@ -109,6 +110,20 @@ void Agent::setRotationTurnRate(float value)
 {
     rotationTurnRate = value;
 }
+
+
+bool Agent::tryGetPath(Vector2 target) const
+{
+    NavigationSystem* navSystem = gameObject->getScene().getNavigationSystem();
+
+    if (navSystem == nullptr)
+        return false;
+
+    PathResult pathResult = navSystem->computePath(*pathFinder, transform->getPosition(), target);
+
+    return pathResult.isValid();
+}
+
 
 
 

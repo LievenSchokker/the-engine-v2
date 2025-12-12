@@ -25,7 +25,7 @@ struct AStarOptions
 class AStarPathFinder final : public IPathFinder
 {
     public:
-        explicit AStarPathFinder() : astarOptions({}) {}
+        explicit AStarPathFinder(HeuristicType heuristic) : astarOptions({false, heuristic }) {}
         ~AStarPathFinder() override = default;
 
         PathResult findPath(const IPathfindingGraph& graph, Vector2 start, Vector2 end) const override;
