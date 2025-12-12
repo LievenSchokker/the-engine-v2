@@ -62,6 +62,7 @@ public:
 	 * On client: true only if this client owns the object
 	 */
 	bool hasAuthority() const;
+
 	GameWorld* getWorld();
 
 	/**
@@ -125,6 +126,7 @@ public:
 	void setComponentNetworkId(uint32_t id);
 
 	void addCommand(const std::string& name, ActionCallback callback);
+
 protected:
 	/**
 	 * @brief Sends a command from client to server.
@@ -138,30 +140,6 @@ protected:
 	 */
 	template <typename... Args>
 	void callCommand(const std::string& name, Args&&... args);
-
-	/**
-	 * @brief Sends an RPC from server to all clients.
-	 *
-	 * RPCs are broadcasts from server to all connected clients.
-	 * Only valid to call on the server.
-	 *
-	 * @tparam Args Types of arguments to serialize
-	 * @param name The registered RPC name
-	 * @param args Arguments to pass to client-side handlers
-	 */
-	template <typename... Args>
-	void callRpc(const std::string& name, Args&&... args);
-
-	/**
-	 * @brief Sends an RPC from server to a specific client.
-	 *
-	 * @param name The registered RPC name
-	 * @param targetClientId The client to send to
-	 * @param args Arguments to pass to the client-side handler
-	 */
-	template <typename... Args>
-	void callTargetRpc(const std::string& name, int targetClientId,
-	                   Args&&... args);
 
 	/**
 	 * @brief Override to serialize state for network sync.
