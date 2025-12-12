@@ -296,3 +296,35 @@ Color SceneManager::getClearColor() const
 {
 	return clearColor;
 }
+
+
+void SceneManager::applyNetworkSnapshot(const std::vector<std::unique_ptr<GameObject>>& receivedObjects)
+{
+	if (!spawnManager)
+	{
+		return;
+	}
+
+	for (const auto& received : receivedObjects)
+	{
+		if (!received)
+		{
+			continue;
+		}
+
+		auto* identity = received->getComponent<NetworkIdentity>();
+		if (!identity)
+		{
+			continue;
+		}
+
+		uint32_t netId = identity->getNetId();
+
+		GameObject* existing = spawnManager->getObjectByNetId(netId);
+		if (!existing)
+		{
+			continue;
+		}
+		existing->copyStateFrom(*received);
+	}
+}

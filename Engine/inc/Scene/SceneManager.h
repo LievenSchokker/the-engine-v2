@@ -153,8 +153,10 @@ class SceneManager
 	 * @brief Retrieve the currently configured clear color.
 	 */
 	Color getClearColor() const;
+	void applyNetworkSnapshot(
+		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
 
-    void setWorld(GameWorld* world) { gameWorld = world; }
+	void setWorld(GameWorld* world) { gameWorld = world; }
 
    private:
 

@@ -271,6 +271,7 @@ public:
 	 */
 	bool getIsDestroyed() const;
 
+	void copyStateFrom(const GameObject& source);
     private:
         std::unique_ptr<ComponentManager> componentManager;
         std::unique_ptr<Transform> transform;

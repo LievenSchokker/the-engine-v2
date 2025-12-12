@@ -33,23 +33,10 @@ void StateSyncSystem::broadcastState(uint32_t currentTick)
 		GameObject* go = identity->getGameObject();
 		if (!go) continue;
 
-		Transform* transform = go->getTransform();
-		if (!transform) continue;
-
-		Vector2 pos = transform->getPosition();
-		float rot = static_cast<float>(transform->getRotationAngle());
-
-		message.addObject(
-			identity->getNetId(),
-			pos.x,
-			pos.y,
-			rot
-		);
+		message.addGameObject(go->clone());
 	}
 
-
-
-	if (!message.objects.empty())
+	if (!message.gameObjects.empty())
 	{
 		server->broadcastMessage(message);
 	}

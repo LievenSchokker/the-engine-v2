@@ -7,6 +7,7 @@
 #include "Component/Transform.h"
 #include "GameObject/ScenePlaceholder.h"
 #include "Networking/Component/ComponentFactory.h"
+#include "Networking/Serialization/Serialization.h"
 #include "Scene/Scene.h"
 
 GameObject::GameObject()
@@ -291,4 +292,15 @@ std::unique_ptr<GameObject> GameObject::clone() const
     cloned->deserialize(reader);
 
     return cloned;
+}
+
+void GameObject::copyStateFrom(const GameObject& source)
+{
+
+	WriteArchive writeArchive;
+	source.serialize(writeArchive);
+
+	std::vector<std::byte> bytes = writeArchive.getBytes();
+	ReadArchive readArchive(bytes.data(), bytes.size());
+	deserialize(readArchive);
 }

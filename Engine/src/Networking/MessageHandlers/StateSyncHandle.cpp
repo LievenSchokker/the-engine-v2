@@ -3,6 +3,8 @@
 #include "../../../inc/Component/NetworkIdentity.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
+#include "Scene/SceneManager.h"
+
 #include <iostream>
 
 StateSyncMessageHandler::StateSyncMessageHandler(GameWorld& world, NetworkIdentityRegistry& registry)
@@ -13,24 +15,9 @@ StateSyncMessageHandler::StateSyncMessageHandler(GameWorld& world, NetworkIdenti
 
 void StateSyncMessageHandler::handleMessageInternal()
 {
-    const StateSyncMessage* syncMsg = getMessage();
+	const StateSyncMessage* msg = getMessage();
 
-    for (const auto& objState : syncMsg->objects)
-    {
+	if (!msg) return;
 
-        const NetworkIdentity* identity = registry.findByNetId(objState.netId);
-        if (!identity)
-        {
-            continue;
-        }
-
-        const GameObject* go = identity->getGameObject();
-        if (!go) continue;
-
-        Transform* transform = go->getTransform();
-        if (!transform) continue;
-
-        transform->setPosition({objState.posX, objState.posY});
-        transform->setRotationAngle(objState.rotation);
-    }
+	gameWorld->sceneManager->applyNetworkSnapshot(msg->gameObjects);
 }

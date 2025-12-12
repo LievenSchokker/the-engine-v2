@@ -77,10 +77,14 @@ void NetworkIdentity::onNetworkDespawn()
 
 void NetworkIdentity::serialize(CerealWriteArchive& archive) const
 {
+	archive.process(const_cast<uint32_t&>(networkId));
+	archive.process(const_cast<int&>(ownerId));
 }
 
 void NetworkIdentity::deserialize(CerealReadArchive& archive)
 {
+	archive.process(networkId);
+	archive.process(ownerId);
 }
 
 int NetworkIdentity::getOwnerId() const
