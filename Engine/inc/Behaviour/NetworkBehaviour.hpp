@@ -72,3 +72,8 @@ void NetworkBehaviour::callTargetRpc(const std::string& name, int targetClientId
 
 	world->sendToClient(targetClientId, message);
 }
+
+inline void NetworkBehaviour::addCommand(const std::string& name, ActionCallback callback)
+{
+	commands[name] = std::move(callback);
+}
