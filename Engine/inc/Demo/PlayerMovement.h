@@ -1,9 +1,10 @@
 #pragma once
 
+
 #include "Behaviour/NetworkBehaviour.h"
 #include "Math/Vector2.h"
 
-class GameWorld;  // Forward declaration
+class GameWorld;
 
 /**
  * @brief Simple networked player movement.
@@ -14,6 +15,7 @@ class GameWorld;  // Forward declaration
 class PlayerMovement final : public NetworkBehaviour
 {
 public:
+    PlayerMovement();
     void onStart() override;
     void onNetworkSpawn() override;
     void registerNetworkMethods(NetworkBuilder& builder) override;

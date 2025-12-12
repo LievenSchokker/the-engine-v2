@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <string>
 
+#include "AuthorityType.h"
+
 class NetworkBuilder;
 
 /**
@@ -127,6 +129,7 @@ public:
 
 	void addCommand(const std::string& name, ActionCallback callback);
 
+    AuthorityType getAuthorityType() const;
 protected:
 	/**
 	 * @brief Sends a command from client to server.
@@ -163,7 +166,7 @@ protected:
 
 	uint32_t componentNetworkId = 0;
 
-
+    AuthorityType authorityType = AuthorityType::ServerAuthority;
 private:
 	GameWorld* world = nullptr;
 	/// Commands are client→server calls

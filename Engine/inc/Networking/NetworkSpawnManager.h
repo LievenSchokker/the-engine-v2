@@ -47,11 +47,6 @@ public:
 	                        int ownerId = -1);
 
 	/**
-	 * @brief Spawns a player for a newly connected client.
-	 */
-	GameObject* spawnPlayer(int clientId, Vector2 spawnPosition);
-
-	/**
 	 * @brief Destroys a networked object and notifies clients.
 	 */
 	void despawnObject(uint32_t netId);

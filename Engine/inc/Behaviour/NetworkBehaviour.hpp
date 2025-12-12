@@ -29,3 +29,8 @@ inline void NetworkBehaviour::addCommand(const std::string& name, ActionCallback
 {
 	commands[name] = std::move(callback);
 }
+
+inline AuthorityType NetworkBehaviour::getAuthorityType() const
+{
+    return authorityType;
+}

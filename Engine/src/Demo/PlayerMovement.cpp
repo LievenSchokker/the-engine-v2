@@ -9,6 +9,11 @@
 
 #include <iostream>
 
+PlayerMovement::PlayerMovement()
+{
+    authorityType = AuthorityType::ServerAuthority;
+}
+
 void PlayerMovement::onStart()
 {
 }

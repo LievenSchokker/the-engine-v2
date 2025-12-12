@@ -16,14 +16,13 @@ NetworkSpawnManager::NetworkSpawnManager(GameWorld* gameWorlds) :
        identityRegistry(std::make_unique<NetworkIdentityRegistry>())
      , prefabLibrary(std::make_unique<PrefabLibrary>())
      , gameWorld(gameWorlds)
-{
-
-}
+{}
 
 uint32_t NetworkSpawnManager::generateNetId()
 {
 	return nextNetworkId++;
 }
+
 
 GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vector2 position, const int ownerId)
 {
@@ -91,22 +90,15 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vecto
     return gameObjectPointer;
 }
 
-GameObject* NetworkSpawnManager::spawnPlayer(int clientId,
-                                             Vector2 spawnPosition)
-{
-	constexpr uint32_t PLAYER_ASSET_ID = 1;
-	return spawnObject(PLAYER_ASSET_ID, spawnPosition, clientId);
-}
-
 void NetworkSpawnManager::despawnObject(uint32_t netId)
 {
-	auto it = spawnedObjects.find(netId);
-	if (it == spawnedObjects.end())
+	auto gameObjectEntry = spawnedObjects.find(netId);
+	if (gameObjectEntry == spawnedObjects.end())
 	{
 		return;
 	}
 
-	GameObject* object = it->second;
+	GameObject* object = gameObjectEntry->second;
 
 	auto* identity = object->getComponent<NetworkIdentity>();
 	if (identity)
@@ -124,9 +116,9 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 
 	if (gameWorld->server)
 	{
-		ObjectDestroyMessage msg;
-		msg.netId = netId;
-		gameWorld->server->broadcastMessage(msg);
+		ObjectDestroyMessage message;
+		message.netId = netId;
+		gameWorld->server->broadcastMessage(message);
 	}
 
 	spawnedObjects.erase(netId);
