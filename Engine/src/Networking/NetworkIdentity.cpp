@@ -11,7 +11,7 @@ NetworkIdentity::~NetworkIdentity()
 }
 
 
-bool NetworkIdentity::hasAuthority()
+bool NetworkIdentity::hasAuthority() const
 {
 	if (!gameWorld) return false;
 

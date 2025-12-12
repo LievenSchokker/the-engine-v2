@@ -12,14 +12,13 @@
 
 #include <iostream>
 
-NetworkSpawnManager::NetworkSpawnManager(GameWorld* gameWorlds)
-	: server(gameWorlds->server)
-	, identityRegistry(std::make_unique<NetworkIdentityRegistry>())
-	, prefabLibrary(std::make_unique<PrefabLibrary>())
-	, gameWorld(gameWorlds)
+NetworkSpawnManager::NetworkSpawnManager(GameWorld* gameWorlds) :
+       identityRegistry(std::make_unique<NetworkIdentityRegistry>())
+     , prefabLibrary(std::make_unique<PrefabLibrary>())
+     , gameWorld(gameWorlds)
 {
-}
 
+}
 
 uint32_t NetworkSpawnManager::generateNetId()
 {
@@ -100,12 +99,12 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vecto
     identity->onNetworkSpawn();
 
     std::cerr << "[spawnObject] Checking server for broadcast...\n";
-    if (server)
+    if (gameWorld->server)
     {
         std::cerr << "[spawnObject] Creating spawn message...\n";
         const SpawnMessage message = createSpawnMessage(identity, assetId);
         std::cerr << "[spawnObject] Broadcasting...\n";
-        server->broadcastMessage(message);
+        gameWorld->server->broadcastMessage(message);
     }
 
     std::cerr << "[spawnObject] Done!\n";
@@ -143,11 +142,11 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 		}
 	}
 
-	if (server)
+	if (gameWorld->server)
 	{
 		ObjectDestroyMessage msg;
 		msg.netId = netId;
-		server->broadcastMessage(msg);
+		gameWorld->server->broadcastMessage(msg);
 	}
 
 	spawnedObjects.erase(netId);
@@ -176,7 +175,7 @@ void NetworkSpawnManager::despawnClientObjects(int clientId)
 
 void NetworkSpawnManager::syncExistingObjects(int clientId)
 {
-	if (!server) return;
+	if (!gameWorld->server) return;
 
 	for (const auto& [networkIdentity, gameObject] : spawnedObjects)
 	{
@@ -185,7 +184,7 @@ void NetworkSpawnManager::syncExistingObjects(int clientId)
 
 		const uint32_t assetId = objectAssets[networkIdentity];
 		SpawnMessage message = createSpawnMessage(identity, assetId);
-		server->sendMessage(clientId, message);
+		gameWorld->server->sendMessage(clientId, message);
 	}
 }
 

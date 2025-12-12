@@ -54,7 +54,7 @@ public:
      * Authority here does not mean they own the state.
      * It means they have authority to perform an action on this Behaviour
      */
-    bool hasAuthority();
+    bool hasAuthority() const;
 
     /**
      * @brief Called by NetworkSpawnManager when spawned on network.
