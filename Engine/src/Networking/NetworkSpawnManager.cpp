@@ -75,9 +75,14 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vecto
 
     getScene()->addGameObject(std::move(gameObject));
 
+	if (gameWorld->isServer())
+	{
+		identity->onNetworkInstantiate();
+	}
+
     identity->onNetworkSpawn();
 
-    if (gameWorld->server)
+    if (gameWorld->isServer())
     {
         const SpawnMessage message = createSpawnMessage(identity, assetId);
         gameWorld->server->broadcastMessage(message);

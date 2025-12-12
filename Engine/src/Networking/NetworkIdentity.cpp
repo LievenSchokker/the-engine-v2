@@ -22,23 +22,41 @@ bool NetworkIdentity::hasAuthority() const
 	return ownerId == gameWorld->localClientId;
 }
 
-void NetworkIdentity::onNetworkSpawn()
+void NetworkIdentity::onNetworkInstantiate()
 {
+	if (getWorld()->isServer() == false) return;
+
 	networkBehaviours.clear();
 
 	const auto& allBehaviours = getGameObject()->getAllBehaviours();
+	uint32_t componentId = 0;
+
 	for (Behaviour* behaviour : allBehaviours)
 	{
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
-			netBehaviour->world = gameWorld;
-			netBehaviour->componentNetworkId = static_cast<uint32_t>(networkBehaviours.size());
-			netBehaviour->identity = this;
+			netBehaviour->setComponentNetworkId(componentId++);
 			networkBehaviours.push_back(netBehaviour);
+		}
+	}
+}
+
+void NetworkIdentity::onNetworkSpawn()
+{
+	for (const auto& allBehaviours = getGameObject()->getAllBehaviours(); Behaviour* behaviour : allBehaviours)
+	{
+		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
+		{
+			netBehaviour->setWorldRefrence(gameWorld);
+			netBehaviour->identity = this;
+
+			if (std::ranges::find(networkBehaviours, netBehaviour) == networkBehaviours.end())
+			{
+				networkBehaviours.push_back(netBehaviour);
+			}
 
 			NetworkBuilder builder(*netBehaviour);
 			netBehaviour->registerNetworkMethods(builder);
-
 			netBehaviour->onNetworkSpawn();
 		}
 	}

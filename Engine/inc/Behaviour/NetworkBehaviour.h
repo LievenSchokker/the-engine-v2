@@ -106,6 +106,9 @@ public:
      */
     void executeAction(const std::string& actionKey);
 
+	void setWorldRefrence(GameWorld* world);
+
+	void setComponentNetworkId(uint32_t id);
 protected:
     /**
      * @brief Sends a command from client to server.
@@ -174,11 +177,6 @@ private:
     friend class NetworkBuilder;
     friend class ActionMessageHandler;
     friend class NetworkSpawnManager;
-    friend class NetworkIdentity;
-	friend class NetworkBuilder;
-	friend class ActionMessageHandler;
-	friend class NetworkSpawnManager;
-	friend class NetworkIdentity;
 };
 
 #include "NetworkBehaviour.hpp"

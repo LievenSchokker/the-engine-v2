@@ -35,3 +35,13 @@ void NetworkBehaviour::executeAction(const std::string& actionKey)
 		commandEntry->second(emptyArchive);
 	}
 }
+
+void NetworkBehaviour::setWorldRefrence(GameWorld* gameWorld)
+{
+	world = gameWorld;
+}
+
+void NetworkBehaviour::setComponentNetworkId(uint32_t id)
+{
+	componentNetworkId = id;
+}
