@@ -5,8 +5,7 @@
 
 #include "AI/Navigation/NavigationGrid.h"
 
-#include <iostream>
-
+#include "AI/Navigation/BoundingBox.h"
 #include "AI/Navigation/CardinalDirections.h"
 #include "AI/Navigation/CompassDirections.h"
 #include "AI/Navigation/NavigationCell.h"
@@ -140,6 +139,37 @@ NavigationCell& NavigationGrid::getNavigationCell(Vector2 positionInGrid)
     int index = static_cast<int>(positionInGrid.y) * width + static_cast<int>(positionInGrid.x);
     return cells[index];
 }
+
+
+const IPathfindingGraph* NavigationGrid::getPathfindingGraph() const
+{
+    return graphAdapter.get();
+}
+
+
+void NavigationGrid::createSurface(Vector2 size, const std::vector<BoundingBox>& obstacles)
+{
+    if (cells.empty())
+        generateGrid({100, 100}, {8,8 }); /// Replace with default members instead.
+
+    for (BoundingBox obstacle : obstacles)
+    {
+        Vector2 minCell = toSurfacePoint(obstacle.min);
+        Vector2 maxCell = toSurfacePoint(obstacle.max);
+
+        for (int y = minCell.y; y <= maxCell.y; ++y)
+        {
+            for (int x = minCell.x; x <= maxCell.x; ++x)
+            {
+                if (isInGrid({static_cast<float>(x), static_cast<float>(y)}))
+                {
+                    setWalkable({static_cast<float>(x), static_cast<float>(y)}, false);
+                }
+            }
+        }
+    }
+}
+
 
 
 void NavigationGrid::fillRenderQueue(IRenderQueueWriter &queue) const

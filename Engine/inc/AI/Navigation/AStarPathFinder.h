@@ -28,9 +28,8 @@ class AStarPathFinder final : public IPathFinder
         explicit AStarPathFinder() : astarOptions({}) {}
         ~AStarPathFinder() override = default;
 
-        PathResult findPath(const IGraph& graph, Vector2 start, Vector2 end) const override;
+        PathResult findPath(const IPathfindingGraph& graph, Vector2 start, Vector2 end) const override;
         int calculateHeuristic(Vector2 from, Vector2 to) const;
-        float calculateMovementCost(const NavigationGrid& grid, Vector2 from, Vector2 to) const;
 
         void setAStarOptions(const AStarOptions& options);
         AStarOptions getAStarOptions() const;

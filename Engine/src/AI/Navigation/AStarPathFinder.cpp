@@ -43,7 +43,7 @@ struct CompareAStarNodes
 };
 
 
-PathResult AStarPathFinder::findPath(const IGraph& graph, Vector2 start, Vector2 end) const
+PathResult AStarPathFinder::findPath(const IPathfindingGraph& graph, Vector2 start, Vector2 end) const
 {
     if (!graph.isValid(start) || !graph.isValid(end))
     {
@@ -137,18 +137,6 @@ int AStarPathFinder::calculateHeuristic(Vector2 from, Vector2 to) const
         default:
             return Vector2::distance(from, to);
     }
-}
-
-float AStarPathFinder::calculateMovementCost(const NavigationGrid &grid, Vector2 from, Vector2 to) const
-{
-    Vector2 delta = to - from;
-    bool isDiagonal = (std::abs(delta.x) > 0 && std::abs(delta.y) > 0);
-
-    float movementCost = isDiagonal ? 1.41421356f : 1.0f;
-
-    float cellCost = static_cast<float>(grid.getCellWeight(to));
-
-    return movementCost + cellCost;
 }
 
 

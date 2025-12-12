@@ -4,15 +4,23 @@
 
 #pragma once
 
-#include "Math/Vector2.h"
+
+#include "INavigationSurface.h"
+#include "NavigationGridGraphAdapter.h"
 #include "AI/Navigation/NavigationCell.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
-#include "IGraph.h"
+#include "AI/Navigation/IPathfindingGraph.h"
+#include "Math/Vector2.h"
 
-class NavigationGrid : public RenderComponent
+class NavigationGrid : public RenderComponent, INavigationSurface
 {
     public:
-        explicit NavigationGrid() : width(0), height(0), cellSize(1,1){};
+        explicit NavigationGrid() : width(0), height(0), cellSize(1,1),
+            graphAdapter(std::make_unique<NavigationGridGraphAdapter>(*this))
+        {
+
+        };
+
         ~NavigationGrid() override = default;
 
         void generateGrid(Vector2 gridDimensions, Vector2 cellSize);
@@ -40,9 +48,13 @@ class NavigationGrid : public RenderComponent
         NavigationCell& getNavigationCell(Vector2 positionInGrid);
         void fillRenderQueue(IRenderQueueWriter &queue) const override;
 
+        const IPathfindingGraph* getPathfindingGraph() const override;
+        void createSurface(Vector2 size, const std::vector<BoundingBox>& obstacles) override;
+
     private:
         int width;
         int height;
         Vector2 cellSize;
         std::vector<NavigationCell> cells;
+        std::unique_ptr<IPathfindingGraph> graphAdapter;
 };

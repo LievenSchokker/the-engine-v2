@@ -4,6 +4,7 @@
 
 #pragma once
 
+class INavigationSurface;
 class GameObject;
 class NavigationObstacle;
 class NavigationGrid;
@@ -18,15 +19,13 @@ struct Vector2;
 class NavigationSystem
 {
     public:
-        NavigationSystem();
+        NavigationSystem() = default;
         ~NavigationSystem() = default;
 
         std::unique_ptr<GameObject> bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles);
-        void setPathFinder(std::unique_ptr<IPathFinder> pathFinder);
 
-        PathResult computePath(Vector2 start, Vector2 end) const;
+        PathResult computePath(const IPathFinder& pathFinder, Vector2 start, Vector2 end) const;
 
     private:
-        NavigationGrid* navigationGrid = nullptr;
-        std::unique_ptr<IPathFinder> pathFinder = nullptr;
+        std::unique_ptr<INavigationSurface> navigationSurface = nullptr;
 };

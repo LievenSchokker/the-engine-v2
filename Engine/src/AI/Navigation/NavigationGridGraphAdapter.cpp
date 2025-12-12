@@ -2,7 +2,7 @@
 // Created by samle on 11/12/2025.
 //
 
-#include "NavigationGridGraphAdapter.h"
+#include "AI/Navigation/NavigationGridGraphAdapter.h"
 #include "AI/Navigation/NavigationGrid.h"
 
 float NavigationGridGraphAdapter::getCost(const Vector2 from, const Vector2 to) const
@@ -11,7 +11,7 @@ float NavigationGridGraphAdapter::getCost(const Vector2 from, const Vector2 to) 
 
     bool isDiagonal = (std::abs(delta.x) > 0 && std::abs(delta.y) > 0);
 
-    float movementCost = isDiagonal ? std::sqrt(2) : 1.0f;
+    float movementCost = isDiagonal ? static_cast<float>(std::sqrt(2)) : 1.0f;
     float cellCost = static_cast<float>(grid.getCellWeight(to));
 
     return movementCost + cellCost;

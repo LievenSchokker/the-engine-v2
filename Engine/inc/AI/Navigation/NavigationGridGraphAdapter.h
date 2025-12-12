@@ -3,12 +3,12 @@
 #pragma once
 
 
-#include "IGraph.h"
+#include "AI/Navigation/IPathfindingGraph.h"
 
 class NavigationGrid;
 
 
-class NavigationGridGraphAdapter : public IGraph
+class NavigationGridGraphAdapter : public IPathfindingGraph
 {
     public:
         NavigationGridGraphAdapter(const NavigationGrid& navGrid) : grid(navGrid){}

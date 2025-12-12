@@ -10,23 +10,25 @@
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/IPathFinder.h"
 #include "AI/Navigation/PathResult.h"
+#include "AI/Navigation/IPathFinder.h"
 #include "Component/GridComponent.h"
 
 
-NavigationSystem::NavigationSystem()
+
+PathResult NavigationSystem::computePath(const IPathFinder& pathFinder, Vector2 start, Vector2 end) const
 {
-    pathFinder = std::make_unique<AStarPathFinder>();
-}
+    if (navigationSurface == nullptr)
+        return PathResult { std::vector<Vector2>{} };
 
+    const IPathfindingGraph* graph = navigationSurface->getPathfindingGraph();
 
-PathResult NavigationSystem::computePath(Vector2 start, Vector2 end) const
-{
-    if (pathFinder == nullptr || navigationGrid == nullptr)
-        return PathResult{ std::vector<Vector2>{} };
+    if (graph == nullptr)
+        return PathResult { std::vector<Vector2>{} };
 
-    start = navigationGrid->worldToCellPosition(start);
-    end = navigationGrid->worldToCellPosition(end);
-    return pathFinder->findPath(*navigationGrid, start, end);
+    start = navigationSurface->toSurfacePoint(start);
+    end = navigationSurface->toSurfacePoint(end);
+
+    return pathFinder.findPath(*graph, start, end);
 }
 
 std::unique_ptr<GameObject> NavigationSystem::bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles)
