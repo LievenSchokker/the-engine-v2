@@ -45,17 +45,14 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 
 	gameWorld->input = InputManager::getInstance();
 	gameWorld->client = client.get();
+	gameWorld->sceneManager = sceneManager.get();
+	sceneManager->configureNetworking(ConnectionMode::Client, spawnManager.get());
+	sceneManager->setActiveScene(sceneName);
 
 	spawnManager = std::make_unique<NetworkSpawnManager>(
-		nullptr,
-		sceneManager->getScene(sceneName),
-		identityRegistry.get(),
-		gameWorld.get()
-	);
+	gameWorld.get()
+);
 
-	sceneManager->configureNetworking(ConnectionMode::Client, spawnManager.get());
-
-	sceneManager->setActiveScene(sceneName);
 }
 
 ClientLoop::~ClientLoop() = default;

@@ -8,15 +8,14 @@
 #include "GameObject/GameObject.h"
 #include "Component/Transform.h"
 #include "Networking/PrefabLibrary.h"
+#include "Scene/SceneManager.h"
 
 #include <iostream>
 
-NetworkSpawnManager::NetworkSpawnManager(Server* server, Scene* scene,
-                                         NetworkIdentityRegistry* registry,
-                                         GameWorld* gameWorlds)
-	: server(server)
-	  , scene(scene)
-	  , identityRegistry(registry)
+NetworkSpawnManager::NetworkSpawnManager(GameWorld* gameWorlds)
+	: server(gameWorlds->server)
+	  , scene(gameWorlds->sceneManager->getActiveScene())
+	  , identityRegistry(std::make_unique<NetworkIdentityRegistry>())
 	  , prefabLibrary(std::make_unique<PrefabLibrary>())
 	  , gameWorld(gameWorlds)
 
