@@ -65,7 +65,7 @@ public:
 	 */
 	bool hasAuthority() const;
 
-	GameWorld* getWorld();
+	GameWorld* getWorld() const;
 
 	/**
 	 * @brief Override to register Commands and RPCs using the NetworkBuilder.

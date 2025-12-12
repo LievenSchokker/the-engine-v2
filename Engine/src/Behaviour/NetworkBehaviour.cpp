@@ -20,7 +20,7 @@ bool NetworkBehaviour::hasAuthority() const
     return identity->hasAuthority();
 }
 
-GameWorld* NetworkBehaviour::getWorld()
+GameWorld* NetworkBehaviour::getWorld() const
 {
 	return world;
 }

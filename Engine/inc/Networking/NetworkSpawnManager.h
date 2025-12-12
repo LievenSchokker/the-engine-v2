@@ -70,6 +70,9 @@ public:
 	 * @brief Client-side: handles incoming SpawnMessage.
 	 */
 	void handleSpawnMessage(SpawnMessage& message);
+
+    void CheckNewClientSpawnObject(int clientId);
+
 	uint32_t addToPrefabLibrary(
 		std::unique_ptr<GameObject> gameObject);
 

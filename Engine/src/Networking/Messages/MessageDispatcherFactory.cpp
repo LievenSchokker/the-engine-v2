@@ -9,6 +9,8 @@
 
 #include <memory>
 
+#include "Networking/MessageHandlers/ServerWelcomeMessageHandler.h"
+
 namespace spelmotorNetworking
 {
 
@@ -18,12 +20,16 @@ namespace spelmotorNetworking
         NetworkSpawnManager& spawnManager,
         NetworkIdentityRegistry& registry)
     {
+        std::cout << "[MessageDispatcherFactory] Creating server dispatcher" << std::endl;
         auto dispatcher = std::make_unique<MessageDispatcher>();
 
         dispatcher->registerMessageHandler(
             MessageTypes::ActionMessage,
             std::make_unique<ActionMessageHandler>(world, registry));
 
+        dispatcher->registerMessageHandler(
+    MessageTypes::WelcomeMessage,
+    std::make_unique<ServerWelcomeMessageHandler>(world, spawnManager));
         return dispatcher;
     }
 

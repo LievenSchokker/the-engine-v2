@@ -5,6 +5,8 @@
 
 #include <iostream>
 
+#include "Behaviour/NetworkBehaviour.h"
+
 uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
 {
     if (prefab == nullptr) return 0;
@@ -79,4 +81,22 @@ bool PrefabLibrary::contains(const uint32_t assetId) const
 size_t PrefabLibrary::size() const
 {
     return prefabsById.size();
+}
+
+std::vector<uint32_t> PrefabLibrary::getNetworkPrefabIdsWithAuthoritativeClient() const
+{
+    std::vector<uint32_t> result;
+
+    for (const auto& [id, gameObject] : prefabsById)
+    {
+        if (const auto* networkBehaviour = gameObject->getComponent<NetworkBehaviour>())
+        {
+            if (networkBehaviour->getAuthorityType() == AuthorityType::ClientAuthority)
+            {
+                result.push_back(id);
+            }
+        }
+    }
+
+    return result;
 }

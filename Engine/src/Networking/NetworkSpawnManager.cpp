@@ -217,6 +217,9 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	{
 		return;
 	}
+    std::cout << "Client received spawn - netId: " << message.netId
+              << " ownerId: " << message.ownerId
+              << " assetId: " << message.assetId << std::endl;
 
 	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
 	if (!identity)
@@ -239,6 +242,24 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 
 	getScene()->addGameObject(std::move(message.gameObject));
 	identity->onNetworkSpawn();
+}
+
+void NetworkSpawnManager::CheckNewClientSpawnObject(int clientId)
+{
+    std::vector<uint32_t> ids = prefabLibrary->getNetworkPrefabIdsWithAuthoritativeClient();
+
+    for (const auto id : ids)
+    {
+        GameObject* spawned = spawnObject(id, {0,0}, clientId);
+
+        if (spawned)
+        {
+            auto* identity = spawned->getComponent<NetworkIdentity>();
+            std::cout << "Spawned netId: " << identity->networkId
+                      << " ownerId: " << identity->ownerId
+                      << " for client: " << clientId << std::endl;
+        }
+    }
 }
 
 uint32_t NetworkSpawnManager::addToPrefabLibrary(std::unique_ptr<GameObject> gameObject)

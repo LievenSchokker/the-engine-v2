@@ -16,6 +16,8 @@
 
 #include <iostream>
 
+#include "Networking/Messages/ConcreteMessages/WelcomeMessage.h"
+
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
 	: transport(std::move(injectedTransport))
@@ -29,7 +31,6 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
 	}
 	setupInformation = serverConnectionInformation;
 }
-
 
 Server::~Server()
 {
@@ -93,14 +94,18 @@ void Server::onConnectionChanged(const Connection& connection)
 
 	switch (connection.connectionStatus)
 	{
-		case ConnectionStatus::Connected:
-			connectedClients.insert(clientId);
-			if (onClientConnected)
-			{
-				onClientConnected(clientId);
-			}
-			break;
-
+	case ConnectionStatus::Connected:
+	    {
+	        connectedClients.insert(clientId);
+	        handleNewClientConnected(clientId);
+	        if (onClientConnected)
+	        {
+	            onClientConnected(clientId);
+	        }
+	        WelcomeMessage msg(clientId);
+	        sendMessage(clientId, msg, SendMode::ReliableOrdered);
+	        break;
+	    }
 		case ConnectionStatus::Terminated:
 			break;
 		case ConnectionStatus::Error:
@@ -172,6 +177,11 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 	}
 }
 
+void Server::handleNewClientConnected(int clientId) const
+{
+    auto message = std::make_unique<WelcomeMessage>(clientId);
+    messageDispatcher->processMessage(std::move(message));
+}
 
 bool Server::sendMessage(const int clientId, const IMessage& message,
                          const SendMode& mode) const

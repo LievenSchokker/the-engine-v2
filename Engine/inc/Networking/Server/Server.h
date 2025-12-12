@@ -164,6 +164,7 @@ private:
      *          or kicks, enabling appropriate cleanup logic for each scenario.
      */
     void handleConnectionMessage(int clientId, ConnectionMessage* message);
+    void handleNewClientConnected(int clientId) const;
 
     /// @brief Abstracted transport layer for testing and multi-backend support
     std::unique_ptr<ITransport> transport;

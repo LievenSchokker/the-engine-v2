@@ -53,6 +53,7 @@ public:
 	 * @brief Gets the total number of registered prefabs.
 	 */
 	[[nodiscard]] size_t size() const;
+    std::vector<uint32_t> getNetworkPrefabIdsWithAuthoritativeClient() const;
 
 private:
 	uint32_t nextAssetId = 1;

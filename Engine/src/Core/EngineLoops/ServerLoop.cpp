@@ -76,22 +76,7 @@ void ServerLoop::start()
 
 void ServerLoop::initializeNetworking()
 {
-	server->setClientConnectedCallback([this](int clientId)
-	{
-		WelcomeMessage welcome(clientId);
-		server->sendMessage(clientId, welcome);
-
-		spawnManager->syncExistingObjects(clientId);
-		Vector2 spawnPos{350.0f + (clientId * 60.0f), 350.0f};
-		spawnManager->spawnPlayer(clientId, spawnPos);
-	});
-
-	server->setClientDisconnectedCallback([this](int clientId)
-	{
-		spawnManager->despawnClientObjects(clientId);
-	});
-
-	// Removed NetworkContext parameter
+    // Removed NetworkContext parameter
 	auto dispatcher =
 		spelmotorNetworking::MessageDispatcherFactory::createServerDispatcher(
 			*gameWorld,
