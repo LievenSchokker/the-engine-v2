@@ -18,12 +18,12 @@
 PathResult NavigationSystem::computePath(const IPathFinder& pathFinder, Vector2 start, Vector2 end) const
 {
     if (navigationSurface == nullptr)
-        return PathResult { std::vector<Vector2>{} };
+        return PathResult::empty();
 
     const IPathfindingGraph* graph = navigationSurface->getPathfindingGraph();
 
     if (graph == nullptr)
-        return PathResult { std::vector<Vector2>{} };
+        return PathResult::empty();
 
     start = navigationSurface->toSurfacePoint(start);
     end = navigationSurface->toSurfacePoint(end);
@@ -31,36 +31,18 @@ PathResult NavigationSystem::computePath(const IPathFinder& pathFinder, Vector2 
     return pathFinder.findPath(*graph, start, end);
 }
 
-std::unique_ptr<GameObject> NavigationSystem::bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles)
+bool NavigationSystem::bakeNavigationSurface(const std::vector<BoundingBox>& obstacles) const
 {
-    std::unique_ptr<GameObject> gridObject = std::make_unique<GameObject>("NavigationGrid");
-    navigationGrid = gridObject->addComponent<NavigationGrid>();
+    if (navigationSurface == nullptr)
+        return false;
 
-    navigationGrid->generateGrid(gridSize, cellSize);
-
-    for (NavigationObstacle* obstacle : navObstacles)
-    {
-        Vector2 minCell = navigationGrid->worldToCellPosition(obstacle->getBounds().min);
-        Vector2 maxCell = navigationGrid->worldToCellPosition(obstacle->getBounds().max);
-
-
-        for (int y = minCell.y; y <= maxCell.y; ++y)
-        {
-            for (int x = minCell.x; x <= maxCell.x; ++x)
-            {
-                if (navigationGrid->isValidCell({static_cast<float>(x), static_cast<float>(y)}))
-                {
-                    navigationGrid->setWalkable({static_cast<float>(x), static_cast<float>(y)}, false);
-                }
-            }
-        }
-    }
-
-    return gridObject;
+    navigationSurface->bakeSurface(obstacles);
+    return true;
 }
 
 
-void NavigationSystem::setPathFinder(std::unique_ptr<IPathFinder> pathFinderPtr)
+void NavigationSystem::setNavigationSurface(std::unique_ptr<INavigationSurface> navSurface)
 {
-    pathFinder = std::move(pathFinderPtr);
+    navigationSurface = std::move(navSurface);
 }
+

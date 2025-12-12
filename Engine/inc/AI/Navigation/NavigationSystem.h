@@ -22,7 +22,8 @@ class NavigationSystem
         NavigationSystem() = default;
         ~NavigationSystem() = default;
 
-        std::unique_ptr<GameObject> bakeNavigationGrid(Vector2 gridSize, Vector2 cellSize, std::vector<NavigationObstacle*> navObstacles);
+        void setNavigationSurface(std::unique_ptr<INavigationSurface> navSurface);
+        bool bakeNavigationSurface(const std::vector<BoundingBox>& obstacles) const;
 
         PathResult computePath(const IPathFinder& pathFinder, Vector2 start, Vector2 end) const;
 

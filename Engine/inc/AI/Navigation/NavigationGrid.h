@@ -12,7 +12,7 @@
 #include "AI/Navigation/IPathfindingGraph.h"
 #include "Math/Vector2.h"
 
-class NavigationGrid : public RenderComponent, INavigationSurface
+class NavigationGrid : public INavigationSurface
 {
     public:
         explicit NavigationGrid() : width(0), height(0), cellSize(1,1),
@@ -46,10 +46,9 @@ class NavigationGrid : public RenderComponent, INavigationSurface
 
         std::vector<Vector2> getNeighbours(Vector2 cellPos, bool diagonalNeighbours) const;
         NavigationCell& getNavigationCell(Vector2 positionInGrid);
-        void fillRenderQueue(IRenderQueueWriter &queue) const override;
 
         const IPathfindingGraph* getPathfindingGraph() const override;
-        void createSurface(Vector2 size, const std::vector<BoundingBox>& obstacles) override;
+        void bakeSurface(const std::vector<BoundingBox>& obstacles) override;
 
     private:
         int width;

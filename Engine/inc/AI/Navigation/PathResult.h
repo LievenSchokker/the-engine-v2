@@ -15,8 +15,11 @@
  */
 struct PathResult
 {
-    explicit PathResult() = default;
-    explicit PathResult(const std::vector<Vector2>& path_) : path(path_) {};
+    PathResult() = default;
+    explicit PathResult(const std::vector<Vector2>& path_) : path(path_) {}
+
+    /// Usefull shorthand for returning an empty pathresult.
+    static PathResult empty();
 
     /**
      * @brief Retrieves the computed path directly

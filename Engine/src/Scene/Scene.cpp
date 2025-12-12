@@ -127,7 +127,7 @@ void Scene::onStart()
     /// Init navigation stuff hihi.
     navigationSystem = std::make_unique<NavigationSystem>();
     auto obstacles = getAllComponentsOfType<NavigationObstacle>();
-    auto gridObject = navigationSystem->bakeNavigationGrid({100, 100}, {7,7 }, obstacles);
+    auto gridObject = navigationSystem->bakeNavigationSurface({100, 100}, {7,7 }, obstacles);
     addGameObject(std::move(gridObject));
 
 	active = true;

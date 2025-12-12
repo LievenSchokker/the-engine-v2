@@ -147,10 +147,10 @@ const IPathfindingGraph* NavigationGrid::getPathfindingGraph() const
 }
 
 
-void NavigationGrid::createSurface(Vector2 size, const std::vector<BoundingBox>& obstacles)
+void NavigationGrid::bakeSurface(const std::vector<BoundingBox>& obstacles)
 {
     if (cells.empty())
-        generateGrid({100, 100}, {8,8 }); /// Replace with default members instead.
+        return;
 
     for (BoundingBox obstacle : obstacles)
     {
@@ -169,34 +169,3 @@ void NavigationGrid::createSurface(Vector2 size, const std::vector<BoundingBox>&
         }
     }
 }
-
-
-
-void NavigationGrid::fillRenderQueue(IRenderQueueWriter &queue) const
-{
-    const float spacing = 0.05f; // small gap between cells
-
-    for (int y = 0; y < height; ++y)
-    {
-        for (int x = 0; x < width; ++x)
-        {
-            const NavigationCell& cell = cells[y * width + x];
-
-            RenderCommand cmd;
-            cmd.type = RenderCommandType::Rectangle;
-
-            // compute position (top-left corner of the cell minus half spacing)
-            Vector2 worldPos = cellToWorldPosition(Vector2{float(x), float(y)});
-            worldPos = worldPos - (cellSize * 0.5f); // adjust center to top-left
-
-            cmd.position = worldPos; // top-left corner of cell
-            cmd.size = cellSize - Vector2{spacing, spacing}; // shrink the rectangle a little
-            cmd.color = cell.walkable ? Color::fromRGBA(0, 200, 0, 75) : Color::lightRed();
-            cmd.layer = 100; // debug overlay layer
-
-            queue.push(cmd);
-        }
-    }
-}
-
-
