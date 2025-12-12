@@ -1,5 +1,15 @@
 #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkBuilder.h"
+#include "Networking/NetworkSpawnManager.h"
+
+NetworkIdentity::~NetworkIdentity()
+{
+	if (gameWorld && gameWorld->spawnManager)
+	{
+		gameWorld->spawnManager->getNetworkIdentityRegistry().unregisterIdentity(this);
+	}
+}
+
 
 bool NetworkIdentity::hasAuthority()
 {

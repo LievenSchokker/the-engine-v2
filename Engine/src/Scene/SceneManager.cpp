@@ -1,13 +1,12 @@
 #include "Scene/SceneManager.h"
 #include "GameObject/GameObject.h"
+#include "Component/Transform.h"
+#include "Component/NetworkIdentity.h"
+#include "Behaviour/NetworkBehaviour.h"
+#include "Networking/NetworkSpawnManager.h"
 
 #include <iostream>
 #include <utility>
-
-#include "Component/Transform.h"
-#include "../../inc/Component/NetworkIdentity.h"
-#include "Behaviour/NetworkBehaviour.h"
-#include "Networking/NetworkSpawnManager.h"
 
 void SceneManager::configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnMgr)
 {

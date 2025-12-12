@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "../../inc/Component/NetworkIdentity.h"
+#include "Networking/NetworkSpawnManager.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
@@ -14,6 +15,7 @@ NetworkIdentityRegistry::NetworkIdentityRegistry()
 NetworkIdentityRegistry::~NetworkIdentityRegistry()
 {
 	clear();
+
 }
 
 void NetworkIdentityRegistry::setGameWorld(GameWorld* gameWorld)

@@ -21,7 +21,7 @@ class NetworkIdentity final : public Component
 {
 public:
     NetworkIdentity() = default;
-    ~NetworkIdentity() override = default;
+    ~NetworkIdentity() override;
 
 	ComponentType getComponentType() const override
 	{
