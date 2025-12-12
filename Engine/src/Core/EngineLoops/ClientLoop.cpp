@@ -78,7 +78,7 @@ void ClientLoop::initializeNetworking()
         return;
     }
 
-    auto dispatcher = spelmotor_networking::MessageDispatcherFactory::createClientDispatcher(
+    auto dispatcher = spelmotorNetworking::MessageDispatcherFactory::createClientDispatcher(
 	    *gameWorld,
 	    *spawnManager,
 	    *identityRegistry);

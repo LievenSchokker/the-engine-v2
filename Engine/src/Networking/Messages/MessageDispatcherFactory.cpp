@@ -5,12 +5,11 @@
 #include "Networking/MessageHandlers/StateSyncHandler.h"
 #include "Networking/MessageHandlers/WelcomeMessageHandler.h"
 #include "Networking/Messages/MessageDispatcher.h"
+#include "Networking/NetworkSpawnManager.h"
 
 #include <memory>
 
-#include "Networking/NetworkSpawnManager.h"
-
-namespace spelmotor_networking
+namespace spelmotorNetworking
 {
 
     std::unique_ptr<MessageDispatcher>

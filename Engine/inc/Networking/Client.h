@@ -1,6 +1,6 @@
 #pragma once
 
-namespace spelmotor_networking
+namespace spelmotorNetworking
 {
     class MessageDispatcher;
 }
@@ -69,7 +69,7 @@ public:
      */
     bool isConnected() const;
 
-    void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
+    void injectMessageDispatcher(std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher);
 
     private:
         /**
@@ -89,5 +89,5 @@ public:
 
 	///< The current server connection.
     Connection currentConnection{};
-    std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
+    std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
 };

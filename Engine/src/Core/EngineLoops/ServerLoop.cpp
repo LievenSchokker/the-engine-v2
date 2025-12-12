@@ -100,7 +100,7 @@ void ServerLoop::initializeNetworking()
 
 	// Removed NetworkContext parameter
 	auto dispatcher =
-		spelmotor_networking::MessageDispatcherFactory::createServerDispatcher(
+		spelmotorNetworking::MessageDispatcherFactory::createServerDispatcher(
 			*gameWorld,
 			*spawnManager,
 			*serverRegistry);

@@ -255,7 +255,7 @@ void Server::kickClient(const int clientId)
 
 
 void Server::injectMessageDispatcher(
-	std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+	std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
 {
 	messageDispatcher = std::move(dispatcher);
 }

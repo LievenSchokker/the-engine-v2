@@ -6,7 +6,7 @@
 
 
 class SpawnGameObjectMessageHandler: public BaseMessageHandler<
-		spelmotor_networking::SpawnGameObjectMessage>
+		spelmotorNetworking::SpawnGameObjectMessage>
 {
 public:
 	explicit
