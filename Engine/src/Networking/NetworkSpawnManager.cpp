@@ -24,7 +24,7 @@ uint32_t NetworkSpawnManager::generateNetId()
 }
 
 
-GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vector2 position, const int ownerId)
+GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int ownerId)
 {
     if (!prefabLibrary)
     {
@@ -36,8 +36,6 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vecto
     {
         return nullptr;
     }
-
-    gameObject->getTransform()->setPosition(position);
 
     auto* identity = gameObject->getComponent<NetworkIdentity>();
     if (!identity)
@@ -74,10 +72,10 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vecto
 
     getScene()->addGameObject(std::move(gameObject));
 
-	if (gameWorld->isServer())
-	{
-		identity->onNetworkInstantiate(nextNetworkId++);
-	}
+    if (gameWorld->isServer())
+    {
+        identity->onNetworkInstantiate(nextNetworkId++);
+    }
 
     identity->onNetworkSpawn();
 
@@ -217,9 +215,6 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	{
 		return;
 	}
-    std::cout << "Client received spawn - netId: " << message.netId
-              << " ownerId: " << message.ownerId
-              << " assetId: " << message.assetId << std::endl;
 
 	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
 	if (!identity)
@@ -250,14 +245,11 @@ void NetworkSpawnManager::CheckNewClientSpawnObject(int clientId)
 
     for (const auto id : ids)
     {
-        GameObject* spawned = spawnObject(id, {0,0}, clientId);
+        GameObject* spawned = spawnObject(id, clientId);
 
         if (spawned)
         {
             auto* identity = spawned->getComponent<NetworkIdentity>();
-            std::cout << "Spawned netId: " << identity->networkId
-                      << " ownerId: " << identity->ownerId
-                      << " for client: " << clientId << std::endl;
         }
     }
 }

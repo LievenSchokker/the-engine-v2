@@ -39,12 +39,11 @@ public:
 	 * @brief Spawns a networked object (server-side).
 	 *
 	 * @param assetId Prefab identifier from PrefabLibrary
-	 * @param position Initial world position
 	 * @param ownerId Client that owns this object (-1 for server)
 	 * @return Pointer to spawned object, or nullptr on failure
 	 */
-	GameObject* spawnObject(uint32_t assetId, Vector2 position,
-	                        int ownerId = -1);
+	GameObject* spawnObject(uint32_t assetId,
+                            int ownerId = -1);
 
 	/**
 	 * @brief Destroys a networked object and notifies clients.
