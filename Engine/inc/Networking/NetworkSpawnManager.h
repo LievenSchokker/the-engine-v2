@@ -79,6 +79,8 @@ public:
 
 	NetworkIdentityRegistry& getNetworkIdentityRegistry();
 	Scene* getScene() const;
+    void trackSpawnedObject(uint32_t netId, GameObject* object);
+    void untrackSpawnedObject(uint32_t netId);
 
 private:
 	SpawnMessage createSpawnMessage(const NetworkIdentity* identity,

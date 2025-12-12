@@ -297,34 +297,105 @@ Color SceneManager::getClearColor() const
 	return clearColor;
 }
 
-
 void SceneManager::applyNetworkSnapshot(const std::vector<std::unique_ptr<GameObject>>& receivedObjects)
 {
-	if (!spawnManager)
-	{
-		return;
-	}
+    if (!spawnManager || !activeScene) return;
 
-	for (const auto& received : receivedObjects)
-	{
-		if (!received)
-		{
-			continue;
-		}
+    std::unordered_set<uint32_t> receivedNetIds;
 
-		auto* identity = received->getComponent<NetworkIdentity>();
-		if (!identity)
-		{
-			continue;
-		}
+    for (const auto& received : receivedObjects)
+    {
+        if (!received) continue;
 
-		uint32_t netId = identity->getNetId();
+        auto* identity = received->getComponent<NetworkIdentity>();
+        if (!identity) continue;
 
-		GameObject* existing = spawnManager->getObjectByNetId(netId);
-		if (!existing)
-		{
-			continue;
-		}
-		existing->copyStateFrom(*received);
-	}
+        uint32_t netId = identity->getNetId();
+        receivedNetIds.insert(netId);
+
+        GameObject* existing = spawnManager->getObjectByNetId(netId);
+
+        if (existing)
+        {
+            existing->copyStateFrom(*received);
+        }
+        else
+        {
+            auto clone = received->clone();
+            if (!clone) continue;
+
+            auto* cloneIdentity = clone->getComponent<NetworkIdentity>();
+            if (cloneIdentity)
+            {
+                cloneIdentity->setWorld(gameWorld);
+                spawnManager->getNetworkIdentityRegistry().registerIdentity(cloneIdentity);
+            }
+
+            GameObject* rawPtr = clone.get();
+            activeScene->addGameObject(std::move(clone));
+            spawnManager->trackSpawnedObject(netId, rawPtr);
+
+            if (cloneIdentity)
+            {
+                cloneIdentity->onNetworkSpawn();
+            }
+        }
+    }
+
+    std::vector<uint32_t> toRemove;
+
+    for (auto* identity : spawnManager->getNetworkIdentityRegistry().getAllIdentities())
+    {
+        if (!identity) continue;
+
+        uint32_t netId = identity->getNetId();
+
+        if (isLocallyOwned(identity))
+        {
+            continue;
+        }
+
+        if (!receivedNetIds.contains(netId))
+        {
+            toRemove.push_back(netId);
+        }
+    }
+
+    for (uint32_t netId : toRemove)
+    {
+        GameObject* object = spawnManager->getObjectByNetId(netId);
+        if (!object) continue;
+
+        auto* identity = object->getComponent<NetworkIdentity>();
+        if (identity)
+        {
+            identity->onNetworkDespawn();
+            spawnManager->getNetworkIdentityRegistry().unregisterIdentity(identity);
+        }
+
+        spawnManager->untrackSpawnedObject(netId);
+        activeScene->removeGameObject(object);
+    }
+}
+
+bool SceneManager::isLocallyOwned(NetworkIdentity* identity) const
+{
+    if (!identity || !gameWorld) return false;
+
+    GameObject* go = identity->getGameObject();
+    if (!go) return false;
+
+    for (Behaviour* behaviour : go->getAllBehaviours())
+    {
+        auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour);
+        if (!netBehaviour) continue;
+
+        if (netBehaviour->getAuthorityType() == AuthorityType::ClientAuthority &&
+            identity->getOwnerId() == gameWorld->localClientId)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }

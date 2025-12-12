@@ -111,3 +111,8 @@ GameWorld* NetworkIdentity::getWorld() const
 {
 	return gameWorld;
 }
+
+void NetworkIdentity::setWorld(GameWorld* world)
+{
+    gameWorld = world;
+}

@@ -287,3 +287,13 @@ Scene* NetworkSpawnManager::getScene() const
 	}
 	return nullptr;
 }
+
+void NetworkSpawnManager::trackSpawnedObject(uint32_t netId, GameObject* object)
+{
+    spawnedObjects[netId] = object;
+}
+
+void NetworkSpawnManager::untrackSpawnedObject(uint32_t netId)
+{
+    spawnedObjects.erase(netId);
+}

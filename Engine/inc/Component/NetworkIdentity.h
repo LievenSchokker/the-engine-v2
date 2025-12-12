@@ -83,6 +83,7 @@ public:
     void dispatchAction(uint32_t componentId, const std::string& action) const;
 
     GameWorld* getWorld() const;
+    void setWorld(GameWorld* world);
 private:
     GameWorld* gameWorld{};
     uint32_t networkId = 0;

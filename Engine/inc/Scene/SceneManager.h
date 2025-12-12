@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Component/NetworkIdentity.h"
 #include "Networking/PrefabLibrary.h"
 #include "Networking/Connection/ConnectionMode.h"
 
@@ -155,8 +156,9 @@ class SceneManager
 	Color getClearColor() const;
 	void applyNetworkSnapshot(
 		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
+    bool isLocallyOwned(NetworkIdentity* identity) const;
 
-	void setWorld(GameWorld* world) { gameWorld = world; }
+    void setWorld(GameWorld* world) { gameWorld = world; }
 
    private:
 
