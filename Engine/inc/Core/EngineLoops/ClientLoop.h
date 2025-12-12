@@ -65,7 +65,6 @@ private:
 	ApplicationSpecifications specifications;
 	std::unique_ptr<GameWorld> gameWorld;
     std::unique_ptr<NetworkSpawnManager> spawnManager;
-    std::unique_ptr<NetworkIdentityRegistry> identityRegistry;
 
 	std::unique_ptr<SceneManager> sceneManager;
 	std::unique_ptr<Client> client;

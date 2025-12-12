@@ -14,11 +14,10 @@
 
 ServerLoop::ServerLoop(const std::unique_ptr<Game>& game)
 	: specifications(game->getApplicationSpecifications())
-	  , serverRegistry(std::make_unique<NetworkIdentityRegistry>())
 	  , sceneManager(std::make_unique<SceneManager>())
 	  , server(std::make_unique<Server>(
-		  Server::convertApplicationSettings(specifications),
-		  std::make_unique<TransportGNS>()))
+		 Server::convertApplicationSettings(specifications),
+		 std::make_unique<TransportGNS>()))
 	  , spawnManager(nullptr)
 	  , stateSync(nullptr)
 	  , gameWorld(std::make_unique<GameWorld>())
@@ -39,20 +38,17 @@ ServerLoop::ServerLoop(const std::unique_ptr<Game>& game)
 	gameWorld->input = InputManager::getInstance();
 	sceneManager->setWorld(gameWorld.get());
 
+	spawnManager = std::make_unique<NetworkSpawnManager>(gameWorld.get());
+	gameWorld->spawnManager = spawnManager.get();
+
 	sceneManager->configureNetworking(ConnectionMode::Host, spawnManager.get());
 
 	sceneManager->setActiveScene(sceneName);
 
 	stateSync = std::make_unique<StateSyncSystem>(
 		server.get(),
-		serverRegistry.get()
-		);
-
-	spawnManager = std::make_unique<NetworkSpawnManager>(
-		gameWorld.get()
-		);
-
-	gameWorld->spawnManager = spawnManager.get();
+		&spawnManager->getNetworkIdentityRegistry()
+	);
 }
 
 ServerLoop::~ServerLoop() = default;
@@ -100,7 +96,7 @@ void ServerLoop::initializeNetworking()
 		spelmotorNetworking::MessageDispatcherFactory::createServerDispatcher(
 			*gameWorld,
 			*spawnManager,
-			*serverRegistry);
+				spawnManager->getNetworkIdentityRegistry());
 	server->injectMessageDispatcher(std::move(dispatcher));
 }
 

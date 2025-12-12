@@ -58,11 +58,10 @@ public:
 private:
 	/// Stored to allow runtime access to configuration (e.g., for network settings)
     ApplicationSpecifications specifications;
-    std::unique_ptr<NetworkIdentityRegistry> serverRegistry;
     std::unique_ptr<SceneManager> sceneManager;
     std::unique_ptr<Server> server;
     std::unique_ptr<NetworkSpawnManager> spawnManager;
-    std::unique_ptr<StateSyncSystem> stateSync;  // Add this
+    std::unique_ptr<StateSyncSystem> stateSync;
     std::unique_ptr<GameWorld> gameWorld;
     ClockFunction clockFunction;
     uint32_t currentTick = 0;

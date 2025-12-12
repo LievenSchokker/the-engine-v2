@@ -69,6 +69,7 @@ public:
      * @brief Finds a networked object by its network ID.
      */
     GameObject* findByNetId(uint32_t netId) const;
+
     SpawnMessage createSpawnMessage(const NetworkIdentity* identity,
                                     uint32_t assetId);
 
@@ -81,12 +82,14 @@ public:
 
     GameObject* getObjectByNetId(uint32_t netId) const;
 
+    NetworkIdentityRegistry& getNetworkIdentityRegistry();
+    Scene* getScene() const;
+
 private:
     uint32_t generateNetId();
 	SpawnMessage createSpawnMessage(const NetworkIdentity* identity, uint32_t assetId) const;
 
     Server* server;
-    Scene* scene;
 	GameWorld* gameWorld;
     std::unique_ptr<NetworkIdentityRegistry> identityRegistry;
     std::unique_ptr<PrefabLibrary> prefabLibrary;

@@ -14,73 +14,102 @@
 
 NetworkSpawnManager::NetworkSpawnManager(GameWorld* gameWorlds)
 	: server(gameWorlds->server)
-	  , scene(gameWorlds->sceneManager->getActiveScene())
-	  , identityRegistry(std::make_unique<NetworkIdentityRegistry>())
-	  , prefabLibrary(std::make_unique<PrefabLibrary>())
-	  , gameWorld(gameWorlds)
-
+	, identityRegistry(std::make_unique<NetworkIdentityRegistry>())
+	, prefabLibrary(std::make_unique<PrefabLibrary>())
+	, gameWorld(gameWorlds)
 {
 }
+
 
 uint32_t NetworkSpawnManager::generateNetId()
 {
 	return nextNetworkId++;
 }
 
-GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vector2 position,
-                                             const int ownerId)
+GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vector2 position, const int ownerId)
 {
-	if (!prefabLibrary)
-	{
-		return nullptr;
-	}
+    std::cerr << "[spawnObject] assetId=" << assetId << " position=(" << position.x << ", " << position.y << ")\n";
 
-	auto gameObject = prefabLibrary->instantiate(assetId);
+    if (!prefabLibrary)
+    {
+        std::cerr << "[spawnObject] No prefabLibrary!\n";
+        return nullptr;
+    }
 
-	if (!gameObject)
-	{
-		return nullptr;
-	}
+    std::cerr << "[spawnObject] PrefabLibrary size=" << prefabLibrary->size() << "\n";
 
-	gameObject->getTransform()->setPosition(position);
+    auto gameObject = prefabLibrary->instantiate(assetId);
+    if (!gameObject)
+    {
+        std::cerr << "[spawnObject] Failed to instantiate assetId=" << assetId << "\n";
+        return nullptr;
+    }
 
-	auto* identity = gameObject->getComponent<NetworkIdentity>();
-	if (!identity)
-	{
-		identity = gameObject->addComponent<NetworkIdentity>();
-	}
+    std::cerr << "[spawnObject] Instantiated successfully\n";
 
-	const uint32_t networkId = generateNetId();
-	identity->networkId = networkId;
-	identity->ownerId = ownerId;
-	identity->gameWorld = gameWorld;
-	identity->onNetworkSpawn();
+    std::cerr << "[spawnObject] Setting position...\n";
+    gameObject->getTransform()->setPosition(position);
 
-	if (identityRegistry)
-	{
-		identityRegistry->registerIdentity(identity);
-	}
+    std::cerr << "[spawnObject] Getting NetworkIdentity...\n";
+    auto* identity = gameObject->getComponent<NetworkIdentity>();
+    if (!identity)
+    {
+        std::cerr << "[spawnObject] Adding NetworkIdentity...\n";
+        identity = gameObject->addComponent<NetworkIdentity>();
+    }
 
-	GameObject* gameObjectPointer = gameObject.get();
-	spawnedObjects[networkId] = gameObjectPointer;
-	objectAssets[networkId] = assetId;
+    std::cerr << "[spawnObject] Generating netId...\n";
+    const uint32_t networkId = generateNetId();
 
-	if (ownerId >= 0)
-	{
-		clientOwnedObjects[ownerId].push_back(networkId);
-	}
+    std::cerr << "[spawnObject] Setting identity fields (netId=" << networkId << ")...\n";
+    identity->networkId = networkId;
+    identity->ownerId = ownerId;
 
-	scene->addGameObject(std::move(gameObject));
+    std::cerr << "[spawnObject] Setting gameWorld...\n";
+    identity->gameWorld = gameWorld;
 
-	identity->onNetworkSpawn();
+    std::cerr << "[spawnObject] Calling onNetworkSpawn (first)...\n";
+    identity->onNetworkSpawn();
 
-	if (server)
-	{
-		const SpawnMessage message = createSpawnMessage(identity, assetId);
-		server->broadcastMessage(message);
-	}
+    std::cerr << "[spawnObject] Registering identity...\n";
+    if (identityRegistry)
+    {
+        identityRegistry->registerIdentity(identity);
+    }
 
-	return gameObjectPointer;
+    std::cerr << "[spawnObject] Storing pointers...\n";
+    GameObject* gameObjectPointer = gameObject.get();
+    spawnedObjects[networkId] = gameObjectPointer;
+    objectAssets[networkId] = assetId;
+
+    if (ownerId >= 0)
+    {
+        clientOwnedObjects[ownerId].push_back(networkId);
+    }
+
+    std::cerr << "[spawnObject] Checking scene...\n";
+    if (!getScene())
+    {
+        return nullptr;
+    }
+
+    std::cerr << "[spawnObject] Adding to scene...\n";
+    getScene()->addGameObject(std::move(gameObject));
+
+    std::cerr << "[spawnObject] Calling onNetworkSpawn (second)...\n";
+    identity->onNetworkSpawn();
+
+    std::cerr << "[spawnObject] Checking server for broadcast...\n";
+    if (server)
+    {
+        std::cerr << "[spawnObject] Creating spawn message...\n";
+        const SpawnMessage message = createSpawnMessage(identity, assetId);
+        std::cerr << "[spawnObject] Broadcasting...\n";
+        server->broadcastMessage(message);
+    }
+
+    std::cerr << "[spawnObject] Done!\n";
+    return gameObjectPointer;
 }
 
 GameObject* NetworkSpawnManager::spawnPlayer(int clientId,
@@ -213,7 +242,7 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 		return;
 	}
 
-	if (!scene)
+	if (!getScene())
 	{
 		return;
 	}
@@ -237,7 +266,7 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
-	scene->addGameObject(std::move(message.gameObject));
+	getScene()->addGameObject(std::move(message.gameObject));
 	identity->onNetworkSpawn();
 }
 
@@ -257,6 +286,20 @@ GameObject* NetworkSpawnManager::getObjectByNetId(uint32_t netId) const
 	if (it != spawnedObjects.end())
 	{
 		return it->second;
+	}
+	return nullptr;
+}
+
+NetworkIdentityRegistry& NetworkSpawnManager::getNetworkIdentityRegistry()
+{
+	return *identityRegistry;
+}
+
+Scene* NetworkSpawnManager::getScene() const
+{
+	if (gameWorld && gameWorld->sceneManager)
+	{
+		return gameWorld->sceneManager->getActiveScene();
 	}
 	return nullptr;
 }

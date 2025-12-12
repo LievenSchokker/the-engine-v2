@@ -35,39 +35,30 @@ void SceneManager::processSceneForNetwork(Scene& scene)
 
 void SceneManager::processForServer(Scene& scene)
 {
-    // Collect objects to process (can't modify while iterating)
-    std::vector<GameObject*> networkObjects;
+	std::vector<GameObject*> networkObjects;
 
-    for (auto& obj : scene.getGameObjects())
-    {
-        // Has NetworkBehaviour but NO NetworkIdentity = needs processing
-        if (hasNetworkBehaviour(*obj) && !hasNetworkIdentity(*obj))
-        {
-            networkObjects.push_back(obj.get());
-        }
-    }
+	for (auto& obj : scene.getGameObjects())
+	{
+		if (hasNetworkBehaviour(*obj) && !hasNetworkIdentity(*obj))
+		{
+			networkObjects.push_back(obj.get());
+		}
+	}
 
-    if (networkObjects.empty())
-    {
-        return;
-    }
+	if (networkObjects.empty())
+	{
+		return;
+	}
 
 	for (GameObject* obj : networkObjects)
 	{
-		std::string name = obj->getName();
-		Vector2 position = obj->getTransform()->getPosition();
+		Vector2 spawnPosition = obj->getTransform()->getPosition();
 
-		// Extract from scene
 		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
 		if (!extracted) continue;
 
-		// Store spawn info before moving
-		Vector2 spawnPosition = extracted->getTransform()->getPosition();
-
-		// Reset position for prefab template
 		extracted->getTransform()->setPosition({0, 0});
 
-		// Add NetworkIdentity if missing (required for network prefabs)
 		if (!extracted->getComponent<NetworkIdentity>())
 		{
 			extracted->addComponent<NetworkIdentity>();

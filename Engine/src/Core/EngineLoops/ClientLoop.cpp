@@ -17,13 +17,13 @@
 #include <iostream>
 
 #include "Networking/NetworkSpawnManager.h"
+
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	: game(std::move(spel)),
 	  specifications(game->getApplicationSpecifications()),
 	  gameWorld(std::make_unique<GameWorld>()),
 	  sceneManager(std::make_unique<SceneManager>()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
-	  identityRegistry(std::make_unique<NetworkIdentityRegistry>()),
 	  spawnManager(nullptr)
 {
 	if (specifications.renderBackend == RenderBackend::SDL)
@@ -46,77 +46,78 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	gameWorld->input = InputManager::getInstance();
 	gameWorld->client = client.get();
 	gameWorld->sceneManager = sceneManager.get();
+
+	spawnManager = std::make_unique<NetworkSpawnManager>(gameWorld.get());
+	gameWorld->spawnManager = spawnManager.get();
+
 	sceneManager->configureNetworking(ConnectionMode::Client, spawnManager.get());
+
 	sceneManager->setActiveScene(sceneName);
-
-	spawnManager = std::make_unique<NetworkSpawnManager>(
-	gameWorld.get()
-);
-
 }
 
 ClientLoop::~ClientLoop() = default;
 
 void ClientLoop::start()
 {
-    initializeNetworking();
-    inputManager = InputManager::getInstance();
+	initializeNetworking();
+	inputManager = InputManager::getInstance();
 }
 
 void ClientLoop::initializeNetworking()
 {
-    ServerConnectionInformation serverInfo;
-    serverInfo.ip = specifications.networkingOptions.serverIP;
-    serverInfo.port = specifications.networkingOptions.port;
+	ServerConnectionInformation serverInfo;
+	serverInfo.ip = specifications.networkingOptions.serverIP;
+	serverInfo.port = specifications.networkingOptions.port;
 
-    if (!client->connectToServer(serverInfo))
-    {
-        std::cerr << "Failed to connect to server!" << std::endl;
-        return;
-    }
+	if (!client->connectToServer(serverInfo))
+	{
+		std::cerr << "Failed to connect to server!" << std::endl;
+		return;
+	}
 
-    auto dispatcher = spelmotorNetworking::MessageDispatcherFactory::createClientDispatcher(
-	    *gameWorld,
-	    *spawnManager,
-	    *identityRegistry);
-    client->injectMessageDispatcher(std::move(dispatcher));
+	auto dispatcher =
+		spelmotorNetworking::MessageDispatcherFactory::createClientDispatcher(
+			*gameWorld,
+			*spawnManager,
+			spawnManager->getNetworkIdentityRegistry());
+	client->injectMessageDispatcher(std::move(dispatcher));
 }
 
 void ClientLoop::update(double deltaTime)
 {
-    inputManager->update();
-    renderer->update(deltaTime, *sceneManager->getActiveScene());
+	inputManager->update();
+	renderer->update(deltaTime, *sceneManager->getActiveScene());
 }
 
 void ClientLoop::fixedUpdate(double deltaTime)
 {
-    client->poll();
-    sceneManager->update(deltaTime, gameWorld.get());
+	client->poll();
+	sceneManager->update(deltaTime, gameWorld.get());
 
-    if (inputManager->quitRequested())
-    {
-        shutdown();
-    }
+	if (inputManager->quitRequested())
+	{
+		shutdown();
+	}
 }
 
 void ClientLoop::shutdown()
 {
-    client->disconnect();
-    InputManager::shutdown();
-    renderer.reset();
+	client->disconnect();
+	InputManager::shutdown();
+	renderer.reset();
 }
 
 GameWorld* ClientLoop::getGameWorld()
 {
-    return gameWorld.get();
+	return gameWorld.get();
 }
 
 SceneManager* ClientLoop::getSceneManager()
 {
-    return sceneManager.get();
+	return sceneManager.get();
 }
 
 ClientLoop::ClockFunction ClientLoop::getClock()
 {
-    return clockFunction;
+	return clockFunction;
 }
