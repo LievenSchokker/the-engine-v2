@@ -99,9 +99,9 @@ Matrix3 Transform::getWorldMatrix() const
 	return cachedWorldMatrix;
 }
 
-void Transform::setParent(Transform* newParent)
+bool Transform::setParent(Transform* newParent)
 {
-	if ( parent == newParent ) return;
+	if ( parent == newParent ) return true;
 
 	// Prevent circular parenting
 	if ( newParent != nullptr )
@@ -112,7 +112,7 @@ void Transform::setParent(Transform* newParent)
 			if ( check == this )
 			{
 				// Circular reference detected, don't set parent
-				return;
+				return false;
 			}
 			check = check->getParent();
 		}
@@ -186,6 +186,7 @@ void Transform::setParent(Transform* newParent)
 
 	parent = newParent;
 	markDirty();
+	return true;
 }
 
 Transform* Transform::getParent() const

@@ -186,25 +186,16 @@ void GameObject::setParent(GameObject* newParent)
 {
 	if ( parent == newParent ) return;
 
-	// Prevent circular parenting
-	if ( newParent != nullptr )
-	{
-		GameObject* check = newParent->getParent();
-		while ( check != nullptr )
-		{
-			if ( check == this )
-			{
-				// Circular reference detected, don't set parent
-				return;
-			}
-			check = check->getParent();
-		}
-	}
+	GameObject* oldParent = parent;
+	Transform* newParentTransform = newParent != nullptr ? newParent->getTransform() : nullptr;
+
+	// Update Transform first; it will reject circular references
+	if ( !transform->setParent(newParentTransform) ) return;
 
 	// Remove from old parent's children list
-	if ( parent != nullptr )
+	if ( oldParent != nullptr )
 	{
-		parent->removeChild(this);
+		oldParent->removeChild(this);
 	}
 
 	// Update parent
@@ -214,13 +205,6 @@ void GameObject::setParent(GameObject* newParent)
 	if ( parent != nullptr )
 	{
 		parent->addChild(this);
-		// Update Transform's parent reference
-		transform->setParent(parent->getTransform());
-	}
-	else
-	{
-		// No parent, remove Transform's parent reference
-		transform->setParent(nullptr);
 	}
 }
 

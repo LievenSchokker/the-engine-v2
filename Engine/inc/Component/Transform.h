@@ -87,8 +87,10 @@ class Transform: public Component
 	/**
 	 * @brief Set the parent transform.
 	 * @param parent The parent transform, or nullptr to remove parent.
+	 * @return true if the parent change was applied, false if rejected
+	 * (e.g. circular relationship).
 	 */
-	void setParent(Transform* parent);
+	bool setParent(Transform* parent);
 
 	/**
 	 * @brief Get the parent transform.
