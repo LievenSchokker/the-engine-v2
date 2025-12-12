@@ -149,8 +149,6 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
 
 	if (messageDispatcher)
 	{
-		std::cout << "Dispatching message type: " << static_cast<int>(
-			messageType) << std::endl;
 		messageDispatcher->processMessage(std::move(message));
 	}
 	else

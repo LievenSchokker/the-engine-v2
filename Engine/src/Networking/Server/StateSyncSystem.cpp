@@ -40,4 +40,5 @@ void StateSyncSystem::broadcastState(uint32_t currentTick)
 	{
 		server->broadcastMessage(message);
 	}
+
 }

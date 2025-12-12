@@ -1,7 +1,9 @@
 #pragma once
 #include "Networking/Serialization/ISerializable.h"
 
+#include <cstdint>
 
+enum class ComponentType : uint32_t;
 class Scene;
 class Transform;
 class Component;
@@ -56,6 +58,7 @@ public:
 	 * @brief Creates a deep copy of this GameObject via serialization.
 	 */
 	std::unique_ptr<GameObject> clone() const;
+	Component* getComponentByType(ComponentType type) const;
 
 
 	/**

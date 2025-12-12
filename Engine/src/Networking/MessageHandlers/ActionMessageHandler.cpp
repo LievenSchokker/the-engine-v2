@@ -29,7 +29,6 @@ void ActionMessageHandler::handleMessageInternal()
         return;
     }
 
-    std::cout << "Handling action message from netId=" << netId << std::endl;
     identity->dispatchAction(
         message->getComponentIdentity(),
         message->getAction()

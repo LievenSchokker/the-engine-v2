@@ -266,15 +266,26 @@ void GameObject::deserialize(CerealReadArchive& archive)
 		archive.process(typeId);
 		ComponentType type = static_cast<ComponentType>(typeId);
 
+		// Try to find existing component first
+		Component* existing = getComponentByType(type);
 
-		auto comp = ComponentFactory::instance().create(type);
-		if (!comp)
+		if (existing)
 		{
-			break;
+			// Update existing component
+			existing->deserialize(archive);
 		}
+		else
+		{
+			// Create new component only if it doesn't exist
+			auto comp = ComponentFactory::instance().create(type);
+			if (!comp)
+			{
+				break;
+			}
 
-		comp->deserialize(archive);
-		componentManager->addComponent(std::move(comp));
+			comp->deserialize(archive);
+			componentManager->addComponent(std::move(comp));
+		}
 	}
 }
 
@@ -292,6 +303,18 @@ std::unique_ptr<GameObject> GameObject::clone() const
     cloned->deserialize(reader);
 
     return cloned;
+}
+
+Component* GameObject::getComponentByType(ComponentType type) const
+{
+	for (const auto& comp : componentManager->getComponents())
+	{
+		if (comp->getComponentType() == type)
+		{
+			return comp.get();
+		}
+	}
+	return nullptr;
 }
 
 void GameObject::copyStateFrom(const GameObject& source)
