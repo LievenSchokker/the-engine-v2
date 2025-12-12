@@ -27,56 +27,38 @@ uint32_t NetworkSpawnManager::generateNetId()
 
 GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vector2 position, const int ownerId)
 {
-    std::cerr << "[spawnObject] assetId=" << assetId << " position=(" << position.x << ", " << position.y << ")\n";
-
     if (!prefabLibrary)
     {
-        std::cerr << "[spawnObject] No prefabLibrary!\n";
         return nullptr;
     }
-
-    std::cerr << "[spawnObject] PrefabLibrary size=" << prefabLibrary->size() << "\n";
 
     auto gameObject = prefabLibrary->instantiate(assetId);
     if (!gameObject)
     {
-        std::cerr << "[spawnObject] Failed to instantiate assetId=" << assetId << "\n";
         return nullptr;
     }
 
-    std::cerr << "[spawnObject] Instantiated successfully\n";
-
-    std::cerr << "[spawnObject] Setting position...\n";
     gameObject->getTransform()->setPosition(position);
 
-    std::cerr << "[spawnObject] Getting NetworkIdentity...\n";
     auto* identity = gameObject->getComponent<NetworkIdentity>();
     if (!identity)
     {
-        std::cerr << "[spawnObject] Adding NetworkIdentity...\n";
         identity = gameObject->addComponent<NetworkIdentity>();
     }
 
-    std::cerr << "[spawnObject] Generating netId...\n";
     const uint32_t networkId = generateNetId();
 
-    std::cerr << "[spawnObject] Setting identity fields (netId=" << networkId << ")...\n";
     identity->networkId = networkId;
     identity->ownerId = ownerId;
-
-    std::cerr << "[spawnObject] Setting gameWorld...\n";
     identity->gameWorld = gameWorld;
 
-    std::cerr << "[spawnObject] Calling onNetworkSpawn (first)...\n";
     identity->onNetworkSpawn();
 
-    std::cerr << "[spawnObject] Registering identity...\n";
     if (identityRegistry)
     {
         identityRegistry->registerIdentity(identity);
     }
 
-    std::cerr << "[spawnObject] Storing pointers...\n";
     GameObject* gameObjectPointer = gameObject.get();
     spawnedObjects[networkId] = gameObjectPointer;
     objectAssets[networkId] = assetId;
@@ -86,28 +68,21 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const Vecto
         clientOwnedObjects[ownerId].push_back(networkId);
     }
 
-    std::cerr << "[spawnObject] Checking scene...\n";
     if (!getScene())
     {
         return nullptr;
     }
 
-    std::cerr << "[spawnObject] Adding to scene...\n";
     getScene()->addGameObject(std::move(gameObject));
 
-    std::cerr << "[spawnObject] Calling onNetworkSpawn (second)...\n";
     identity->onNetworkSpawn();
 
-    std::cerr << "[spawnObject] Checking server for broadcast...\n";
     if (gameWorld->server)
     {
-        std::cerr << "[spawnObject] Creating spawn message...\n";
         const SpawnMessage message = createSpawnMessage(identity, assetId);
-        std::cerr << "[spawnObject] Broadcasting...\n";
         gameWorld->server->broadcastMessage(message);
     }
 
-    std::cerr << "[spawnObject] Done!\n";
     return gameObjectPointer;
 }
 
