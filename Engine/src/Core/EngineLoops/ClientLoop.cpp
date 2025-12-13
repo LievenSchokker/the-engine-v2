@@ -86,6 +86,13 @@ void ClientLoop::initializeEvents()
 			}
 		});
 
+    eventDispatcher->subscribe<WindowCloseEvent>(
+    [this](const WindowCloseEvent& event)
+    {
+        shutdown();
+    });
+
+
 	std::cout << "Setting up events" << std::endl;
 	renderer->setupEvents(*eventDispatcher.get());
 }
