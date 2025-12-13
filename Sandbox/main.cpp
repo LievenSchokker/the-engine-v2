@@ -9,7 +9,7 @@
 
 #include <iostream>
 
-#include "AgentsZandbak.h"
+#include "AI/AgentsZandbak.h"
 #include "IZandbak.h"
 
 // This has been added because sometimes SDL causes main to be redefined.

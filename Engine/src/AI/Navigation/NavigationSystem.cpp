@@ -43,3 +43,9 @@ void NavigationSystem::setNavigationSurface(std::unique_ptr<INavigationSurface> 
     navigationSurface = std::move(navSurface);
 }
 
+
+INavigationSurface* NavigationSystem::getNavigationSurface() const
+{
+    return navigationSurface.get();
+}
+

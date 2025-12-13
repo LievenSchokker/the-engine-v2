@@ -191,7 +191,7 @@ class Agent final : public Behaviour
         /// @brief The rate to turn the agent towards its current velocity with, in degrees (0 -360).
         float rotationTurnRate;
 
-
+        /// Path finder this agent wants to use for pathfinding.
         std::unique_ptr<IPathFinder> pathFinder;
 };
 

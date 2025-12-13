@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "Game.h"
-#include "SimpleMoveBehaviour.h"
+#include "../SimpleMoveBehaviour.h"
 #include "AI/Agent.h"
 #include "AI/Modules/AvoidTargetModule.h"
 #include "AI/Modules/FollowTargetModule.h"

@@ -56,6 +56,12 @@ class NavigationSystem
          */
         void setNavigationSurface(std::unique_ptr<INavigationSurface> navSurface);
 
+        /**
+         * Retrieves a raw pointer to this systems navigation surface.
+         * @return
+         */
+        INavigationSurface* getNavigationSurface() const;
+
     private:
         std::unique_ptr<INavigationSurface> navigationSurface = nullptr;
 };

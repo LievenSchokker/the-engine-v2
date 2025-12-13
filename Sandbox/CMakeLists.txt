@@ -5,7 +5,7 @@ add_executable(engineSandbox
         main.cpp
         SimpleMoveBehaviour.cpp
 #        Behaviours/NavigationTest.cpp
-        AgentsZandbak.cpp
+        AI/AgentsZandbak.cpp
 )
 
 target_link_libraries(

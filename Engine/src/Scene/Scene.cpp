@@ -12,6 +12,9 @@
 #include <iostream>
 #include <utility>
 
+#include "../../../Sandbox/AI/GridRenderComponent.h"
+#include "../../../Sandbox/AI/NavigationGridVisualizer.h"
+
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -120,7 +123,7 @@ void Scene::onStart()
 	}
 
     /// Init navigation stuff hihi ^^.
-    std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(100, 100, Vector2{ 8.0f,8.0f });
+    std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(100, 100, Vector2{ 20.0f,20.0f });
 
     std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<NavigationObstacle>();
     std::vector<BoundingBox> obstacleBounds {};
@@ -128,7 +131,10 @@ void Scene::onStart()
     {
         obstacleBounds.push_back(obstacle->getBounds());
     }
-
+    auto visuals = std::make_unique<GameObject>();
+    auto gridVisual = visuals->addComponent<NavigationGridVisualizer>();
+    gridVisual->setGrid(navGrid.get());
+    addGameObject(std::move(visuals));
     navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
     navigationSystem->setNavigationSurface(std::move(navGrid));
     navigationSystem->bake(obstacleBounds);
