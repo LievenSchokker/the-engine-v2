@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include "Events/EventDispatcher.h"
+#include "EventDispatcher/EventDispatcher.h"
 
 #include <queue>
 #include <mutex>

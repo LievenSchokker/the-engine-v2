@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "../Events/SubscriptionScope.h"
+#include "../Events/Subscriptions/SubscriptionScope.h"
 #include "../Component/BaseComponentTypes/Component.h"
-#include "Events/EventDispatcher.h"
+#include "../Events/EventDispatcher/EventDispatcher.h"
 
 
 class GameWorld;

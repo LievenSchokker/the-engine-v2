@@ -2,7 +2,7 @@
 
 #include "KeyCode.h"
 #include "MouseButton.h"
-#include "Events/EventDispatcher.h"
+#include "../Events/EventDispatcher/EventDispatcher.h"
 
 #include <memory>
 #include <unordered_set>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Events/EventDispatcher.h"
-#include "Events/SubscriptionHandle.h"
+#include "../Events/EventDispatcher/EventDispatcher.h"
+#include "../Events/Subscriptions/SubscriptionHandle.h"
 
 #include <vector>
 

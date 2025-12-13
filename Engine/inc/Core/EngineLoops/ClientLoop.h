@@ -3,7 +3,7 @@
 
 #include "Core/ApplicationSpecifications.h"
 #include "Core/IEngineLoop.h"
-#include "Events/EventDispatcher.h"
+#include "../../Events/EventDispatcher/EventDispatcher.h"
 #include "Events/SDL/SDLEventProccesor.h"
 #include "External/SdlContext.h"
 #include "Rendering/RenderSystem.h"

@@ -1,4 +1,4 @@
-#include "Events/EventDispatcher.h"
+#include "../../inc/Events/EventDispatcher/EventDispatcher.h"
 
 void EventDispatcher::unsubscribe(SubscriptionHandle& handle)
 {

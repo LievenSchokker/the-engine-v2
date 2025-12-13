@@ -1,4 +1,4 @@
-#include "Events/SubscriptionHandle.h"
+#include "../../inc/Events/Subscriptions/SubscriptionHandle.h"
 
 SubscriptionHandle::SubscriptionHandle(const uint64_t id, const uint32_t typeId) :
 	id(id),

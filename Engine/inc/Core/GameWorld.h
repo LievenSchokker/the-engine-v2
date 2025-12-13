@@ -1,5 +1,5 @@
 #pragma once
-#include "Events/EventDispatcher.h"
+#include "../Events/EventDispatcher/EventDispatcher.h"
 
 
 class Server;

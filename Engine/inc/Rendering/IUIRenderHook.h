@@ -10,7 +10,7 @@
 
 
 #include "UIRenderCommand.h"
-#include "Events/EventDispatcher.h"
+#include "../Events/EventDispatcher/EventDispatcher.h"
 
 struct UserInterfaceSettings;
 

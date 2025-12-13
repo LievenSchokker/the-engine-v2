@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Events/EventDispatcher.h"
+#include "../Events/EventDispatcher/EventDispatcher.h"
 #include "External/SdlContext.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/Color.h"
