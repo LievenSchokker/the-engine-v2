@@ -32,6 +32,7 @@ add_executable(engine_tests
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
+        Events/EventTest.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
