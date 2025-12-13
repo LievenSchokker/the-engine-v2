@@ -14,7 +14,7 @@ class SubscriptionHandle
 public:
 	SubscriptionHandle(uint64_t id, uint32_t typeId);
 
-	bool isValid() const;
+	[[nodiscard]] bool isValid() const;
 	void invalidate();
 	uint64_t id;
 	uint32_t typeId;
