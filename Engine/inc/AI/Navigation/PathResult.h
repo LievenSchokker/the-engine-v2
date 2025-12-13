@@ -11,14 +11,25 @@
 #include <vector>
 
 /**
- * @brief Stores the result of a computed path by the NavigationSystem
+ * @brief Stores the result of a computed path by a @c IPathFinder
  */
 struct PathResult
 {
+    /**
+     * @brief Default constructor
+     */
     PathResult() = default;
-    explicit PathResult(const std::vector<Vector2>& path_) : path(path_) {}
 
-    /// Usefull shorthand for returning an empty pathresult.
+    /**
+     * @brief Constructor takes in a std::vector of Vector2, representing the computed path by an algorithm
+     * @param computedPath
+     */
+    explicit PathResult(const std::vector<Vector2>& computedPath) : path(computedPath) {}
+
+    /**
+     * @brief Shorthand for returning an empty path
+     * @return a PathResult with a @c path of an empty std::vector<Vector2>
+     */
     static PathResult empty();
 
     /**
