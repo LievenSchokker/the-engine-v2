@@ -4,9 +4,10 @@
 
 #pragma once
 
+
+#include "AI/Navigation/BoundingBox.h"
 #include "Component/BaseComponentTypes/Component.h"
 #include "Math/Vector2.h"
-#include "AI/Navigation/BoundingBox.h"
 
 class Collider;
 
@@ -18,7 +19,19 @@ class Collider;
 class NavigationObstacle : public Component
 {
     public:
+        /**
+         * @brief Default constructor attempts to use this GameObject's Collider component to set this obstacle's bounding box
+         */
         NavigationObstacle();
+
+        /**
+         * @brief This constructor disregards this GameObject's Collider component, and uses the given size for its bounding box instead
+         * @param manualSize desired size of the bounding box
+         * @param offset Offset of the bounding box, relative to this GameObject's position
+         */
+        NavigationObstacle(Vector2 manualSize, Vector2 offset);
+
+        /// Default destructor
         ~NavigationObstacle() override = default;
 
         /**

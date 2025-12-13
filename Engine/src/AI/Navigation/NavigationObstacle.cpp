@@ -9,9 +9,20 @@
 #include "Math/Vector2.h"
 #include "Physics/Components/Collider.h"
 
-NavigationObstacle::NavigationObstacle() : useManualBoundingBox(false), boundingBoxOffset(Vector2::zero()), manualBounds({Vector2::zero(), Vector2::zero()})
+NavigationObstacle::NavigationObstacle() :
+    collider(nullptr) , boundingBoxOffset(Vector2::zero()), useManualBoundingBox(false) , manualBounds({Vector2::zero(), Vector2::zero()})
 {
+    if (!tryGetComponent<Collider>(collider))
+    {
+        std::cerr << "[ NavigationObstacle ] Collider not found on NavigationObstacle, call the useManualSize() method to configure its BoundingBox \n";
+    }
+}
 
+
+NavigationObstacle::NavigationObstacle(Vector2 manualSize, Vector2 offset) :
+    collider(nullptr) , boundingBoxOffset(offset), useManualBoundingBox(false), manualBounds({Vector2::zero(), Vector2::zero()})
+{
+    useManualBounds(manualSize);
 }
 
 
@@ -35,6 +46,7 @@ BoundingBox NavigationObstacle::getBounds()
     return BoundingBox{Vector2::zero(), Vector2::zero() };
 }
 
+
 void NavigationObstacle::useManualBounds(Vector2 size)
 {
     useManualBoundingBox = true;
@@ -42,6 +54,7 @@ void NavigationObstacle::useManualBounds(Vector2 size)
     manualBounds.min = Vector2{-size.x / 2, -size.y / 2};
     manualBounds.max = Vector2{ size.x / 2,  size.y / 2};
 }
+
 
 void NavigationObstacle::setBoundsOffset(Vector2 offset)
 {
