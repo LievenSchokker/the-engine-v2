@@ -18,25 +18,17 @@
  */
 
 #pragma once
-#include "RenderCommand.h"
-#include "Scene/Scene.h"
-
-class IUIRenderHook;
-class IImage;
-class string;
-struct WindowOptions;
-struct Rect;
-
 #include "Color.h"
-#include "Math/Vector2.h"
+#include "RenderCommand.h"
 #include "Rendering/IUIRenderHook.h"
+#include "Rendering/Window/WindowOptions.h"
 
 #include <memory>
 #include <string>
 
 class IRenderer
 {
-public:
+   public:
 	virtual ~IRenderer() = default;
 
 	/**
