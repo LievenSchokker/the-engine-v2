@@ -27,6 +27,13 @@ bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 
 bool SceneManager::removeScene(const std::string& name)
 {
+	// Prevent removal of persistent scene
+	if ( persistentScene != nullptr && persistentScene->getName() == name )
+	{
+		std::cerr << "[SceneManager] Error: Cannot remove persistent scene\n";
+		return false;
+	}
+
 	const auto it = scenes.find(name);
 	if ( it == scenes.end() )
 	{
@@ -121,9 +128,19 @@ bool SceneManager::setActiveScene(const std::string& name)
 		return false;
 	}
 
-	if ( activeScene != nullptr )
+	// Don't stop if it's the persistent scene (persistent scene is never
+	// stopped)
+	if ( activeScene != nullptr && activeScene != persistentScene.get() )
 	{
 		activeScene->onStop();
+	}
+
+	// Don't allow setting persistent scene as active scene
+	if ( nextScene == persistentScene.get() )
+	{
+		std::cerr << "[SceneManager] Error: Cannot set persistent scene as "
+					 "active scene\n";
+		return false;
 	}
 
 	activeScene = nextScene;
@@ -174,8 +191,31 @@ void SceneManager::update(float deltaTime, GameWorld* world)
 
 void SceneManager::updateAlways(float deltaTime, GameWorld* world)
 {
+	// Update persistent scene first (always active, never stopped)
+	if ( persistentScene != nullptr )
+	{
+		persistentScene->update(deltaTime, world);
+	}
+
+	// Update active scene
 	if ( activeScene != nullptr )
 	{
 		activeScene->update(deltaTime, world);
 	}
+}
+
+Scene* SceneManager::getOrCreatePersistentScene()
+{
+	if ( persistentScene == nullptr )
+	{
+		persistentScene = std::make_unique<Scene>("__PersistentScene__");
+		persistentScene
+			->onStart();  // Start it immediately so it's always active
+	}
+	return persistentScene.get();
+}
+
+Scene* SceneManager::getPersistentScene() const
+{
+	return persistentScene.get();
 }

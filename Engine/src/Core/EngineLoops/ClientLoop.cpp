@@ -47,6 +47,9 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	sceneManager->addScene(std::move(scenePtr));
 	sceneManager->setActiveScene(scene);
 
+	// Set GameWorld references for behaviors to access
+	gameWorld->sceneManager = sceneManager.get();
+	gameWorld->input = InputManager::getInstance();
 	inputManager = InputManager::getInstance();
 }
 

@@ -84,26 +84,25 @@ int main(int argc, char** argv)
 	movingObject->addComponent<MovingObjectBehaviour>(200.0f,
 													  SCREEN_WIDTH - 100.0f);
 
-	// Create a debug controller object using the engine's configurable
-	// component Example: Use default key bindings (SPACE for pause, 1-5 for
-	// time scales)
+	// Create a debug controller that will move itself to the persistent scene
+	// This ensures debug controls work across all scene transitions
 	auto debugController = std::make_unique<GameObject>();
 	debugController->setName("DebugController");
-	debugController->addComponent<DebugTimeControlBehaviour>();
 
-	// Example of custom key bindings (uncomment and include "Input/KeyCode.h"
-	// to use): #include "Input/KeyCode.h"
-	// debugController->addComponent<DebugTimeControlBehaviour>(
-	//     KeyCode::P,  // Custom pause key instead of SPACE
-	//     KeyCode::NUMBER_1_AND_EXCLAMATION,  // Normal speed
-	//     KeyCode::NUMBER_2_AND_AT,  // Slow
-	//     KeyCode::NUMBER_3_AND_HASHMARK,  // Very slow
-	//     KeyCode::NUMBER_4_AND_DOLLAR,  // Fast
-	//     KeyCode::NUMBER_5_AND_PERCENTAGE,  // Very fast
-	//     true  // Print menu
-	// );
+	// Example: Only pause + slow/fast (disable normal, very slow, very fast)
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::SPACE,				   // Pause key
+		std::nullopt,				   // Normal speed (disabled)
+		KeyCode::NUMBER_2_AND_AT,	   // Slow (enabled)
+		std::nullopt,				   // Very slow (disabled)
+		KeyCode::NUMBER_4_AND_DOLLAR,  // Fast (enabled)
+		std::nullopt,				   // Very fast (disabled)
+		true						   // Print menu
+	);
 
 	scene->addGameObject(std::move(movingObject));
+	// Add debug controller to regular scene - it will move itself to persistent
+	// scene on first update (see DebugTimeControlBehaviour implementation)
 	scene->addGameObject(std::move(debugController));
 
 	game->addScene(std::move(scene));

@@ -6,6 +6,7 @@
 #include "Assets/AssetManager.h"
 #include "Assets/SpritesheetLoader.h"
 #include "Behaviour/Behaviour.h"
+#include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Behaviours/PlayerControllerBehaviour.h"
 #include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
@@ -281,6 +282,21 @@ int main(int argc, char** argv)
 	auto exitHandler = std::make_unique<GameObject>();
 	exitHandler->setName("ExitHandler");
 	exitHandler->addComponent<ExitBehaviour>();
+
+	// Create a debug behavior
+	auto debugController = std::make_unique<GameObject>();
+	debugController->setName("DebugController");
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::SPACE,				   // Pause key
+		std::nullopt,				   // Normal speed (disabled)
+		KeyCode::NUMBER_2_AND_AT,	   // Slow (enabled)
+		std::nullopt,				   // Very slow (disabled)
+		KeyCode::NUMBER_4_AND_DOLLAR,  // Fast (enabled)
+		std::nullopt,				   // Very fast (disabled)
+		true						   // Print menu
+	);
+
+	gameScene->addGameObject(std::move(debugController));
 
 	// Add GameObjects to scene
 	gameScene->addGameObject(std::move(player));
