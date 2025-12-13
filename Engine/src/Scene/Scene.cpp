@@ -1,22 +1,17 @@
 #include "Scene/Scene.h"
 
-#include "../../inc/Component/ComponentManager.h"
-#include "../../inc/Component/GridComponent.h"
-#include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Component/TilemapComponent.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
+#include "Component/ComponentManager.h"
+#include "Component/GridComponent.h"
+#include "Component/ShapeRenderer.h"
+#include "Component/TilemapComponent.h"
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
-#include "Component/ComponentManager.h"
-#include "Component/ShapeRenderer.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
 #include "AI/Navigation/NavigationObstacle.h"
 
 #include <algorithm>
 #include <iostream>
 #include <utility>
 
-#include "Behaviour/Behaviour.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -125,16 +120,18 @@ void Scene::onStart()
 	}
 
     /// Init navigation stuff hihi ^^.
-    navigationSystem = std::make_unique<NavigationSystem>();
     std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(100, 100, Vector2{ 8.0f,8.0f });
-    auto obstacles = getAllComponentsOfType<NavigationObstacle>();
+
+    std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<NavigationObstacle>();
     std::vector<BoundingBox> obstacleBounds {};
     for ( const auto& obstacle : obstacles )
     {
         obstacleBounds.push_back(obstacle->getBounds());
     }
+
+    navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
     navigationSystem->setNavigationSurface(std::move(navGrid));
-    navigationSystem->bakeNavigationSurface(obstacleBounds);
+    navigationSystem->bake(obstacleBounds);
     ///
 
 

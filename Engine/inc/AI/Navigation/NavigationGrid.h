@@ -9,7 +9,7 @@
 #include "NavigationGridGraphAdapter.h"
 #include "AI/Navigation/GridCell.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
-#include "AI/Navigation/IPathfindingGraph.h"
+#include "Pathfinding/IPathfindingGraph.h"
 #include "Math/Vector2.h"
 
 class NavigationGrid : public INavigationSurface

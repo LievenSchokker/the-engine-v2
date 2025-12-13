@@ -2,7 +2,7 @@
 // Created by samle on 08/12/2025.
 //
 
-#include "AI/Navigation/PathResult.h"
+#include "../../../inc/AI/Navigation/Pathfinding/PathResult.h"
 #include "Math/Vector2.h"
 
 

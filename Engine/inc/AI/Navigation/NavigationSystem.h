@@ -5,7 +5,7 @@
 #pragma once
 
 
-#include "AI/Navigation/IPathFinder.h"
+#include "Pathfinding/IPathFinder.h"
 
 class INavigationSurface;
 class GameObject;

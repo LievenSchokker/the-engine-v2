@@ -6,7 +6,7 @@
 
 
 #include "AI/Navigation/NavigationGrid.h"
-#include "AI/Navigation/PathResult.h"
+#include "PathResult.h"
 #include "Math/Vector2.h"
 
 /**

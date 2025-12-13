@@ -6,8 +6,8 @@
 #pragma once
 
 
-#include "HeuristicType.h"
-#include "AI/Navigation/IPathFinder.h"
+#include "AI/Navigation/Pathfinding/IPathFinder.h"
+#include "AI/Navigation/Pathfinding/HeuristicType.h"
 #include "Math/Vector2.h"
 
 class  NavigationGrid;

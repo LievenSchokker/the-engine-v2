@@ -3,8 +3,8 @@
 //
 
 
-#include "AI/Navigation/AStarPathFinder.h"
-#include "AI/Navigation/PathResult.h"
+#include "../../../inc/AI/Navigation/Pathfinding/AStarPathFinder.h"
+#include "../../../inc/AI/Navigation/Pathfinding/PathResult.h"
 
 #include <queue>
 #include <unordered_set>

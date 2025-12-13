@@ -8,7 +8,7 @@
 
 #include "Behaviour/Behaviour.h"
 #include "Math/Vector2.h"
-#include "Navigation/AStarPathFinder.h"
+#include "Navigation/Pathfinding/AStarPathFinder.h"
 
 struct ModuleData;
 enum class ModuleStatus;

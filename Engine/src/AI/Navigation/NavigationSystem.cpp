@@ -5,12 +5,10 @@
 
 #include "AI/Navigation/NavigationSystem.h"
 
-#include "AI/Navigation/AStarPathFinder.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationObstacle.h"
-#include "AI/Navigation/IPathFinder.h"
-#include "AI/Navigation/PathResult.h"
-#include "Component/GridComponent.h"
+#include "AI/Navigation/Pathfinding/IPathFinder.h"
+#include "AI/Navigation/Pathfinding/PathResult.h"
 
 
 
