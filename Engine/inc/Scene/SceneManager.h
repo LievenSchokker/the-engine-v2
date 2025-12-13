@@ -1,9 +1,6 @@
 #pragma once
 
-#include "../Rendering/Color.h"
-#include "../Rendering/RenderQueue/RenderQueue.h"
 #include "Scene.h"
-#include "Rendering/IRenderer.h"
 
 #include <memory>
 #include <string>
@@ -125,6 +122,16 @@ class SceneManager
 	 * @param deltaTime Seconds elapsed since the previous update call.
 	 */
 	void update(float deltaTime, GameWorld* world);
+
+	/**
+	 * @brief Update the active scene unconditionally (even when paused).
+	 *
+	 * Used for behaviors that need to run every frame, such as debug controls
+	 * that must work even when the simulation is paused.
+	 *
+	 * @param deltaTime Seconds elapsed since the previous update call.
+	 */
+	void updateAlways(float deltaTime, GameWorld* world);
 
    private:
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;

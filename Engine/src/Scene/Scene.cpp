@@ -4,6 +4,7 @@
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Component/ComponentManager.h"
+#include "Core/ApplicationClock.h"
 #include "GameObject/GameObject.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 
@@ -202,6 +203,9 @@ void Scene::update(double deltaTime, GameWorld* world)
 		return;
 	}
 
+	int behaviorCount = 0;
+	bool clockPaused = (world != nullptr && world->clock != nullptr &&
+						world->clock->isPaused());
 	for ( auto& gameObject : gameObjects )
 	{
 		if ( !gameObject->getIsActive() ) continue;
@@ -210,6 +214,16 @@ void Scene::update(double deltaTime, GameWorld* world)
 		{
 			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
 				continue;
+			// Skip simulation behaviors when paused, but allow debug behaviors
+			// to run For now, we check the GameObject name to identify debug
+			// behaviors
+			// TODO: Add a proper way to mark behaviors as "always-run" vs
+			// "simulation-only"
+			if ( clockPaused && gameObject->getName() != "DebugController" )
+			{
+				continue;  // Skip simulation behaviors when paused
+			}
+			behaviorCount++;
 			behaviour->update(deltaTime, world);
 		}
 	}

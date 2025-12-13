@@ -23,6 +23,9 @@ SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 			"Core System Loop is null double check your "
 			"applicationSpecifications.");
 	}
+
+	// Set the clock reference in GameWorld for debug access
+	coreSystemLoop->setApplicationClock(coreClock.get());
 }
 
 SpelMotor::~SpelMotor()
@@ -45,17 +48,26 @@ void SpelMotor::run()
 	{
 		coreClock->tick();
 
+		// Poll input BEFORE fixedUpdate so behaviors can read current frame's
+		// input This ensures input is available when behaviors run in
+		// fixedUpdate
+		coreSystemLoop->update(coreClock->getDeltaTime());
+
 		while ( coreClock->shouldFixedUpdate() )
 		{
 			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
 			coreClock->consumeFixedUpdate();
 		}
-
-		coreSystemLoop->update(coreClock->getDeltaTime());
 	}
 }
 
 void SpelMotor::shutdown() const
 {
+	running = false;
 	coreSystemLoop->shutdown();
+}
+
+ApplicationClock* SpelMotor::getClock()
+{
+	return coreClock.get();
 }

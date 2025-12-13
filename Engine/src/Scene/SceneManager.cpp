@@ -171,3 +171,11 @@ void SceneManager::update(float deltaTime, GameWorld* world)
 		activeScene->update(deltaTime, world);
 	}
 }
+
+void SceneManager::updateAlways(float deltaTime, GameWorld* world)
+{
+	if ( activeScene != nullptr )
+	{
+		activeScene->update(deltaTime, world);
+	}
+}
