@@ -9,7 +9,7 @@
 #include "Component/UIObject/Button.h"
 #include "Component/UIObject/UIPanelObject.h"
 #include "Events/EventQueue.h"
-#include "Events/UserInterfaceEvent.h"
+#include "../Engine/inc/Events/EventImplementations/UserInterfaceEvent.h"
 #include "Physics/IPhysicsWorld.h"
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"

@@ -3,7 +3,7 @@
 #include "Game.h"
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
-#include "Events/ApplicationEvents.h"
+#include "Events/EventImplementations/ApplicationEvents.h"
 #include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
@@ -57,7 +57,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
     gameWorld->dispatcher = eventDispatcher.get();
     gameWorld->sceneManager = sceneManager.get();
     gameWorld->physics = physicsWorld.get();
-    
+
 	inputManager = InputManager::getInstance();
 	inputManager->initialize(*eventDispatcher.get());
 

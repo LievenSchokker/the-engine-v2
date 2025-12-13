@@ -1,7 +1,7 @@
 #include "Events/SDL/SDLEventProccesor.h"
 
 #include "Component/UIObject/Button.h"
-#include "Events/ApplicationEvents.h"
+#include "../../../inc/Events/EventImplementations/ApplicationEvents.h"
 
 
 bool SDLEventProcessor::pollEvents(EventQueue& queue)

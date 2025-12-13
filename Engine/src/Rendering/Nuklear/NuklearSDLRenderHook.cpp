@@ -2,8 +2,8 @@
 
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
-#include "Events/ApplicationEvents.h"
-#include "Events/UserInterfaceEvent.h"
+#include "../../../inc/Events/EventImplementations/ApplicationEvents.h"
+#include "../../../inc/Events/EventImplementations/UserInterfaceEvent.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"

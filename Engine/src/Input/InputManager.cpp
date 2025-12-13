@@ -1,6 +1,6 @@
 #include "Input/InputManager.h"
 
-#include "Events/ApplicationEvents.h"
+#include "../../inc/Events/EventImplementations/ApplicationEvents.h"
 
 #include <iostream>
 #include <ostream>
