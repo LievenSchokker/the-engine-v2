@@ -44,13 +44,6 @@ public:
 	void initialize(EventDispatcher& dispatcher);
 
 	/**
-	 * @brief Poll for new input events and update cached state.
-	 *
-	 * Call once per frame; the adapter will feed fresh events into the manager.
-	 */
-	void update();
-
-	/**
 	 * @brief Record a key state change for the current frame.
 	 *
 	 * Typically used by an input adapter to push low-level events.
@@ -248,4 +241,6 @@ private:
 	int wheelX = 0;
 	int wheelY = 0;
 	bool quitSignaled = false;
+
+    EventDispatcher* cachedDispatcher = nullptr;
 };

@@ -17,7 +17,11 @@ void Behaviour::awake(GameWorld& world)
     hasAwakened = true;
 
     setGameWorld(&world);
-    subscriptions.setDispatcher(*gameWorld->dispatcher);
+
+    if (gameWorld->dispatcher != nullptr)
+    {
+        subscriptions.setDispatcher(*gameWorld->dispatcher);
+    }
     onAwake();
 }
 

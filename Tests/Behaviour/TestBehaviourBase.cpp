@@ -15,7 +15,8 @@ namespace engine_tests
 
     void TestBehaviourBase::onAwake()
     {
-        Behaviour::awake();
+        auto world = std::make_shared<GameWorld>();
+        Behaviour::awake(*world);
         awakeCalled = true;
     }
 

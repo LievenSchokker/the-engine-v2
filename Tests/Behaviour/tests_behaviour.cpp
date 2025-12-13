@@ -20,9 +20,10 @@ namespace engine_tests
 
     TEST(BehaviourTests, AwakeSetsHasAwakened)
     {
+        auto world = std::make_unique<GameWorld>();
         TestBehaviourOne b;
         EXPECT_FALSE(b.getHasAwakened());
-        b.awake();
+        b.awake(*world);
         EXPECT_TRUE(b.getHasAwakened());
     }
 

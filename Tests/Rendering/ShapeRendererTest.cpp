@@ -10,6 +10,7 @@
 #include "Rendering/RenderSystem.h"
 
 #include <gtest/gtest.h>
+#include <memory>
 
 struct FakeRenderer : public IRenderer
 {
@@ -51,7 +52,7 @@ struct FakeRenderer : public IRenderer
 				break;
 		}
 	}
-
+    void setupEvents(EventDispatcher&) override {}
 	// Add this - missing from your FakeRenderer
 	void setUIRenderHook(std::unique_ptr<IUIRenderHook>) override {}
 
@@ -69,14 +70,15 @@ struct FakeRenderer : public IRenderer
 TEST(ShapeRendererTest, FillsQueueWithCircleCommand)
 {
     // Arrange
+    auto gameworld = std::make_unique<GameWorld>();
     Scene scene("TestScene");
-    scene.onStart(TODO);
+    scene.onStart(*gameworld);
 
     auto circle = std::make_unique<GameObject>();
     circle->getTransform()->setPosition({42.0, 24.0});
     circle->getTransform()->setScale({1.0, 1.0});
     circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(Color::blue());
-    scene.addRunTimeGameObject(std::move(circle), TODO);
+    scene.addRunTimeGameObject(std::move(circle), *gameworld);
 
     // Act
     RenderQueue queue;
@@ -100,15 +102,16 @@ TEST(ShapeRendererTest, FillsQueueWithCircleCommand)
 TEST(ShapeRendererTest, FillsQueueWithRectangleCommand)
 {
     // Arrange
+    auto gameworld = std::make_unique<GameWorld>();
     Scene scene("TestScene");
-    scene.onStart(TODO);
+    scene.onStart(*gameworld);
 
     auto rect = std::make_unique<GameObject>();
     rect->getTransform()->setPosition({10.0, 12.0});
     rect->getTransform()->setRotationAngle(33.0);
     rect->getTransform()->setScale({1.0, 1.0});
     rect->addComponent<ShapeRenderer>()->setRectangle({80.0, 40.0}).setColor(Color::yellow());
-    scene.addRunTimeGameObject(std::move(rect), TODO);
+    scene.addRunTimeGameObject(std::move(rect), *gameworld);
 
     // Act
     RenderQueue queue;
@@ -132,18 +135,19 @@ TEST(ShapeRendererTest, FillsQueueWithRectangleCommand)
 TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
 {
     // Arrange
+    auto gameworld = std::make_unique<GameWorld>();
 	auto fakeRenderer = std::make_unique<FakeRenderer>();
 	FakeRenderer* rendererPtr = fakeRenderer.get();
 	RenderSystem renderSystem{std::move(fakeRenderer)};
 
 
     Scene scene("TestScene");
-    scene.onStart(TODO);
+    scene.onStart(*gameworld);
 
     auto circle = std::make_unique<GameObject>();
     circle->getTransform()->setPosition({42.0, 24.0});
     circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(Color::blue());
-    scene.addRunTimeGameObject(std::move(circle), TODO);
+    scene.addRunTimeGameObject(std::move(circle), *gameworld);
 
     // Act
     renderSystem.update(0.016f, scene);
@@ -164,21 +168,22 @@ TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
 TEST(RenderSystemTest, SortsCommandsByLayer)
 {
     // Arrange
+    auto gameworld = std::make_unique<GameWorld>();
 	auto fakeRenderer = std::make_unique<FakeRenderer>();
 	FakeRenderer* rendererPtr = fakeRenderer.get();
 	RenderSystem renderSystem{std::move(fakeRenderer)};
 
     Scene scene("TestScene");
-    scene.onStart(TODO);
+    scene.onStart(*gameworld);
 
     // Add objects in wrong order (layer 2, then layer 1)
     auto backObject = std::make_unique<GameObject>();
     backObject->addComponent<ShapeRenderer>()->setCircle(10.0).setLayer(2);
-    scene.addRunTimeGameObject(std::move(backObject), TODO);
+    scene.addRunTimeGameObject(std::move(backObject), *gameworld);
 
     auto frontObject = std::make_unique<GameObject>();
     frontObject->addComponent<ShapeRenderer>()->setRectangle({20.0, 20.0}).setLayer(1);
-    scene.addRunTimeGameObject(std::move(frontObject), TODO);
+    scene.addRunTimeGameObject(std::move(frontObject), *gameworld);
 
     // Act
     renderSystem.update(0.016f, scene);
@@ -196,18 +201,18 @@ TEST(RenderSystemTest, SkipsInactiveGameObjects)
 	auto fakeRenderer = std::make_unique<FakeRenderer>();
 	FakeRenderer* rendererPtr = fakeRenderer.get();
 	RenderSystem renderSystem{std::move(fakeRenderer)};
-
+    auto gameworld = std::make_unique<GameWorld>();
     Scene scene("TestScene");
-    scene.onStart(TODO);
+    scene.onStart(*gameworld);
 
     auto activeObj = std::make_unique<GameObject>();
     activeObj->addComponent<ShapeRenderer>()->setCircle(10.0);
-    scene.addRunTimeGameObject(std::move(activeObj), TODO);
+    scene.addRunTimeGameObject(std::move(activeObj), *gameworld);
 
     auto inactiveObj = std::make_unique<GameObject>();
     inactiveObj->addComponent<ShapeRenderer>()->setCircle(20.0);
     inactiveObj->setActive(false);
-    scene.addRunTimeGameObject(std::move(inactiveObj), TODO);
+    scene.addRunTimeGameObject(std::move(inactiveObj), *gameworld);
 
     // Act
     renderSystem.update(0.016f, scene);

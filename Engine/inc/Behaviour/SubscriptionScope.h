@@ -14,46 +14,31 @@
 class SubscriptionScope
 {
 public:
-	SubscriptionScope() = default;
-	~SubscriptionScope();
+    SubscriptionScope() = default;
+    ~SubscriptionScope();
 
-	// Can't allow copy since that would defeat the purpose of the ownership
-	SubscriptionScope(const SubscriptionScope&) = delete;
-	SubscriptionScope& operator=(const SubscriptionScope&) = delete;
+    SubscriptionScope(const SubscriptionScope&) = delete;
+    SubscriptionScope& operator=(const SubscriptionScope&) = delete;
+    SubscriptionScope(SubscriptionScope&& other) noexcept;
+    SubscriptionScope& operator=(SubscriptionScope&& other) noexcept;
 
-	// Move allowed
-	SubscriptionScope(SubscriptionScope&& other) noexcept;
-	SubscriptionScope& operator=(SubscriptionScope&& other) noexcept;
+    /**
+     * @brief Set the dispatcher (call once, before subscribing)
+     */
+    void setDispatcher(EventDispatcher& disp) { dispatcher = &disp; }
 
-	/**
-	 * @brief Subscribe to an event. Automatically unsubscribes on destruction.
-	 */
-	template <typename EventType, typename F>
-	void subscribe(EventDispatcher& dispatcher, F&& callback);
+    /**
+     * @brief Subscribe to an event. Automatically unsubscribes on destruction.
+     */
+    template <typename EventType, typename F>
+    void subscribe(F&& callback);
 
-	/**
-	 * @brief Manually unsubscribe all.
-	 */
-	void unsubscribeAll();
-
-	/**
-	 * @brief Check if there are active subscriptions.
-	 */
-	bool empty() const;
-
-	/**
-	 * @brief Get number of active subscriptions.
-	 */
-	size_t size() const;
+    void unsubscribeAll();
+    bool empty() const;
+    size_t size() const;
 
 private:
-	struct Entry
-	{
-		EventDispatcher* dispatcher;
-		SubscriptionHandle handle;
-	};
-
-	std::vector<Entry> subscriptions;
+    EventDispatcher* dispatcher = nullptr;
+    std::vector<SubscriptionHandle> handles;
 };
-
 #include "SubscriptionScope.inl"

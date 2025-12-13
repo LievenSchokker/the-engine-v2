@@ -1,45 +1,29 @@
-#include "Behaviour/SubscriptionScope.h"
 
+
+#include "Events/Subscriptions/SubscriptionScope.h"
 SubscriptionScope::~SubscriptionScope()
 {
-	unsubscribeAll();
-}
-
-SubscriptionScope::SubscriptionScope(SubscriptionScope&& other) noexcept
-	: subscriptions(std::move(other.subscriptions))
-{
-	other.subscriptions.clear();
-}
-
-SubscriptionScope& SubscriptionScope::operator=(SubscriptionScope&& other) noexcept
-{
-	if (this != &other)
-	{
-		unsubscribeAll();
-		subscriptions = std::move(other.subscriptions);
-		other.subscriptions.clear();
-	}
-	return *this;
+    unsubscribeAll();
 }
 
 void SubscriptionScope::unsubscribeAll()
 {
-	for (auto& sub : subscriptions)
-	{
-		if (sub.dispatcher)
-		{
-			sub.dispatcher->unsubscribe(sub.handle);
-		}
-	}
-	subscriptions.clear();
+    if (dispatcher == nullptr)
+        return;
+
+    for (auto& handle : handles)
+    {
+        dispatcher->unsubscribe(handle);
+    }
+    handles.clear();
 }
 
 bool SubscriptionScope::empty() const
 {
-	return subscriptions.empty();
+    return handles.empty();
 }
 
 size_t SubscriptionScope::size() const
 {
-	return subscriptions.size();
+    return handles.size();
 }

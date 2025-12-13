@@ -21,6 +21,10 @@ void InputManager::shutdown()
 {
     if (instance)
     {
+        if (instance->initialized && instance->cachedDispatcher)
+        {
+            instance->disconnect(*instance->cachedDispatcher);
+        }
         delete instance;
         instance = nullptr;
     }
@@ -32,7 +36,7 @@ void InputManager::initialize(EventDispatcher& dispatcher)
     {
         return;
     }
-
+    cachedDispatcher = &dispatcher;
 
     keyPressedHandle = dispatcher.subscribe<KeyPressedEvent>(
         [this](const KeyPressedEvent& e) {
@@ -252,4 +256,46 @@ int InputManager::wheelDeltaX() const
 int InputManager::wheelDeltaY() const
 {
     return wheelY;
+}
+
+void InputManager::setKeyDown(KeyCode key, bool isDown)
+{
+    if (isDown)
+    {
+        keysCurrent.insert(key);
+    }
+    else
+    {
+        keysCurrent.erase(key);
+    }
+}
+
+void InputManager::setMouseDown(MouseButton button, bool isDown)
+{
+    if (isDown)
+    {
+        mouseCurrent.insert(button);
+    }
+    else
+    {
+        mouseCurrent.erase(button);
+    }
+}
+
+void InputManager::setMousePosition(int x, int y)
+{
+    currentMouseX = x;
+    currentMouseY = y;
+    mouseMovedInFrame = true;
+}
+
+void InputManager::addMouseWheelDelta(int dx, int dy)
+{
+    wheelX += dx;
+    wheelY += dy;
+}
+
+void InputManager::signalQuit()
+{
+    quitSignaled = true;
 }
