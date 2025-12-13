@@ -192,7 +192,7 @@ class Agent final : public Behaviour
         float rotationTurnRate;
 
 
-        std::unique_ptr<AStarPathFinder> pathFinder;
+        std::unique_ptr<IPathFinder> pathFinder;
 };
 
 #include "AI/AgentImplementation.h"

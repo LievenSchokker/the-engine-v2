@@ -4,13 +4,11 @@
 
 
 #include "AI/Navigation/AStarPathFinder.h"
+#include "AI/Navigation/PathResult.h"
 
-#include <filesystem>
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
-
-#include "AI/Navigation/PathResult.h"
 
 
 struct AStarNode
@@ -28,7 +26,7 @@ struct CompareAStarNodes
 {
     Vector2 goal;
 
-    CompareAStarNodes(const Vector2& goal) : goal(goal) {}
+    explicit CompareAStarNodes(const Vector2& goal) : goal(goal) {}
 
     bool operator()(const AStarNode& a, const AStarNode& b) const
     {
@@ -41,6 +39,12 @@ struct CompareAStarNodes
         return fA > fB;
     }
 };
+
+
+AStarPathFinder::AStarPathFinder()
+{
+    heuristicType = HeuristicType::EUCLIDIAN;
+}
 
 
 PathResult AStarPathFinder::findPath(const IPathfindingGraph& graph, Vector2 start, Vector2 end) const
@@ -126,29 +130,19 @@ PathResult AStarPathFinder::findPath(const IPathfindingGraph& graph, Vector2 sta
 
 int AStarPathFinder::calculateHeuristic(Vector2 from, Vector2 to) const
 {
-    switch (astarOptions.heuristic)
+    switch (heuristicType)
     {
         case HeuristicType::MANHATTEN:
-            return std::abs(from.x - to.x) + std::abs(from.y - to.y);
+            return static_cast<int>(std::abs(from.x - to.x) + std::abs(from.y - to.y));
         case HeuristicType::EUCLIDIAN:
-            return Vector2::distance(from, to);
+            return static_cast<int>(Vector2::distance(from, to));
         case HeuristicType::CHEBYSHEV:
-            return std::max(std::abs(to.x - from.x), std::abs(to.y - from.y));
+            return static_cast<int>(std::max(std::abs(to.x - from.x), std::abs(to.y - from.y)));
         default:
-            return Vector2::distance(from, to);
+            return static_cast<int>(Vector2::distance(from, to));
     }
 }
 
-
-AStarOptions AStarPathFinder::getAStarOptions() const
-{
-    return astarOptions;
-}
-
-void AStarPathFinder::setAStarOptions(const AStarOptions &options)
-{
-    astarOptions = options;
-}
 
 
 
