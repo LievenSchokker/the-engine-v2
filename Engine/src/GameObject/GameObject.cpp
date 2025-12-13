@@ -15,7 +15,6 @@ GameObject::GameObject()
 {
 	componentManager = std::make_unique<ComponentManager>(this);
 	transform = std::make_unique<Transform>();
-	// Set the gameObject on Transform so it can access children for markDirty()
 	transform->setGameObject(this);
 	name = "GameObject";
 	layer = 0;
@@ -31,6 +30,23 @@ GameObject::GameObject()
 
 GameObject::~GameObject()
 {
+	// Clean up parent-child relationship to prevent dangling pointers
+	if ( parent != nullptr )
+	{
+		parent->removeChild(this);
+		parent = nullptr;
+	}
+
+	// Clear parent pointers from all children to prevent dangling pointers
+	for ( GameObject* child : children )
+	{
+		if ( child != nullptr )
+		{
+			child->parent = nullptr;
+		}
+	}
+	children.clear();
+
 	componentManager->destroyAllComponents();
 	transform = nullptr;
 }
@@ -187,7 +203,8 @@ void GameObject::setParent(GameObject* newParent)
 	if ( parent == newParent ) return;
 
 	GameObject* oldParent = parent;
-	Transform* newParentTransform = newParent != nullptr ? newParent->getTransform() : nullptr;
+	Transform* newParentTransform =
+		newParent != nullptr ? newParent->getTransform() : nullptr;
 
 	// Update Transform first; it will reject circular references
 	if ( !transform->setParent(newParentTransform) ) return;
@@ -235,5 +252,24 @@ void GameObject::addChild(GameObject* child)
 	if ( std::find(children.begin(), children.end(), child) == children.end() )
 	{
 		children.push_back(child);
+	}
+}
+
+void GameObject::markTransformDirty()
+{
+	// Mark this GameObject's Transform as dirty
+	if ( transform != nullptr )
+	{
+		transform->markDirtyLocal();
+	}
+
+	// Mark all children's Transforms as dirty (their world matrices depend on
+	// this transform)
+	for ( GameObject* child : children )
+	{
+		if ( child != nullptr )
+		{
+			child->markTransformDirty();
+		}
 	}
 }

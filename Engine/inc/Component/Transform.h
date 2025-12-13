@@ -101,8 +101,19 @@ class Transform: public Component
 	/**
 	 * @brief Mark this transform and all children as dirty (forces matrix
 	 * recomputation).
+	 *
+	 * Delegates to GameObject to handle child propagation.
 	 */
 	void markDirty();
+
+	/**
+	 * @brief Mark only this transform as dirty (without propagating to
+	 * children).
+	 *
+	 * Used internally by GameObject::markTransformDirty() to mark individual
+	 * transforms.
+	 */
+	void markDirtyLocal();
 
    private:
 	Vector2 position;

@@ -196,21 +196,23 @@ Transform* Transform::getParent() const
 
 void Transform::markDirty()
 {
-	isLocalMatrixDirty = true;
-	isWorldMatrixDirty = true;
-	// Mark all children as dirty too (their world matrices depend on this
-	// transform)
+	// Delegate to GameObject to handle dirty propagation through parent-child
+	// hierarchy
 	if ( gameObject != nullptr )
 	{
-		const std::vector<GameObject*>& children = gameObject->getChildren();
-		for ( GameObject* child : children )
-		{
-			if ( child != nullptr && child->getTransform() != nullptr )
-			{
-				child->getTransform()->markDirty();
-			}
-		}
+		gameObject->markTransformDirty();
 	}
+	else
+	{
+		// Fallback: if no GameObject, just mark local dirty
+		markDirtyLocal();
+	}
+}
+
+void Transform::markDirtyLocal()
+{
+	isLocalMatrixDirty = true;
+	isWorldMatrixDirty = true;
 }
 
 void Transform::updateLocalMatrix() const

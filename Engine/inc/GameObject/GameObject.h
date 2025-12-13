@@ -274,6 +274,15 @@ class GameObject
 	 */
 	int getChildCount() const;
 
+	/**
+	 * @brief Marks this GameObject's Transform and all children's Transforms as
+	 * dirty.
+	 *
+	 * This propagates the dirty state through the parent-child hierarchy,
+	 * ensuring that world matrices are recomputed when needed.
+	 */
+	void markTransformDirty();
+
    private:
 	std::unique_ptr<ComponentManager> componentManager;
 	std::unique_ptr<Transform> transform;
