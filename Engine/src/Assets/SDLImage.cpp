@@ -8,8 +8,7 @@
 
 
 #include <iostream>
-
-
+#include <SDL_image.h>
 
 
 SDLImage::SDLImage() : surface(nullptr)

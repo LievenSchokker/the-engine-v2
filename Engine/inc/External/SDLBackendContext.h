@@ -1,30 +1,30 @@
+
+
 #pragma once
+
+#include "IBackendContext.h"
 
 #include <SDL2/SDL.h>
 
 /**
-* @file SdlContext.h
- * @brief RAII wrapper for SDL initialization and cleanup
- * @author Lieven Schokker
- * @date 11/11/2025
- */
-
-/**
- * @class SdlContext
- * @brief Resource Acquisition Is Initialization (RAII) wrapper for SDL subsystems
+ * @class SDLBackendContext
+ * @brief Resource Acquisition Is Initialization (RAII) wrapper for SDL
+ * subsystems
  *
  * This class manages SDL initialization and cleanup using reference counting,
  * ensuring SDL is properly initialized when the first instance is created and
  * cleaned up when the last instance is destroyed. Multiple instances can safely
  * coexist, and each can request different subsystems.
  *
- * @note This class uses reference counting to manage the lifetime of SDL initialization
- * @warning Not thread-safe. External synchronization required for concurrent use.
+ * @note This class uses reference counting to manage the lifetime of SDL
+ * initialization
+ * @warning Not thread-safe. External synchronization required for concurrent
+ * use.
  *
  */
-class SdlContext
+class SDLBackendContext: public IBackendContext
 {
-public:
+   public:
 	/**
 	 * @brief Constructs an SdlContext and initializes requested SDL subsystems
 	 *
@@ -32,12 +32,13 @@ public:
 	 * If SDL is already initialized, only initializes the additional subsystems
 	 * that weren't already initialized.
 	 *
-	 * @param flags SDL subsystem flags to initialize (default: SDL_INIT_EVERYTHING)
+	 * @param flags SDL subsystem flags to initialize (default:
+	 * SDL_INIT_EVERYTHING)
 	 * @throws std::runtime_error if SDL initialization fails
 	 *
 	 * @see SDL_Init, SDL_InitSubSystem
 	 */
-	explicit SdlContext(Uint32 flags = SDL_INIT_EVERYTHING);
+	explicit SDLBackendContext(Uint32 flags = SDL_INIT_EVERYTHING);
 
 	/**
 	 * @brief Destroys the SdlContext
@@ -46,7 +47,7 @@ public:
 	 *
 	 * @see SDL_Quit
 	 */
-	~SdlContext();
+	~SDLBackendContext();
 
 	/**
 	 * @brief Gets the currently initialized SDL subsystem flags
@@ -54,7 +55,7 @@ public:
 	 * @return Bitmask of all currently initialized SDL subsystems
 	 * @see SDL_WasInit
 	 */
-	static Uint32 initFlags();
+	Uint32 initialize() override;
 
 	/**
 	 * @brief Checks if a specific SDL subsystem is initialized
@@ -63,9 +64,12 @@ public:
 	 * @return true if the subsystem is initialized, false otherwise
 	 * @see SDL_WasInit
 	 */
-	static bool wasInit(Uint32 subsystem);
+	bool wasInit(Uint32 subsystem) const override;
 
-private:
+
+	void shutdown() override;
+
+   private:
 	/**
 	 * @brief Initializes SDL subsystems and increments reference count
 	 *
@@ -86,9 +90,9 @@ private:
 	 */
 	void release();
 
-	Uint32 flags = 0; ///< SDL subsystem flags requested by this instance
+	Uint32 flags = 0;  ///< SDL subsystem flags requested by this instance
 
-	static int referenceCount; ///< Number of active SdlContext instances
-	static Uint32 globalFlags;
-	///< Currently initialized SDL subsystem flags (global state)
+	static int referenceCount;	///< Number of active SdlContext instances
+	static Uint32 globalFlags;	///< Currently initialized SDL subsystem flags
+								///< (global state)
 };

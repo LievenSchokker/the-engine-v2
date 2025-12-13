@@ -19,8 +19,11 @@ add_executable(engine_tests
         Component/tests_component_manager.cpp
         Component/GridComponentTest.cpp
         Scene/SceneManagerTest.cpp
+        Networking/Messages/ActionMessageTest.cpp
         Networking/Messages/MessageReaderTest.cpp
         Networking/Messages/MessageWriterTest.cpp
+        Networking/SerializationTest.cpp
+        Networking/Messages/MessageDispatcherTest.cpp
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
@@ -32,6 +35,9 @@ add_executable(engine_tests
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
+        Audio/TestAudioManager.cpp
+        Audio/TestMusicSource.cpp
+        Audio/TestSoundSource.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE

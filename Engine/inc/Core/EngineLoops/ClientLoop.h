@@ -1,9 +1,9 @@
 #pragma once
 
-
+#include "Audio/AudioManager.h"
 #include "Core/ApplicationSpecifications.h"
 #include "Core/IEngineLoop.h"
-#include "External/SdlContext.h"
+#include "External/IBackendContext.h"
 #include "Rendering/RenderSystem.h"
 
 class Game;
@@ -61,12 +61,14 @@ private:
 	void initializeNetworking();
 
 	std::unique_ptr<Game> game;
-	ApplicationSpecifications specifications;
-	std::unique_ptr<GameWorld> gameWorld;
-	std::unique_ptr<SceneManager> sceneManager;
-	std::unique_ptr<Client> client;
+    ApplicationSpecifications specifications;
+    std::unique_ptr<GameWorld> gameWorld;
+    std::unique_ptr<SceneManager> sceneManager;
+    std::unique_ptr<Client> client;
 	std::unique_ptr<RenderSystem> renderer;
-	std::unique_ptr<SdlContext> sdlContext;
-	InputManager* inputManager;
-	ClockFunction clockFunction;
+    std::unique_ptr<IBackendContext> backendContext;
+	std::unique_ptr<AudioManager> audioManager;
+    InputManager* inputManager;
+    ClockFunction clockFunction;
+
 };

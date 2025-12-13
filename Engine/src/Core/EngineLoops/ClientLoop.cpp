@@ -1,13 +1,15 @@
 #include "Core/EngineLoops/ClientLoop.h"
 
-#include "Game.h"
+#include "Audio/SDL/AudioBackendSDL.h"
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
-#include "External/SdlContext.h"
+#include "External/SDLBackendContext.h"
+#include "Game.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
-#include "Networking/TransportGNS.h"
+#include "Networking/Server/Server.h"
 #include "Networking/Server/ServerInformation.h"
+#include "Networking/TransportGNS.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
@@ -16,9 +18,8 @@
 
 #include <iostream>
 #include <ostream>
-#include "Networking/Server/Server.h"
 
-//TODO Create proper factory for each system that needs to be created
+// TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	: sceneManager(std::make_unique<SceneManager>()),
 	  game(std::move(spel)),
@@ -26,22 +27,21 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  specifications(game->getApplicationSpecifications()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
 {
-	clockFunction = []()
+	clockFunction = []() { return 1.0; };
+	if ( specifications.renderBackend == RenderBackend::SDL )
 	{
-		return 1.0;
-	};
-	if (specifications.renderBackend == RenderBackend::SDL)
-	{
-		sdlContext = std::make_unique<SdlContext>();
-		//TODO SDL Injection layer
-		clockFunction = []()
-		{
-			return SDL_GetTicks() / 1000.0;
-		};
-		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*sdlContext);
+		backendContext = std::make_unique<SDLBackendContext>();
+		// TODO SDL Injection layer
+		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
+		std::unique_ptr<IRenderer> sdlRenderer =
+			std::make_unique<SDLRenderer>(*backendContext);
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
-		gameWorld->render = renderer.get();
+
+		// Audio
+		auto audioBackend = std::make_unique<AudioBackendSDL>();
+		audioManager = std::make_unique<AudioManager>();
+		audioManager->initialize(std::move(audioBackend));
 	}
 	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
 	std::string scene = scenePtr->getName();
@@ -50,7 +50,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	sceneManager->setActiveScene(scene);
 
 	inputManager = InputManager::getInstance();
-
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -71,7 +70,7 @@ void ClientLoop::fixedUpdate(double deltaTime)
 {
 	client->poll();
 	sceneManager->update(deltaTime, gameWorld.get());
-	if (inputManager->quitRequested())
+	if ( inputManager->quitRequested() )
 	{
 		shutdown();
 	}
@@ -104,6 +103,6 @@ ClientLoop::ClockFunction ClientLoop::getClock()
 
 SceneManager* ClientLoop::getSceneManager()
 {
-	if (sceneManager) return sceneManager.get();
+	if ( sceneManager ) return sceneManager.get();
 	return nullptr;
 }

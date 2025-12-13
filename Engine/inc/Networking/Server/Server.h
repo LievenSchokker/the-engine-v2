@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include <memory>
 #include <unordered_set>
 
@@ -8,6 +9,7 @@
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
 
 class TransportGNS;
 class IMessage;
@@ -16,8 +18,10 @@ class ConnectionMessage;
 struct ServerConnectionInformation;
 struct IncomingRawMessage;
 struct Connection;
+class MessageDispatcher;
 
 enum class ConnectionStatus : uint8_t;
+
 
 /**
  * @brief Manages game server networking with abstracted transport layer
@@ -82,6 +86,8 @@ public:
      *          from treating kick as network error.
      */
     void kickClient(int clientId);
+
+	void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
 
     /**
      * @brief Sends message with explicit delivery guarantees
@@ -161,4 +167,5 @@ private:
 
     /// @brief Fast lookup set for validating message sources and broadcast targets
     std::unordered_set<int> connectedClients;
+    std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
 };
