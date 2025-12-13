@@ -10,7 +10,6 @@
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/IPathFinder.h"
 #include "AI/Navigation/PathResult.h"
-#include "AI/Navigation/IPathFinder.h"
 #include "Component/GridComponent.h"
 
 
@@ -31,11 +30,11 @@ PathResult NavigationSystem::computePath(const IPathFinder& pathFinder, Vector2 
     return pathFinder.findPath(*graph, start, end);
 }
 
-void NavigationSystem::bakeNavigationSurface(const std::vector<BoundingBox>& obstacles) const
+
+void NavigationSystem::bake(const std::vector<BoundingBox>& obstacles) const
 {
     if (navigationSurface == nullptr)
         return;
-
 
     navigationSurface->bakeSurface(obstacles);
 }
