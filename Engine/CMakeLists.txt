@@ -22,9 +22,6 @@ add_library(engine STATIC
 target_include_directories(engine PUBLIC
         ${CMAKE_SOURCE_DIR}/Engine/inc
         ${CMAKE_SOURCE_DIR}/Engine/third-party
-        ${SDL2_INCLUDE_DIRS}
-        ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${GAMENETWORKINGSOCKETS_INCLUDE_DIRS}
 )
 
 target_link_libraries(engine PUBLIC

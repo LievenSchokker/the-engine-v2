@@ -19,7 +19,6 @@
  * @see IRenderer, SdlContext
  */
 
-
 #pragma once
 
 #include "External/IBackendContext.h"
@@ -29,6 +28,7 @@
 
 #include <SDL.h>
 #include <memory>
+#include <unordered_map>
 
 class SDLRenderer: public IRenderer
 {
@@ -115,9 +115,10 @@ class SDLRenderer: public IRenderer
 	 */
 	void endFrame() override;
 
-    void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
+	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
 	void submitUI(const std::vector<UIRenderCommand>& commands) override;
+
    private:
 	/**
 	 * @brief Draw a filled circle in window space.
@@ -132,16 +133,28 @@ class SDLRenderer: public IRenderer
 					   double rotationDegrees, const Color& color,
 					   const Vector2& scale);
 
+	/**
+	 * @brief Draw a sprite from an image in window space.
+	 */
+	void drawSprite(const Vector2& position, const Vector2& size, IImage* image,
+					const Rect* srcRect, double rotationDegrees,
+					const Vector2& scale, const Color& tint, bool flipX = false,
+					bool flipY = false);
 
-    std::unique_ptr<IUIRenderHook> userInterfaceHook;
+   private:
+	std::unique_ptr<IUIRenderHook> userInterfaceHook;
 
-    bool ensureSolidQuadTexture();
+	bool ensureSolidQuadTexture();
 	void destroySolidQuadTexture();
-    SDL_Window* window =
+	SDL_Texture* getOrCreateTexture(IImage* image);
+	void clearTextureCache();
+
+	SDL_Window* window =
 		nullptr;  ///< Null indicates closed state; must outlive renderer
 	SDL_Renderer* renderer =
 		nullptr;  ///< Must be destroyed before window; null-checked for safety
 	SDL_Texture* solidQuadTexture =
 		nullptr;  ///< Texture for solid quad rendering
-
+	std::unordered_map<IImage*, SDL_Texture*> textureCache;
+	///< Cache of textures created from IImage surfaces
 };

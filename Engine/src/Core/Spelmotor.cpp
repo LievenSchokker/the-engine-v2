@@ -33,7 +33,7 @@ SpelMotor::~SpelMotor()
 void SpelMotor::start()
 {
 	coreClock->start();
-	coreSystemLoop->start();
+	coreSystemLoop->start();  // what does this do?
 	run();
 }
 

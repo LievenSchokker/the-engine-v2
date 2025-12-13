@@ -19,7 +19,7 @@
 #include <iostream>
 #include <ostream>
 
-//TODO Create proper factory for each system that needs to be created
+// TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	: sceneManager(std::make_unique<SceneManager>()),
 	  game(std::move(spel)),
@@ -27,19 +27,14 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  specifications(game->getApplicationSpecifications()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
 {
-	clockFunction = []()
-	{
-		return 1.0;
-	};
-	if (specifications.renderBackend == RenderBackend::SDL)
+	clockFunction = []() { return 1.0; };
+	if ( specifications.renderBackend == RenderBackend::SDL )
 	{
 		backendContext = std::make_unique<SDLBackendContext>();
-		//TODO SDL Injection layer
-		clockFunction = []()
-		{
-			return SDL_GetTicks() / 1000.0;
-		};
-		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(*backendContext);
+		// TODO SDL Injection layer
+		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
+		std::unique_ptr<IRenderer> sdlRenderer =
+			std::make_unique<SDLRenderer>(*backendContext);
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
 
@@ -47,7 +42,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		auto audioBackend = std::make_unique<AudioBackendSDL>();
 		audioManager = std::make_unique<AudioManager>();
 		audioManager->initialize(std::move(audioBackend));
-		
 	}
 	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
 	std::string scene = scenePtr->getName();
@@ -56,7 +50,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	sceneManager->setActiveScene(scene);
 
 	inputManager = InputManager::getInstance();
-
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -77,7 +70,7 @@ void ClientLoop::fixedUpdate(double deltaTime)
 {
 	client->poll();
 	sceneManager->update(deltaTime, gameWorld.get());
-	if (inputManager->quitRequested())
+	if ( inputManager->quitRequested() )
 	{
 		shutdown();
 	}
@@ -110,6 +103,6 @@ ClientLoop::ClockFunction ClientLoop::getClock()
 
 SceneManager* ClientLoop::getSceneManager()
 {
-	if (sceneManager) return sceneManager.get();
+	if ( sceneManager ) return sceneManager.get();
 	return nullptr;
 }

@@ -1,4 +1,5 @@
 #include "Scene/SceneManager.h"
+
 #include "GameObject/GameObject.h"
 
 #include <iostream>
@@ -6,13 +7,15 @@
 
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
-	if ( scene == nullptr ) {
+	if ( scene == nullptr )
+	{
 		std::cerr << "[SceneManager] Error: Attempted to add a null scene\n";
 		return false;
 	}
 
 	const std::string name = scene->getName();
-	if ( scenes.contains(name) ) {
+	if ( scenes.contains(name) )
+	{
 		std::cerr << "[SceneManager] Error: Scene with name '" << name
 				  << "' already exists\n";
 		return false;
@@ -25,15 +28,19 @@ bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 bool SceneManager::removeScene(const std::string& name)
 {
 	const auto it = scenes.find(name);
-	if ( it == scenes.end() ) {
+	if ( it == scenes.end() )
+	{
 		return false;
 	}
 
-	if ( it->second.get() == activeScene ) {
+	if ( it->second.get() == activeScene )
+	{
 		activeScene->onStop();
 		activeScene = nullptr;
 		paused = false;
-	} else {
+	}
+	else
+	{
 		it->second->onStop();
 	}
 
@@ -44,7 +51,8 @@ bool SceneManager::removeScene(const std::string& name)
 Scene* SceneManager::getScene(const std::string& name) const
 {
 	const auto it = scenes.find(name);
-	if ( it != scenes.end() ) {
+	if ( it != scenes.end() )
+	{
 		return it->second.get();
 	}
 
@@ -58,20 +66,23 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
 	Scene* fromScene = getScene(fromSceneName);
 	Scene* toScene = getScene(toSceneName);
 
-	if ( fromScene == nullptr || toScene == nullptr ) {
+	if ( fromScene == nullptr || toScene == nullptr )
+	{
 		std::cerr << "[SceneManager] Error: Scene not found\n";
 		return false;
 	}
 
 	// Check if object exists in source scene
-	if ( fromScene->getGameObject(objectName) == nullptr ) {
+	if ( fromScene->getGameObject(objectName) == nullptr )
+	{
 		std::cerr << "[SceneManager] Error: GameObject '" << objectName
 				  << "' not found in scene '" << fromSceneName << "'\n";
 		return false;
 	}
 
 	// Check if object already exists in target scene
-	if ( toScene->getGameObject(objectName) != nullptr ) {
+	if ( toScene->getGameObject(objectName) != nullptr )
+	{
 		std::cerr << "[SceneManager] Error: GameObject '" << objectName
 				  << "' already exists in scene '" << toSceneName << "'\n";
 		return false;
@@ -79,7 +90,8 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
 
 	// Extract and transfer
 	auto gameObject = fromScene->extractGameObject(objectName);
-	if ( gameObject == nullptr ) {
+	if ( gameObject == nullptr )
+	{
 		return false;
 	}
 
@@ -94,20 +106,23 @@ Scene* SceneManager::getActiveScene() const
 
 bool SceneManager::setActiveScene(const std::string& name)
 {
-	if ( activeScene && activeScene->getName() == name ) {
+	if ( activeScene && activeScene->getName() == name )
+	{
 		std::cout << "[SceneManager] Warning: Scene with name '" << name
 				  << "' is already active\n";
 		return true;
 	}
 
 	Scene* nextScene = getScene(name);
-	if ( nextScene == nullptr ) {
+	if ( nextScene == nullptr )
+	{
 		std::cerr << "[SceneManager] Error: Scene with name '" << name
 				  << "' not found\n";
 		return false;
 	}
 
-	if ( activeScene != nullptr ) {
+	if ( activeScene != nullptr )
+	{
 		activeScene->onStop();
 	}
 
@@ -124,7 +139,8 @@ bool SceneManager::loadScene(const std::string& name)
 
 void SceneManager::pause()
 {
-	if ( activeScene == nullptr || paused ) {
+	if ( activeScene == nullptr || paused )
+	{
 		return;
 	}
 
@@ -134,7 +150,8 @@ void SceneManager::pause()
 
 void SceneManager::resume()
 {
-	if ( activeScene == nullptr || !paused ) {
+	if ( activeScene == nullptr || !paused )
+	{
 		return;
 	}
 
@@ -149,18 +166,8 @@ bool SceneManager::isPaused() const
 
 void SceneManager::update(float deltaTime, GameWorld* world)
 {
-	if (activeScene != nullptr && !paused)
+	if ( activeScene != nullptr && !paused )
 	{
 		activeScene->update(deltaTime, world);
 	}
-}
-
-void SceneManager::setClearColor(const Color& color)
-{
-	clearColor = color;
-}
-
-Color SceneManager::getClearColor() const
-{
-	return clearColor;
 }

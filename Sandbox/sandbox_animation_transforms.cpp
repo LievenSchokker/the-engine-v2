@@ -2,17 +2,18 @@
 #include "Animation/AnimationCurve.h"
 #include "Animation/AnimationTrack.h"
 #include "Animation/Animator.h"
+#include "Behaviour/Behaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "External/SdlContext.h"
+#include "Core/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "EntryPoint.h"
+#include "Game.h"
 #include "GameObject/GameObject.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Rendering/Color.h"
-#include "Rendering/RenderQueue.h"
-#include "Rendering/SDL/SDLRenderer.h"
-#include "Rendering/Window/WindowOptions.h"
-#include "Scene/SceneManager.h"
+#include "Scene/Scene.h"
 
 #include <iostream>
 #include <memory>
@@ -20,21 +21,200 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
-int main()
+/**
+ * @brief Behavior class that handles input for the animation demo.
+ *
+ * Handles:
+ * - SPACE: Pause/Resume all animations
+ * - R: Reset all animations
+ * - T: Toggle time scale (normal/slow/fast)
+ */
+class AnimationInputBehaviour: public Behaviour
 {
-	SdlContext context(SDL_INIT_VIDEO);
-	SDLRenderer renderer(context);
-
-	WindowOptions options{"Animation Example", SCREEN_WIDTH, SCREEN_HEIGHT};
-	renderer.open(options);
-	if ( !renderer.isOpen() )
+   public:
+	explicit AnimationInputBehaviour(Scene* scene)
+		: scene(scene), inputManager(nullptr), timeScaleState(1.0f)
 	{
-		std::cout << "Failed to open SDL window\n";
-		return 1;
 	}
 
-	SceneManager sceneManager;
-	sceneManager.setClearColor(Color::darkGray());
+	~AnimationInputBehaviour() override = default;
+
+	void onAwake() override
+	{
+		inputManager = InputManager::getInstance();
+
+		// Get all animators from the scene
+		if ( scene != nullptr )
+		{
+			GameObject* movingCircleObj = scene->getGameObject("MovingCircle");
+			GameObject* rotatingSquareObj =
+				scene->getGameObject("RotatingSquare");
+			GameObject* pulsingRectObj = scene->getGameObject("PulsingRect");
+			GameObject* combinedObj = scene->getGameObject("CombinedAnimation");
+			GameObject* pingPongObj = scene->getGameObject("PingPongAnimation");
+
+			if ( movingCircleObj )
+				movingCircleAnim = movingCircleObj->getComponent<Animator>();
+			if ( rotatingSquareObj )
+				rotatingSquareAnim =
+					rotatingSquareObj->getComponent<Animator>();
+			if ( pulsingRectObj )
+				pulsingRectAnim = pulsingRectObj->getComponent<Animator>();
+			if ( combinedObj )
+				combinedAnim = combinedObj->getComponent<Animator>();
+			if ( pingPongObj )
+				pingPongAnim = pingPongObj->getComponent<Animator>();
+		}
+
+		std::cout << "Animation System Demo\n";
+		std::cout << "=====================\n";
+		std::cout << "Controls:\n";
+		std::cout << "  SPACE - Pause/Resume all animations\n";
+		std::cout << "  R - Reset all animations\n";
+		std::cout << "  T - Toggle time scale (normal/slow/fast)\n";
+		std::cout << "  ESC - Exit\n\n";
+	}
+
+	void update(float deltaTime, GameWorld* world) override
+	{
+		(void)deltaTime;
+		(void)world;
+
+		if ( inputManager == nullptr )
+		{
+			return;
+		}
+
+		// Pause/Resume all animations
+		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
+		{
+			bool shouldPause =
+				movingCircleAnim && movingCircleAnim->getIsPlaying();
+
+			if ( movingCircleAnim )
+			{
+				if ( shouldPause )
+					movingCircleAnim->pause();
+				else
+					movingCircleAnim->resume();
+			}
+			if ( rotatingSquareAnim )
+			{
+				if ( shouldPause )
+					rotatingSquareAnim->pause();
+				else
+					rotatingSquareAnim->resume();
+			}
+			if ( pulsingRectAnim )
+			{
+				if ( shouldPause )
+					pulsingRectAnim->pause();
+				else
+					pulsingRectAnim->resume();
+			}
+			if ( combinedAnim )
+			{
+				if ( shouldPause )
+					combinedAnim->pause();
+				else
+					combinedAnim->resume();
+			}
+			if ( pingPongAnim )
+			{
+				if ( shouldPause )
+					pingPongAnim->pause();
+				else
+					pingPongAnim->resume();
+			}
+
+			std::cout << "Animations: " << (shouldPause ? "PAUSED" : "RESUMED")
+					  << "\n";
+		}
+
+		// Reset all animations
+		if ( inputManager->wasKeyPressed(KeyCode::R) )
+		{
+			if ( movingCircleAnim ) movingCircleAnim->stop();
+			if ( rotatingSquareAnim ) rotatingSquareAnim->stop();
+			if ( pulsingRectAnim ) pulsingRectAnim->stop();
+			if ( combinedAnim ) combinedAnim->stop();
+			if ( pingPongAnim ) pingPongAnim->stop();
+
+			// Restart them
+			if ( movingCircleAnim && movingCircleAnim->getCurrentClip() )
+				movingCircleAnim->play(movingCircleAnim->getCurrentClip());
+			if ( rotatingSquareAnim && rotatingSquareAnim->getCurrentClip() )
+				rotatingSquareAnim->play(rotatingSquareAnim->getCurrentClip());
+			if ( pulsingRectAnim && pulsingRectAnim->getCurrentClip() )
+				pulsingRectAnim->play(pulsingRectAnim->getCurrentClip());
+			if ( combinedAnim && combinedAnim->getCurrentClip() )
+				combinedAnim->play(combinedAnim->getCurrentClip());
+			if ( pingPongAnim && pingPongAnim->getCurrentClip() )
+				pingPongAnim->play(pingPongAnim->getCurrentClip());
+
+			std::cout << "Animations: RESET\n";
+		}
+
+		// Toggle time scale
+		if ( inputManager->wasKeyPressed(KeyCode::T) )
+		{
+			if ( timeScaleState == 1.0f )
+			{
+				timeScaleState = 0.5f;
+				std::cout << "Time scale: SLOW (0.5x)\n";
+			}
+			else if ( timeScaleState == 0.5f )
+			{
+				timeScaleState = 2.0f;
+				std::cout << "Time scale: FAST (2.0x)\n";
+			}
+			else
+			{
+				timeScaleState = 1.0f;
+				std::cout << "Time scale: NORMAL (1.0x)\n";
+			}
+
+			if ( movingCircleAnim )
+				movingCircleAnim->setTimeScale(timeScaleState);
+			if ( rotatingSquareAnim )
+				rotatingSquareAnim->setTimeScale(timeScaleState);
+			if ( pulsingRectAnim )
+				pulsingRectAnim->setTimeScale(timeScaleState);
+			if ( combinedAnim ) combinedAnim->setTimeScale(timeScaleState);
+			if ( pingPongAnim ) pingPongAnim->setTimeScale(timeScaleState);
+		}
+	}
+
+   private:
+	Scene* scene;
+	InputManager* inputManager;
+	float timeScaleState;  // 1.0 = normal, 0.5 = slow, 2.0 = fast
+
+	// Animator references
+	Animator* movingCircleAnim = nullptr;
+	Animator* rotatingSquareAnim = nullptr;
+	Animator* pulsingRectAnim = nullptr;
+	Animator* combinedAnim = nullptr;
+	Animator* pingPongAnim = nullptr;
+};
+
+#undef main
+
+int main(int argc, char** argv)
+{
+	(void)argc;
+	(void)argv;
+
+	ApplicationSpecifications spec = {};
+	spec.networkingOptions.port = 8080;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.mode = EngineMode::CLIENT;
+	spec.networkingOptions.tickRate = 60;
+	spec.renderBackend = RenderBackend::SDL;
+	spec.windowOptions = {"Animation Example", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.maxFrameTime = 0.1;  // 100ms max frame time
+
+	std::unique_ptr<Game> game = std::make_unique<Game>();
 
 	// Create a scene
 	auto animationScene = std::make_unique<Scene>("AnimationScene");
@@ -166,172 +346,22 @@ int main()
 	auto* pingPongAnimator = pingPongObject->addComponent<Animator>();
 	pingPongAnimator->play(&pingPongClip);
 
+	// Create a GameObject for input handling
+	auto inputHandler = std::make_unique<GameObject>();
+	inputHandler->setName("InputHandler");
+	// Add the behavior with a reference to the scene
+	inputHandler->addComponent<AnimationInputBehaviour>(animationScene.get());
+
 	// Add GameObjects to scene
 	animationScene->addGameObject(std::move(movingCircle));
 	animationScene->addGameObject(std::move(rotatingSquare));
 	animationScene->addGameObject(std::move(pulsingRect));
 	animationScene->addGameObject(std::move(combinedObject));
 	animationScene->addGameObject(std::move(pingPongObject));
+	animationScene->addGameObject(std::move(inputHandler));
 
-	sceneManager.addScene(std::move(animationScene));
-	sceneManager.setActiveScene("AnimationScene");
+	game->addScene(std::move(animationScene));
+	game->setApplicationSpecifications(spec);
 
-	std::cout << "Animation System Demo\n";
-	std::cout << "=====================\n";
-	std::cout << "Controls:\n";
-	std::cout << "  SPACE - Pause/Resume all animations\n";
-	std::cout << "  R - Reset all animations\n";
-	std::cout << "  T - Toggle time scale (normal/slow/fast)\n";
-	std::cout << "  ESC - Exit\n\n";
-
-	bool running = true;
-	Uint32 lastTicks = SDL_GetTicks();
-	RenderQueue renderQueue;
-	InputManager* input = InputManager::getInstance();
-	Scene* activeScene = sceneManager.getActiveScene();
-
-	// Get animators for controls
-	GameObject* movingCircleObj = activeScene->getGameObject("MovingCircle");
-	GameObject* rotatingSquareObj =
-		activeScene->getGameObject("RotatingSquare");
-	GameObject* pulsingRectObj = activeScene->getGameObject("PulsingRect");
-	GameObject* combinedObj = activeScene->getGameObject("CombinedAnimation");
-	GameObject* pingPongObj = activeScene->getGameObject("PingPongAnimation");
-
-	Animator* movingCircleAnim =
-		movingCircleObj ? movingCircleObj->getComponent<Animator>() : nullptr;
-	Animator* rotatingSquareAnim =
-		rotatingSquareObj ? rotatingSquareObj->getComponent<Animator>()
-						  : nullptr;
-	Animator* pulsingRectAnim =
-		pulsingRectObj ? pulsingRectObj->getComponent<Animator>() : nullptr;
-	Animator* combinedAnim =
-		combinedObj ? combinedObj->getComponent<Animator>() : nullptr;
-	Animator* pingPongAnim =
-		pingPongObj ? pingPongObj->getComponent<Animator>() : nullptr;
-
-	float timeScaleState = 1.0f;  // 1.0 = normal, 0.5 = slow, 2.0 = fast
-
-	while ( running && renderer.isOpen() )
-	{
-		input->update();
-
-		// Pause/Resume all animations
-		if ( input->wasKeyPressed(KeyCode::SPACE) )
-		{
-			bool shouldPause =
-				movingCircleAnim && movingCircleAnim->getIsPlaying();
-
-			if ( movingCircleAnim )
-			{
-				if ( shouldPause )
-					movingCircleAnim->pause();
-				else
-					movingCircleAnim->resume();
-			}
-			if ( rotatingSquareAnim )
-			{
-				if ( shouldPause )
-					rotatingSquareAnim->pause();
-				else
-					rotatingSquareAnim->resume();
-			}
-			if ( pulsingRectAnim )
-			{
-				if ( shouldPause )
-					pulsingRectAnim->pause();
-				else
-					pulsingRectAnim->resume();
-			}
-			if ( combinedAnim )
-			{
-				if ( shouldPause )
-					combinedAnim->pause();
-				else
-					combinedAnim->resume();
-			}
-			if ( pingPongAnim )
-			{
-				if ( shouldPause )
-					pingPongAnim->pause();
-				else
-					pingPongAnim->resume();
-			}
-
-			std::cout << "Animations: " << (shouldPause ? "PAUSED" : "RESUMED")
-					  << "\n";
-		}
-
-		// Reset all animations
-		if ( input->wasKeyPressed(KeyCode::R) )
-		{
-			if ( movingCircleAnim ) movingCircleAnim->stop();
-			if ( rotatingSquareAnim ) rotatingSquareAnim->stop();
-			if ( pulsingRectAnim ) pulsingRectAnim->stop();
-			if ( combinedAnim ) combinedAnim->stop();
-			if ( pingPongAnim ) pingPongAnim->stop();
-
-			// Restart them
-			if ( movingCircleAnim && movingCircleAnim->getCurrentClip() )
-				movingCircleAnim->play(movingCircleAnim->getCurrentClip());
-			if ( rotatingSquareAnim && rotatingSquareAnim->getCurrentClip() )
-				rotatingSquareAnim->play(rotatingSquareAnim->getCurrentClip());
-			if ( pulsingRectAnim && pulsingRectAnim->getCurrentClip() )
-				pulsingRectAnim->play(pulsingRectAnim->getCurrentClip());
-			if ( combinedAnim && combinedAnim->getCurrentClip() )
-				combinedAnim->play(combinedAnim->getCurrentClip());
-			if ( pingPongAnim && pingPongAnim->getCurrentClip() )
-				pingPongAnim->play(pingPongAnim->getCurrentClip());
-
-			std::cout << "Animations: RESET\n";
-		}
-
-		// Toggle time scale
-		if ( input->wasKeyPressed(KeyCode::T) )
-		{
-			if ( timeScaleState == 1.0f )
-			{
-				timeScaleState = 0.5f;
-				std::cout << "Time scale: SLOW (0.5x)\n";
-			}
-			else if ( timeScaleState == 0.5f )
-			{
-				timeScaleState = 2.0f;
-				std::cout << "Time scale: FAST (2.0x)\n";
-			}
-			else
-			{
-				timeScaleState = 1.0f;
-				std::cout << "Time scale: NORMAL (1.0x)\n";
-			}
-
-			if ( movingCircleAnim )
-				movingCircleAnim->setTimeScale(timeScaleState);
-			if ( rotatingSquareAnim )
-				rotatingSquareAnim->setTimeScale(timeScaleState);
-			if ( pulsingRectAnim )
-				pulsingRectAnim->setTimeScale(timeScaleState);
-			if ( combinedAnim ) combinedAnim->setTimeScale(timeScaleState);
-			if ( pingPongAnim ) pingPongAnim->setTimeScale(timeScaleState);
-		}
-
-		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) )
-		{
-			running = false;
-		}
-
-		Uint32 currentTicks = SDL_GetTicks();
-		float deltaTime =
-			static_cast<float>(currentTicks - lastTicks) / 1000.0f;
-		lastTicks = currentTicks;
-
-		sceneManager.update(deltaTime);
-		sceneManager.buildRenderQueue(renderQueue);
-		executeRenderQueue(renderer, renderQueue);
-
-		SDL_Delay(16);
-	}
-
-	renderer.close();
-	return 0;
+	return SpelMotorEntry::main(std::move(game));
 }

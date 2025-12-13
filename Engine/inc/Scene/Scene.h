@@ -5,6 +5,7 @@
 
 class GameObject;
 class Behaviour;
+struct RenderQueue;
 struct ShapeRenderCommand;
 
 #include <memory>
@@ -124,9 +125,9 @@ public:
 	/**
 	 * @brief Collect render commands for active objects in this scene.
 	 *
-	 * Appends commands to the provided collection; does nothing when inactive.
+	 * Appends shape and sprite commands to the provided render queue; does nothing when inactive.
 	 */
-	void collectRenderCommands(std::vector<ShapeRenderCommand>& out) const;
+	void collectRenderCommands(RenderQueue& queue) const;
 
 	/**
 	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.

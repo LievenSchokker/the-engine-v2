@@ -1,6 +1,6 @@
-#include "../../inc/Assets/TilemapAsset.h"
+#include "Assets/TilemapAsset.h"
 
-#include "../../inc/Assets/AssetTypes.h"
+#include "Assets/AssetTypes.h"
 
 #include <fstream>
 #include <iostream>

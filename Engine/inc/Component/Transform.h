@@ -1,17 +1,17 @@
 #pragma once
 
-
-#include "Math/Vector2.h"
+#include "../Math/Vector2.h"
 #include "Component/BaseComponentTypes/Component.h"
+#include "GameObject/GameObject.h"
 
 /**
  * @brief Transform holds the position, rotation and scale.
  */
 class Transform: public Component
 {
-public:
+   public:
 	Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0,
-	          Vector2 scale = {1.0, 1.0});
+			  Vector2 scale = {1.0, 1.0});
 	~Transform();
 
 	/**
@@ -34,25 +34,25 @@ public:
 	Vector2 getScale() const;
 
 	/**
-	* @brief Set the new position.
-	*
-	* @param newPosition Vector2 of the new position.
-	*/
+	 * @brief Set the new position.
+	 *
+	 * @param newPosition Vector2 of the new position.
+	 */
 	void setPosition(Vector2 newPosition);
 	/**
-	* @brief Set the new rotation angle.
-	*
-	* @param newRotationAngle Double of the new rotation angle.
-	*/
+	 * @brief Set the new rotation angle.
+	 *
+	 * @param newRotationAngle Double of the new rotation angle.
+	 */
 	void setRotationAngle(double newRotationAngle);
 	/**
-	* @brief Set the new scale.
-	*
-	* @param newScale Vector2 of the new scale.
-	*/
+	 * @brief Set the new scale.
+	 *
+	 * @param newScale Vector2 of the new scale.
+	 */
 	void setScale(Vector2 newScale);
 
-private:
+   private:
 	Vector2 position;
 	double rotationAngle;
 	Vector2 scale;
