@@ -48,12 +48,19 @@ class INavigationSurface
          * @param surfacePoint Point on the surface to convert
          * @return a Vector2 containing the world-position of the given @c surfacePoint
          */
-        virtual Vector2 toWorldPoint(Vector2 surfacePoint) = 0;
+        virtual Vector2 toWorldPoint(Vector2 surfacePoint) const = 0;
 
         /**
          * Converts a given Vector2 in world coordinates to a point on the navigation surface
          * @param worldPoint point in the world to convert to the surface
          * @return A Vector2 containing the coordinate on the surface
          */
-        virtual Vector2 toSurfacePoint(Vector2 worldPoint) = 0;
+        virtual Vector2 toSurfacePoint(Vector2 worldPoint) const = 0;
+
+        /**
+         * @brief Checks whether a given point converted to surface space lies on this navigation surface
+         * @param surfacePoint point in the world
+         * @return True if the point is on the surface, false otherwise
+         */
+        virtual bool isPointOnSurface(Vector2 surfacePoint) const = 0;
 };

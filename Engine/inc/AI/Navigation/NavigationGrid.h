@@ -48,9 +48,10 @@ class NavigationGrid : public INavigationSurface
         GridCell& getNavigationCell(Vector2 positionInGrid);
 
         const IPathfindingGraph* getPathfindingGraph() const override;
-        void bakeSurface(const std::vector<BoundingBox>& obstacles) override;
-        Vector2 toWorldPoint(Vector2 surfacePoint) override;
-        Vector2 toSurfacePoint(Vector2 worldPoint) override;
+        void bakeSurface(const std::vector<BoundingBox>& obstacles)  override;
+        Vector2 toWorldPoint(Vector2 surfacePoint) const override;
+        Vector2 toSurfacePoint(Vector2 worldPoint) const override;
+        bool isPointOnSurface(Vector2 surfacePoint) const override;
 
     private:
         int width;

@@ -170,12 +170,17 @@ void NavigationGrid::bakeSurface(const std::vector<BoundingBox>& obstacles)
     }
 }
 
-Vector2 NavigationGrid::toSurfacePoint(Vector2 worldPoint)
+Vector2 NavigationGrid::toSurfacePoint(Vector2 worldPoint) const
 {
     return worldToCellPosition(worldPoint);
 }
 
-Vector2 NavigationGrid::toWorldPoint(Vector2 surfacePoint)
+Vector2 NavigationGrid::toWorldPoint(Vector2 surfacePoint) const
 {
     return cellToWorldPosition(surfacePoint);
+}
+
+bool NavigationGrid::isPointOnSurface(Vector2 surfacePoint) const
+{
+    return isInGrid(surfacePoint);
 }
