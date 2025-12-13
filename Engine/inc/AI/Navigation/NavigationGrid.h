@@ -7,7 +7,7 @@
 
 #include "INavigationSurface.h"
 #include "NavigationGridGraphAdapter.h"
-#include "AI/Navigation/NavigationCell.h"
+#include "AI/Navigation/GridCell.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "AI/Navigation/IPathfindingGraph.h"
 #include "Math/Vector2.h"
@@ -39,13 +39,13 @@ class NavigationGrid : public INavigationSurface
         Vector2 worldToCellPosition(Vector2 worldPos) const;
         Vector2 cellToWorldPosition(Vector2 cellPos) const;
 
-        const std::vector<NavigationCell>& getCells() const;
+        const std::vector<GridCell>& getCells() const;
 
         int getWidth() const;
         int getHeight() const;
 
         std::vector<Vector2> getNeighbours(Vector2 cellPos, bool diagonalNeighbours) const;
-        NavigationCell& getNavigationCell(Vector2 positionInGrid);
+        GridCell& getNavigationCell(Vector2 positionInGrid);
 
         const IPathfindingGraph* getPathfindingGraph() const override;
         void bakeSurface(const std::vector<BoundingBox>& obstacles) override;
@@ -56,6 +56,6 @@ class NavigationGrid : public INavigationSurface
         int width;
         int height;
         Vector2 cellSize;
-        std::vector<NavigationCell> cells;
+        std::vector<GridCell> cells;
         std::unique_ptr<IPathfindingGraph> graphAdapter;
 };

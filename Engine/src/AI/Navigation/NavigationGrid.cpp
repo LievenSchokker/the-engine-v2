@@ -8,7 +8,7 @@
 #include "AI/Navigation/BoundingBox.h"
 #include "AI/Navigation/CardinalDirections.h"
 #include "AI/Navigation/CompassDirections.h"
-#include "AI/Navigation/NavigationCell.h"
+#include "AI/Navigation/GridCell.h"
 #include "Math/Vector2.h"
 
 
@@ -88,7 +88,7 @@ Vector2 NavigationGrid::cellToWorldPosition(Vector2 cellPos) const
     return Vector2{ worldX, worldY };
 }
 
-const std::vector<NavigationCell> &NavigationGrid::getCells() const
+const std::vector<GridCell> &NavigationGrid::getCells() const
 {
     return cells;
 }
@@ -134,7 +134,7 @@ std::vector<Vector2> NavigationGrid::getNeighbours(Vector2 cellPos, bool diagona
     return validNeighbours;
 }
 
-NavigationCell& NavigationGrid::getNavigationCell(Vector2 positionInGrid)
+GridCell& NavigationGrid::getNavigationCell(Vector2 positionInGrid)
 {
     int index = static_cast<int>(positionInGrid.y) * width + static_cast<int>(positionInGrid.x);
     return cells[index];
