@@ -4,6 +4,11 @@
 #include <iostream>
 #include <utility>
 
+SceneManager::SceneManager(GameWorld& gameWorld)
+    : world(gameWorld)
+{}
+
+
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
 	if ( scene == nullptr ) {
@@ -83,7 +88,7 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
 		return false;
 	}
 
-	toScene->addGameObject(std::move(gameObject));
+	toScene->addRunTimeGameObject(std::move(gameObject), world);
 	return true;
 }
 
@@ -113,7 +118,7 @@ bool SceneManager::setActiveScene(const std::string& name)
 
 	activeScene = nextScene;
 	paused = false;
-	activeScene->onStart();
+	activeScene->onStart(world);
 	return true;
 }
 

@@ -18,7 +18,7 @@
 class SceneManager
 {
    public:
-	SceneManager() = default;
+	SceneManager(GameWorld& world);
 
 	/**
 	 * @brief Register a scene owned by the manager.
@@ -137,6 +137,7 @@ class SceneManager
 	Color getClearColor() const;
 
    private:
+    GameWorld& world;
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;

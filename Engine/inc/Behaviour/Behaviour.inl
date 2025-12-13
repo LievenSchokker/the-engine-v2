@@ -13,7 +13,6 @@ template <typename EventType, typename T>
 void Behaviour::subscribe(void (T::*method)(const EventType&))
 {
 	static_assert(std::is_base_of_v<Behaviour, T>, "T must derive from Behaviour");
-	std::cout << "Subscribing to event " << typeid(T).name() << std::endl;
 	T* self = static_cast<T*>(this);
 
 	subscriptions.subscribe<EventType>(

@@ -15,6 +15,7 @@
 #include <iostream>
 #include <utility>
 
+#include "Game.h"
 #include "Behaviour/Behaviour.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
@@ -34,21 +35,37 @@ const std::string& Scene::getName() const
 
 bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
-	if ( gameObject == nullptr ) {
-		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-		return false;
-	}
+    if ( gameObject == nullptr ) {
+        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
+        return false;
+    }
 
-	bool isGameObjectActive = gameObject->getIsActive();
+    bool isGameObjectActive = gameObject->getIsActive();
 
-	gameObjects.emplace_back(std::move(gameObject));
+    gameObjects.emplace_back(std::move(gameObject));
+    GameObject* addedObject = gameObjects.back().get();
+    addedObject->setScene(*this);
+
+    return true;
+}
+
+bool Scene::addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWorld& world)
+{
+    if ( gameObject == nullptr ) {
+        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
+        return false;
+    }
+
+    bool isGameObjectActive = gameObject->getIsActive();
+
+    gameObjects.emplace_back(std::move(gameObject));
     GameObject* addedObject = gameObjects.back().get();
     addedObject->setScene(*this);
 
     if (active)
 	{
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
-	    initialiseBehaviours(addedObject->getAllBehaviours());
+	    initialiseBehaviours(addedObject->getAllBehaviours(), world);
 	}
 
 	return true;
@@ -116,7 +133,7 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 	return result;
 }
 
-void Scene::onStart()
+void Scene::onStart(GameWorld& world)
 {
 	if ( active ) {
 		return;
@@ -140,7 +157,7 @@ void Scene::onStart()
 	}
 
     /// Initialise all the behaviours by calling their lifetime functions in the correct order.
-    initialiseBehaviours(allBehaviours);
+    initialiseBehaviours(allBehaviours, world);
 }
 
 void Scene::onStop()
@@ -208,52 +225,8 @@ void Scene::update(double deltaTime, GameWorld* world)
 
 	processDestroyQueue();
 }
-//
-// void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
-// {
-// 	if ( !active ) {
-// 		return;
-// 	}
-//
-// 	std::vector<ShapeRenderCommand> debugCommands;
-// 	for ( const auto& gameObject : gameObjects ) {
-// 		if ( !gameObject->getIsActive() ) {
-// 			continue;
-// 		}
-//
-// 		// Collect ShapeRenderer commands
-// 		auto* shapeRenderer = gameObject->getComponent<ShapeRenderer>();
-// 		if ( shapeRenderer != nullptr ) {
-// 			const auto command = shapeRenderer->buildRenderCommand();
-// 			if ( command.has_value() ) {
-// 				out.emplace_back(*command);
-// 			}
-// 		}
-//
-// 		// Collect TilemapComponent commands
-// 		auto* tilemapComponent = gameObject->getComponent<TilemapComponent>();
-// 		if ( tilemapComponent != nullptr ) {
-// 			const auto tilemapCommands =
-// 				tilemapComponent->buildRenderCommands();
-// 			out.insert(out.end(), tilemapCommands.begin(),
-// 					   tilemapCommands.end());
-// 		}
-//
-// 		// Collect GridComponent debug render commands
-// 		auto* gridComponent = gameObject->getComponent<GridComponent>();
-// 		if ( gridComponent != nullptr &&
-// 			 gridComponent->isDebugRenderEnabled() ) {
-// 			const auto gridCommands = gridComponent->buildDebugRenderCommands();
-// 			debugCommands.insert(debugCommands.end(), gridCommands.begin(),
-// 								 gridCommands.end());
-// 		}
-// 	}
-//
-// 	// Append deferred debug overlays after regular render commands.
-// 	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
-// }
 
-void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
+void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, GameWorld& world)
 {
     /// First call awake on all behaviours:
     for (auto& behaviour : behaviours)
@@ -263,7 +236,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
 
         /// Awake may only be called once per behaviour
         if (!behaviour->getHasAwakened())
-            behaviour->awake();
+            behaviour->awake(world);
     }
 
     /// Then call onEnable on all enabled behaviours on active GameObjects:

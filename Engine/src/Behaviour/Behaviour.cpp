@@ -9,12 +9,15 @@
 
 Behaviour::~Behaviour() = default;
 
-void Behaviour::awake()
+void Behaviour::awake(GameWorld& world)
 {
     if (hasAwakened)
         return;
 
     hasAwakened = true;
+
+    setGameWorld(&world);
+    subscriptions.setDispatcher(*gameWorld->dispatcher);
     onAwake();
 }
 

@@ -32,18 +32,20 @@ public:
 	 * @return Reference to the stored scene name.
 	 */
 	const std::string& getName() const;
+    bool addGameObject(std::unique_ptr<GameObject> gameObject);
 
-	/**
+    /**
 	 * @brief Add a game object to the scene.
 	 *
 	 * If the scene is currently active the object's components are activated
 	 * via its @ref ComponentManager.
 	 *
 	 * @param gameObject Game object instance to own.
+	 * @param world
 	 * @return true if the object was successfully added, false if gameObject
 	 * was null.
 	 */
-	bool addGameObject(std::unique_ptr<GameObject> gameObject);
+	bool addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWorld& world);
 
 	/**
 	 * @brief Remove a game object by name.
@@ -87,7 +89,7 @@ public:
 	 * Activates every stored object's components through their component
 	 * manager.
 	 */
-	void onStart();
+	void onStart(GameWorld& world);
 
 	/**
 	 * @brief Stop the scene if it is active.
@@ -122,9 +124,10 @@ public:
 	/**
 	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
 	 *
-	 * @param behaviours the behaviours that need to be initialised.
+	 * @param behaviour the behaviours that need to be initialised.
+	 * @param world
 	 */
-	void initialiseBehaviours(const std::vector<Behaviour*>& behaviours);
+	void initialiseBehaviours(const std::vector<Behaviour*>& behaviour, GameWorld& world);
 
 	/**
 	 * @brief Adds the provided GameObject to the @c destroyQueue vector, in order to delete and destroy the object when @c processDestroyQueue is called.

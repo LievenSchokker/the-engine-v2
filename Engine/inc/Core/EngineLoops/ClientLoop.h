@@ -72,15 +72,14 @@ private:
 	// Event subscription handles
 	SubscriptionHandle windowCloseHandle;
 	SubscriptionHandle windowResizeHandle;
-
+    std::unique_ptr<Client> client;
+    std::unique_ptr<RenderSystem> renderer;
+    std::unique_ptr<SdlContext> sdlContext;
+    std::unique_ptr<IPhysicsWorld> physicsWorld;
 	std::unique_ptr<Game> game;
 	ApplicationSpecifications specifications;
 	std::unique_ptr<GameWorld> gameWorld;
-	std::unique_ptr<SceneManager> sceneManager;
-	std::unique_ptr<Client> client;
-	std::unique_ptr<RenderSystem> renderer;
-	std::unique_ptr<SdlContext> sdlContext;
-	std::unique_ptr<IPhysicsWorld> physicsWorld;
+    std::unique_ptr<SceneManager> sceneManager;
 	InputManager* inputManager;
 	ClockFunction clockFunction;
 };

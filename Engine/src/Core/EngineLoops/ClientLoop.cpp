@@ -23,16 +23,16 @@
 
 //TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-	: windowCloseHandle(1, 1), windowResizeHandle(2, 2),
-	  sceneManager(std::make_unique<SceneManager>()),
-	  game(std::move(spel)),
-	  gameWorld(std::make_unique<GameWorld>()),
-	  specifications(game->getApplicationSpecifications()),
+	: eventDispatcher(std::make_unique<EventDispatcher>()), eventQueue(std::make_unique<EventQueue>()),
+	  windowCloseHandle(1, 1),
+	  windowResizeHandle(2, 2),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
-	  eventDispatcher(std::make_unique<EventDispatcher>()),
-	  eventQueue(std::make_unique<EventQueue>()),
-	  inputManager(nullptr),
-	  physicsWorld(std::make_unique<Box2DPhysicsWorld>())
+	  physicsWorld(std::make_unique<Box2DPhysicsWorld>()),
+	  game(std::move(spel)),
+	  specifications(game->getApplicationSpecifications()),
+	  gameWorld(std::make_unique<GameWorld>()),
+	  sceneManager(std::make_unique<SceneManager>(*gameWorld)),
+	  inputManager(nullptr)
 {
 	clockFunction = []()
 	{
@@ -54,15 +54,15 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	}
 	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
 	std::string scene = scenePtr->getName();
-
+    gameWorld->dispatcher = eventDispatcher.get();
+    gameWorld->sceneManager = sceneManager.get();
+    gameWorld->physics = physicsWorld.get();
+    
 	inputManager = InputManager::getInstance();
 	inputManager->initialize(*eventDispatcher.get());
 
 	sceneManager->addScene(std::move(scenePtr));
 	sceneManager->setActiveScene(scene);
-	gameWorld->dispatcher = eventDispatcher.get();
-	gameWorld->sceneManager = sceneManager.get();
-	gameWorld->physics = physicsWorld.get();
 }
 
 ClientLoop::~ClientLoop() = default;

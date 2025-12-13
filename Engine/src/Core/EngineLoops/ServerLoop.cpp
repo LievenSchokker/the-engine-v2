@@ -12,11 +12,11 @@
 
 ServerLoop::ServerLoop(std::unique_ptr<Game> game)
 	: specifications(game->getApplicationSpecifications())
-	  , gameWorld(std::make_unique<GameWorld>())
-	  , sceneManager(std::make_unique<SceneManager>())
 	  , server(std::make_unique<Server>(
-		  Server::convertApplicationSettings(specifications),
-		  std::make_unique<TransportGNS>()))
+          Server::convertApplicationSettings(specifications),
+          std::make_unique<TransportGNS>()))
+	  , gameWorld(std::make_unique<GameWorld>())
+	  , sceneManager(std::make_unique<SceneManager>(*gameWorld))
 {
 	clockFunction = []()
 	{

@@ -55,10 +55,10 @@ public:
 private:
     /// Stored to allow runtime access to configuration (e.g., for network settings)
     ApplicationSpecifications specifications;
-    std::unique_ptr<SceneManager> sceneManager;
     std::unique_ptr<Server> server;
-    std::unique_ptr<GameWorld> gameWorld;
 	std::unique_ptr<Client> game;
+    std::unique_ptr<GameWorld> gameWorld;
+    std::unique_ptr<SceneManager> sceneManager;
     ClockFunction clockFunction;
     uint32_t currentTick = 0;
 };

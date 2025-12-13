@@ -20,8 +20,9 @@ class GameWorld;
 class Behaviour: virtual public Component
 {
 public:
-	Behaviour() : dispatcher(nullptr),
-	              isEnabled(true), hasAwakened(false), hasStarted(false)
+	Behaviour() :
+	              subscriptions(), isEnabled(true), hasAwakened(false),
+    hasStarted(false)
 	{
 	}
 
@@ -39,7 +40,7 @@ public:
 	 * Use Awake instead of the constructor for initialisation, always called by the engine once per scene instance.
 	 * Awake is always called by the engine before @c onEnable() and @c start() functions.
 	 */
-	void awake();
+	void awake(GameWorld& world);
 
 	/**
 	 * Callback for when @c awake() is called by the engine on this behaviour.
@@ -151,10 +152,9 @@ public:
 	*
 	*/
 	bool hasSubscriptions() const;
-	void setGameWorld(GameWorld* world);
-	GameWorld* getWorld();
-
 protected:
+    void setGameWorld(GameWorld* world);
+    GameWorld* getWorld();
 	/**
 	 * @brief Subscribe to an event with automatic cleanup on destruction.
 	 *
@@ -176,10 +176,7 @@ protected:
 	template <class EventType, class T>
 	void subscribe(void (T::*method)(const EventType&));
 
-
-
 private:
-	EventDispatcher* dispatcher;
 	GameWorld* gameWorld = nullptr;
 
 	/// A RAII Wrapper for subscription handles. (This automatically manages subscription's)
