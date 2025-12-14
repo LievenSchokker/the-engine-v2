@@ -112,7 +112,7 @@ void Agent::setRotationTurnRate(float value)
 }
 
 
-bool Agent::tryGetPath(Vector2 target) const
+bool Agent::tryGetPath(const Vector2& target, PathResult* out) const
 {
     NavigationSystem* navSystem = gameObject->getScene().getNavigationSystem();
 
@@ -120,6 +120,9 @@ bool Agent::tryGetPath(Vector2 target) const
         return false;
 
     PathResult pathResult = navSystem->computePath(*pathFinder, transform->getPosition(), target);
+
+    if (out != nullptr)
+        *out = pathResult;
 
     return pathResult.isValid();
 }

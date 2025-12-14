@@ -12,10 +12,6 @@
 #include <iostream>
 #include <utility>
 
-#include "../../../Sandbox/AI/GridRenderComponent.h"
-#include "../../../Sandbox/AI/NavigationGridVisualizer.h"
-
-
 Scene::Scene(std::string name) : name(std::move(name))
 {
 
@@ -132,8 +128,6 @@ void Scene::onStart()
         obstacleBounds.push_back(obstacle->getBounds());
     }
     auto visuals = std::make_unique<GameObject>();
-    auto gridVisual = visuals->addComponent<NavigationGridVisualizer>();
-    gridVisual->setGrid(navGrid.get());
     addGameObject(std::move(visuals));
     navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
     navigationSystem->setNavigationSurface(std::move(navGrid));

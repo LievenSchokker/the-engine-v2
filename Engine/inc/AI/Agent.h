@@ -161,7 +161,7 @@ class Agent final : public Behaviour
          */
         void setRotationTurnRate(float value);
 
-        bool tryGetPath(Vector2 target) const;
+        bool tryGetPath(const Vector2& target, PathResult* out) const;
 
     private:
         /// @brief Internal method used by other template methods that attempts to retrieve an BaseAgentModule on this Agent.

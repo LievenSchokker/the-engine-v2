@@ -64,7 +64,7 @@ bool NavigationGrid::isPointOnSurface(Vector2 surfacePoint) const
 
 void NavigationGrid::generateGrid(Vector2 dimensions, Vector2 cellsSize)
 {
-    width = std::floor(cellsSize.x);
+    width = std::floor(dimensions.x);
     height = std::floor(dimensions.y);
 
     cells.resize(width * height);
