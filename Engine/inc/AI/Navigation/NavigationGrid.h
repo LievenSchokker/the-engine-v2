@@ -22,10 +22,10 @@
 class NavigationGrid final : public INavigationSurface
 {
     public:
-        explicit NavigationGrid(int gridWidth, int gridHeight, Vector2 cellSize) : width(0), height(0), cellSize(1,1),
+        explicit NavigationGrid(int gridWidth, int gridHeight, Vector2 cellSize) : width(gridWidth), height(gridHeight), cellSize(cellSize),
             graphAdapter(std::make_unique<NavigationGridGraphAdapter>(*this))
         {
-
+            generateGrid(Vector2{std::floorf(width), std::floorf(height)}, cellSize);
         };
 
         ~NavigationGrid() override = default;
