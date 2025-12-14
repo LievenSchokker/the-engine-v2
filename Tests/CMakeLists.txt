@@ -33,6 +33,7 @@ add_executable(engine_tests
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
+        AI/tests_navigation_grid.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE
