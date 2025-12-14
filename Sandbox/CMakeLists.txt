@@ -6,6 +6,7 @@ add_executable(engineSandbox
         SimpleMoveBehaviour.cpp
 #        Behaviours/NavigationTest.cpp
         AI/AgentsZandbak.cpp
+        AI/PathFindingZandbak.cpp
 )
 
 target_link_libraries(

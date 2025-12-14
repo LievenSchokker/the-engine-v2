@@ -29,7 +29,7 @@ void PathRenderer::onAwake()
 
 void PathRenderer::update(float deltaTime, GameWorld *world)
 {
-    if (InputManager::getInstance()->isKeyDown(KeyCode::SPACE))
+    if (InputManager::getInstance()->wasKeyPressed(KeyCode::SPACE))
     {
         computeNewPath();
     }
@@ -40,7 +40,6 @@ void PathRenderer::computeNewPath()
     if (!agent)
         return;
 
-    std::cout << " Attempting to find a path... " << std::endl;
 
     PathResult pathResult;
     if (agent->tryGetPath(target, &pathResult))
@@ -53,21 +52,27 @@ void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 {
     for (size_t i = 0; i < path.size(); ++i)
     {
+        // Draw dot
         RenderCommand dot;
         dot.type = RenderCommandType::Circle;
         dot.position = path[i];
         dot.radius = 5.0f;
-        dot.color = Color{0,0,255,255};
+        dot.color = Color{0, 0, 255, 255};
         queue.push(dot);
 
-        // Draw line to next
-        if (i+1 < path.size())
+        // Draw line as thin rectangle
+        if (i + 1 < path.size())
         {
+            Vector2 start = path[i];
+            Vector2 end = path[i + 1];
+            Vector2 delta = end - start;
+
             RenderCommand line;
-            line.type = RenderCommandType::Line;
-            line.position = path[i]; // start
-            line.targetPosition = path[i+1]; // end
-            line.color = Color{0,0,255,200};
+            line.type = RenderCommandType::Rectangle;
+            line.position = start + delta * 0.5f;   // midpoint
+            line.size = { std::sqrt(delta.x * delta.x + delta.y * delta.y), 2.0f }; // width = length, height = 2px
+            line.rotationDegrees = std::atan2(delta.y, delta.x) * 180.0 / 3.14159265358979323846;
+            line.color = Color{0, 0, 255, 200};
             queue.push(line);
         }
     }

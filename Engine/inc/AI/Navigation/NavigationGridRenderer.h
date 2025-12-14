@@ -4,12 +4,15 @@
 
 #pragma once
 #include "NavigationGrid.h"
+#include "Behaviour/Behaviour.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 
-class NavigationGridRenderer : public RenderComponent
+class NavigationGridRenderer : public Behaviour, public RenderComponent
 {
     public:
-        explicit NavigationGridRenderer();
+        explicit NavigationGridRenderer() : grid(nullptr) {};
+
+        void onAwake() override;
 
         /// Note: This should be passed via constructor once component args can be forwarded.
         void setGrid(NavigationGrid& grid);

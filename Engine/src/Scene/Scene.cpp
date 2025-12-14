@@ -130,7 +130,6 @@ void Scene::onStart()
     auto visuals = std::make_unique<GameObject>();
     addGameObject(std::move(visuals));
     navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
-    navigationSystem->setNavigationSurface(std::move(navGrid));
     navigationSystem->bake(obstacleBounds);
     ///
 

@@ -14,7 +14,8 @@ class Agent;
 class PathRenderer : public Behaviour, public RenderComponent
 {
     public:
-        explicit PathRenderer() = default;
+        explicit PathRenderer() : navigationSystem(nullptr), agent(nullptr), path({}), target(Vector2::zero()) {}
+        ~PathRenderer() override = default;
 
         void onAwake() override;
         void setPath(const std::vector<Vector2>& newPath);

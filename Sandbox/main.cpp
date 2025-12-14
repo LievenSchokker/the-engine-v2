@@ -11,7 +11,7 @@
 
 #include "AI/AgentsZandbak.h"
 #include "IZandbak.h"
-
+#include "AI/PathFindingZandbak.h"
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's
 #undef main
@@ -31,10 +31,10 @@ int main(int argc, char** argv)
 
 	// Panel
 	std::unique_ptr<GameObject> profiler = std::make_unique<GameObject>();
-	profiler->addComponent<Profiler>(480.0f, 10.0f, 210.0f, 320.0f);  // Top-right of 700x700 window
+	// profiler->addComponent<Profiler>(480.0f, 10.0f, 210.0f, 320.0f);  // Top-right of 700x700 window
 
     /// Note: Change the unique_ptr to create the sandbox you want
-    std::unique_ptr<IZandbak> zandbak = std::make_unique<AgentsZandbak>();
+    std::unique_ptr<IZandbak> zandbak = std::make_unique<PathFindingZandbak>();
 	std::unique_ptr<Scene> scene = zandbak->getScene();
 
 	scene->addGameObject(std::move(profiler));

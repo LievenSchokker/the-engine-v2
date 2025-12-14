@@ -19,7 +19,7 @@
  *
  * This class only stores the data needed to represent a grid, stored in a flattened std::vector instead of a 2D array.
  */
-class NavigationGrid : public INavigationSurface
+class NavigationGrid final : public INavigationSurface
 {
     public:
         explicit NavigationGrid(int gridWidth, int gridHeight, Vector2 cellSize) : width(0), height(0), cellSize(1,1),

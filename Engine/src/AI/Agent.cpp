@@ -21,8 +21,11 @@ void Agent::update(float deltaTime, GameWorld* gameWorld)
 {
     Vector2 velocity = computeDesiredVelocity();
 
-    transform->rotateTowards(velocity, rotationTurnRate, deltaTime);
-    transform->moveTowards(transform->getPosition() + velocity, velocity.magnitude() * deltaTime);
+    if (velocity.magnitude() > 0.0f)
+    {
+        transform->rotateTowards(velocity, rotationTurnRate, deltaTime);
+        transform->moveTowards(transform->getPosition() + velocity, velocity.magnitude() * deltaTime);
+    }
 }
 
 
@@ -120,6 +123,8 @@ bool Agent::tryGetPath(const Vector2& target, PathResult* out) const
         return false;
 
     PathResult pathResult = navSystem->computePath(*pathFinder, transform->getPosition(), target);
+    std::cout << "Found path, length: " << pathResult.getPathLength() << std::endl;
+
 
     if (out != nullptr)
         *out = pathResult;
