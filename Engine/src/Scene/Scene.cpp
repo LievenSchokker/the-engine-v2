@@ -4,6 +4,7 @@
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Component/ComponentManager.h"
+#include "Core/ApplicationClock.h"
 #include "GameObject/GameObject.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 
@@ -189,6 +190,9 @@ void Scene::update(double deltaTime, GameWorld* world)
 		return;
 	}
 
+	int behaviorCount = 0;
+	bool clockPaused = (world != nullptr && world->clock != nullptr &&
+						world->clock->isPaused());
 	for ( auto& gameObject : gameObjects )
 	{
 		if (!gameObject->getIsActive())
@@ -198,6 +202,14 @@ void Scene::update(double deltaTime, GameWorld* world)
 		{
 			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
 				continue;
+			// Skip simulation behaviors when paused, but allow behaviors that
+			// override shouldRunWhenPaused() to return true (e.g., debug
+			// controls)
+			if ( clockPaused && !behaviour->shouldRunWhenPaused() )
+			{
+				continue;  // Skip simulation behaviors when paused
+			}
+			behaviorCount++;
 			behaviour->update(deltaTime, world);
 		}
 	}

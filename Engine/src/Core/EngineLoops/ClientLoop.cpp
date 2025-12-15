@@ -6,6 +6,7 @@
 #include "External/SDLBackendContext.h"
 #include "Game.h"
 #include "Input/InputManager.h"
+#include "Input/KeyCode.h"
 #include "Networking/Client.h"
 #include "Networking/Server/Server.h"
 #include "Networking/Server/ServerInformation.h"
@@ -15,9 +16,6 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
-
-#include <iostream>
-#include <ostream>
 
 // TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
@@ -50,6 +48,9 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	sceneManager->addScene(std::move(scenePtr));
 	sceneManager->setActiveScene(scene);
 
+	// Set GameWorld references for behaviors to access
+	gameWorld->sceneManager = sceneManager.get();
+	gameWorld->input = InputManager::getInstance();
 	inputManager = InputManager::getInstance();
 }
 
@@ -67,6 +68,11 @@ void ClientLoop::update(double deltaTime)
 		return;
 	}
 	inputManager->update();
+
+	// Update behaviors unconditionally (even when paused) so debug controls
+	// work This allows behaviors to handle input that needs to work when paused
+	sceneManager->updateAlways(deltaTime, gameWorld.get());
+
 	renderer->update(deltaTime, *sceneManager->getActiveScene());
 	RenderQueue renderQueue;
 }
@@ -74,7 +80,10 @@ void ClientLoop::update(double deltaTime)
 void ClientLoop::fixedUpdate(double deltaTime)
 {
 	client->poll();
-	sceneManager->update(deltaTime, gameWorld.get());
+	// Note: SceneManager::update() removed - behaviors now run from
+	// updateAlways() in update() to ensure they run every frame (even when
+	// paused) for input handling sceneManager->update(deltaTime,
+	// gameWorld.get());
 	if ( inputManager->quitRequested() )
 	{
 		shutdown();
@@ -116,4 +125,12 @@ SceneManager* ClientLoop::getSceneManager()
 {
 	if ( sceneManager ) return sceneManager.get();
 	return nullptr;
+}
+
+void ClientLoop::setApplicationClock(ApplicationClock* clock)
+{
+	if ( gameWorld )
+	{
+		gameWorld->clock = clock;
+	}
 }

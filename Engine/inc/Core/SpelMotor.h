@@ -45,7 +45,17 @@ class SpelMotor
 	 * initialization to prevent dependency issues.
 	 *
 	 */
-	void shutdown() const;
+	void shutdown();
+
+	/**
+	 * @brief Gets the application clock for debug time controls.
+	 *
+	 * Allows access to time scale and pause functionality for debugging.
+	 * Use with caution in production code.
+	 *
+	 * @return Pointer to the application clock
+	 */
+	ApplicationClock* getClock();
 
    private:
 	/** @brief Immutable configuration set at construction.

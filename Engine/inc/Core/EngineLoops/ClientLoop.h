@@ -38,7 +38,8 @@ class ClientLoop: public IEngineLoop
 	 * allows the engine to configure additional settings between construction
 	 * and the window becoming visible.
 	 *
-	 * @param applicationSpecifications Client configuration (resolution, server address)
+	 * @param applicationSpecifications Client configuration (resolution, server
+	 * address)
 	 */
 	explicit ClientLoop(std::unique_ptr<Game> game);
 	~ClientLoop() override;
@@ -46,6 +47,7 @@ class ClientLoop: public IEngineLoop
 	GameWorld* getGameWorld() override;
 	SceneManager* getSceneManager() override;
 	ClockFunction getClock() override;
+	void setApplicationClock(ApplicationClock* clock) override;
 	void start() override;
 	void update(double deltaTime) override;
 	void fixedUpdate(double deltaTime) override;

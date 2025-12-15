@@ -21,6 +21,8 @@ SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 			"Core System Loop is null double check your "
 			"applicationSpecifications.");
 	}
+
+	coreSystemLoop->setApplicationClock(coreClock.get());
 }
 
 SpelMotor::~SpelMotor()
@@ -60,8 +62,13 @@ void SpelMotor::run()
 	shutdown();
 }
 
-void SpelMotor::shutdown() const
+void SpelMotor::shutdown()
 {
 	running = false;
 	coreSystemLoop->shutdown();
+}
+
+ApplicationClock* SpelMotor::getClock()
+{
+	return coreClock.get();
 }
