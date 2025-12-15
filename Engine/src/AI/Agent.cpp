@@ -1,8 +1,3 @@
-//
-// Created by samle on 02/12/2025.
-//
-
-
 #include "AI/Agent.h"
 #include "Component/Transform.h"
 #include "Scene/Scene.h"
@@ -123,6 +118,7 @@ bool Agent::tryGetPath(const Vector2& target, PathResult* out) const
         return false;
 
     PathResult pathResult = navSystem->computePath(*pathFinder, transform->getPosition(), target);
+    std::cout << "Target: " << target.x << target.y << std::endl;
     std::cout << "Found path, length: " << pathResult.getPathLength() << std::endl;
 
 

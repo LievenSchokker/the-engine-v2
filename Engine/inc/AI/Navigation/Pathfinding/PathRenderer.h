@@ -8,6 +8,7 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/Transform.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
+class INavigationSurface;
 class NavigationSystem;
 class Agent;
 
@@ -28,8 +29,10 @@ class PathRenderer : public Behaviour, public RenderComponent
         void computeNewPath();
 
         NavigationSystem* navigationSystem = nullptr;
-        Agent* agent;
+        INavigationSurface* navSurface = nullptr;
+        Agent* agent = nullptr;
 
         std::vector<Vector2> path;
         Vector2 target;
+        GameObject* player;
 };

@@ -21,4 +21,9 @@ class NavigationGridRenderer : public Behaviour, public RenderComponent
 
     private:
         NavigationGrid* grid;
+
+    std::vector<RenderCommand> cachedCommands;
+    bool cacheBuilt = false;
+
+    void buildCache();
 };

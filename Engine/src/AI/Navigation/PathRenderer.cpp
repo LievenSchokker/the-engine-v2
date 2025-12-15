@@ -16,10 +16,15 @@ void PathRenderer::onAwake()
     {
         navigationSystem = gameObject->getScene().getNavigationSystem();
 
-        if (navigationSystem == nullptr)
+        if (navigationSystem != nullptr)
         {
-            std::cout << "Navigation System is not found " << std::endl;
-            setEnabled(false);
+            navSurface = navigationSystem->getNavigationSurface();
+
+            if (navSurface == nullptr)
+            {
+                std::cout << "Navigation surface is not found " << std::endl;
+                setEnabled(false);
+            }
         }
     }
     else
@@ -40,6 +45,11 @@ void PathRenderer::computeNewPath()
     if (!agent)
         return;
 
+    player = agent->getGameObject()->getScene().getGameObject("Player");
+    if (player == nullptr)
+        return;
+
+    target = player->getTransform()->getPosition();
 
     PathResult pathResult;
     if (agent->tryGetPath(target, &pathResult))
@@ -50,31 +60,20 @@ void PathRenderer::computeNewPath()
 
 void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 {
-    for (size_t i = 0; i < path.size(); ++i)
+    if (path.empty())
+        return;
+
+    const float circleRadius = 3;
+
+    for (const auto& node : path)
     {
-        // Draw dot
         RenderCommand dot;
         dot.type = RenderCommandType::Circle;
-        dot.position = path[i];
-        dot.radius = 5.0f;
-        dot.color = Color{0, 0, 255, 255};
+
+        dot.position = navSurface->toWorldPoint(node);
+        dot.radius = circleRadius;
+        dot.color = Color::darkOrange();
         queue.push(dot);
-
-        // Draw line as thin rectangle
-        if (i + 1 < path.size())
-        {
-            Vector2 start = path[i];
-            Vector2 end = path[i + 1];
-            Vector2 delta = end - start;
-
-            RenderCommand line;
-            line.type = RenderCommandType::Rectangle;
-            line.position = start + delta * 0.5f;   // midpoint
-            line.size = { std::sqrt(delta.x * delta.x + delta.y * delta.y), 2.0f }; // width = length, height = 2px
-            line.rotationDegrees = std::atan2(delta.y, delta.x) * 180.0 / 3.14159265358979323846;
-            line.color = Color{0, 0, 255, 200};
-            queue.push(line);
-        }
     }
 }
 

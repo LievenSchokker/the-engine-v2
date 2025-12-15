@@ -1,7 +1,7 @@
 //
 // Created by samle on 14/12/2025.
 //
-#include "../../../inc/AI/Navigation/NavigationGridRenderer.h"
+#include "AI/Navigation/NavigationGridRenderer.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "Component/Transform.h"
 #include "Scene/Scene.h"
@@ -14,91 +14,98 @@ void NavigationGridRenderer::onAwake()
     {
         std::cout << "Failed to load navigation grid" << std::endl;
         setEnabled(false);
+        return;
     }
+
+    buildCache();
 }
 
 
 void NavigationGridRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 {
+    if (!cacheBuilt)
+        return;
+
+    for (const auto& cmd : cachedCommands)
+    {
+        RenderCommand command = cmd;
+        queue.push(command);
+    }
+}
+
+void NavigationGridRenderer::buildCache()
+{
+     cachedCommands.clear();
+
     if (!grid)
         return;
 
-    const Vector2 origin = transform->getPosition();
     const Vector2 cellSize = grid->getCellSize();
-
     const int width = grid->getWidth();
     const int height = grid->getHeight();
+    const float lineThickness = 1.0f;
 
-    const float dotRadius = std::min(cellSize.x, cellSize.y) * 0.1f;
-    const float lineThickness = std::min(cellSize.x, cellSize.y) * 0.05f;
+    Color walkableColor = Color::darkGreen();
+    Color unwalkableColor = Color::darkRed();
 
-    // Collect all walkable cells
-    std::vector<Vector2> walkableCenters;
     for (int y = 0; y < height; ++y)
     {
         for (int x = 0; x < width; ++x)
         {
-            if (!grid->isWalkable({std::floorf(x), std::floorf(y)}))
-                continue;
-
-            Vector2 cellCenter{
-                origin.x + x * cellSize.x + cellSize.x / 2.0f,
-                origin.y + y * cellSize.y + cellSize.y / 2.0f
+            Vector2 center{
+                x * cellSize.x + cellSize.x * 0.5f,
+                y * cellSize.y + cellSize.y * 0.5f
             };
 
-            walkableCenters.push_back(cellCenter);
-        }
-    }
+            bool currentCellWalkable = grid->isWalkable({(float)x, (float)y});
 
-    // Draw connections as thin rectangles
-    for (const auto& center : walkableCenters)
-    {
-        // Simple 4-directional neighbors
-        std::vector<Vector2> neighbors = {
-            {center.x + cellSize.x, center.y},
-            {center.x - cellSize.x, center.y},
-            {center.x, center.y + cellSize.y},
-            {center.x, center.y - cellSize.y}
-        };
-
-        for (const auto& neighbor : neighbors)
-        {
-            // Only draw if neighbor exists in walkableCenters
-            if (std::find(walkableCenters.begin(), walkableCenters.end(), neighbor) != walkableCenters.end())
+            // Right edge: only draw for last column
+            if (x == width - 1)
             {
-                Vector2 lineCenter{ (center.x + neighbor.x) / 2.0f, (center.y + neighbor.y) / 2.0f };
-                Vector2 lineSize{ lineThickness, lineThickness };
-
-                // If horizontal, width = distance; vertical, height = distance
-                if (center.x != neighbor.x)
-                    lineSize.x = std::abs(neighbor.x - center.x);
-                else
-                    lineSize.y = std::abs(neighbor.y - center.y);
-
-                RenderCommand line;
-                line.type = RenderCommandType::Rectangle;
-                line.position = lineCenter;
-                line.size = lineSize;
-                line.color = Color{200, 200, 200, 255};
-                queue.push(line);
+                cachedCommands.push_back(RenderCommand{
+                    .type = RenderCommandType::Rectangle,
+                    .position = { center.x + cellSize.x * 0.5f, center.y },
+                    .size = { lineThickness, cellSize.y },
+                .color = (currentCellWalkable && grid->isWalkable(Vector2{(float)x, (float)y-1})) ? walkableColor : unwalkableColor
+                });
             }
+
+            // Bottom edge: only draw for last row
+            if (y == height - 1)
+            {
+                cachedCommands.push_back(RenderCommand{
+                    .type = RenderCommandType::Rectangle,
+                    .position = { center.x, center.y + cellSize.y * 0.5f },
+                    .size = { cellSize.x, lineThickness },
+                    .color = (currentCellWalkable &&grid->isWalkable(Vector2{(float)x, (float)y+1})) ? walkableColor : unwalkableColor
+                });
+            }
+
+            // Top edge
+            cachedCommands.push_back(RenderCommand{
+                .type = RenderCommandType::Rectangle,
+                .position = { center.x, center.y - cellSize.y * 0.5f },
+                .size = { cellSize.x, lineThickness },
+                .color = (currentCellWalkable && grid->isWalkable(Vector2{(float)x, (float)y-1})) ? walkableColor : unwalkableColor
+            });
+
+            // Left edge (always)
+            cachedCommands.push_back(RenderCommand{
+                .type = RenderCommandType::Rectangle,
+                .position = { center.x - cellSize.x * 0.5f, center.y },
+                .size = { lineThickness, cellSize.y },
+                .color = (currentCellWalkable && grid->isWalkable(Vector2{(float)x-1, (float)y})) ? walkableColor : unwalkableColor
+            });
         }
     }
 
-    // Draw dots for walkable cells
-    for (const auto& center : walkableCenters)
-    {
-        RenderCommand dot;
-        dot.type = RenderCommandType::Circle;
-        dot.position = center;
-        dot.radius = dotRadius;
-        dot.color = Color{0, 255, 0, 255};
-        queue.push(dot);
-    }
+    cacheBuilt = true;
 }
+
 
 
 void NavigationGridRenderer::setGrid( NavigationGrid& navigationGrid)
 {
     grid = &navigationGrid;
+    buildCache();
 }
