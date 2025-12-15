@@ -31,7 +31,6 @@ TEST(Box2DPhysicsWorldTest, PhysicsSimulationUpdatesTransform)
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_NE(initialPos.y, newPos.y);
@@ -58,7 +57,6 @@ TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
 
     for (int i = 0; i < 60; ++i) {
         world.fixedUpdate();
-        world.syncTransforms();
     }
 
     Vector2 newPos = obj.getTransform()->getPosition();
@@ -88,7 +86,6 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_EQ(initialPos.y, newPos.y);
@@ -114,7 +111,6 @@ TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
     world.fixedUpdate();
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_GT(newPos.x, initialPos.x); // Object moved horizontally
@@ -144,7 +140,6 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
 
     for (int i = 0; i < 120; ++i) {
         world.fixedUpdate();
-        world.syncTransforms();
     }
 
     Vector2 ballPos = ball.getTransform()->getPosition();
@@ -171,7 +166,6 @@ TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
 
     world.fixedUpdate();
-    world.syncTransforms();
 
     Vector2 pos = obj.getTransform()->getPosition();
     EXPECT_GT(pos.x, 0);
@@ -202,7 +196,6 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
     // Apply a force and update world
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.fixedUpdate();
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_EQ(newPos.y, initialPos.y); // Object no longer simulated
@@ -233,7 +226,6 @@ TEST(Box2DPhysicsWorldTest, DestroyDynamicObject)
     for (int i = 0; i < 10; ++i) {
         world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
         world.fixedUpdate();
-        world.syncTransforms();
     }
 
 	Vector2 newPos = obj.getTransform()->getPosition();

@@ -2,7 +2,6 @@
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
 #include "Core/ApplicationSpecifications.h"
-#include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
@@ -15,12 +14,15 @@
 #include "Physics/IPhysicsWorld.h"
 #include "Rendering/Color.h"
 #include "Scene/Scene.h"
+#include "Behaviours/SensorListener.h"
 
 #include <iostream>
 #include <memory>
 
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
+
+class SensorListener;
 
 /**
  * @brief Behavior class that handles physics demo input.
@@ -87,24 +89,6 @@ class PhysicsInputBehaviour: public Behaviour
 	IPhysicsWorld* physicsWorld;
 	GameObject* rectangleGO;
 };
-
-
-class SensorListener : public Behaviour
-{
-public:
-	void onSensorEnter(Collider* other) override
-	{
-		std::cout << "Sensor hit by: "
-				  << other->getGameObject()->getName() << std::endl;
-	}
-
-	void onSensorExit(Collider* other) override
-	{
-		std::cout << "Sensor STOPPED touching: "
-				  << other->getGameObject()->getName() << std::endl;
-	}
-};
-
 
 void createCircle(std::unique_ptr<GameObject>& circle)
 {
