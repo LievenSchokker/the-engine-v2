@@ -52,6 +52,7 @@ class ClientLoop: public IEngineLoop
 	void update(double deltaTime) override;
 	void fixedUpdate(double deltaTime) override;
 	void shutdown() override;
+	bool isShutdownRequested() const override;
 
    private:
 	/**
@@ -72,4 +73,5 @@ class ClientLoop: public IEngineLoop
 	std::unique_ptr<AudioManager> audioManager;
 	InputManager* inputManager;
 	ClockFunction clockFunction;
+	bool isShutdown;
 };

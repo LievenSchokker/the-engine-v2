@@ -109,4 +109,18 @@ class IEngineLoop
 	 * a server) may need error handling.
 	 */
 	virtual void shutdown() = 0;
+
+	/**
+	 * @brief Checks if shutdown has been requested
+	 *
+	 * Allows SpelMotor to detect when the loop has initiated shutdown
+	 * and stop the main loop gracefully. Default implementation returns
+	 * false for loops that don't support shutdown detection.
+	 *
+	 * @return true if shutdown has been requested, false otherwise
+	 */
+	virtual bool isShutdownRequested() const
+	{
+		return false;
+	}
 };

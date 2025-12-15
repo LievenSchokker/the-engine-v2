@@ -1,5 +1,4 @@
 #include "Assets/TilemapAsset.h"
-
 #include "Assets/AssetTypes.h"
 
 #include <fstream>

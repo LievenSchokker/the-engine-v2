@@ -23,7 +23,8 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  game(std::move(spel)),
 	  gameWorld(std::make_unique<GameWorld>()),
 	  specifications(game->getApplicationSpecifications()),
-	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
+	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
+	  isShutdown(false)
 {
 	clockFunction = []() { return 1.0; };
 	if ( specifications.renderBackend == RenderBackend::SDL )
@@ -62,6 +63,10 @@ void ClientLoop::start()
 
 void ClientLoop::update(double deltaTime)
 {
+	if ( !renderer )
+	{
+		return;
+	}
 	inputManager->update();
 
 	// Update behaviors unconditionally (even when paused) so debug controls
@@ -95,9 +100,15 @@ void ClientLoop::initializeNetworking()
 
 void ClientLoop::shutdown()
 {
+	isShutdown = true;
 	InputManager::shutdown();
 	renderer.release();
 	client->disconnect();
+}
+
+bool ClientLoop::isShutdownRequested() const
+{
+	return isShutdown;
 }
 
 GameWorld* ClientLoop::getGameWorld()
