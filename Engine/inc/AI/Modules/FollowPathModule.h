@@ -22,6 +22,7 @@ class FollowPathModule : public BaseAgentModule
         ~FollowPathModule() override = default;
 
         Vector2 compute() override;
+        std::vector<Vector2> convertToWorldCoordinates(const std::vector<Vector2>& rawPathPoints);
 
     private:
         int currentPathIndex;

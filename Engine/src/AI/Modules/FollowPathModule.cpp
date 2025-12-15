@@ -5,7 +5,7 @@
 
 #include "AI/Agent.h"
 #include "Component/Transform.h"
-
+#include "Scene/Scene.h"
 
 Vector2 FollowPathModule::compute()
 {
@@ -23,14 +23,37 @@ Vector2 FollowPathModule::compute()
     if (currentPathIndex >= currentPath->getPathSize())
         return Vector2::zero();
 
-    const std::vector<Vector2>& pathPoints = currentPath->getPath();
+    std::vector<Vector2> pathPointsWorld = convertToWorldCoordinates(currentPath->getPath());
 
-    if (Vector2::distance(agentTransform.getPosition(), pathPoints[currentPathIndex]) < waypointRadius)
+    if (Vector2::distance(agentTransform.getPosition(), pathPointsWorld[currentPathIndex]) < waypointRadius)
     {
         currentPathIndex = std::min(currentPathIndex +1, currentPath->getPathSize() -1);
     }
 
-    return (pathPoints[currentPathIndex] - agentTransform.getPosition()).normalised();
+    return (pathPointsWorld[currentPathIndex] - agentTransform.getPosition()).normalised();
 }
+
+
+std::vector<Vector2> FollowPathModule::convertToWorldCoordinates(const std::vector<Vector2> &rawPathPoints)
+{
+    auto navSystem = agent.getGameObject()->getScene().getNavigationSystem();
+    if (!navSystem) return {};
+
+    auto navSurface = navSystem->getNavigationSurface();
+    if (!navSurface) return {};
+
+    std::vector<Vector2> worldPath;
+    worldPath.reserve(rawPathPoints.size());
+
+    for (const auto& point : rawPathPoints)
+    {
+        worldPath.push_back(navSurface->toWorldPoint(point));
+    }
+
+    return worldPath;
+}
+
+
+
 
 

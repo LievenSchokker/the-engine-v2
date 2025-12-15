@@ -40,7 +40,7 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
     Agent* agentComp = agentGO->addComponent<Agent>();
     agentComp->setMaxSpeed(100.0f);
     agentComp->setRotationTurnRate(180);
-    agentComp->addAgentModule<FollowPathModule>(10);
+    agentComp->addAgentModule<FollowPathModule>(50);
 
 
     /// Grid Renderer:
