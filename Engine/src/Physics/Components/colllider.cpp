@@ -1,3 +1,4 @@
+#include "Behaviour/Behaviour.h"
 #include "Physics/Components/Collider.h"
 
 void Collider::onSensorExit(Collider* other)

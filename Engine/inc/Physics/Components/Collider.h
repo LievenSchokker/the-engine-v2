@@ -2,6 +2,7 @@
 
 #include "../../Component/BaseComponentTypes/Component.h"
 #include "Physics/PhysicsShapes.h"
+#include "Math/Vector2.h"
 
 class Collider: public Component
 {
@@ -12,11 +13,11 @@ class Collider: public Component
 
    public:
 	float radius = 0.0f;	// circle
-	Vector2 size = {0, 0};	// box
+	Vector2 size = Vector2();	// box
 
-	void setDensity(float density)
+	void setDensity(float _density)
 	{
-		this->density = density;
+		this->density = _density;
 	}
 
 	float getDensity() const
