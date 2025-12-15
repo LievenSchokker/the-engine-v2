@@ -25,7 +25,7 @@ enum class ModuleType;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : currentVelocity(Vector2::zero()), maxSpeed(1), arrivingDistance(10.0f), rotationTurnRate(90)
+        Agent() : currentVelocity(Vector2::zero()), maxSpeed(1), arrivingDistance(10.0f), rotationTurnRate(90), navigationTarget(Vector2::zero())
         {
             pathFinder = std::make_unique<AStarPathFinder>(HeuristicType::CHEBYSHEV);
         };
@@ -161,7 +161,9 @@ class Agent final : public Behaviour
          */
         void setRotationTurnRate(float value);
 
-        bool tryGetPath(const Vector2& target, PathResult* out) const;
+        bool requestPath(const Vector2& target);
+        const PathResult& getPathResult() const;
+        bool hasPath() const;
 
     private:
         /// @brief Internal method used by other template methods that attempts to retrieve an BaseAgentModule on this Agent.
@@ -191,8 +193,11 @@ class Agent final : public Behaviour
         /// @brief The rate to turn the agent towards its current velocity with, in degrees (0 -360).
         float rotationTurnRate;
 
-        /// Path finder this agent wants to use for pathfinding.
+        /// @brief Pathfinder this agent wants to use for pathfinding.
         std::unique_ptr<IPathFinder> pathFinder;
+
+        PathResult currentPath;
+        Vector2 navigationTarget;
 };
 
 #include "AI/AgentImplementation.h"

@@ -110,7 +110,7 @@ void Agent::setRotationTurnRate(float value)
 }
 
 
-bool Agent::tryGetPath(const Vector2& target, PathResult* out) const
+bool Agent::requestPath(const Vector2 &target)
 {
     NavigationSystem* navSystem = gameObject->getScene().getNavigationSystem();
 
@@ -118,14 +118,25 @@ bool Agent::tryGetPath(const Vector2& target, PathResult* out) const
         return false;
 
     PathResult pathResult = navSystem->computePath(*pathFinder, transform->getPosition(), target);
-    std::cout << "Target: " << target.x << target.y << std::endl;
-    std::cout << "Found path, length: " << pathResult.getPathLength() << std::endl;
 
+    if (!pathResult.isValid())
+        return false;
 
-    if (out != nullptr)
-        *out = pathResult;
+    currentPath = pathResult;
+    navigationTarget = target;
 
     return pathResult.isValid();
+}
+
+
+const PathResult &Agent::getPathResult() const
+{
+    return currentPath;
+}
+
+bool Agent::hasPath() const
+{
+    return currentPath.isValid();
 }
 
 

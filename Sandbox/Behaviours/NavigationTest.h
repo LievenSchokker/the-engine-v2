@@ -5,35 +5,29 @@
 #pragma once
 
 #include "Behaviour/Behaviour.h"
-#include "Component/BaseComponentTypes/RenderComponent.h"
-#include "AI/Navigation/PathResult.h"
 
+
+class PathRenderer;
+class Agent;
 class NavigationGrid;
 class InputManager;
 class NavigationSystem;
 
-class NavigationTest : public Behaviour, public RenderComponent
+class NavigationTest : public Behaviour
 {
     public:
-        explicit NavigationTest() : input(nullptr), navSystem(nullptr), target(nullptr), grid(nullptr) {};
+        explicit NavigationTest() : input(nullptr),  target(nullptr), pathRenderer(nullptr), agent(nullptr) {};
         ~NavigationTest() override = default;
 
         void onAwake() override;
         void update(float deltaTime, GameWorld *world) override;
 
-        void fillRenderQueue(IRenderQueueWriter &queue) const override;
-
-        void createPath();
-        void showPath( );
         void setTarget(const Transform& targetTransform);
+        void setAgent(Agent& agent);
 
     private:
         InputManager* input;
-        NavigationSystem* navSystem;
+        PathRenderer* pathRenderer;
         const Transform* target;
-        NavigationGrid* grid;
-
-        PathResult pathResult;
-        int currentWaypointIndex;
-        bool showPathDebug;
+        Agent* agent;
 };

@@ -11,6 +11,8 @@
 #include "AI/Agent.h"
 #include "AI/Navigation/Pathfinding/PathRenderer.h"
 #include "../SimpleMoveBehaviour.h"
+#include "../Behaviours/NavigationTest.h"
+#include "AI/Modules/FollowPathModule.h"
 #include "AI/Navigation/NavigationGridRenderer.h"
 #include "AI/Navigation/Pathfinding/PathRenderer.h"
 
@@ -30,21 +32,18 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
     /// Agent
     auto agentGO = std::make_unique<GameObject>("Agent");
     agentGO->getTransform()->setPosition({10, 10});
-    // Add PathRenderer
-    auto pathRenderer = agentGO->addComponent<PathRenderer>();
-    pathRenderer->setTarget(*player->getTransform());
 
     auto agentRenderer = agentGO->addComponent<ShapeRenderer>();
     agentRenderer->setRectangle({30, 30});
     agentRenderer->setColor({0, 0, 255, 255});
 
     Agent* agentComp = agentGO->addComponent<Agent>();
-    agentComp->setMaxSpeed(0.0f); // stationary
+    agentComp->setMaxSpeed(100.0f);
     agentComp->setRotationTurnRate(180);
+    agentComp->addAgentModule<FollowPathModule>(10);
 
 
-
-    /// Grid Renderer
+    /// Grid Renderer:
     auto gridGO = std::make_unique<GameObject>("GridRenderer");
     auto gridRenderer = gridGO->addComponent<NavigationGridRenderer>();
 
@@ -52,6 +51,17 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
     for (auto& obstacle : createObstacles())
         scene->addGameObject(std::move(obstacle));
 
+    /// Test Object / PathRender:
+    auto inputGO = std::make_unique<GameObject>("Input");
+    auto navTest = inputGO->addComponent<NavigationTest>();
+    auto pathRender = inputGO->addComponent<PathRenderer>();
+
+    navTest->setAgent(*agentComp);
+    navTest->setTarget(*player->getTransform());
+
+
+    /// Add to scene:
+    scene->addGameObject(std::move(inputGO));
     scene->addGameObject(std::move(player));
     scene->addGameObject(std::move(agentGO));
     scene->addGameObject(std::move(gridGO));
