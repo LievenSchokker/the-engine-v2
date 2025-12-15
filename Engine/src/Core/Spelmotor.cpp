@@ -7,8 +7,6 @@
 #include "Core/IEngineLoop.h"
 #include "Game.h"
 
-#include <chrono>
-
 SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 	: running(false),
 	  specifications(game->getApplicationSpecifications()),
@@ -49,13 +47,21 @@ void SpelMotor::run()
 		{
 			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
 			coreClock->consumeFixedUpdate();
+
+			if ( coreSystemLoop->isShutdownRequested() )
+			{
+				running = false;
+				break;
+			}
 		}
 
 		coreSystemLoop->update(coreClock->getDeltaTime());
 	}
+	shutdown();
 }
 
 void SpelMotor::shutdown() const
 {
+	running = false;
 	coreSystemLoop->shutdown();
 }

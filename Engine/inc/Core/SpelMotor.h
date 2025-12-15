@@ -1,18 +1,11 @@
 #pragma once
 #include "Core/ApplicationSpecifications.h"
-#include "Core/GameWorld.h"
-#include "External/IBackendContext.h"
-#include "Audio/AudioManager.h"
-#include "Physics/IPhysicsWorld.h"
 
 class Game;
 class IEngineLoop;
 class ApplicationClock;
 
-#include <atomic>
-#include <functional>
 #include <memory>
-#include <thread>
 
 /**
  * @class SpelMotor
@@ -61,7 +54,7 @@ class SpelMotor
 	const ApplicationSpecifications specifications;
 
 	/** @brief Tracks whether the game loop is active. */
-	bool running;
+	mutable bool running;
 
 	std::unique_ptr<IEngineLoop> coreSystemLoop;
 	std::unique_ptr<ApplicationClock> coreClock;
