@@ -206,6 +206,7 @@ void NuklearSDLRenderHook::presentFrame()
 	flushCommands();
 
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
+	nk_clear(nuklearContext);
 }
 
 void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands)

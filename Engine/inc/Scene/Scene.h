@@ -184,19 +184,21 @@ public:
 
 
 private:
+	/// @brief Method that removes the @c gameObject from the containers storing it
+	bool removeGameObjectInternal(GameObject* gameObject);
+
+	/// @brief Method that adds the @c gameObject to the internal containers storing it
+	bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
+
+
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 	std::vector<GameObject*> destroyQueue;
 	bool active = false;
 
-    /// @brief Method that removes the @c gameObject from the containers storing it
-    bool removeGameObjectInternal(GameObject* gameObject);
-
-    /// @brief Method that adds the @c gameObject to the internal containers storing it
-    bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
-
-    /// Map stores the GameObject and their scene id.
-    std::map<const GameObject*, int> gameObjectIds;
+	/// Map stores the GameObject and their scene id.
+	std::map<const GameObject*, int> gameObjectIds;
+	int currentGameObjectId = 0;
 };
 
 #include "Scene.inl"

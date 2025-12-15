@@ -2,7 +2,6 @@
 #include "Core/SpelMotor.h"
 #include "Core/ApplicationClock.h"
 #include "Core/ApplicationSpecifications.h"
-#include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Networking/Server/Server.h"

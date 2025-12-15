@@ -5,7 +5,6 @@
 #include "Core/IEngineLoop.h"
 #include "../../Events/EventDispatcher/EventDispatcher.h"
 #include "Events/SDL/SDLEventProccesor.h"
-#include "External/SdlContext.h"
 #include "Rendering/RenderSystem.h"
 
 class Game;
@@ -74,9 +73,9 @@ private:
 	SubscriptionHandle windowResizeHandle;
     std::unique_ptr<Client> client;
     std::unique_ptr<RenderSystem> renderer;
-    std::unique_ptr<SdlContext> sdlContext;
     std::unique_ptr<IPhysicsWorld> physicsWorld;
-	std::unique_ptr<Game> game;
+	std::unique_ptr<IBackendContext> backendContext;
+ 	std::unique_ptr<Game> game;
 	ApplicationSpecifications specifications;
 	std::unique_ptr<GameWorld> gameWorld;
     std::unique_ptr<SceneManager> sceneManager;

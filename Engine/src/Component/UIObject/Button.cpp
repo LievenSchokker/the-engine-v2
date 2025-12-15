@@ -1,4 +1,4 @@
-#include "Component/UIObject/Button.h"
+#include "Component/UIElement/Button.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 #include "Rendering/UIRenderCommand.h"
 
@@ -13,7 +13,7 @@ Button::Button(
 	float height,
 	std::string text
 )
-	: UIObject(x, y, width, height)
+	: UIElement(x, y, width, height)
 	, buttonId(nextButtonId++)
 	, text(std::move(text))
 {}

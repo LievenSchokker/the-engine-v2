@@ -46,28 +46,17 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
 bool Scene::addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWorld& world)
 {
-    if ( gameObject == nullptr ) {
-        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-        return false;
-    }
-	if ( gameObject == nullptr )
-	{
+	if (gameObject == nullptr) {
 		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
 		return false;
 	}
 
-    GameObject* addedObject = gameObject.get();
-    addGameObjectInternal(std::move(gameObject));
-    bool isGameObjectActive = gameObject->getIsActive();
+	GameObject* addedObject = gameObject.get();
+	addGameObjectInternal(std::move(gameObject));
+	addedObject->setScene(*this);
 
-    gameObjects.emplace_back(std::move(gameObject));
-    GameObject* addedObject = gameObjects.back().get();
-    addedObject->setScene(*this);
-
-	if ( active)
-	{
-	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
-	    initialiseBehaviours(addedObject->getAllBehaviours(), world);
+	if (active) {
+		initialiseBehaviours(addedObject->getAllBehaviours(), world);
 	}
 
 	return true;
@@ -142,30 +131,19 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 
 void Scene::onStart(GameWorld& world)
 {
-	if ( active )
-	{
-		return;
-	}
+	if (active) return;
 
 	active = true;
 
-	/// Store all behaviours in this scene object:
 	std::vector<Behaviour*> allBehaviours;
-
-	/// Retrieve every behaviour on every GameObject in this scene object.
-	for ( auto& gameObject : gameObjects )
-	{
-		for ( auto& behaviour : gameObject->getAllBehaviours() )
-		{
-			if ( behaviour == nullptr ) continue;
-
-			allBehaviours.emplace_back(behaviour);
+	for (auto& gameObject : gameObjects) {
+		for (auto& behaviour : gameObject->getAllBehaviours()) {
+			if (behaviour != nullptr)
+				allBehaviours.emplace_back(behaviour);
 		}
 	}
 
-	/// Initialise all the behaviours by calling their lifetime functions in the
-	/// correct order.
-	initialiseBehaviours(allBehaviours);
+	initialiseBehaviours(allBehaviours, world);
 }
 
 void Scene::onStop()

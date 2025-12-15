@@ -39,7 +39,7 @@ void RenderSystem::update(float deltaTime, Scene& scene)
 		renderer->execute(command);
 	}
 
-	// renderer->submitUI(queue.ui().getCommands());s
+	renderer->submitUI(queue.ui().getCommands());
 
 	renderer->endFrame();
 }

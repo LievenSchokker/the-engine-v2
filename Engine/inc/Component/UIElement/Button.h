@@ -1,13 +1,10 @@
 #pragma once
-#include "Component/UIObject/UIObject.h"
-
-
-#include "UIObject.h"
+#include "UIElement.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 
 #include <string>
 
-class Button : public UIObject
+class Button : public UIElement
 {
 public:
 	explicit Button(

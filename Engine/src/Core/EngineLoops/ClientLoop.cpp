@@ -4,7 +4,6 @@
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
 #include "Events/EventImplementations/ApplicationEvents.h"
-#include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
 #include "Networking/TransportGNS.h"
@@ -40,7 +39,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	};
 	if (specifications.renderBackend == RenderBackend::SDL)
 	{
-		sdlContext = std::make_unique<SdlContext>();
+		backendContext = std::make_unique<SDLBackendContext>();
 		sdlEventProcessor = std::make_unique<SDLEventProcessor>();
 		//TODO SDL Injection layer
 		clockFunction = []()
@@ -48,7 +47,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 			return SDL_GetTicks() / 1000.0;
 		};
 		std::unique_ptr<IRenderer> sdlRenderer = std::make_unique<SDLRenderer>(
-			*sdlContext);
+			*backendContext);
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
 	}

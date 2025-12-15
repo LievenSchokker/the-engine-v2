@@ -147,6 +147,7 @@ class SDLRenderer: public IRenderer
 	std::unique_ptr<IUIRenderHook> userInterfaceHook;
 	void setupEvents(EventDispatcher& dispatcher) override;
 	SDL_Texture* getOrCreateTexture(IImage* image);
+	void clearTextureCache();
 	bool ensureSolidQuadTexture();
 	void destroySolidQuadTexture();
 	SDL_Window* window =

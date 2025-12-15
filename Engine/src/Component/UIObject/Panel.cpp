@@ -1,22 +1,20 @@
-// Engine/src/Component/UIObject/UIPanelObject.cpp
-
-#include "Component/UIObject/UIPanelObject.h"
+#include "Component/UIElement/UIPanelElement.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 #include "Rendering/UIRenderCommand.h"
 
-UIPanelObject::UIPanelObject(
+UIPanelElement::UIPanelElement(
 	float x,
 	float y,
 	float width,
 	float height,
 	std::string title
 	)
-	: UIObject(x, y, width, height)
+	: UIElement(x, y, width, height)
 	  , title(std::move(title))
 {
 }
 
-void UIPanelObject::fillUserInterfaceRenderQueue(
+void UIPanelElement::fillUserInterfaceRenderQueue(
 	IUserInterfaceRenderQueueWriter& queue) const
 {
 	if (!visible)
@@ -40,47 +38,47 @@ void UIPanelObject::fillUserInterfaceRenderQueue(
 	queue.push(command);
 }
 
-std::string UIPanelObject::getTitle() const
+std::string UIPanelElement::getTitle() const
 {
 	return title;
 }
 
-bool UIPanelObject::hasBorder() const
+bool UIPanelElement::hasBorder() const
 {
 	return border;
 }
 
-bool UIPanelObject::hasTitle() const
+bool UIPanelElement::hasTitle() const
 {
 	return !title.empty();
 }
 
-float UIPanelObject::getRowHeight() const
+float UIPanelElement::getRowHeight() const
 {
 	return rowHeight;
 }
 
-int UIPanelObject::getColumns() const
+int UIPanelElement::getColumns() const
 {
 	return columns;
 }
 
-void UIPanelObject::setTitle(const std::string& newTitle)
+void UIPanelElement::setTitle(const std::string& newTitle)
 {
 	title = newTitle;
 }
 
-void UIPanelObject::setBorder(bool enabled)
+void UIPanelElement::setBorder(bool enabled)
 {
 	border = enabled;
 }
 
-void UIPanelObject::setRowHeight(float height)
+void UIPanelElement::setRowHeight(float height)
 {
 	rowHeight = height;
 }
 
-void UIPanelObject::setColumns(int cols)
+void UIPanelElement::setColumns(int cols)
 {
 	columns = cols;
 }
