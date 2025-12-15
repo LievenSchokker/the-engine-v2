@@ -4,6 +4,7 @@
 #include "Component/UIElement/UIElement.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Rendering/ViewAdapters/WorldToCameraSpaceAdapter.h"
 #include "Scene/Scene.h"
 
 #include <iostream>
@@ -20,19 +21,37 @@ void RenderSystem::update(float deltaTime, Scene& scene)
 		return;
 	}
 
+	updateCameras(scene);
 	queue.clearAll();
 	collectCommands(scene);
 	queue.sortAll();
 	renderer->beginFrame(clearColor);
 
-	for ( auto& command : queue.world().getCommands() )
-	{
-		renderer->execute(command);
-	}
 
-	// renderer->submitUI(queue.ui().getCommands());s
+	processWorldCommands();
+
+	// renderer->submitUI(queue.ui().getCommands());
 
 	renderer->endFrame();
+}
+
+void RenderSystem::processWorldCommands()
+{
+
+	for ( auto& command : queue.world().getCommands() )
+	{
+		if (cameras.empty())
+		{
+			renderer->execute(command);
+		}
+		else
+		{
+			for (auto camera : cameras)
+			{
+				renderer->execute(WorldToCameraSpaceAdapter::RecalculateCommandWithCamera(*camera, command));
+			}
+		}
+	}
 }
 
 void RenderSystem::collectCommands(Scene& scene)
@@ -62,4 +81,9 @@ void RenderSystem::collectCommands(Scene& scene)
 void RenderSystem::setClearColor(const Color& color)
 {
 	clearColor = color;
+}
+
+void RenderSystem::updateCameras(const Scene& scene)
+{
+	cameras = scene.getAllComponentsOfType<Camera>();
 }

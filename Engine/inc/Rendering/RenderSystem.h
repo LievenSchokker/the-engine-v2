@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Component/Camera.h"
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Scene/Scene.h"
@@ -37,11 +38,14 @@ class RenderSystem
 	 *
 	 */
 	void update(float deltaTime, Scene& scene);
+	void processWorldCommands();
 
 	void setClearColor(const Color& color);
+	void updateCameras(const Scene& scene);
 
-   private:
+private:
 	std::unique_ptr<IRenderer> renderer;
+	std::vector<Camera*> cameras;
 	RenderQueue queue;
 	Color clearColor = Color::black();
 	void collectCommands(Scene& scene);
