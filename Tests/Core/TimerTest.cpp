@@ -160,10 +160,10 @@ TEST_F(TimerTest, TimeScaleAffectsDeltaTime)
 	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 2.0);
 	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime * 2.0);
 
-	// Act & Assert - Very slow (0.25x)
-	timer->setTimeScale(0.25);
-	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 0.25);
-	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime * 0.25);
+	// Act & Assert - Very slow (0.10x)
+	timer->setTimeScale(0.10);
+	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 0.10);
+	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime * 0.10);
 
 	// Act & Assert - Reset to normal
 	timer->setTimeScale(1.0);

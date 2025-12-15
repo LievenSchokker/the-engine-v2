@@ -50,7 +50,7 @@ class DebugTimeControlBehaviour: public Behaviour
 	 * disabled)
 	 * @param slowKey Key for slow motion 0.5x (default: std::nullopt =
 	 * disabled)
-	 * @param verySlowKey Key for very slow motion 0.25x (default: std::nullopt
+	 * @param verySlowKey Key for very slow motion 0.10x (default: std::nullopt
 	 * = disabled)
 	 * @param fastKey Key for fast motion 2.0x (default: std::nullopt =
 	 * disabled)

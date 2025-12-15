@@ -95,7 +95,7 @@ void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 		if ( slowKey.has_value() )
 			std::cout << "Slow key - Slow motion (0.5x)" << std::endl;
 		if ( verySlowKey.has_value() )
-			std::cout << "Very slow key - Very slow motion (0.25x)"
+			std::cout << "Very slow key - Very slow motion (0.10x)"
 					  << std::endl;
 		if ( fastKey.has_value() )
 			std::cout << "Fast key - Fast motion (2.0x)" << std::endl;
@@ -137,9 +137,9 @@ void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 	else if ( verySlowKey.has_value() &&
 			  inputManager->wasKeyPressed(verySlowKey.value()) )
 	{
-		clock->setTimeScale(0.25);
-		currentTimeScale = 0.25;
-		std::cout << "Time scale: VERY SLOW (0.25x)" << std::endl;
+		clock->setTimeScale(0.10);
+		currentTimeScale = 0.10;
+		std::cout << "Time scale: VERY SLOW (0.10x)" << std::endl;
 	}
 	else if ( fastKey.has_value() &&
 			  inputManager->wasKeyPressed(fastKey.value()) )
