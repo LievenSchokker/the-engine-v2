@@ -1,12 +1,11 @@
 
 
 #include "AgentsZandbak.h"
-
-#include "SimpleMoveBehaviour.h"
 #include "AI/Agent.h"
 #include "AI/Modules/AvoidTargetModule.h"
 #include "AI/Modules/FollowTargetModule.h"
 #include "AI/Modules/WanderModule.h"
+#include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
