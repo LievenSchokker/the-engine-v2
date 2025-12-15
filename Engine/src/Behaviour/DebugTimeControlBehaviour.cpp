@@ -16,7 +16,6 @@ DebugTimeControlBehaviour::DebugTimeControlBehaviour(
 	bool printMenu)
 	: inputManager(nullptr),
 	  clock(nullptr),
-	  currentTimeScale(1.0),
 	  menuPrinted(false),
 	  movedToPersistentScene(false),
 	  pauseKey(pauseKey),
@@ -129,35 +128,30 @@ void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 		 inputManager->wasKeyPressed(normalSpeedKey.value()) )
 	{
 		clock->setTimeScale(1.0);
-		currentTimeScale = 1.0;
 		std::cout << "Time scale: NORMAL (1.0x)" << std::endl;
 	}
 	else if ( slowKey.has_value() &&
 			  inputManager->wasKeyPressed(slowKey.value()) )
 	{
 		clock->setTimeScale(0.5);
-		currentTimeScale = 0.5;
 		std::cout << "Time scale: SLOW (0.5x)" << std::endl;
 	}
 	else if ( verySlowKey.has_value() &&
 			  inputManager->wasKeyPressed(verySlowKey.value()) )
 	{
 		clock->setTimeScale(0.10);
-		currentTimeScale = 0.10;
 		std::cout << "Time scale: VERY SLOW (0.10x)" << std::endl;
 	}
 	else if ( fastKey.has_value() &&
 			  inputManager->wasKeyPressed(fastKey.value()) )
 	{
 		clock->setTimeScale(2.0);
-		currentTimeScale = 2.0;
 		std::cout << "Time scale: FAST (2.0x)" << std::endl;
 	}
 	else if ( veryFastKey.has_value() &&
 			  inputManager->wasKeyPressed(veryFastKey.value()) )
 	{
 		clock->setTimeScale(4.0);
-		currentTimeScale = 4.0;
 		std::cout << "Time scale: VERY FAST (4.0x)" << std::endl;
 	}
 }

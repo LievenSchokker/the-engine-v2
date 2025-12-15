@@ -46,7 +46,7 @@ class SpelMotor
 	 * initialization to prevent dependency issues.
 	 *
 	 */
-	void shutdown() const;
+	void shutdown();
 
 	/**
 	 * @brief Gets the application clock for debug time controls.
@@ -65,7 +65,7 @@ class SpelMotor
 	const ApplicationSpecifications specifications;
 
 	/** @brief Tracks whether the game loop is active. */
-	mutable bool running;
+	bool running;
 
 	std::unique_ptr<IEngineLoop> coreSystemLoop;
 	std::unique_ptr<ApplicationClock> coreClock;

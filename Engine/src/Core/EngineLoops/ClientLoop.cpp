@@ -68,15 +68,6 @@ void ClientLoop::update(double deltaTime)
 	// work This allows behaviors to handle input that needs to work when paused
 	sceneManager->updateAlways(deltaTime, gameWorld.get());
 
-	// Handle ESC key and window close - check in update() so it works when
-	// paused
-	if ( inputManager->wasKeyPressed(KeyCode::ESCAPE) ||
-		 inputManager->quitRequested() )
-	{
-		shutdown();
-		return;
-	}
-
 	renderer->update(deltaTime, *sceneManager->getActiveScene());
 	RenderQueue renderQueue;
 }

@@ -57,7 +57,7 @@ void SpelMotor::run()
 	}
 }
 
-void SpelMotor::shutdown() const
+void SpelMotor::shutdown()
 {
 	running = false;
 	coreSystemLoop->shutdown();

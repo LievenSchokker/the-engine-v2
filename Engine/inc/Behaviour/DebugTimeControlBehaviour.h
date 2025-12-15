@@ -91,7 +91,6 @@ class DebugTimeControlBehaviour: public Behaviour
    private:
 	InputManager* inputManager;
 	ApplicationClock* clock;
-	double currentTimeScale;
 	bool menuPrinted;
 	bool movedToPersistentScene;
 
