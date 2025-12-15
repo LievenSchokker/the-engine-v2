@@ -43,10 +43,10 @@ void NavigationGridRenderer::buildCache()
     const Vector2 cellSize = grid->getCellSize();
     const int width = grid->getWidth();
     const int height = grid->getHeight();
-    const float lineThickness = 1.0f;
 
-    Color walkableColor = Color::darkGreen();
-    Color unwalkableColor = Color::darkRed();
+    const float lineThickness = gridRenderOptions.lineThickness;
+    Color walkableColor = gridRenderOptions.walkableCellsColor;
+    Color unwalkableColor = gridRenderOptions.unwalkableCellsColor;
 
     for (int y = 0; y < height; ++y)
     {
@@ -101,7 +101,6 @@ void NavigationGridRenderer::buildCache()
 
     cacheBuilt = true;
 }
-
 
 
 void NavigationGridRenderer::setGrid( NavigationGrid& navigationGrid)

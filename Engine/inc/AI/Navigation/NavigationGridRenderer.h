@@ -24,7 +24,7 @@ class NavigationGridRenderer : public Behaviour, public RenderComponent
 
         void onAwake() override;
 
-        /// Note: This should be passed via constructor once component args can be forwarded.
+        /// Note: This should probably be passed via constructor once component args can be forwarded.
         void setGrid(NavigationGrid& grid);
 
         void fillRenderQueue(IRenderQueueWriter& queue) const override;

@@ -29,7 +29,7 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
 
     /// Agent
     auto agentGO = std::make_unique<GameObject>("Agent");
-    agentGO->getTransform()->setPosition({200, 200});
+    agentGO->getTransform()->setPosition({10, 10});
     // Add PathRenderer
     auto pathRenderer = agentGO->addComponent<PathRenderer>();
     pathRenderer->setTarget(*player->getTransform());
