@@ -16,8 +16,9 @@ class GameWorld;
  * - Toggle pause/unpause
  * - Adjust simulation time scale (slow motion, fast motion)
  *
- * This component runs every frame (even when paused) via updateAlways(),
- * allowing debug controls to work regardless of simulation state.
+ * This component runs every frame (even when paused) by overriding
+ * shouldRunWhenPaused() to return true, allowing debug controls to work
+ * regardless of simulation state.
  *
  * @example
  * // Use default key bindings
@@ -85,6 +86,7 @@ class DebugTimeControlBehaviour: public Behaviour
 
 	void onAwake() override;
 	void update(float deltaTime, GameWorld* world) override;
+	bool shouldRunWhenPaused() const override;
 
    private:
 	InputManager* inputManager;

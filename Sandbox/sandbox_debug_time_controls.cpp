@@ -86,8 +86,11 @@ int main(int argc, char** argv)
 
 	// Create a debug controller that will move itself to the persistent scene
 	// This ensures debug controls work across all scene transitions
+	// Note: The name is optional - DebugTimeControlBehaviour will run when
+	// paused because it overrides shouldRunWhenPaused() to return true
 	auto debugController = std::make_unique<GameObject>();
-	debugController->setName("DebugController");
+	debugController->setName(
+		"DebugController");	 // Name is optional, just for identification
 
 	// Example: Only pause + slow/fast (disable normal, very slow, very fast)
 	debugController->addComponent<DebugTimeControlBehaviour>(

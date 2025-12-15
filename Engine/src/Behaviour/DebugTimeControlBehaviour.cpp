@@ -34,6 +34,11 @@ void DebugTimeControlBehaviour::onAwake()
 	inputManager = InputManager::getInstance();
 }
 
+bool DebugTimeControlBehaviour::shouldRunWhenPaused() const
+{
+	return true;
+}
+
 void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 {
 	(void)deltaTime;

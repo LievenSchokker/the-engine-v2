@@ -214,12 +214,10 @@ void Scene::update(double deltaTime, GameWorld* world)
 		{
 			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
 				continue;
-			// Skip simulation behaviors when paused, but allow debug behaviors
-			// to run For now, we check the GameObject name to identify debug
-			// behaviors
-			// TODO: Add a proper way to mark behaviors as "always-run" vs
-			// "simulation-only"
-			if ( clockPaused && gameObject->getName() != "DebugController" )
+			// Skip simulation behaviors when paused, but allow behaviors that
+			// override shouldRunWhenPaused() to return true (e.g., debug
+			// controls)
+			if ( clockPaused && !behaviour->shouldRunWhenPaused() )
 			{
 				continue;  // Skip simulation behaviors when paused
 			}
