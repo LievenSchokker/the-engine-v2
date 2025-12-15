@@ -20,7 +20,6 @@ public:
     RenderSystem* render = nullptr;
     InputManager* input = nullptr;
 
-
     Client* client = nullptr;
     Server* server = nullptr;
 

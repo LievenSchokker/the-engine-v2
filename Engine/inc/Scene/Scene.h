@@ -131,7 +131,7 @@ public:
 
 	/**
 	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
-	 *
+	 * Does not enable the behaviours on their own only calls the callback.
 	 * @param behaviours the behaviours that need to be initialised.
 	 */
 	void initialiseBehaviours(const std::vector<Behaviour*>& behaviours);
@@ -169,6 +169,7 @@ public:
 	std::vector<T*> getAllComponentsOfType() const;
 
 private:
+	std::vector<Behaviour*> beforeEnableBehaviours;
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 	std::vector<GameObject*> destroyQueue;

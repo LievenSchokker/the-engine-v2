@@ -1,13 +1,10 @@
 #include "Core/EngineLoops/ClientLoop.h"
 
-#include "Audio/SDL/AudioBackendSDL.h"
-#include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
 #include "External/SDLBackendContext.h"
 #include "Game.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
-#include "Networking/Server/Server.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/TransportGNS.h"
 #include "Rendering/IRenderer.h"
@@ -16,38 +13,32 @@
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
-#include <iostream>
 #include <ostream>
 
 // TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-	: sceneManager(std::make_unique<SceneManager>()),
-	  game(std::move(spel)),
+	: sceneManager(std::move(spel->getSceneManager())),
 	  gameWorld(std::make_unique<GameWorld>()),
-	  specifications(game->getApplicationSpecifications()),
+	  specifications(spel->getApplicationSpecifications()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
 {
+	// Transfer ownership of the scene manager and give gameWorld a non owning
+	// pointer
+	gameWorld->sceneManager = sceneManager.get();
+
 	clockFunction = []() { return 1.0; };
 	if ( specifications.renderBackend == RenderBackend::SDL )
 	{
-		backendContext = std::make_unique<SDLBackendContext>();
 		// TODO SDL Injection layer
+		backendContext = std::make_unique<SDLBackendContext>();
 		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
 		std::unique_ptr<IRenderer> sdlRenderer =
 			std::make_unique<SDLRenderer>(*backendContext);
+
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
-
-		// Audio
-		auto audioBackend = std::make_unique<AudioBackendSDL>();
-		audioManager = std::make_unique<AudioManager>();
-		audioManager->initialize(std::move(audioBackend));
+		gameWorld->render = renderer.get();
 	}
-	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
-	std::string scene = scenePtr->getName();
-
-	sceneManager->addScene(std::move(scenePtr));
-	sceneManager->setActiveScene(scene);
 
 	inputManager = InputManager::getInstance();
 }
@@ -62,7 +53,15 @@ void ClientLoop::start()
 void ClientLoop::update(double deltaTime)
 {
 	inputManager->update();
-	renderer->update(deltaTime, *sceneManager->getActiveScene());
+
+	auto activeScene = sceneManager->getActiveScene();
+	if ( activeScene == nullptr )
+	{
+		// TODO BETERE ERROR
+		throw std::runtime_error("No active scene");
+	}
+
+	renderer->update(deltaTime, *activeScene);
 	RenderQueue renderQueue;
 }
 

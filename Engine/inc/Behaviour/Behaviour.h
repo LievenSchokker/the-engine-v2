@@ -95,6 +95,7 @@ public:
 
         /**
          * @brief Sets the @c isEnabled field of this Behaviour
+		 * Also calls the @c onEnable or @c onDisable function.
          * @param value new value to set
          */
         void setEnabled(bool value);
@@ -106,6 +107,11 @@ public:
          */
         bool getIsEnabled() const;
 
+		/**
+		 * @brief Retrieves if the gameobject is active
+		 * @return whether the gameobject exists and is active.
+		 */
+		bool getIsActive() const;
 
         /**
          * @brief Checks whether this Behaviour is enabled, and its associated GameObject is active.

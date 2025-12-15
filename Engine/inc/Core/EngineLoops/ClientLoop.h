@@ -30,7 +30,7 @@ class ClientLoop: public IEngineLoop
 {
 	using ClockFunction = std::function<double()>;
 
-public:
+   public:
 	/**
 	 * @brief Constructs a client loop with rendering and networking support
 	 *
@@ -38,9 +38,10 @@ public:
 	 * allows the engine to configure additional settings between construction
 	 * and the window becoming visible.
 	 *
-	 * @param applicationSpecifications Client configuration (resolution, server address)
+	 * @param applicationSpecifications Client configuration (resolution, server
+	 * address)
 	 */
-	explicit ClientLoop(std::unique_ptr<Game> game);
+	explicit ClientLoop(std::unique_ptr<Game> spel);
 	~ClientLoop() override;
 
 	GameWorld* getGameWorld() override;
@@ -51,7 +52,7 @@ public:
 	void fixedUpdate(double deltaTime) override;
 	void shutdown() override;
 
-private:
+   private:
 	/**
 	 * @brief Establishes connection to the game server
 	 *
@@ -60,15 +61,13 @@ private:
 	 */
 	void initializeNetworking();
 
-	std::unique_ptr<Game> game;
-    ApplicationSpecifications specifications;
-    std::unique_ptr<GameWorld> gameWorld;
-    std::unique_ptr<SceneManager> sceneManager;
-    std::unique_ptr<Client> client;
+	ApplicationSpecifications specifications;
+	std::unique_ptr<GameWorld> gameWorld;
+	std::unique_ptr<SceneManager> sceneManager;
+	std::unique_ptr<Client> client;
 	std::unique_ptr<RenderSystem> renderer;
-    std::unique_ptr<IBackendContext> backendContext;
+	std::unique_ptr<IBackendContext> backendContext;
 	std::unique_ptr<AudioManager> audioManager;
-    InputManager* inputManager;
-    ClockFunction clockFunction;
-
+	InputManager* inputManager;
+	ClockFunction clockFunction;
 };

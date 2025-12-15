@@ -1,23 +1,23 @@
 #include "Core/EngineLoops/ServerLoop.h"
-#include "Networking/Client.h"
-#include "Game.h"
+
 #include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ClientLoop.h"
+#include "Game.h"
+#include "Networking/Client.h"
+#include "Networking/Server/Server.h"
+#include "Networking/TransportGNS.h"
 #include "Scene/SceneManager.h"
 
 #include <chrono>
 
-#include "Networking/TransportGNS.h"
-#include "Networking/Server/Server.h"
-
 ServerLoop::ServerLoop(std::unique_ptr<Game> game)
-	: specifications(game->getApplicationSpecifications())
-	  , gameWorld(std::make_unique<GameWorld>())
-	  , sceneManager(std::make_unique<SceneManager>())
-	  , server(std::make_unique<Server>(
+	: specifications(game->getApplicationSpecifications()),
+	  gameWorld(std::make_unique<GameWorld>()),
+	  server(std::make_unique<Server>(
 		  Server::convertApplicationSettings(specifications),
 		  std::make_unique<TransportGNS>()))
 {
+	sceneManager = std::move(game->getSceneManager());
 	clockFunction = []()
 	{
 		using namespace std::chrono;

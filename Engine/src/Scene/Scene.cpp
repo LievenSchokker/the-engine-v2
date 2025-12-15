@@ -13,6 +13,7 @@
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
+	// gameObjects = std::vector<std::unique_ptr<GameObject>();
 }
 
 Scene::~Scene()
@@ -127,7 +128,7 @@ void Scene::onStart()
 
 	active = true;
 
-	/// Store all behaviours in this scene object:
+	/// Store all behaviours from all gameobjects in this scene
 	std::vector<Behaviour*> allBehaviours;
 
 	/// Retrieve every behaviour on every GameObject in this scene object.
@@ -140,6 +141,14 @@ void Scene::onStart()
 			allBehaviours.emplace_back(behaviour);
 		}
 	}
+
+	// Reactivates behaviours
+	for ( auto& behaviour : beforeEnableBehaviours )
+	{
+		behaviour->setEnabled(true);
+	}
+
+	beforeEnableBehaviours.clear();
 
 	/// Initialise all the behaviours by calling their lifetime functions in the
 	/// correct order.
@@ -159,6 +168,7 @@ void Scene::onStop()
 		// TODO: call gameobject on stop
 		/// GO does not have (and shouldn't have) an onStop, but we can
 		/// deactivate all behaviours:
+		beforeEnableBehaviours = gameObject->getEnabledBehaviours();
 		gameObject->setBehavioursEnabled(false);
 	}
 }
@@ -278,7 +288,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
 	{
 		if ( behaviour == nullptr ) continue;
 
-		if ( behaviour->getIsActiveAndEnabled() ) behaviour->onEnable();
+		if ( behaviour->getIsActiveAndEnabled() ) behaviour->setEnabled(true);
 	}
 
 	/// Lastly call start on all enabled behaviours on Active GameObjects:

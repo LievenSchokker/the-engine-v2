@@ -59,9 +59,18 @@ bool Behaviour::getIsEnabled() const
 }
 
 
+bool Behaviour::getIsActive() const
+{
+	return gameObject->getIsActive();
+}
+
+
 bool Behaviour::getIsActiveAndEnabled() const
 {
-    return (isEnabled && gameObject != nullptr && gameObject->getIsActive());
+	if ( isEnabled == false ) return false;
+	if ( gameObject == nullptr ) return false;
+
+	return gameObject->getIsActive();
 }
 
 

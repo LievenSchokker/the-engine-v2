@@ -18,7 +18,7 @@
 class SceneManager
 {
    public:
-	SceneManager() = default;
+	SceneManager();
 
 	/**
 	 * @brief Register a scene owned by the manager.
