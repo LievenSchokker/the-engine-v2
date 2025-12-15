@@ -62,9 +62,10 @@ void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
     b2BodyId body = b2CreateBody(worldId, &def);
 
 	// Shape/fixture
-    b2ShapeDef shapeDef = b2DefaultShapeDef();
-    shapeDef.density = collider->density;
-    shapeDef.isSensor = collider->isSensor;
+	b2ShapeDef shapeDef = b2DefaultShapeDef();
+	shapeDef.density = collider->density;
+	shapeDef.material.restitution = collider->restitution;
+	shapeDef.isSensor = collider->isSensor;
 
     // Create shape
     if (collider->shape == PhysicsShapeType::Circle) {

@@ -74,6 +74,7 @@ void ClientLoop::update(double deltaTime)
 void ClientLoop::fixedUpdate(double deltaTime)
 {
 	client->poll();
+	sceneManager->fixedUpdate(deltaTime);
 	sceneManager->update(deltaTime, gameWorld.get());
 	if ( inputManager->quitRequested() )
 	{

@@ -115,13 +115,23 @@ class Scene
          */
         void onResume();
 
-        /**
-         * @brief Update all game objects when the scene is active.
-         *
-         * @param deltaTime Seconds elapsed since the previous update.
-         * @param world
-         */
-        void update(double deltaTime, GameWorld* world);
+	/**
+	 * @brief Update all game objects when the scene is active.
+	 *
+	 * @param deltaTime Seconds elapsed since the previous update.
+	 * @param world
+	 */
+	void update(double deltaTime, GameWorld* world);
+
+	/**
+	 * @brief Fixed update all game objects when the scene is active.
+	 *
+	 * Calls fixedUpdate() on all enabled behaviours of active game objects.
+	 * This is called at a fixed rate for deterministic physics simulation.
+	 *
+	 * @param deltaTime Fixed time step for physics calculations.
+	 */
+	void fixedUpdate(double deltaTime);
 
         /**
          * @brief Collect render commands for active objects in this scene.

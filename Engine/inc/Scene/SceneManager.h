@@ -126,6 +126,16 @@ class SceneManager
 	 */
 	void update(float deltaTime, GameWorld* world);
 
+	/**
+	 * @brief Fixed update the active scene when not paused.
+	 *
+	 * Calls fixedUpdate() on the active scene for deterministic physics
+	 * simulation.
+	 *
+	 * @param deltaTime Fixed time step for physics calculations.
+	 */
+	void fixedUpdate(double deltaTime);
+
    private:
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
