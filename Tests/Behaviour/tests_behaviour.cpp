@@ -1,13 +1,10 @@
-//
-// Created by samle on 18/11/2025.
-//
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
 #include "TestBehaviours.h"
 #include "../Component/TestComponents.h"
+#include "Core/GameWorld.h"
 
 #include <gtest/gtest.h>
-
 
 namespace engine_tests
 {
