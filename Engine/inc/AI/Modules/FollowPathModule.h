@@ -18,14 +18,16 @@
 class FollowPathModule : public BaseAgentModule
 {
     public:
-        explicit FollowPathModule(const Agent& agent) : BaseAgentModule(agent), currentPathIndex(0), waypointRadius(3.0f) {}
+        explicit FollowPathModule(const Agent& agent) : BaseAgentModule(agent), currentPathIndex(0), waypointRadius(3.0f), lastRawPath({}) {}
         ~FollowPathModule() override = default;
 
         Vector2 compute() override;
         std::vector<Vector2> convertToWorldCoordinates(const std::vector<Vector2>& rawPathPoints);
 
     private:
-        int currentPathIndex;
+        size_t currentPathIndex;
         float waypointRadius;
         const PathResult* currentPath;
+        std::vector<Vector2> lastRawPath;
+        std::vector<Vector2> worldPathPoints;
 };

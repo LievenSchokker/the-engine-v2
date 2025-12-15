@@ -23,7 +23,6 @@ void NavigationTest::onAwake()
     if (gameObject->hasComponent<PathRenderer>())
     {
         pathRenderer = gameObject->getComponent<PathRenderer>();
-        std::cout << "Has path renderer" << std::endl;
     }
 }
 
@@ -36,13 +35,8 @@ void NavigationTest::update(float deltaTime, GameWorld *world)
     {
        if (agent->requestPath(target->getPosition()))
        {
-            std::cout << "Agent requested path success" << std::endl;
             pathRenderer->setPath(agent->getPathResult().getPath());
        }
-        else
-        {
-            std::cout << "Agent requested path failed" << std::endl;
-        }
     }
 }
 
