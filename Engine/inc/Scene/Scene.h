@@ -124,13 +124,6 @@ class Scene
         void update(double deltaTime, GameWorld* world);
 
         /**
-         * @brief Collect render commands for active objects in this scene.
-         *
-         * Appends commands to the provided collection; does nothing when inactive.
-         */
-        void collectRenderCommands(std::vector<ShapeRenderCommand> &out) const;
-
-        /**
          * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
          *
          * @param behaviours the behaviours that need to be initialised.
