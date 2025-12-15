@@ -16,7 +16,7 @@ RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 
 void RenderSystem::update(float deltaTime, Scene& scene)
 {
-	if ( !renderer || !renderer->isOpen() )
+	if (!renderer || !renderer->isOpen())
 	{
 		return;
 	}
@@ -27,7 +27,6 @@ void RenderSystem::update(float deltaTime, Scene& scene)
 	queue.sortAll();
 	renderer->beginFrame(clearColor);
 
-
 	processWorldCommands();
 
 	// renderer->submitUI(queue.ui().getCommands());
@@ -37,8 +36,7 @@ void RenderSystem::update(float deltaTime, Scene& scene)
 
 void RenderSystem::processWorldCommands()
 {
-
-	for ( auto& command : queue.world().getCommands() )
+	for (auto& command : queue.world().getCommands())
 	{
 		if (cameras.empty())
 		{
@@ -46,9 +44,14 @@ void RenderSystem::processWorldCommands()
 		}
 		else
 		{
-			for (auto camera : cameras)
+			for (const auto camera : cameras)
 			{
-				renderer->execute(WorldToCameraSpaceAdapter::RecalculateCommandWithCamera(*camera, command));
+				//Transform returns optional because camera culling happens here
+				if (auto transformed = WorldToCameraSpaceAdapter::Transform(
+					*camera, command); transformed.has_value())
+				{
+					renderer->execute(transformed.value());
+				}
 			}
 		}
 	}
@@ -56,23 +59,23 @@ void RenderSystem::processWorldCommands()
 
 void RenderSystem::collectCommands(Scene& scene)
 {
-	for ( auto* component : scene.getAllComponentsOfType<RenderComponent>() )
+	for (auto* component : scene.getAllComponentsOfType<RenderComponent>())
 	{
-		if ( component == nullptr ) continue;
+		if (component == nullptr) continue;
 
 		auto* gameObject = component->getGameObject();
-		if ( gameObject == nullptr || !gameObject->getIsActive() ) continue;
+		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
 
 		component->fillRenderQueue(queue);
 	}
 
-	for ( auto* component :
-		  scene.getAllComponentsOfType<UserInterfaceRenderComponent>() )
+	for (auto* component :
+	     scene.getAllComponentsOfType<UserInterfaceRenderComponent>())
 	{
-		if ( component == nullptr ) continue;
+		if (component == nullptr) continue;
 
 		auto* gameObject = component->getGameObject();
-		if ( gameObject == nullptr || !gameObject->getIsActive() ) continue;
+		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
 
 		component->fillUserInterfaceRenderQueue(queue);
 	}
