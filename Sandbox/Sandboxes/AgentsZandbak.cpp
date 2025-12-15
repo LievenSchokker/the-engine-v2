@@ -5,6 +5,7 @@
 #include "AI/Modules/AvoidTargetModule.h"
 #include "AI/Modules/FollowTargetModule.h"
 #include "AI/Modules/WanderModule.h"
+#include "Behaviours/ScreenShakeBehaviour.h"
 #include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/Camera.h"
 #include "Component/ShapeRenderer.h"
@@ -21,8 +22,8 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     renderer->setCircle(50);
     renderer->setColor(Color(0,255,0));
     auto movement = player->addComponent<SimpleMoveBehaviour>();
-	player->addComponent<Camera>(200.0f, 200.0f, 1920, 1080);
-
+	auto camera = player->addComponent<Camera>(1.0f, Vector2{0,0}, 700, 700);
+	auto shake = player->addComponent<ScreenShakeBehaviour>();
     movement->setMaxSpeed(250.0f);
     player->getTransform()->setPosition((Vector2{500, 500}));
 
