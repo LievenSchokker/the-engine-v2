@@ -491,7 +491,7 @@ TEST_F(ProfilerTest, ProfilerCanBeUsedAsBehaviour)
 
 TEST_F(ProfilerTest, ProfilerCanBeUsedAsUIObject)
 {
-    UIObject* uiObject = profiler.get();
+    UIElement* uiObject = profiler.get();
 
     MockUIRenderQueueWriter queue;
     EXPECT_NO_THROW(uiObject->fillUserInterfaceRenderQueue(queue));

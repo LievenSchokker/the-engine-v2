@@ -13,8 +13,9 @@ class Transform;
  * @class AnimationTrack
  * @brief Represents a single property animation track.
  *
- * An AnimationTrack animates a specific property (Position, Rotation, Scale)
- * of a Transform component over a duration using an easing curve.
+ * An AnimationTrack animates a specific property (Position, Rotation, Scale,
+ * Frame) of a Transform or Sprite component over a duration using an easing
+ * curve.
  */
 class AnimationTrack
 {
@@ -22,27 +23,28 @@ class AnimationTrack
 	/**
 	 * @brief Constructs an AnimationTrack.
 	 *
-	 * @param target The target type (currently only Transform)
+	 * @param target The target type (Transform or Sprite)
 	 * @param property The property to animate
 	 * @param duration Duration in seconds
 	 * @param relative If true, animates relative to current value
-	 * @param fromValue Starting value (Vector2 for Position/Scale, float for
-	 * Rotation)
-	 * @param toValue Ending value (Vector2 for Position/Scale, float for
-	 * Rotation)
+	 * @param fromValue Starting value (Vector2 for Position/Scale/Offset, float
+	 * for Rotation, int for Frame/FlipX/FlipY where 0=false, 1=true)
+	 * @param toValue Ending value (Vector2 for Position/Scale/Offset, float for
+	 * Rotation, int for Frame/FlipX/FlipY where 0=false, 1=true)
 	 * @param curve The easing curve to use
 	 */
 	AnimationTrack(TargetType target, PropertyType property, float duration,
-				   bool relative, std::variant<Vector2, float> fromValue,
-				   std::variant<Vector2, float> toValue, AnimationCurve curve);
+				   bool relative, std::variant<Vector2, float, int> fromValue,
+				   std::variant<Vector2, float, int> toValue,
+				   AnimationCurve curve);
 
 	/**
 	 * @brief Samples the animation value at normalized time.
 	 *
 	 * @param t Normalized time in range [0, 1]
-	 * @return Interpolated value (Vector2 or float)
+	 * @return Interpolated value (Vector2, float, or int)
 	 */
-	std::variant<Vector2, float> sample(float t) const;
+	std::variant<Vector2, float, int> sample(float t) const;
 
 	/**
 	 * @brief Applies the sampled value to the Animator's GameObject's Transform
@@ -83,13 +85,13 @@ class AnimationTrack
 	 * @brief Gets the starting value.
 	 * @return The fromValue variant
 	 */
-	const std::variant<Vector2, float>& getFromValue() const;
+	const std::variant<Vector2, float, int>& getFromValue() const;
 
 	/**
 	 * @brief Gets the ending value.
 	 * @return The toValue variant
 	 */
-	const std::variant<Vector2, float>& getToValue() const;
+	const std::variant<Vector2, float, int>& getToValue() const;
 
 	/**
 	 * @brief Gets the animation curve.
@@ -101,8 +103,9 @@ class AnimationTrack
 	TargetType target;
 	PropertyType property;
 	float duration;
-	bool relative;
-	std::variant<Vector2, float> fromValue;
-	std::variant<Vector2, float> toValue;
+	bool relative;	// If true, the fromValue is an offset. If false, the
+					// fromValue is an absolute value.
+	std::variant<Vector2, float, int> fromValue;
+	std::variant<Vector2, float, int> toValue;
 	AnimationCurve curve;
 };

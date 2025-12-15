@@ -1,15 +1,11 @@
 #include "Scene/Scene.h"
 
-#include "../../inc/Component/ComponentManager.h"
-#include "../../inc/Component/GridComponent.h"
-#include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Component/TilemapComponent.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
-#include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
+#include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Component/ComponentManager.h"
-#include "Component/ShapeRenderer.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
+#include "GameObject/GameObject.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 
 #include <algorithm>
 #include <iostream>
@@ -24,9 +20,8 @@ Scene::Scene(std::string name) : name(std::move(name))
 
 Scene::~Scene()
 {
-    destroyAllGameObjects();
+	destroyAllGameObjects();
 }
-
 
 const std::string& Scene::getName() const
 {
@@ -55,14 +50,21 @@ bool Scene::addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWor
         std::cerr << "[Scene] Error: Attempted to add a null game object\n";
         return false;
     }
+	if ( gameObject == nullptr )
+	{
+		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
+		return false;
+	}
 
+    GameObject* addedObject = gameObject.get();
+    addGameObjectInternal(std::move(gameObject));
     bool isGameObjectActive = gameObject->getIsActive();
 
     gameObjects.emplace_back(std::move(gameObject));
     GameObject* addedObject = gameObjects.back().get();
     addedObject->setScene(*this);
 
-    if (active)
+	if ( active)
 	{
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
 	    initialiseBehaviours(addedObject->getAllBehaviours(), world);
@@ -89,8 +91,10 @@ bool Scene::removeGameObject(const std::string& name)
 						   return false;
 					   });
 
-	if ( it != gameObjects.end() ) {
-		gameObjects.erase(it, gameObjects.end());
+	if ( it != gameObjects.end() )
+	{
+        GameObject* gameObject = it->get();
+	    removeGameObjectInternal(gameObject);
 		return true;
 	}
 
@@ -99,8 +103,10 @@ bool Scene::removeGameObject(const std::string& name)
 
 GameObject* Scene::getGameObject(const std::string& name) const
 {
-	for ( const auto& gameObject : gameObjects ) {
-		if ( gameObject->getName() == name ) {
+	for ( const auto& gameObject : gameObjects )
+	{
+		if ( gameObject->getName() == name )
+		{
 			return gameObject.get();
 		}
 	}
@@ -111,58 +117,61 @@ GameObject* Scene::getGameObject(const std::string& name) const
 std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 {
 	auto it = std::find_if(gameObjects.begin(), gameObjects.end(),
-						   [&](const std::unique_ptr<GameObject>& gameObject) {
-							   return gameObject->getName() == name;
-						   });
+						   [&](const std::unique_ptr<GameObject>& gameObject)
+						   { return gameObject->getName() == name; });
 
-	if ( it == gameObjects.end() ) {
+	if ( it == gameObjects.end() )
+	{
 		return nullptr;
 	}
 
+    GameObject* gameObject = it->get();
+
 	// Call onStop if scene is active
-	if ( active && it->get()->getIsActive())
+	if (active && gameObject != nullptr)
 	{
-		// TODO: call gameobject on stop
-	    /// GO does not have (and shouldn't have) an onStop, but we can deactivate all behaviours:
-	    it->get()->setBehavioursEnabled(false);
+	    gameObject->setBehavioursEnabled(false);
 	}
 
 	// Move ownership and remove from vector
 	auto result = std::move(*it);
-	gameObjects.erase(it);
+    removeGameObjectInternal(gameObject);
+
 	return result;
 }
 
 void Scene::onStart(GameWorld& world)
 {
-	if ( active ) {
+	if ( active )
+	{
 		return;
 	}
 
 	active = true;
 
-    /// Store all behaviours in this scene object:
-    std::vector<Behaviour*> allBehaviours;
+	/// Store all behaviours in this scene object:
+	std::vector<Behaviour*> allBehaviours;
 
-    /// Retrieve every behaviour on every GameObject in this scene object.
+	/// Retrieve every behaviour on every GameObject in this scene object.
 	for ( auto& gameObject : gameObjects )
 	{
-        for (auto& behaviour : gameObject->getAllBehaviours())
-        {
-            if (behaviour == nullptr)
-                continue;
+		for ( auto& behaviour : gameObject->getAllBehaviours() )
+		{
+			if ( behaviour == nullptr ) continue;
 
-            allBehaviours.emplace_back(behaviour);
-        }
+			allBehaviours.emplace_back(behaviour);
+		}
 	}
 
-    /// Initialise all the behaviours by calling their lifetime functions in the correct order.
-    initialiseBehaviours(allBehaviours, world);
+	/// Initialise all the behaviours by calling their lifetime functions in the
+	/// correct order.
+	initialiseBehaviours(allBehaviours);
 }
 
 void Scene::onStop()
 {
-	if ( !active ) {
+	if ( !active )
+	{
 		return;
 	}
 
@@ -177,26 +186,26 @@ void Scene::onStop()
 
 void Scene::onPause()
 {
-	if ( !active ) {
+	if ( !active )
+	{
 		return;
 	}
 
-	for ( auto& gameObject : gameObjects ) {
-		// TODO: call gameobject on pause
-	    /// GO does not have (and shouldn't have) an onPause, but we can deactivate all behaviours:
+	for ( auto& gameObject : gameObjects )
+	{
 	    gameObject->setBehavioursEnabled(false);
 	}
 }
 
 void Scene::onResume()
 {
-	if ( !active ) {
+	if ( !active )
+	{
 		return;
 	}
 
-	for ( auto& gameObject : gameObjects ) {
-		// TODO: call gameobject on resume
-	    /// GO does not have (and shouldn't have) an onResume, but we can reactivate all behaviours:
+	for ( auto& gameObject : gameObjects )
+	{
 	    gameObject->setBehavioursEnabled(true);
 
 	}
@@ -204,19 +213,19 @@ void Scene::onResume()
 
 void Scene::update(double deltaTime, GameWorld* world)
 {
-	if (!active)
+	if ( !active )
 	{
 		return;
 	}
 
-	for (auto& gameObject : gameObjects)
+	for ( auto& gameObject : gameObjects )
 	{
 		if (!gameObject->getIsActive())
 			continue;
 
-		for (const auto& behaviour : gameObject->getEnabledBehaviours())
+		for ( const auto& behaviour : gameObject->getEnabledBehaviours() )
 		{
-			if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
+			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
 				continue;
 			behaviour->update(deltaTime, world);
 		}
@@ -228,11 +237,11 @@ void Scene::update(double deltaTime, GameWorld* world)
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, GameWorld& world)
 {
-    /// First call awake on all behaviours:
-    for (auto& behaviour : behaviours)
-    {
-        if (behaviour == nullptr)
-            continue;
+	/// First call awake on all behaviours:
+	for ( auto& behaviour : behaviours )
+	{
+		if ( behaviour == nullptr )
+		    continue;
 
         /// Awake may only be called once per behaviour
         if (!behaviour->getHasAwakened())
@@ -264,46 +273,30 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, Gam
     }
 }
 
-void Scene::queueDestroy(GameObject *obj)
+void Scene::queueDestroy(GameObject* obj)
 {
-    /// Check if the object is already in the destroyQueue.
-    for (auto* queued : destroyQueue)
-    {
-        if (queued == obj)
-            return;
-    }
+	/// Check if the object is already in the destroyQueue.
+	for ( auto* queued : destroyQueue )
+	{
+		if ( queued == obj ) return;
+	}
 
-    destroyQueue.push_back(obj);
+	destroyQueue.push_back(obj);
 }
-
 
 void Scene::processDestroyQueue()
 {
     for (GameObject* gameObject : destroyQueue)
     {
-
         gameObject->onSceneDestroy();
-
-        /// Remove the GameObject from the stored gameObjects,
-        /// Destroys the GameObject stored in the unqiue ptr automatically.
-        gameObjects.erase(
-            std::remove_if(
-                gameObjects.begin(),
-                gameObjects.end(),
-                [gameObject](const std::unique_ptr<GameObject>& ptr) {
-                    return ptr.get() == gameObject;
-                }
-            ),
-
-            gameObjects.end()
-        );
+        removeGameObjectInternal(gameObject);
     }
 
-    /// Clear the queue when all queued objects have been deleted.
-    destroyQueue.clear();
+	/// Clear the queue when all queued objects have been deleted.
+	destroyQueue.clear();
 }
 
-bool Scene::isInDestroyQueue(GameObject *obj)
+bool Scene::isInDestroyQueue(GameObject* obj)
 {
     if (obj == nullptr)
         return false;
@@ -320,5 +313,66 @@ void Scene::destroyAllGameObjects()
         gameObject->onSceneDestroy();
     }
 
-    gameObjects.clear();
+	gameObjects.clear();
+}
+
+
+int Scene::getSceneId(const GameObject& gameObject) const
+{
+    auto it = gameObjectIds.find(&gameObject);
+
+    if (it == gameObjectIds.end())
+        return -1;
+
+    return it->second;
+}
+
+
+GameObject* Scene::getGameObjectById(int id) const
+{
+    for (const auto& obj : gameObjects)
+    {
+        if (getSceneId(*obj) == id)
+            return obj.get();
+    }
+
+    return nullptr;
+}
+
+
+bool Scene::removeGameObjectInternal(GameObject* gameObject)
+{
+    if (gameObject == nullptr)
+        return false;
+
+    auto it = std::find_if(
+        gameObjects.begin(),
+        gameObjects.end(),
+        [gameObject](const std::unique_ptr<GameObject>& ptr) {
+            return ptr.get() == gameObject;
+        }
+    );
+
+    if (it == gameObjects.end())
+        return false;
+
+    gameObjectIds.erase(gameObject);
+    gameObjects.erase(it);
+
+    return true;
+}
+
+bool Scene::addGameObjectInternal(std::unique_ptr<GameObject> gameObject)
+{
+    if (!gameObject)
+        return false;
+
+    GameObject* goRaw = gameObject.get();
+
+    gameObjects.emplace_back(std::move(gameObject));
+
+    gameObjectIds[goRaw] = currentGameObjectId;
+    currentGameObjectId++;
+
+    return true;
 }

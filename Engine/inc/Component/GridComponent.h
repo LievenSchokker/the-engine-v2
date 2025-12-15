@@ -1,8 +1,8 @@
 #pragma once
 
-#include "BaseComponentTypes/Component.h"
+
 #include "BaseComponentTypes/RenderComponent.h"
-#include "GameObject/Vector2.h"
+#include "Math/Vector2.h"
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 

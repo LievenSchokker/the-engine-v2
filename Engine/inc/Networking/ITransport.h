@@ -1,29 +1,38 @@
 #pragma once
 
 
-#include <functional>
-
+struct Connection;
 
 #include "TransportResult.h"
 #include "Messages/IncomingRawMessage.h"
 
+#include <functional>
 
-struct Connection;
+
 class OutgoingRawMessage;
 /**
  * @typedef OnMessageReceivedCallback
- * @brief Callback invoked when a message is received.
- * @param connectionId ID of the connection that sent the message.
- * @param data Pointer to the received message data.
- * @param length Length of the received message in bytes.
+ * @brief Callback invoked when a raw network message is received.
+ *
+ * Triggered whenever the transport layer delivers an incoming message.
+ * The callback receives an ::IncomingRawMessage.
+ *
+ * @warning The underlying data pointer is only valid for the duration
+ *          of the callback. Do not store it beyond this scope.
+ *
+ * @param message The received message.
  */
 using OnMessageReceivedCallback = std::function<void(const IncomingRawMessage&)>;
 
+
 /**
  * @typedef OnConnectionChangedCallback
- * @brief Callback invoked when a connection is established or closed.
- * @param connectionId ID of the connection.
- * @param connected True if connection is now active, false if disconnected.
+ * @brief Callback invoked when a connection is created, updated, or closed.
+ *
+ * Triggered when the transport layer reports a change in connection state.
+ * The callback receives a ::Connection describing the updated state.
+ *
+ * @param connection The connection whose state has changed.
  */
 using OnConnectionChangedCallback = std::function<void(Connection connection)>;
 

@@ -1,11 +1,19 @@
 #pragma once
+
 #include <cmath>
+
 /**
  * @brief A struct for storing 2D vector points.
  */
 struct Vector2
 {
-    Vector2(const float x_, const float y_) : x(x_), y(y_) {}
+	Vector2() : x(0), y(0)
+	{
+	}
+
+	Vector2(const float x_, const float y_) : x(x_), y(y_)
+	{
+	}
 
     /// Shorthand for writing Vector2{1.0, 1.0}
     static Vector2 one();
@@ -44,8 +52,13 @@ struct Vector2
     /// Sets the value of this vector's y component
     void setY(float value);
 
-    /// Makes this vector have a magnitude of 1, keeping the same directions.
+    /// Normalises this vector, making it have a magnitude of 1 in the same directions.
+    /// Returns Vector2::zero() if magnitude == 0.0f
     void normalize();
+
+    /// Returns a normalised copy of this vector, with a magnitude of 1 in the same directions
+    /// Returns Vector2::zero() if magnitude == 0.0f
+    Vector2 normalised() const;
 
     /// Returns the length of this vector
     [[nodiscard]] float magnitude() const;

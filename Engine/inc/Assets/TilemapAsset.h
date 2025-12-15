@@ -1,5 +1,6 @@
 #pragma once
 
+
 #include "Asset.h"
 #include "Math/Vector2.h"
 
@@ -23,7 +24,7 @@
  */
 class TilemapAsset: public Asset
 {
-   public:
+public:
 	TilemapAsset();
 	~TilemapAsset() override = default;
 
@@ -66,7 +67,7 @@ class TilemapAsset: public Asset
 	 */
 	const std::vector<int>& getTiles() const;
 
-   private:
+private:
 	std::vector<int> tiles;
 	int width = 0;
 	int height = 0;

@@ -1,5 +1,7 @@
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 
+#include <algorithm>
+
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
 #include "../../../inc/Events/EventImplementations/ApplicationEvents.h"
@@ -8,6 +10,7 @@
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
 
+#include <algorithm>
 #include <iostream>
 #include <algorithm>
 

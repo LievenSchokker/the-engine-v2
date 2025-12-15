@@ -1,11 +1,13 @@
 #pragma once
-#include "../Events/EventDispatcher/EventDispatcher.h"
 
+
+#include "Events/EventDispatcher/EventDispatcher.h"
 
 class Server;
 class Client;
 class IRenderer;
 class SceneManager;
+class RenderSystem;
 class IPhysicsWorld;
 class InputManager;
 class NetworkSpawnManager;
@@ -18,8 +20,10 @@ public:
 
     SceneManager* sceneManager = nullptr;
     IPhysicsWorld* physics = nullptr;
-    IRenderer* renderer = nullptr;
+    RenderSystem* render = nullptr;
     InputManager* input = nullptr;
+
+
 	EventDispatcher* dispatcher = nullptr;
     Client* client = nullptr;
     Server* server = nullptr;

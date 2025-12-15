@@ -2,8 +2,6 @@
 
 #include "Math/Vector2.h"
 #include "Rendering/Color.h"
-#include "../Rendering/RenderQueue/RenderQueue.h"
-#include "BaseComponentTypes/Component.h"
 #include "BaseComponentTypes/RenderComponent.h"
 
 #include <unordered_map>
@@ -25,7 +23,10 @@ class TilemapAsset;
 class TilemapComponent: public RenderComponent
 {
    public:
-	TilemapComponent();
+	TilemapComponent() :tileSize{32.0, 32.0}
+	{
+
+	};
 	~TilemapComponent() override = default;
 
 	/**

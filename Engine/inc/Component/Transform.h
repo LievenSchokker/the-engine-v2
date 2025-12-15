@@ -8,11 +8,12 @@
 /**
  * @brief Transform holds the position, rotation and scale.
  */
-class Transform : public Component
+class Transform: public Component
 {
-public:
-    Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0, Vector2 scale = {1.0, 1.0});
-    ~Transform();
+   public:
+	Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0,
+			  Vector2 scale = {1.0, 1.0});
+	~Transform();
 
     /**
      * @brief Get the current position.
@@ -25,7 +26,7 @@ public:
      *
      * @return A double of the current rotation angle.
      */
-    double getRotationAngle() const;
+    float getRotationAngle() const;
     /**
      * @brief Get the current scale.
      *
@@ -51,8 +52,28 @@ public:
     * @param newScale Vector2 of the new scale.
     */
     void setScale(Vector2 newScale);
+
+    /**
+     * @brief  Moves the Transform towards a target position.
+     *
+     *
+     * @param targetPosition the position to move towards
+     * @param maxDistance Maximum allowed distance the Transform can move in this call.
+     * If the targetPosition is closer than the maxDistance, the transform will snap to it.
+     */
+    void moveTowards(Vector2 targetPosition, float maxDistance);
+
+
+    void rotateTowards(const Vector2& targetDirection, float maxRotationSpeed, float deltaTime);
+
+    const Vector2& forward() const;
+    const Vector2& right() const;
+
 private:
+    void updateDirectionVectors();
     Vector2 position;
-    double rotationAngle;
+    float rotationAngle;
     Vector2 scale;
+    Vector2 forwardVector = Vector2(0, 1);
+    Vector2 rightVector = Vector2(1, 0);
 };

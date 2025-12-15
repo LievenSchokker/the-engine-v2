@@ -16,9 +16,7 @@ Button::Button(
 	: UIObject(x, y, width, height)
 	, buttonId(nextButtonId++)
 	, text(std::move(text))
-{
-	std::cout << "Button created with id: " << buttonId << ", text: " << this->text << std::endl;
-}
+{}
 
 void Button::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const
 {

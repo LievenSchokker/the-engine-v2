@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include "../Events/Subscriptions/SubscriptionScope.h"
-#include "../Component/BaseComponentTypes/Component.h"
-#include "../Events/EventDispatcher/EventDispatcher.h"
-
+#include "Component/BaseComponentTypes/Component.h"
+#include "Component/BaseComponentTypes/Component.h"
+#include "Events/Subscriptions/SubscriptionScope.h"
 
 class GameWorld;
 /**
@@ -21,8 +20,7 @@ class Behaviour: virtual public Component
 {
 public:
 	Behaviour() :
-	              subscriptions(), isEnabled(true), hasAwakened(false),
-    hasStarted(false)
+		isEnabled(true), hasAwakened(false), hasStarted(false)
 	{
 	}
 
@@ -190,5 +188,3 @@ private:
 	/// Keeps track if start function has been called for this behaviour.
 	bool hasStarted;
 };
-
-#include "Behaviour.inl"

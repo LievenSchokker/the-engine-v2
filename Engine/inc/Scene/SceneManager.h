@@ -126,21 +126,9 @@ class SceneManager
 	 */
 	void update(float deltaTime, GameWorld* world);
 
-	/**
-	 * @brief Change the clear color used at the start of each frame.
-	 */
-	void setClearColor(const Color& color);
-
-	/**
-	 * @brief Retrieve the currently configured clear color.
-	 */
-	Color getClearColor() const;
-
    private:
     GameWorld& world;
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	bool paused = false;
-	IRenderer* renderer = nullptr;
-	Color clearColor = Color::black();
 };

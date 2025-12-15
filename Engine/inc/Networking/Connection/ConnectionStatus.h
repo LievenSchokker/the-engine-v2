@@ -1,5 +1,8 @@
 #pragma once
+
+
 #include <cstdint>
+
 
 /**
  * @brief Represents the state of a network connection.

@@ -10,7 +10,7 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(std::unique_ptr
             return std::make_unique<ClientLoop>(std::move(game));
     	case EngineMode::SERVER:
             return std::make_unique<ServerLoop>(std::move(game));
-    //default asume client since its most likely what game dev wants.
+    //default assume client since its most likely what game dev wants.
     default:
         return std::make_unique<ClientLoop>(std::move(game));
     }

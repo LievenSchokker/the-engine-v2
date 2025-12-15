@@ -1,18 +1,17 @@
+#pragma once
+
+
+#include "UIRenderCommand.h"
+#include "Events/EventDispatcher/EventDispatcher.h"
+
+struct UserInterfaceSettings;
+
 /**
  * @brief Abstract interface for UI rendering integration.
  *
  * Allows UI libraries (Nuklear, Dear ImGui, etc.) to hook into the renderer's
  * frame lifecycle without the renderer knowing which UI library is in use.
  */
-
-
-#pragma once
-
-
-#include "UIRenderCommand.h"
-#include "../Events/EventDispatcher/EventDispatcher.h"
-
-struct UserInterfaceSettings;
 
 class IUIRenderHook
 {

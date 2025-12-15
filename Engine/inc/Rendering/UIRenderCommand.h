@@ -2,7 +2,7 @@
 
 #include <string>
 #include "Rendering/Color.h"
-#include "Component/UIObject/Alignment.h"
+#include "Component/UIElement/Alignment.h"
 
 #include <functional>
 #include <vector>
@@ -20,7 +20,6 @@ enum class UICommandType
 	Chart,
 	Button,
 };
-
 
 
 /**

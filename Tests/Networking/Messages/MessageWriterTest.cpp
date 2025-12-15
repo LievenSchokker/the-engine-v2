@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "Networking/Messages/MessageWriter.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"

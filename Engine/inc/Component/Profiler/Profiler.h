@@ -1,7 +1,8 @@
 #pragma once
 
+
 #include "Behaviour/Behaviour.h"
-#include "Component/UIObject/UIObject.h"
+#include "Component/UIElement/UIElement.h"
 #include "Rendering/Color.h"
 #include "Rendering/IUIRenderHook.h"
 
@@ -23,81 +24,82 @@ class GameWorld;
  * keep the displayed values readable (rapidly changing numbers are hard
  * to follow).
  */
-class Profiler : public UIObject, public Behaviour
+class Profiler: public UIElement, public Behaviour
 {
 public:
-    explicit Profiler(
-       float x = 10.0f,
-       float y = 10.0f,
-       float width = 250.0f,
-       float height = 300.0f
-    );
+	explicit Profiler(
+		float x = 10.0f,
+		float y = 10.0f,
+		float width = 250.0f,
+		float height = 300.0f
+		);
 
-    void fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const override;
+	void fillUserInterfaceRenderQueue(
+		IUserInterfaceRenderQueueWriter& queue) const override;
 
-    /// @name Individual render commands
-    /// @brief Split into separate methods so subclasses or tests can
-    ///        override or verify specific panel sections independently.
-    /// @{
-    UIRenderCommand renderPanel() const;
-    UIRenderCommand renderFps() const;
-    UIRenderCommand renderFrameTime() const;
-    UIRenderCommand renderMinMaxLabel() const;
-    UIRenderCommand renderEntityLabel() const;
-    UIRenderCommand renderSceneLabel() const;
-    /// @}
+	/// @name Individual render commands
+	/// @brief Split into separate methods so subclasses or tests can
+	///        override or verify specific panel sections independently.
+	/// @{
+	UIRenderCommand renderPanel() const;
+	UIRenderCommand renderFps() const;
+	UIRenderCommand renderFrameTime() const;
+	UIRenderCommand renderMinMaxLabel() const;
+	UIRenderCommand renderEntityLabel() const;
+	UIRenderCommand renderSceneLabel() const;
+	/// @}
 
-    void update(float deltaTime, GameWorld* world) override;
+	void update(float deltaTime, GameWorld* world) override;
 
-    void toggle();
+	void toggle();
 
-    void setUpdateInterval(float seconds);
-    void setShowFPS(bool show);
-    void setShowFrameTime(bool show);
-    void setShowEntityCount(bool show);
+	void setUpdateInterval(float seconds);
+	void setShowFPS(bool show);
+	void setShowFrameTime(bool show);
+	void setShowEntityCount(bool show);
 
 private:
-    /// Rolling window size for frame time averaging. 60 samples smooths
-    /// out single-frame spikes while still responding to sustained changes.
-    static constexpr size_t kMaxFrameSamples = 60;
+	/// Rolling window size for frame time averaging. 60 samples smooths
+	/// out single-frame spikes while still responding to sustained changes.
+	static constexpr size_t kMaxFrameSamples = 60;
 
-    float updateInterval;
-    float timeSinceLastUpdate;
+	float updateInterval;
+	float timeSinceLastUpdate;
 
-    /// @name FPS calculation
-    /// @brief Uses a deque as a fixed-size sliding window—cheap to push/pop
-    ///        at both ends without reallocating.
-    /// @{
-    std::deque<float> frameTimes;
-    float currentFPS;
-    float averageFrameTime;
-    float minFrameTime;
-    float maxFrameTime;
-    /// @}
+	/// @name FPS calculation
+	/// @brief Uses a deque as a fixed-size sliding window—cheap to push/pop
+	///        at both ends without reallocating.
+	/// @{
+	std::deque<float> frameTimes;
+	float currentFPS;
+	float averageFrameTime;
+	float minFrameTime;
+	float maxFrameTime;
+	/// @}
 
-    int entityCount;
-    int activeSceneCount;
+	int entityCount;
+	int activeSceneCount;
 
-    bool showFPS;
-    bool showFrameTime;
-    bool showFrameGraph;
-    bool showEntityCount;
+	bool showFPS;
+	bool showFrameTime;
+	bool showFrameGraph;
+	bool showEntityCount;
 
-    /// @name Status colors
-    /// @brief Provide immediate visual feedback: green/yellow/red thresholds
-    ///        let developers spot performance problems at a glance without
-    ///        reading exact numbers.
-    /// @{
-    Color titleColor;
-    Color labelColor;
-    Color goodColor;
-    Color warningColor;
-    Color badColor;
-    /// @}
+	/// @name Status colors
+	/// @brief Provide immediate visual feedback: green/yellow/red thresholds
+	///        let developers spot performance problems at a glance without
+	///        reading exact numbers.
+	/// @{
+	Color titleColor;
+	Color labelColor;
+	Color goodColor;
+	Color warningColor;
+	Color badColor;
+	/// @}
 
-    void updateStats(GameWorld* world);
-    void calculateFPS(float deltaTime);
-    Color getFPSColor() const;
-    Color getFrameTimeColor() const;
-    std::string formatFloat(float value, int decimals) const;
+	void updateStats(GameWorld* world);
+	void calculateFPS(float deltaTime);
+	Color getFPSColor() const;
+	Color getFrameTimeColor() const;
+	std::string formatFloat(float value, int decimals) const;
 };

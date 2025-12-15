@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Component/BaseComponentTypes/UIRenderComponent.h"
-#include "Rendering/RenderCommand.h"
 
+#include "Component/BaseComponentTypes/UIRenderComponent.h"
+
+struct UIRenderCommand;
 /**
  * @brief Interface that makes sure components are only allowed to write to the
  * render queue. This makes sure they don't invalidate other data.

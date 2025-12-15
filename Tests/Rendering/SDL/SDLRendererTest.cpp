@@ -1,4 +1,4 @@
-#include "External/SdlContext.h"
+#include "External/SDLBackendContext.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Rendering/Window/WindowOptions.h"
 
@@ -7,11 +7,11 @@
 class SDLRendererTest: public ::testing::Test
 {
    protected:
-	SdlContext* ctx;
+	SDLBackendContext* ctx;
 
 	void SetUp() override
 	{
-		ctx = new SdlContext(SDL_INIT_VIDEO);
+		ctx = new SDLBackendContext(SDL_INIT_VIDEO);
 	}
 
 	void TearDown() override

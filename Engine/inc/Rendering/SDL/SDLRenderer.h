@@ -22,17 +22,14 @@
 
 #pragma once
 
-
-#include "Rendering/IUIRenderHook.h"
+#include "External/IBackendContext.h"
 #include "Rendering/IRenderer.h"
+#include "Rendering/IUIRenderHook.h"
 #include "Rendering/RenderCommand.h"
 
 #include <SDL.h>
 #include <memory>
-
-
-class SdlContext;
-
+#include <unordered_map>
 
 class SDLRenderer: public IRenderer
 {
@@ -51,7 +48,7 @@ class SDLRenderer: public IRenderer
 	 * @throws assertion failure if video subsystem not initialized (debug
 	 * builds)
 	 */
-	explicit SDLRenderer(SdlContext& context);
+	explicit SDLRenderer(IBackendContext& context);
 
 	/**
 	 * @brief Ensures proper cleanup of SDL resources in correct order
@@ -119,9 +116,10 @@ class SDLRenderer: public IRenderer
 	 */
 	void endFrame() override;
 
-    void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
+	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
 	void submitUI(const std::vector<UIRenderCommand>& commands) override;
+
    private:
 	/**
 	 * @brief Draw a filled circle in window space.
@@ -136,18 +134,27 @@ class SDLRenderer: public IRenderer
 					   double rotationDegrees, const Color& color,
 					   const Vector2& scale);
 
+	/**
+	 * @brief Draw a sprite from an image in window space.
+	 */
+	void drawSprite(const Vector2& position, const Vector2& size, IImage* image,
+					const Rect* srcRect, double rotationDegrees,
+					const Vector2& scale, const Color& tint, bool flipX = false,
+					bool flipY = false);
 
+
+   private:
+	std::unique_ptr<IUIRenderHook> userInterfaceHook;
 	void setupEvents(EventDispatcher& dispatcher) override;
-
-    std::unique_ptr<IUIRenderHook> userInterfaceHook;
-
-    bool ensureSolidQuadTexture();
+	SDL_Texture* getOrCreateTexture(IImage* image);
+	bool ensureSolidQuadTexture();
 	void destroySolidQuadTexture();
-    SDL_Window* window =
+	SDL_Window* window =
 		nullptr;  ///< Null indicates closed state; must outlive renderer
 	SDL_Renderer* renderer =
 		nullptr;  ///< Must be destroyed before window; null-checked for safety
 	SDL_Texture* solidQuadTexture =
 		nullptr;  ///< Texture for solid quad rendering
-
+	std::unordered_map<IImage*, SDL_Texture*> textureCache;
+	///< Cache of textures created from IImage surfaces
 };
