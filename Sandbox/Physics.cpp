@@ -52,6 +52,9 @@ class PhysicsInputBehaviour: public Behaviour
 		(void)deltaTime;
 		(void)world;
 
+		//#TODO Super hacky way to update the physics world
+		physicsWorld->fixedUpdate();
+
 		if ( inputManager == nullptr || physicsWorld == nullptr ||
 			 rectangleGO == nullptr )
 		{
@@ -85,17 +88,39 @@ class PhysicsInputBehaviour: public Behaviour
 	GameObject* rectangleGO;
 };
 
+
+class SensorListener : public Behaviour
+{
+public:
+	void onSensorEnter(Collider* other) override
+	{
+		std::cout << "Sensor hit by: "
+				  << other->getGameObject()->getName() << std::endl;
+	}
+
+	void onSensorExit(Collider* other) override
+	{
+		std::cout << "Sensor STOPPED touching: "
+				  << other->getGameObject()->getName() << std::endl;
+	}
+};
+
+
 void createCircle(std::unique_ptr<GameObject>& circle)
 {
 	circle = std::make_unique<GameObject>();
 	circle->setName("BlueCircle");
-	circle->getTransform()->setPosition({150.0, 140.0});
+	circle->getTransform()->setPosition({150.0, 200.0});
 	circle->getTransform()->setScale({1.0, 1.0});
 	circle->addComponent<ShapeRenderer>()->setCircle(50).setColor(
 		Color::lightBlue());
 
 	circle->addComponent<RigidBody>();
-	circle->addComponent<Collider>()->setCircle(50);
+
+	auto collider = circle->addComponent<Collider>();
+	collider->setCircle(50);
+	collider->isSensor(true);
+	circle->addComponent<SensorListener>();
 }
 
 void createRectangle(std::unique_ptr<GameObject>& rectangle)
@@ -108,7 +133,8 @@ void createRectangle(std::unique_ptr<GameObject>& rectangle)
 
 	auto rb = rectangle->addComponent<RigidBody>();
 	rb->makeStatic();
-	rectangle->addComponent<Collider>()->setRectangle({400, 50});
+	auto collider = rectangle->addComponent<Collider>();
+	collider->setRectangle({400, 50});
 }
 
 #undef main

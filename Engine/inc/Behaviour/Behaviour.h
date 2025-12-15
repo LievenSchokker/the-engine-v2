@@ -3,6 +3,7 @@
 
 #include "Component/BaseComponentTypes/Component.h"
 
+class Collider;
 class GameWorld;
 /**
  * @brief This class serves as an abstract component that custom behaviour can derive from.
@@ -125,6 +126,12 @@ public:
         * @return true if this behaviour's start function has been called, false otherwise
         */
         bool getHasStarted() const;
+
+		// Called when this GameObject's collider enters a sensor
+		virtual void onSensorEnter(Collider* other) {}
+
+		// Called when this GameObject's collider exits a sensor
+		virtual void onSensorExit(Collider* other) {}
 
     private:
         /// Enabled components are Updated, disabled Beahviours are not.

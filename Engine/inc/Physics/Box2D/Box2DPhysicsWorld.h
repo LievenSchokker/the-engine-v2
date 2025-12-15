@@ -1,9 +1,10 @@
 #pragma once
 
-#include "box2d/id.h"
-#include "Physics/IPhysicsWorld.h"
 #include "Physics/Components/RigidBody.h"
+#include "Physics/IPhysicsWorld.h"
+#include "box2d/id.h"
 
+#include <box2d/types.h>
 #include <unordered_map>
 
 /**
@@ -12,14 +13,15 @@
  *
  * This class wraps the Box2D C API and provides concrete implementations for
  * the IPhysicsWorld interface. It handles world creation, stepping the physics
- * simulation, and creating/destroying physics bodies associated with GameObjects.
+ * simulation, and creating/destroying physics bodies associated with
+ * GameObjects.
  *
  * The PhysicsSystem owns a single instance of this class and delegates all
  * physics operations to it.
  */
 class Box2DPhysicsWorld: public IPhysicsWorld
 {
-public:
+   public:
 	/**
 	 * @brief Constructs an empty physics world.
 	 *
@@ -81,20 +83,13 @@ public:
 	/**
 	 * @brief Applies a force to the center of mass of a physics body.
 	 *
-	 * @param rigitBody Pointer to the RigidBody whose body will receive the force.
+	 * @param rigitBody Pointer to the RigidBody whose body will receive the
+	 * force.
 	 * @param force Force vector in world units.
 	 */
 	void applyForce(const RigidBody* rigitBody, Vector2 force) override;
 
-	/**
-	 * @brief Synchronizes all registered RigidBody transforms with the physics world.
-	 *
-	 * After stepping the simulation, this function updates each RigidBody's
-	 * Transform component to match the corresponding Box2D body's position and rotation.
-	 */
-	void syncTransforms() override;
-
-private:
+   private:
 	/**
 	 * @brief Box2D world identifier.
 	 *
@@ -103,15 +98,26 @@ private:
 	b2WorldId worldId;
 
 	/**
-	 * @brief Mapping from RigidBody pointers to their corresponding Box2D bodies.
+	 * @brief Mapping from RigidBody pointers to their corresponding Box2D
+	 * bodies.
 	 *
-	 * This allows direct RigidBody-based operations without needing a separate body ID map.
+	 * This allows direct RigidBody-based operations without needing a separate
+	 * body ID map.
 	 */
 	std::unordered_map<const RigidBody*, b2BodyId> bodies;
-
 
 	/**
 	 * @brief The amount of ticks to calculate
 	 */
 	float tickRate;
+
+	/**
+	 * @brief Synchronizes all registered RigidBody transforms with the physics
+	 * world.
+	 *
+	 * After stepping the simulation, this function updates each RigidBody's
+	 * Transform component to match the corresponding Box2D body's position and
+	 * rotation.
+	 */
+	void syncTransforms() override;
 };
