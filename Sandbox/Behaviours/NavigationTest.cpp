@@ -22,7 +22,12 @@ void NavigationTest::onAwake()
 
     if (gameObject->hasComponent<PathRenderer>())
     {
+
         pathRenderer = gameObject->getComponent<PathRenderer>();
+    }
+    else
+    {
+        std::cout << "[NavigationTest component] No PathRenderer component exists on this GameObbject, consider adding it." << std::endl;
     }
 }
 
@@ -35,7 +40,8 @@ void NavigationTest::update(float deltaTime, GameWorld *world)
     {
        if (agent->requestPath(target->getPosition()))
        {
-            pathRenderer->setPath(agent->getPathResult().getPath());
+           if (pathRenderer != nullptr)
+               pathRenderer->setPath(agent->getCurrentPath().getPath());
        }
     }
 }

@@ -123,13 +123,12 @@ bool Agent::requestPath(const Vector2 &target)
         return false;
 
     currentPath = pathResult;
-    navigationTarget = target;
 
     return pathResult.isValid();
 }
 
 
-const PathResult &Agent::getPathResult() const
+const PathResult &Agent::getCurrentPath() const
 {
     return currentPath;
 }

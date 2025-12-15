@@ -14,7 +14,7 @@ Vector2 FollowPathModule::compute()
         return  Vector2::zero();
 
     /// Note: We need to retrieve this every call because the agent's path might change.
-    const PathResult& pathResult = agent.getPathResult();
+    const PathResult& pathResult = agent.getCurrentPath();
     const auto& agentPathRaw = pathResult.getPath();
 
     /// Agent has a new path:

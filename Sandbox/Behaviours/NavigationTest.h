@@ -13,6 +13,8 @@ class NavigationGrid;
 class InputManager;
 class NavigationSystem;
 
+/// NOTE: This is a temporary class used to test Agent navigation.
+/// #TODO THIS SHOULD BE REMOVED FROM THE ENGINE BEFORE DELIVERING
 class NavigationTest : public Behaviour
 {
     public:

@@ -25,7 +25,7 @@ enum class ModuleType;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : currentVelocity(Vector2::zero()), maxSpeed(1), arrivingDistance(10.0f), rotationTurnRate(90), navigationTarget(Vector2::zero())
+        Agent() : currentVelocity(Vector2::zero()), maxSpeed(1), arrivingDistance(10.0f), rotationTurnRate(90)
         {
             pathFinder = std::make_unique<AStarPathFinder>(HeuristicType::CHEBYSHEV);
         };
@@ -161,8 +161,30 @@ class Agent final : public Behaviour
          */
         void setRotationTurnRate(float value);
 
+        /**
+         * @brief Computes a path for this agent, using the scene's @c NavigationSystem
+         *
+         * This method does not return any other information about the path. To get the actual path,
+         * use the @c getPathResult() method, which returns a @c PathResult containing information.
+         *
+         * Returns whether the retrieved path is valid (path >0, with total distance between points >0 as well)
+         * @param target the goal of the path
+         * @return True if the retrieved path is Valid, false otherwise
+         */
         bool requestPath(const Vector2& target);
-        const PathResult& getPathResult() const;
+
+        /**
+         * Returns the current active path of this agent.
+         *
+         * The path is stored in a @c PathResult, which can be used to retrieve the NavSurface-oriented points.
+         * @return the current PathResult of this agent.
+         */
+        const PathResult& getCurrentPath() const;
+
+        /**
+         * @brief Utility method to determine if this agent has a valid path.
+         * @return true if this agents current path stored in @c currentPath is valid.
+         */
         bool hasPath() const;
 
     private:
@@ -196,8 +218,10 @@ class Agent final : public Behaviour
         /// @brief Pathfinder this agent wants to use for pathfinding.
         std::unique_ptr<IPathFinder> pathFinder;
 
+        /// The current path this agent has stored.
+        /// Note: An agent itself does nothing with a path, he only stores it so modules and other behaviours can make use of it.
+        /// To get a new path to a target, use the @c requestPath() method
         PathResult currentPath;
-        Vector2 navigationTarget;
 };
 
 #include "AI/AgentImplementation.h"
