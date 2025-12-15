@@ -8,12 +8,8 @@
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/TransportGNS.h"
 #include "Rendering/IRenderer.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
-#include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
-
-#include <ostream>
 
 // TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
@@ -57,12 +53,12 @@ void ClientLoop::update(double deltaTime)
 	auto activeScene = sceneManager->getActiveScene();
 	if ( activeScene == nullptr )
 	{
-		// TODO BETERE ERROR
-		throw std::runtime_error("No active scene");
+		throw std::runtime_error(
+			"ClientLoop::update(): No active scene available. Ensure at least "
+			"one scene is registered and active.");
 	}
 
 	renderer->update(deltaTime, *activeScene);
-	RenderQueue renderQueue;
 }
 
 void ClientLoop::fixedUpdate(double deltaTime)

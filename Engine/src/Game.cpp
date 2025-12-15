@@ -27,6 +27,10 @@ void Game::addScene(std::unique_ptr<Scene> scene)
 
 bool Game::setActiveScene(const std::string& name) const
 {
+	if ( sceneManager == nullptr )
+	{
+		return false;
+	}
 	return sceneManager->setActiveScene(name);
 }
 
