@@ -17,7 +17,9 @@ NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
 	  , sdlWindow(window)
 	  , sdlRenderer(renderer)
 	  , nuklearContext(nullptr),
-	  eventDispatcher(nullptr)
+	  eventDispatcher(nullptr),
+	  mouseX(0),
+	  mouseY(0)
 {
 }
 
@@ -211,23 +213,15 @@ void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands)
 	}
 }
 
-
 void NuklearSDLRenderHook::flushCommands()
 {
-	std::sort(rootPanels.begin(), rootPanels.end());
-
-	for (uint32_t id : rootPanels)
-	{
-		renderPanel(id);
-	}
-
 	std::stable_partition(commandQueue.begin(), commandQueue.end(),
 	                      [](const UIRenderCommand& cmd)
 	                      {
 		                      return cmd.type == UICommandType::Panel;
 	                      });
 
-	size_t originalSize = commandQueue.size();
+	const size_t originalSize = commandQueue.size();
 
 	for (size_t i = 0; i < originalSize; ++i)
 	{
@@ -238,10 +232,6 @@ void NuklearSDLRenderHook::flushCommands()
 			if (commandIterator.parentId == NO_PARENT)
 			{
 				rootPanels.push_back(commandIterator.panelId);
-			}
-			else
-			{
-				panelElementIndices[commandIterator.parentId].push_back(i);
 			}
 		}
 		else
@@ -254,6 +244,9 @@ void NuklearSDLRenderHook::flushCommands()
 			panelElementIndices[commandIterator.panelId].push_back(i);
 		}
 	}
+
+	std::ranges::sort(rootPanels);
+	rootPanels.erase(std::ranges::unique(rootPanels).begin(), rootPanels.end());
 
 	for (uint32_t id : rootPanels)
 	{
@@ -288,7 +281,6 @@ void NuklearSDLRenderHook::renderElement(const UIRenderCommand& command)
 	switch (command.type)
 	{
 		case UICommandType::Panel:
-			renderPanel(command.panelId);
 			break;
 
 		case UICommandType::Text:

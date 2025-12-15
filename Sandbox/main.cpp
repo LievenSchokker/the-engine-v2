@@ -95,7 +95,6 @@ private:
 
             auto* collider = obj->addComponent<Collider>();
             auto* shape = obj->addComponent<ShapeRenderer>();
-
             if (isCircle)
             {
                 collider->setCircle(size);
@@ -208,7 +207,7 @@ int main(int argc, char** argv)
     auto* floorShape = floor->addComponent<ShapeRenderer>();
     floorShape->setRectangle({700.0f, 40.0f});
     floorShape->setColor(Color(100, 100, 100, 255));
-
+	floor->addComponent<Profiler>(100, 100, 100, 100);
     scene->addGameObject(std::move(floor));
 
     game->addScene(std::move(scene));
