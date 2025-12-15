@@ -1,11 +1,12 @@
 //
 // Created by samle on 15/12/2025.
 //
-#include "../../../inc/AI/Modules/FollowPathModule.h"
+#include "AI/Modules/FollowPathModule.h"
 
 #include "AI/Agent.h"
 #include "Component/Transform.h"
 #include "Scene/Scene.h"
+
 
 Vector2 FollowPathModule::compute()
 {
@@ -21,20 +22,20 @@ Vector2 FollowPathModule::compute()
     {
         lastRawPath = agentPathRaw;
         currentPathIndex = 0;
-        worldPathPoints = convertToWorldCoordinates(agentPathRaw);
+        currentPathWorldPoints = convertToWorldCoordinates(agentPathRaw);
     }
 
     /// Agent has reached the end of his path, this module becomes "inactive".
-    if (currentPathIndex >= worldPathPoints.size())
+    if (currentPathIndex >= currentPathWorldPoints.size())
     {
         return Vector2::zero();
     }
 
     /// Keep track of where the agent is along the path by incrementing the index if the distance between agent and waypoint < radius.
-    const Vector2& currentWaypoint = worldPathPoints[currentPathIndex];
+    const Vector2& currentWaypoint = currentPathWorldPoints[currentPathIndex];
     if (Vector2::distance(agentTransform.getPosition(), currentWaypoint) < waypointRadius)
     {
-        currentPathIndex = std::min(currentPathIndex + 1, worldPathPoints.size() -1);
+        currentPathIndex = std::min(currentPathIndex + 1, currentPathWorldPoints.size() -1);
     }
 
     /// Return a normalised vector pointing from agent towards the current waypoint.
@@ -66,6 +67,11 @@ std::vector<Vector2> FollowPathModule::convertToWorldCoordinates(const std::vect
     return worldPath;
 }
 
+
+void FollowPathModule::setWayPointRadius(float radius)
+{
+    waypointRadius = radius;
+}
 
 
 
