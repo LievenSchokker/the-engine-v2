@@ -24,7 +24,6 @@ SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 			"applicationSpecifications.");
 	}
 
-	// Set the clock reference in GameWorld for debug access
 	coreSystemLoop->setApplicationClock(coreClock.get());
 }
 
@@ -48,16 +47,13 @@ void SpelMotor::run()
 	{
 		coreClock->tick();
 
-		// Poll input BEFORE fixedUpdate so behaviors can read current frame's
-		// input This ensures input is available when behaviors run in
-		// fixedUpdate
-		coreSystemLoop->update(coreClock->getDeltaTime());
-
 		while ( coreClock->shouldFixedUpdate() )
 		{
 			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
 			coreClock->consumeFixedUpdate();
 		}
+
+		coreSystemLoop->update(coreClock->getDeltaTime());
 	}
 }
 
