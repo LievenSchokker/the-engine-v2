@@ -25,6 +25,7 @@ class SimpleMoveBehaviour: public Behaviour
 	void onStart() override;
 	void update(float deltaTime, GameWorld* world) override;
 	void onDisable() override;
+	void setMaxSpeed(float speed) { maxSpeed = speed; }
 
 	void move();
 	void pollInput();
