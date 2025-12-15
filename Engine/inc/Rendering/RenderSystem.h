@@ -40,6 +40,8 @@ class RenderSystem
 
 	void setClearColor(const Color& color);
 
+	const Color& getClearColor() const;
+
    private:
 	std::unique_ptr<IRenderer> renderer;
 	RenderQueue queue;

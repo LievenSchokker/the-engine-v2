@@ -31,7 +31,7 @@ class SandboxInputBehaviour: public Behaviour
 {
    public:
 	explicit SandboxInputBehaviour(Scene* scene)
-		: scene(scene), inputManager(nullptr), clearColor(Color::darkGray())
+		: scene(scene), inputManager(nullptr)
 	{
 	}
 
@@ -60,6 +60,7 @@ class SandboxInputBehaviour: public Behaviour
 		// Handle SPACE key to toggle clear color
 		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
 		{
+			Color clearColor = world->render->getClearColor();
 			clearColor = (clearColor == Color::darkGreen())
 							 ? Color::darkPurple()
 							 : Color::darkGreen();
@@ -160,7 +161,6 @@ class SandboxInputBehaviour: public Behaviour
    private:
 	Scene* scene;
 	InputManager* inputManager;
-	Color clearColor;
 };
 
 //////////////////////////////
