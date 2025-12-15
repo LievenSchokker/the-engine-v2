@@ -1,9 +1,9 @@
-#include "Component/UIObject/UISeperator.h"
+#include "Component/UIElement/UISeperator.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 #include "Rendering/UIRenderCommand.h"
 
 UISeparator::UISeparator()
-	: UIObject(0, 0, 0, 0)
+	: UIElement(0, 0, 0, 0)
 {
 }
 

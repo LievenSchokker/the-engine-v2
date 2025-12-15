@@ -1,11 +1,19 @@
 #pragma once
+
 #include <cmath>
+
 /**
  * @brief A struct for storing 2D vector points.
  */
 struct Vector2
 {
-    Vector2(const float x_, const float y_) : x(x_), y(y_) {}
+	Vector2() : x(0), y(0)
+	{
+	}
+
+	Vector2(const float x_, const float y_) : x(x_), y(y_)
+	{
+	}
 
     /// Shorthand for writing Vector2{1.0, 1.0}
     static Vector2 one();

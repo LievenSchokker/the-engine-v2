@@ -1,8 +1,8 @@
-#include "Component/UIObject/UITextObject.h"
+#include "Component/UIElement/UITextElement.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 #include "Rendering/UIRenderCommand.h"
 
-UITextObject::UITextObject(
+UITextElement::UITextElement(
 	float x,
 	float y,
 	float width,
@@ -12,7 +12,7 @@ UITextObject::UITextObject(
 	Alignment alignment,
 	Color color
 )
-	: UIObject(x, y, width, height)
+	: UIElement(x, y, width, height)
 	, text(std::move(text))
 	, fontSize(fontSize)
 	, alignment(alignment)
@@ -20,7 +20,7 @@ UITextObject::UITextObject(
 {
 }
 
-void UITextObject::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const
+void UITextElement::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const
 {
 	if (!visible)
 	{
@@ -43,12 +43,12 @@ void UITextObject::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter&
 	queue.push(command);
 }
 
-std::string UITextObject::getText() const { return text; }
-int UITextObject::getFontSize() const { return fontSize; }
-Alignment UITextObject::getAlignment() const { return alignment; }
-Color UITextObject::getColor() const { return color; }
+std::string UITextElement::getText() const { return text; }
+int UITextElement::getFontSize() const { return fontSize; }
+Alignment UITextElement::getAlignment() const { return alignment; }
+Color UITextElement::getColor() const { return color; }
 
-void UITextObject::setText(const std::string& newText) { text = newText; }
-void UITextObject::setFontSize(int newSize) { fontSize = newSize; }
-void UITextObject::setAlignment(Alignment newAlignment) { alignment = newAlignment; }
-void UITextObject::setColor(const Color& newColor) { color = newColor; }
+void UITextElement::setText(const std::string& newText) { text = newText; }
+void UITextElement::setFontSize(int newSize) { fontSize = newSize; }
+void UITextElement::setAlignment(Alignment newAlignment) { alignment = newAlignment; }
+void UITextElement::setColor(const Color& newColor) { color = newColor; }

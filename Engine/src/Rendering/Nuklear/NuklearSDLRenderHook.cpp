@@ -9,6 +9,7 @@
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
 
+#include <algorithm>
 #include <iostream>
 #include <algorithm>
 

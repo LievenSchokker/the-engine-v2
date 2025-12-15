@@ -3,7 +3,6 @@
 
 #include "Scene.h"
 #include "GameObject/GameObject.h"
-#include <typeindex>
 
 template <typename T>
 std::vector<T*> Scene::getAllComponentsOfType() const
@@ -13,8 +12,7 @@ std::vector<T*> Scene::getAllComponentsOfType() const
 
 	for (const auto& gameObject : gameObjects)
 	{
-		if (!gameObject->getIsActive())
-			continue;
+		if (!gameObject->getIsActive()) continue;
 
 		T* component = gameObject->getComponent<T>();
 		if (component != nullptr)

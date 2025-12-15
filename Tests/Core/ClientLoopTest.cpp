@@ -2,8 +2,9 @@
 #include "Core/EngineLoops/ServerLoop.h"
 #include "Game.h"
 
-#include <memory>
+#include <SDL_timer.h>
 #include <gtest/gtest.h>
+#include <memory>
 
 class ClientLoopTest : public ::testing::Test
 {

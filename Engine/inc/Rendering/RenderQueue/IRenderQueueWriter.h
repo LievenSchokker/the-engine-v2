@@ -11,5 +11,5 @@ class IRenderQueueWriter
 {
 public :
 	virtual ~IRenderQueueWriter() = default;
-	virtual void push(RenderCommand& command) = 0;
+	virtual void push(RenderCommand command) = 0;
 };

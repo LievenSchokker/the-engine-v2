@@ -125,7 +125,7 @@ Vector2 Vector2::normalised() const
 
 float Vector2::magnitude() const
 {
-	return std::sqrt(x * x + y * y);
+	return std::hypot(x , y);
 }
 
 

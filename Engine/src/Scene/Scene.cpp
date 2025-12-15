@@ -1,22 +1,15 @@
 #include "Scene/Scene.h"
 
-#include "../../inc/Component/ComponentManager.h"
-#include "../../inc/Component/GridComponent.h"
-#include "../../inc/Component/ShapeRenderer.h"
-#include "../../inc/Component/TilemapComponent.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
-#include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
+#include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Component/ComponentManager.h"
-#include "Component/ShapeRenderer.h"
-#include "../../inc/Rendering/RenderQueue/RenderQueue.h"
+#include "GameObject/GameObject.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 
 #include <algorithm>
-#include <filesystem>
 #include <iostream>
 #include <utility>
-
-#include "Behaviour/Behaviour.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -24,9 +17,8 @@ Scene::Scene(std::string name) : name(std::move(name))
 
 Scene::~Scene()
 {
-    destroyAllGameObjects();
+	destroyAllGameObjects();
 }
-
 
 const std::string& Scene::getName() const
 {
@@ -35,7 +27,8 @@ const std::string& Scene::getName() const
 
 bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
-	if ( gameObject == nullptr ) {
+	if ( gameObject == nullptr )
+	{
 		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
 		return false;
 	}
@@ -44,7 +37,7 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
     addGameObjectInternal(std::move(gameObject));
     addedObject->setScene(*this);
 
-    if (active)
+	if ( active )
 	{
 	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
 	    initialiseBehaviours(addedObject->getAllBehaviours());
@@ -57,8 +50,10 @@ bool Scene::removeGameObject(const std::string& name)
 {
 	const auto it =
 		std::remove_if(gameObjects.begin(), gameObjects.end(),
-					   [&](const std::unique_ptr<GameObject>& gameObject) {
-						   if ( gameObject->getName() == name ) {
+					   [&](const std::unique_ptr<GameObject>& gameObject)
+					   {
+						   if ( gameObject->getName() == name )
+						   {
 							   if ( active && gameObject->getIsActive() )
 							   {
 							       gameObject->destroy();
@@ -81,8 +76,10 @@ bool Scene::removeGameObject(const std::string& name)
 
 GameObject* Scene::getGameObject(const std::string& name) const
 {
-	for ( const auto& gameObject : gameObjects ) {
-		if ( gameObject->getName() == name ) {
+	for ( const auto& gameObject : gameObjects )
+	{
+		if ( gameObject->getName() == name )
+		{
 			return gameObject.get();
 		}
 	}
@@ -93,11 +90,11 @@ GameObject* Scene::getGameObject(const std::string& name) const
 std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 {
 	auto it = std::find_if(gameObjects.begin(), gameObjects.end(),
-						   [&](const std::unique_ptr<GameObject>& gameObject) {
-							   return gameObject->getName() == name;
-						   });
+						   [&](const std::unique_ptr<GameObject>& gameObject)
+						   { return gameObject->getName() == name; });
 
-	if ( it == gameObjects.end() ) {
+	if ( it == gameObjects.end() )
+	{
 		return nullptr;
 	}
 
@@ -118,34 +115,36 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 
 void Scene::onStart()
 {
-	if ( active ) {
+	if ( active )
+	{
 		return;
 	}
 
 	active = true;
 
-    /// Store all behaviours in this scene object:
-    std::vector<Behaviour*> allBehaviours;
+	/// Store all behaviours in this scene object:
+	std::vector<Behaviour*> allBehaviours;
 
-    /// Retrieve every behaviour on every GameObject in this scene object.
+	/// Retrieve every behaviour on every GameObject in this scene object.
 	for ( auto& gameObject : gameObjects )
 	{
-        for (auto& behaviour : gameObject->getAllBehaviours())
-        {
-            if (behaviour == nullptr)
-                continue;
+		for ( auto& behaviour : gameObject->getAllBehaviours() )
+		{
+			if ( behaviour == nullptr ) continue;
 
-            allBehaviours.emplace_back(behaviour);
-        }
+			allBehaviours.emplace_back(behaviour);
+		}
 	}
 
-    /// Initialise all the behaviours by calling their lifetime functions in the correct order.
-    initialiseBehaviours(allBehaviours);
+	/// Initialise all the behaviours by calling their lifetime functions in the
+	/// correct order.
+	initialiseBehaviours(allBehaviours);
 }
 
 void Scene::onStop()
 {
-	if ( !active ) {
+	if ( !active )
+	{
 		return;
 	}
 
@@ -158,7 +157,8 @@ void Scene::onStop()
 
 void Scene::onPause()
 {
-	if ( !active ) {
+	if ( !active )
+	{
 		return;
 	}
 
@@ -170,7 +170,8 @@ void Scene::onPause()
 
 void Scene::onResume()
 {
-	if ( !active ) {
+	if ( !active )
+	{
 		return;
 	}
 
@@ -183,19 +184,19 @@ void Scene::onResume()
 
 void Scene::update(double deltaTime, GameWorld* world)
 {
-	if (!active)
+	if ( !active )
 	{
 		return;
 	}
 
-	for (auto& gameObject : gameObjects)
+	for ( auto& gameObject : gameObjects )
 	{
 		if (!gameObject->getIsActive())
 			continue;
 
-		for (const auto& behaviour : gameObject->getEnabledBehaviours())
+		for ( const auto& behaviour : gameObject->getEnabledBehaviours() )
 		{
-			if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
+			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
 				continue;
 			behaviour->update(deltaTime, world);
 		}
@@ -203,6 +204,7 @@ void Scene::update(double deltaTime, GameWorld* world)
 
 	processDestroyQueue();
 }
+
 //
 // void Scene::collectRenderCommands(std::vector<ShapeRenderCommand>& out) const
 // {
@@ -248,13 +250,13 @@ void Scene::update(double deltaTime, GameWorld* world)
 // 	out.insert(out.end(), debugCommands.begin(), debugCommands.end());
 // }
 
-void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
+void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
 {
-    /// First call awake on all behaviours:
-    for (auto& behaviour : behaviours)
-    {
-        if (behaviour == nullptr)
-            continue;
+	/// First call awake on all behaviours:
+	for ( auto& behaviour : behaviours )
+	{
+		if ( behaviour == nullptr )
+		    continue;
 
         /// Awake may only be called once per behaviour
         if (!behaviour->getHasAwakened())
@@ -285,19 +287,40 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours)
             behaviour->start();
     }
 }
+//
+// void Scene::collectRenderCommands(RenderQueue& queue) const
+// {
+// 	if ( !active )
+// 	{
+// 		return;
+// 	}
+//
+// 	// Collect commands from RenderComponents
+// 	for ( auto* component : getAllComponentsOfType<RenderComponent>() )
+// 	{
+// 		if ( component == nullptr ) continue;
+// 		component->fillRenderQueue(queue);
+// 	}
+//
+// 	// Collect commands from UserInterfaceRenderComponents
+// 	for ( auto* component :
+// 		  getAllComponentsOfType<UserInterfaceRenderComponent>() )
+// 	{
+// 		if ( component == nullptr ) continue;
+// 		component->fillUserInterfaceRenderQueue(queue);
+// 	}
+// }
 
-void Scene::queueDestroy(GameObject *obj)
+void Scene::queueDestroy(GameObject* obj)
 {
-    /// Check if the object is already in the destroyQueue.
-    for (auto* queued : destroyQueue)
-    {
-        if (queued == obj)
-            return;
-    }
+	/// Check if the object is already in the destroyQueue.
+	for ( auto* queued : destroyQueue )
+	{
+		if ( queued == obj ) return;
+	}
 
-    destroyQueue.push_back(obj);
+	destroyQueue.push_back(obj);
 }
-
 
 void Scene::processDestroyQueue()
 {
@@ -307,11 +330,11 @@ void Scene::processDestroyQueue()
         removeGameObjectInternal(gameObject);
     }
 
-    /// Clear the queue when all queued objects have been deleted.
-    destroyQueue.clear();
+	/// Clear the queue when all queued objects have been deleted.
+	destroyQueue.clear();
 }
 
-bool Scene::isInDestroyQueue(GameObject *obj)
+bool Scene::isInDestroyQueue(GameObject* obj)
 {
     if (obj == nullptr)
         return false;
@@ -320,7 +343,6 @@ bool Scene::isInDestroyQueue(GameObject *obj)
             != destroyQueue.end();
 }
 
-
 void Scene::destroyAllGameObjects()
 {
     for ( auto& gameObject : gameObjects )
@@ -328,7 +350,7 @@ void Scene::destroyAllGameObjects()
         gameObject->onSceneDestroy();
     }
 
-    gameObjects.clear();
+	gameObjects.clear();
 }
 
 

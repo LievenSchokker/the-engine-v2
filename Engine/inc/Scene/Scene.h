@@ -1,9 +1,11 @@
 #pragma once
 
+
 #include "Core/GameWorld.h"
 
 class GameObject;
 class Behaviour;
+struct RenderQueue;
 struct ShapeRenderCommand;
 
 #include <map>
