@@ -42,10 +42,11 @@ public:
 	 * as a dependency for headless servers. steady_clock is guaranteed
 	 * monotonic, preventing issues if system time is adjusted during runtime.
 	 *
+	 * @param game
 	 * @param applicationSpecifications Server configuration (tick rate, network settings)
 	 */
-	explicit ServerLoop(const std::unique_ptr<Game>& game);
-    ServerLoop(const std::unique_ptr<Game>& game, std::unique_ptr<ITransport> transport);
+    explicit ServerLoop(std::unique_ptr<Game> game);
+    ServerLoop(std::unique_ptr<Game> game, std::unique_ptr<ITransport> transport);
 	~ServerLoop() override;
 
 	GameWorld* getGameWorld() override;
