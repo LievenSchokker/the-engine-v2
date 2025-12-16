@@ -1,6 +1,4 @@
-//
-// Created by samle on 14/12/2025.
-//
+
 #include "AI/Navigation/NavigationGridRenderer.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "Component/Transform.h"
@@ -12,7 +10,6 @@ void NavigationGridRenderer::onAwake()
 
     if (grid == nullptr)
     {
-        std::cout << "Failed to load navigation grid" << std::endl;
         setEnabled(false);
         return;
     }
