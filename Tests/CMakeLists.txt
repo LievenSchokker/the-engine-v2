@@ -26,15 +26,14 @@ add_executable(engine_tests
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
         Math/TestsVector2.cpp
-        AI/tests_agent.cpp
-        AI/TestAgentModule.cpp
         Animation/AnimationCurveTest.cpp
         Animation/AnimationTrackTest.cpp
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
-        AI/tests_navigation_grid.cpp
 )
+
+add_subdirectory(AI)
 
 target_link_libraries(engine_tests PRIVATE
         Engine::Core
