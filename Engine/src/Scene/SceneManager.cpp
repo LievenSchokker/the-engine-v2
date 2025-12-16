@@ -7,17 +7,17 @@
 
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
-	if ( scene == nullptr )
+	if (scene == nullptr)
 	{
 		std::cerr << "[SceneManager] Error: Attempted to add a null scene\n";
 		return false;
 	}
 
 	const std::string name = scene->getName();
-	if ( scenes.contains(name) )
+	if (scenes.contains(name))
 	{
 		std::cerr << "[SceneManager] Error: Scene with name '" << name
-				  << "' already exists\n";
+			<< "' already exists\n";
 		return false;
 	}
 
@@ -28,19 +28,19 @@ bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 bool SceneManager::removeScene(const std::string& name)
 {
 	// Prevent removal of persistent scene
-	if ( persistentScene != nullptr && persistentScene->getName() == name )
+	if (persistentScene != nullptr && persistentScene->getName() == name)
 	{
 		std::cerr << "[SceneManager] Error: Cannot remove persistent scene\n";
 		return false;
 	}
 
 	const auto it = scenes.find(name);
-	if ( it == scenes.end() )
+	if (it == scenes.end())
 	{
 		return false;
 	}
 
-	if ( it->second.get() == activeScene )
+	if (it->second.get() == activeScene)
 	{
 		activeScene->onStop();
 		activeScene = nullptr;
@@ -58,7 +58,7 @@ bool SceneManager::removeScene(const std::string& name)
 Scene* SceneManager::getScene(const std::string& name) const
 {
 	const auto it = scenes.find(name);
-	if ( it != scenes.end() )
+	if (it != scenes.end())
 	{
 		return it->second.get();
 	}
@@ -67,37 +67,37 @@ Scene* SceneManager::getScene(const std::string& name) const
 }
 
 bool SceneManager::transferGameObject(const std::string& fromSceneName,
-									  const std::string& toSceneName,
-									  const std::string& objectName) const
+                                      const std::string& toSceneName,
+                                      const std::string& objectName) const
 {
 	Scene* fromScene = getScene(fromSceneName);
 	Scene* toScene = getScene(toSceneName);
 
-	if ( fromScene == nullptr || toScene == nullptr )
+	if (fromScene == nullptr || toScene == nullptr)
 	{
 		std::cerr << "[SceneManager] Error: Scene not found\n";
 		return false;
 	}
 
 	// Check if object exists in source scene
-	if ( fromScene->getGameObject(objectName) == nullptr )
+	if (fromScene->getGameObject(objectName) == nullptr)
 	{
 		std::cerr << "[SceneManager] Error: GameObject '" << objectName
-				  << "' not found in scene '" << fromSceneName << "'\n";
+			<< "' not found in scene '" << fromSceneName << "'\n";
 		return false;
 	}
 
 	// Check if object already exists in target scene
-	if ( toScene->getGameObject(objectName) != nullptr )
+	if (toScene->getGameObject(objectName) != nullptr)
 	{
 		std::cerr << "[SceneManager] Error: GameObject '" << objectName
-				  << "' already exists in scene '" << toSceneName << "'\n";
+			<< "' already exists in scene '" << toSceneName << "'\n";
 		return false;
 	}
 
 	// Extract and transfer
 	auto gameObject = fromScene->extractGameObject(objectName);
-	if ( gameObject == nullptr )
+	if (gameObject == nullptr)
 	{
 		return false;
 	}
@@ -113,33 +113,33 @@ Scene* SceneManager::getActiveScene() const
 
 bool SceneManager::setActiveScene(const std::string& name)
 {
-	if ( activeScene && activeScene->getName() == name )
+	if (activeScene && activeScene->getName() == name)
 	{
 		std::cout << "[SceneManager] Warning: Scene with name '" << name
-				  << "' is already active\n";
+			<< "' is already active\n";
 		return true;
 	}
 
 	Scene* nextScene = getScene(name);
-	if ( nextScene == nullptr )
+	if (nextScene == nullptr)
 	{
 		std::cerr << "[SceneManager] Error: Scene with name '" << name
-				  << "' not found\n";
+			<< "' not found\n";
 		return false;
 	}
 
 	// Don't stop if it's the persistent scene (persistent scene is never
 	// stopped)
-	if ( activeScene != nullptr && activeScene != persistentScene.get() )
+	if (activeScene != nullptr && activeScene != persistentScene.get())
 	{
 		activeScene->onStop();
 	}
 
 	// Don't allow setting persistent scene as active scene
-	if ( nextScene == persistentScene.get() )
+	if (nextScene == persistentScene.get())
 	{
 		std::cerr << "[SceneManager] Error: Cannot set persistent scene as "
-					 "active scene\n";
+			"active scene\n";
 		return false;
 	}
 
@@ -156,7 +156,7 @@ bool SceneManager::loadScene(const std::string& name)
 
 void SceneManager::pause()
 {
-	if ( activeScene == nullptr || paused )
+	if (activeScene == nullptr || paused)
 	{
 		return;
 	}
@@ -167,7 +167,7 @@ void SceneManager::pause()
 
 void SceneManager::resume()
 {
-	if ( activeScene == nullptr || !paused )
+	if (activeScene == nullptr || !paused)
 	{
 		return;
 	}
@@ -181,36 +181,26 @@ bool SceneManager::isPaused() const
 	return paused;
 }
 
-void SceneManager::update(float deltaTime, GameWorld* world)
+void SceneManager::update(double deltaTime, const GameWorld& gameWorld)
 {
-	if ( activeScene != nullptr && !paused )
+	if (persistentScene != nullptr)
 	{
-		activeScene->update(deltaTime, world);
-	}
-}
-
-void SceneManager::updateAlways(float deltaTime, GameWorld* world)
-{
-	// Update persistent scene first (always active, never stopped)
-	if ( persistentScene != nullptr )
-	{
-		persistentScene->update(deltaTime, world);
+		persistentScene->update(deltaTime, gameWorld);
 	}
 
-	// Update active scene
-	if ( activeScene != nullptr )
+	if (activeScene != nullptr && !paused)
 	{
-		activeScene->update(deltaTime, world);
+		activeScene->update(deltaTime, gameWorld);
 	}
 }
 
 Scene* SceneManager::getOrCreatePersistentScene()
 {
-	if ( persistentScene == nullptr )
+	if (persistentScene == nullptr)
 	{
 		persistentScene = std::make_unique<Scene>("__PersistentScene__");
 		persistentScene
-			->onStart();  // Start it immediately so it's always active
+			->onStart(); // Start it immediately so it's always active
 	}
 	return persistentScene.get();
 }
@@ -218,4 +208,9 @@ Scene* SceneManager::getOrCreatePersistentScene()
 Scene* SceneManager::getPersistentScene() const
 {
 	return persistentScene.get();
+}
+
+const std::string SceneManager::getName() const
+{
+	return "SceneManager";
 }

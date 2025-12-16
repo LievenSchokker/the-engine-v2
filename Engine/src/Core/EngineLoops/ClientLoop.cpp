@@ -71,15 +71,15 @@ void ClientLoop::update(double deltaTime)
 
 	// Update behaviors unconditionally (even when paused) so debug controls
 	// work This allows behaviors to handle input that needs to work when paused
-	sceneManager->updateAlways(deltaTime, gameWorld.get());
+	sceneManager->update(deltaTime, *gameWorld.get());
 
-	renderer->update(deltaTime, *sceneManager->getActiveScene());
+	renderer->update(static_cast<float>(deltaTime), *gameWorld);
 	RenderQueue renderQueue;
 }
 
 void ClientLoop::fixedUpdate(double deltaTime)
 {
-	client->poll();
+	client->update(deltaTime, *gameWorld.get());
 	// Note: SceneManager::update() removed - behaviors now run from
 	// updateAlways() in update() to ensure they run every frame (even when
 	// paused) for input handling sceneManager->update(deltaTime,

@@ -49,7 +49,7 @@ public:
 	UIRenderCommand renderSceneLabel() const;
 	/// @}
 
-	void update(float deltaTime, GameWorld* world) override;
+	void update(double deltaTime, const GameWorld& world) override;
 
 	void toggle();
 
@@ -97,7 +97,7 @@ private:
 	Color badColor;
 	/// @}
 
-	void updateStats(GameWorld* world);
+	void updateStats(const GameWorld& world);
 	void calculateFPS(float deltaTime);
 	Color getFPSColor() const;
 	Color getFrameTimeColor() const;

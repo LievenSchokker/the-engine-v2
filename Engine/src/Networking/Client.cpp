@@ -80,7 +80,7 @@ bool Client::sendMessage(const IMessage& message) const
 }
 
 
-void Client::poll() const
+void Client::update(double deltaTime, const GameWorld& gameWorld)
 {
     transport->poll();
 }
@@ -130,9 +130,19 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
     messageDispatcher->processMessage(std::move(message));
 }
 
-
 void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
 {
     messageDispatcher = std::move(dispatcher);
+}
+
+void Client::shutdown(GameWorld& world)
+{
+	disconnect();
+	world.client = nullptr;
+}
+
+const std::string Client::getName() const
+{
+	return "Client";
 }
 

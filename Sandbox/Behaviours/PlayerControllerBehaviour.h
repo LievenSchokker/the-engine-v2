@@ -24,7 +24,7 @@ class PlayerControllerBehaviour: public Behaviour
 
 	void onAwake() override;
 	void onStart() override;
-	void update(float deltaTime, GameWorld* world) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 
 	/**
 	 * @brief Sets the movement speed in pixels per second.

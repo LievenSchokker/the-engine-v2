@@ -13,10 +13,6 @@
 ServerLoop::ServerLoop(std::unique_ptr<Game> game)
 	: specifications(game->getApplicationSpecifications())
 	  , gameWorld(std::make_unique<GameWorld>())
-	  , sceneManager(std::make_unique<SceneManager>())
-	  , server(std::make_unique<Server>(
-		  Server::convertApplicationSettings(specifications),
-		  std::make_unique<TransportGNS>()))
 {
 	clockFunction = []()
 	{
@@ -52,7 +48,6 @@ void ServerLoop::setApplicationClock(ApplicationClock* clock)
 
 void ServerLoop::start()
 {
-	server->start();
 }
 
 void ServerLoop::update(double deltaTime)
@@ -61,12 +56,10 @@ void ServerLoop::update(double deltaTime)
 
 void ServerLoop::fixedUpdate(double deltaTime)
 {
-	server->update();
-	sceneManager->update(deltaTime, gameWorld.get());
+	sceneManager->update(deltaTime, *gameWorld.get());
 	currentTick++;
 }
 
 void ServerLoop::shutdown()
 {
-	server->stop();
 }

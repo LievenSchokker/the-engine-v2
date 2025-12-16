@@ -21,7 +21,7 @@ void Agent::onAwake()
 }
 
 
-void Agent::update(float deltaTime, GameWorld* gameWorld)
+void Agent::update(double deltaTime, const GameWorld& gameWorld)
 {
     Vector2 velocity = computeDesiredVelocity();
 

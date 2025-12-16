@@ -1,5 +1,6 @@
 #pragma once
 
+
 class Server;
 class Client;
 class SceneManager;
@@ -12,7 +13,7 @@ class ApplicationClock;
 
 class GameWorld
 {
-   public:
+public:
 	GameWorld() = default;
 
 	SceneManager* sceneManager = nullptr;

@@ -121,7 +121,7 @@ class Scene
          * @param deltaTime Seconds elapsed since the previous update.
          * @param world
          */
-        void update(double deltaTime, GameWorld* world);
+        void update(double deltaTime, const GameWorld& world);
 
         /**
          * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.

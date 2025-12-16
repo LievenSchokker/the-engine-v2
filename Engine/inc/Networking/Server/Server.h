@@ -6,6 +6,7 @@
 
 #include "ServerInformation.h"
 #include "Core/ApplicationSpecifications.h"
+#include "Core/IEngineSystems.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
 #include "Networking/Server/ServerStatus.h"
@@ -29,7 +30,7 @@ enum class ConnectionStatus : uint8_t;
  * @details Designed to decouple high-level server logic from transport implementation.
  *          Maintains authoritative list of connected clients for validation and routing.
  */
-class Server
+class Server : public IEngineSystem
 {
 public:
     /**
@@ -57,7 +58,7 @@ public:
      *          race condition where connections arrive before handlers are ready.
      * @return Status to allow caller to handle startup failures appropriately
      */
-    ServerStatus start();
+    SystemStatus start(GameWorld& gameWorld) override;
 
     /**
      * @brief Cleanly shuts down networking and clears connection state
@@ -65,9 +66,8 @@ public:
      * @details Explicit stop allows controlled shutdown timing and proper cleanup
      *          sequencing. Client list is cleared to prevent stale state if server
      *          is restarted.
-     * @return Status for caller verification
      */
-    ServerStatus stop();
+    void shutdown(GameWorld& gameWorld) override;
 
     /**
      * @brief Polls transport for pending network events
@@ -76,7 +76,7 @@ public:
      *          triggers callbacks. Must be called regularly since network I/O
      *          isn't automatically processed.
      */
-    void update() const;
+    void update(double deltaTime, const GameWorld& gameWorld) override;
 
     /**
      * @brief Forcibly disconnects a client with notification
@@ -126,6 +126,8 @@ public:
     bool broadcastMessage(const IMessage& message, int excludeClientId) const;
 
     static ServerConnectionInformation convertApplicationSettings(const ApplicationSpecifications& specifications);
+    const std::string getName() const override;
+
 private:
     /**
      * @brief Deserializes and routes incoming messages
@@ -163,7 +165,7 @@ private:
     ServerConnectionInformation setupInformation;
 
     /// @brief Tracks lifecycle state for preventing invalid operations
-    ServerStatus status;
+    SystemStatus status;
 
     /// @brief Fast lookup set for validating message sources and broadcast targets
     std::unordered_set<int> connectedClients;

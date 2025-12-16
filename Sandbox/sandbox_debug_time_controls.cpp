@@ -21,10 +21,8 @@ class MovingObjectBehaviour: public Behaviour
 	{
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& gameWorld) override
 	{
-		(void)world;
-
 		Transform* transform = getGameObject()->getTransform();
 		if ( transform == nullptr )
 		{

@@ -74,7 +74,7 @@ class Behaviour: virtual public Component
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	virtual void update(float deltaTime, GameWorld* world) {};
+	virtual void update(double deltaTime, const GameWorld& world) {};
 
 	/**
 	 * @brief fixedUpdate is called at regular and fixed intervals as part of

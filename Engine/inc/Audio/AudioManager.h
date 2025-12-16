@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/IEngineSystems.h"
+
 #include <memory>
 #include <string>
 

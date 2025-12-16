@@ -185,7 +185,7 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(double deltaTime, GameWorld* world)
+void Scene::update(double deltaTime, const GameWorld& world)
 {
 	if ( !active )
 	{
@@ -193,8 +193,8 @@ void Scene::update(double deltaTime, GameWorld* world)
 	}
 
 	int behaviorCount = 0;
-	bool clockPaused = (world != nullptr && world->clock != nullptr &&
-						world->clock->isPaused());
+	bool clockPaused = (world.clock != nullptr &&
+						world.clock->isPaused());
 	for ( auto& gameObject : gameObjects )
 	{
 		if (!gameObject->getIsActive())

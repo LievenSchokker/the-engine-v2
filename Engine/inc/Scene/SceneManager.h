@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Scene.h"
+#include "Core/IEngineSystems.h"
 
 #include <memory>
 #include <string>
@@ -12,9 +13,9 @@
  * Stores scenes by name, forwards lifecycle calls, and keeps track of the
  * active scene along with a simple paused state.
  */
-class SceneManager
+class SceneManager : public IEngineSystem
 {
-   public:
+public:
 	SceneManager() = default;
 
 	/**
@@ -65,8 +66,8 @@ class SceneManager
 	 * found, object not found, or object already exists in target scene).
 	 */
 	bool transferGameObject(const std::string& fromSceneName,
-							const std::string& toSceneName,
-							const std::string& objectName) const;
+	                        const std::string& toSceneName,
+	                        const std::string& objectName) const;
 
 	/**
 	 * @brief Get the currently active scene.
@@ -120,20 +121,9 @@ class SceneManager
 	 * @brief Update the active scene when not paused.
 	 *
 	 * @param deltaTime Seconds elapsed since the previous update call.
+	 * @param gameWorld
 	 */
-	void update(float deltaTime, GameWorld* world);
-
-	/**
-	 * @brief Update the active scene unconditionally (even when paused).
-	 *
-	 * Used for behaviors that need to run every frame, such as debug controls
-	 * that must work even when the simulation is paused.
-	 *
-	 * Updates both the persistent scene (if it exists) and the active scene.
-	 *
-	 * @param deltaTime Seconds elapsed since the previous update call.
-	 */
-	void updateAlways(float deltaTime, GameWorld* world);
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 
 	/**
 	 * @brief Get or create the persistent scene.
@@ -153,10 +143,10 @@ class SceneManager
 	 */
 	Scene* getPersistentScene() const;
 
-   private:
+	const std::string getName() const override;
+private:
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
-	std::unique_ptr<Scene>
-		persistentScene;  // Always-active scene for debug/utilities
+	std::unique_ptr<Scene> persistentScene; // Always-active scene for debug/utilities
 	bool paused = false;
 };
