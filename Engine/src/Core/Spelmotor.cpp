@@ -7,8 +7,6 @@
 #include "Core/IEngineLoop.h"
 #include "Game.h"
 
-#include <chrono>
-
 SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 	: running(false),
 	  specifications(game->getApplicationSpecifications()),
@@ -23,6 +21,8 @@ SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 			"Core System Loop is null double check your "
 			"applicationSpecifications.");
 	}
+
+	coreSystemLoop->setApplicationClock(coreClock.get());
 }
 
 SpelMotor::~SpelMotor()
@@ -49,13 +49,26 @@ void SpelMotor::run()
 		{
 			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
 			coreClock->consumeFixedUpdate();
+
+			if ( coreSystemLoop->isShutdownRequested() )
+			{
+				running = false;
+				break;
+			}
 		}
 
 		coreSystemLoop->update(coreClock->getDeltaTime());
 	}
+	shutdown();
 }
 
-void SpelMotor::shutdown() const
+void SpelMotor::shutdown()
 {
+	running = false;
 	coreSystemLoop->shutdown();
+}
+
+ApplicationClock* SpelMotor::getClock()
+{
+	return coreClock.get();
 }

@@ -42,6 +42,14 @@ SceneManager* ServerLoop::getSceneManager()
 	return sceneManager.get();
 }
 
+void ServerLoop::setApplicationClock(ApplicationClock* clock)
+{
+	if ( gameWorld )
+	{
+		gameWorld->clock = clock;
+	}
+}
+
 void ServerLoop::start()
 {
 	server->start();

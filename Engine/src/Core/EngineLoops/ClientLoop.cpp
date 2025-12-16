@@ -4,6 +4,7 @@
 #include "External/SDLBackendContext.h"
 #include "Game.h"
 #include "Input/InputManager.h"
+#include "Input/KeyCode.h"
 #include "Networking/Client.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/TransportGNS.h"
@@ -16,7 +17,8 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	: sceneManager(std::move(spel->getSceneManager())),
 	  gameWorld(std::make_unique<GameWorld>()),
 	  specifications(spel->getApplicationSpecifications()),
-	  client(std::make_unique<Client>(std::make_unique<TransportGNS>()))
+	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
+	  isShutdown(false)
 {
 	// Transfer ownership of the scene manager and give gameWorld a non owning
 	// pointer
@@ -36,6 +38,9 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		gameWorld->render = renderer.get();
 	}
 
+	// Set GameWorld references for behaviors to access
+	gameWorld->sceneManager = sceneManager.get();
+	gameWorld->input = InputManager::getInstance();
 	inputManager = InputManager::getInstance();
 }
 
@@ -48,6 +53,10 @@ void ClientLoop::start()
 
 void ClientLoop::update(double deltaTime)
 {
+	if ( !renderer )
+	{
+		return;
+	}
 	inputManager->update();
 
 	auto activeScene = sceneManager->getActiveScene();
@@ -59,12 +68,21 @@ void ClientLoop::update(double deltaTime)
 	}
 
 	renderer->update(deltaTime, *activeScene);
+	// Update behaviors unconditionally (even when paused) so debug controls
+	// work This allows behaviors to handle input that needs to work when paused
+	sceneManager->updateAlways(deltaTime, gameWorld.get());
+
+	renderer->update(deltaTime, *sceneManager->getActiveScene());
+	RenderQueue renderQueue;
 }
 
 void ClientLoop::fixedUpdate(double deltaTime)
 {
 	client->poll();
-	sceneManager->update(deltaTime, gameWorld.get());
+	// Note: SceneManager::update() removed - behaviors now run from
+	// updateAlways() in update() to ensure they run every frame (even when
+	// paused) for input handling sceneManager->update(deltaTime,
+	// gameWorld.get());
 	if ( inputManager->quitRequested() )
 	{
 		shutdown();
@@ -81,9 +99,15 @@ void ClientLoop::initializeNetworking()
 
 void ClientLoop::shutdown()
 {
+	isShutdown = true;
 	InputManager::shutdown();
 	renderer.release();
 	client->disconnect();
+}
+
+bool ClientLoop::isShutdownRequested() const
+{
+	return isShutdown;
 }
 
 GameWorld* ClientLoop::getGameWorld()
@@ -100,4 +124,12 @@ SceneManager* ClientLoop::getSceneManager()
 {
 	if ( sceneManager ) return sceneManager.get();
 	return nullptr;
+}
+
+void ClientLoop::setApplicationClock(ApplicationClock* clock)
+{
+	if ( gameWorld )
+	{
+		gameWorld->clock = clock;
+	}
 }

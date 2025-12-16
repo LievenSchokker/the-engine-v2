@@ -3,6 +3,7 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
+#include <memory>
 
 /**
  * @class Game

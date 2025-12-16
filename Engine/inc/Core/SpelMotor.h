@@ -1,18 +1,11 @@
 #pragma once
 #include "Core/ApplicationSpecifications.h"
-#include "Core/GameWorld.h"
-#include "External/IBackendContext.h"
-#include "Audio/AudioManager.h"
-#include "Physics/IPhysicsWorld.h"
 
 class Game;
 class IEngineLoop;
 class ApplicationClock;
 
-#include <atomic>
-#include <functional>
 #include <memory>
-#include <thread>
 
 /**
  * @class SpelMotor
@@ -52,7 +45,17 @@ class SpelMotor
 	 * initialization to prevent dependency issues.
 	 *
 	 */
-	void shutdown() const;
+	void shutdown();
+
+	/**
+	 * @brief Gets the application clock for debug time controls.
+	 *
+	 * Allows access to time scale and pause functionality for debugging.
+	 * Use with caution in production code.
+	 *
+	 * @return Pointer to the application clock
+	 */
+	ApplicationClock* getClock();
 
    private:
 	/** @brief Immutable configuration set at construction.
@@ -61,7 +64,7 @@ class SpelMotor
 	const ApplicationSpecifications specifications;
 
 	/** @brief Tracks whether the game loop is active. */
-	bool running;
+	mutable bool running;
 
 	std::unique_ptr<IEngineLoop> coreSystemLoop;
 	std::unique_ptr<ApplicationClock> coreClock;

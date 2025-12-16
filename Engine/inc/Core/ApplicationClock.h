@@ -48,8 +48,9 @@ public:
 
 	/**
 	 * @brief Checks if enough time has accumulated for another fixed update.
-	 * @return true when accumulator contains at least one full timestep
+	 * @return true when accumulator contains at least one full timestep and not paused
 	 *
+	 * @note Returns false when paused, preventing simulation updates.
 	 */
 	bool shouldFixedUpdate() const;
 
@@ -77,9 +78,11 @@ public:
 	double getTime() const;
 
 	/**
-	 * @brief Gets the fixed timestep duration.
-	 * @return Constant delta time for each simulation step
+	 * @brief Gets the fixed timestep duration, scaled by time scale.
+	 * @return Scaled delta time for each simulation step (fixedDeltaTime * timeScale)
 	 *
+	 * @note This returns the scaled delta time, which affects simulation speed.
+	 *       Use this for all game logic and physics updates to respect debug time controls.
 	 */
 	double getDeltaTime() const;
 
@@ -97,6 +100,45 @@ public:
 	 */
 	int getTotalTicks() const;
 
+	/**
+	 * @brief Sets the time scale multiplier for simulation speed.
+	 * @param scale Time scale multiplier (1.0 = normal, 0.5 = slow, 2.0 = fast)
+	 *
+	 * @note Time scale affects getDeltaTime(), effectively speeding up or slowing down
+	 *       the entire simulation. Rendering continues at normal speed.
+	 */
+	void setTimeScale(double scale);
+
+	/**
+	 * @brief Gets the current time scale multiplier.
+	 * @return Current time scale (default: 1.0)
+	 */
+	double getTimeScale() const;
+
+	/**
+	 * @brief Pauses the simulation (fixed updates).
+	 *
+	 * @note When paused, shouldFixedUpdate() returns false, preventing simulation
+	 *       updates. Rendering and input continue to function normally.
+	 */
+	void pause();
+
+	/**
+	 * @brief Resumes a paused simulation.
+	 */
+	void resume();
+
+	/**
+	 * @brief Toggles pause state.
+	 */
+	void togglePause();
+
+	/**
+	 * @brief Checks if the simulation is currently paused.
+	 * @return true when paused, false otherwise
+	 */
+	bool isPaused() const;
+
 private:
 	/** @brief A functions that retusn, the time the applicationhas beenrunning in second */
 	ClockFunction getClock;
@@ -108,4 +150,8 @@ private:
 
 	int tickRate;
 	double maxAccumulatedTime;
+
+	// Debug controls
+	double timeScale;  // Multiplier for simulation speed (1.0 = normal)
+	bool paused;       // Whether simulation is paused
 };

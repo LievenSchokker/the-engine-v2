@@ -47,10 +47,12 @@ class ClientLoop: public IEngineLoop
 	GameWorld* getGameWorld() override;
 	SceneManager* getSceneManager() override;
 	ClockFunction getClock() override;
+	void setApplicationClock(ApplicationClock* clock) override;
 	void start() override;
 	void update(double deltaTime) override;
 	void fixedUpdate(double deltaTime) override;
 	void shutdown() override;
+	bool isShutdownRequested() const override;
 
    private:
 	/**
@@ -70,4 +72,5 @@ class ClientLoop: public IEngineLoop
 	std::unique_ptr<AudioManager> audioManager;
 	InputManager* inputManager;
 	ClockFunction clockFunction;
+	bool isShutdown;
 };
