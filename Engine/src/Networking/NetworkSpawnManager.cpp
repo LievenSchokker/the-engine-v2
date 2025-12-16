@@ -172,14 +172,6 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 	message.assetId = assetId;
 	message.ownerId = identity->getOwnerId();
 
-	const Transform* transform = identity->getTransform();
-	if (transform)
-	{
-		message.position = transform->getPosition();
-		message.rotation = transform->getRotationAngle();
-		message.scale = transform->getScale();
-	}
-
 	auto clone = prefabLibrary->instantiate(assetId);
 	if (clone)
 	{
@@ -189,15 +181,6 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 			cloneIdentity->networkId = message.netId;
 			cloneIdentity->ownerId = message.ownerId;
 		}
-
-		auto* cloneTransform = clone->getTransform();
-		if (cloneTransform)
-		{
-			cloneTransform->setPosition(message.position);
-			cloneTransform->setRotationAngle(message.rotation);
-			cloneTransform->setScale(message.scale);
-		}
-
 		message.gameObject = std::move(clone);
 	}
 

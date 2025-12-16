@@ -36,8 +36,5 @@ public:
     uint32_t netId = 0;           ///< Server-assigned network identifier
     uint32_t assetId = 0;         ///< Prefab/asset type for instantiation
     int ownerId = -1;             ///< Owning client (-1 = server)
-    Vector2 position{0, 0};       ///< Initial world position
-    double rotation = 0;       ///< Initial rotation
-    Vector2 scale{1, 1};          ///< Initial scale
     std::unique_ptr<GameObject> gameObject;
 };
