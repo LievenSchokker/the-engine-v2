@@ -5,7 +5,6 @@
 #pragma once
 
 
-#include "Behaviour/Behaviour.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "AI/Navigation/Pathfinding/PathResult.h"
 
@@ -28,18 +27,12 @@ struct PathRenderOptions
  *
  * Uses the scene's NavigationSystem to access its INavigationSurface to be able to visualise the points on the path.
  */
-class PathRenderer : public Behaviour, public RenderComponent
+class PathRenderer : public RenderComponent
 {
     public:
-        explicit PathRenderer() : navigationSystem(nullptr), pathRenderOptions({3.0f, Color::darkOrange()}) {}
-        explicit PathRenderer(PathRenderOptions renderOptions) : navigationSystem(nullptr),  pathRenderOptions(renderOptions) {}
+        explicit PathRenderer() :  pathRenderOptions({3.0f, Color::darkOrange()}) {}
+        explicit PathRenderer(PathRenderOptions renderOptions) : pathRenderOptions(renderOptions) {}
         ~PathRenderer() override = default;
-
-        /**
-         * @brief onAwake() is used to retrieve the scene's navigation system.
-         * If the system is not found, this behaviour silently gets disabled to prevent errors occuring
-         */
-        void onAwake() override;
 
         /**
          * @brief Visualise the path.
@@ -54,8 +47,6 @@ class PathRenderer : public Behaviour, public RenderComponent
         void setPath(const PathResult& newPath);
 
     private:
-        NavigationSystem* navigationSystem = nullptr;
-
         PathRenderOptions pathRenderOptions;
         PathResult currentPath;
 };

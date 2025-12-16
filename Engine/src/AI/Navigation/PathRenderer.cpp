@@ -5,30 +5,21 @@
 #include "AI/Agent.h"
 #include "Scene/Scene.h"
 
-void PathRenderer::onAwake()
-{
-    navigationSystem = gameObject->getScene().getNavigationSystem();
-
-    if (navigationSystem == nullptr)
-    {
-        setEnabled(false);
-    }
-}
 
 void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 {
     const float circleRadius = pathRenderOptions.circleRadius;
+    const Color circleColor = currentPath.isValid() ? pathRenderOptions.validPathColor : pathRenderOptions.invalidPathColor;
 
-    Color circleColor = currentPath.isValid() ? pathRenderOptions.validPathColor : pathRenderOptions.invalidPathColor;
     for (const auto& node : currentPath.getPath())
     {
-        RenderCommand dot;
-        dot.type = RenderCommandType::Circle;
+        RenderCommand command;
+        command.type = RenderCommandType::Circle;
 
-        dot.position = node;
-        dot.radius = circleRadius;
-        dot.color = circleColor;
-        queue.push(dot);
+        command.position = node;
+        command.radius = circleRadius;
+        command.color = circleColor;
+        queue.push(command);
     }
 }
 

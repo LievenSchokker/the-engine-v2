@@ -1,6 +1,3 @@
-//
-// Created by samle on 14/12/2025.
-//
 #include "PathFindingZandbak.h"
 
 #include "Scene/Scene.h"
@@ -14,7 +11,6 @@
 #include "../Behaviours/NavigationTest.h"
 #include "AI/Modules/FollowPathModule.h"
 #include "AI/Navigation/NavigationGridRenderer.h"
-#include "AI/Navigation/Pathfinding/PathRenderer.h"
 
 std::unique_ptr<Scene> PathFindingZandbak::getScene()
 {
@@ -55,7 +51,6 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
     auto inputGO = std::make_unique<GameObject>("Input");
     auto navTest = inputGO->addComponent<NavigationTest>();
     auto pathRender = inputGO->addComponent<PathRenderer>();
-
     navTest->setAgent(*agentComp);
     navTest->setTarget(*player->getTransform());
 

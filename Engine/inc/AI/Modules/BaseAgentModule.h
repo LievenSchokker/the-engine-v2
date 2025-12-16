@@ -31,7 +31,7 @@ class BaseAgentModule
         /**
          * @brieff Computes a directional vector the agent should move in based on this module's definition.
          *
-         * Interally, an Agent computes its velocity by summing all module's direction vector scaled by their weight.
+         * Internally, an Agent computes its velocity by summing all module's direction vector scaled by their weight.
          *
          */
         virtual Vector2 compute() = 0;
