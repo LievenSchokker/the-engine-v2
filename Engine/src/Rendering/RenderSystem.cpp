@@ -63,3 +63,8 @@ void RenderSystem::setClearColor(const Color& color)
 {
 	clearColor = color;
 }
+
+const Color& RenderSystem::getClearColor() const
+{
+	return clearColor;
+}

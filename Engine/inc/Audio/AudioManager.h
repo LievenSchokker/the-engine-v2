@@ -1,9 +1,10 @@
 #pragma once
 
+#include "IAudioBackend.h"
+
 #include <memory>
 #include <string>
 
-class IAudioBackend;
 class AudioSource;
 class MusicSource;
 

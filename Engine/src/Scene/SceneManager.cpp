@@ -5,6 +5,11 @@
 #include <iostream>
 #include <utility>
 
+SceneManager::SceneManager()
+	: scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>())
+{
+}
+
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
 	if ( scene == nullptr )

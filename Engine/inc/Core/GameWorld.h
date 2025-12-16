@@ -21,8 +21,8 @@ class GameWorld
 	InputManager* input = nullptr;
 	ApplicationClock* clock = nullptr;
 
-	Client* client = nullptr;
-	Server* server = nullptr;
+    Client* client = nullptr;
+    Server* server = nullptr;
 
 	NetworkSpawnManager* spawnManager = nullptr;
 

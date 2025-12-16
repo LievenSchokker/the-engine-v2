@@ -1,6 +1,8 @@
 #include "Component/Profiler/Profiler.h"
 
 #include "Core/GameWorld.h"
+#include "Rendering/UIRenderCommand.h"
+#include "Scene/SceneManager.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 #include "Rendering/UIRenderCommand.h"
 

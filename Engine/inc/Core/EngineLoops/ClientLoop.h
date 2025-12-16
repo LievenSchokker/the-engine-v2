@@ -41,7 +41,7 @@ class ClientLoop: public IEngineLoop
 	 * @param applicationSpecifications Client configuration (resolution, server
 	 * address)
 	 */
-	explicit ClientLoop(std::unique_ptr<Game> game);
+	explicit ClientLoop(std::unique_ptr<Game> spel);
 	~ClientLoop() override;
 
 	GameWorld* getGameWorld() override;
@@ -63,7 +63,6 @@ class ClientLoop: public IEngineLoop
 	 */
 	void initializeNetworking();
 
-	std::unique_ptr<Game> game;
 	ApplicationSpecifications specifications;
 	std::unique_ptr<GameWorld> gameWorld;
 	std::unique_ptr<SceneManager> sceneManager;

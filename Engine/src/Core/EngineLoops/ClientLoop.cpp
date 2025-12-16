@@ -1,57 +1,52 @@
 #include "Core/EngineLoops/ClientLoop.h"
 
+#include "Audio/Components/MusicSource.h"
 #include "Audio/SDL/AudioBackendSDL.h"
-#include "Core/ApplicationClock.h"
 #include "Core/EngineLoops/ServerLoop.h"
 #include "External/SDLBackendContext.h"
 #include "Game.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Networking/Client.h"
-#include "Networking/Server/Server.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/TransportGNS.h"
 #include "Rendering/IRenderer.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/SDL/SDLRenderer.h"
-#include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
 // TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-	: sceneManager(std::make_unique<SceneManager>()),
-	  game(std::move(spel)),
+	: sceneManager(std::move(spel->getSceneManager())),
 	  gameWorld(std::make_unique<GameWorld>()),
-	  specifications(game->getApplicationSpecifications()),
+	  specifications(spel->getApplicationSpecifications()),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
 	  isShutdown(false)
 {
+	gameWorld->sceneManager = sceneManager.get();
+
 	clockFunction = []() { return 1.0; };
 	if ( specifications.renderBackend == RenderBackend::SDL )
 	{
-		backendContext = std::make_unique<SDLBackendContext>();
 		// TODO SDL Injection layer
+		backendContext = std::make_unique<SDLBackendContext>();
 		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
 		std::unique_ptr<IRenderer> sdlRenderer =
 			std::make_unique<SDLRenderer>(*backendContext);
+
 		sdlRenderer->open(specifications.windowOptions);
 		renderer = std::make_unique<RenderSystem>(std::move(sdlRenderer));
-
-		// Audio
-		auto audioBackend = std::make_unique<AudioBackendSDL>();
-		audioManager = std::make_unique<AudioManager>();
-		audioManager->initialize(std::move(audioBackend));
+		gameWorld->render = renderer.get();
 	}
-	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
-	std::string scene = scenePtr->getName();
-
-	sceneManager->addScene(std::move(scenePtr));
-	sceneManager->setActiveScene(scene);
 
 	// Set GameWorld references for behaviors to access
 	gameWorld->sceneManager = sceneManager.get();
 	gameWorld->input = InputManager::getInstance();
 	inputManager = InputManager::getInstance();
+
+	// Aduio
+	auto backend = std::make_unique<AudioBackendSDL>();
+	audioManager = std::make_unique<AudioManager>();
+	audioManager->initialize(std::move(backend));
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -69,6 +64,15 @@ void ClientLoop::update(double deltaTime)
 	}
 	inputManager->update();
 
+	auto activeScene = sceneManager->getActiveScene();
+	if ( activeScene == nullptr )
+	{
+		throw std::runtime_error(
+			"ClientLoop::update(): No active scene available. Ensure at least "
+			"one scene is registered and active.");
+	}
+
+	renderer->update(deltaTime, *activeScene);
 	// Update behaviors unconditionally (even when paused) so debug controls
 	// work This allows behaviors to handle input that needs to work when paused
 	sceneManager->updateAlways(deltaTime, gameWorld.get());

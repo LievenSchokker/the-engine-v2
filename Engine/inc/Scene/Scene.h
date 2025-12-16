@@ -124,9 +124,9 @@ class Scene
         void update(double deltaTime, GameWorld* world);
 
         /**
-         * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
-         *
-         * @param behaviours the behaviours that need to be initialised.
+	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
+	 * Does not enable the behaviours on their own only calls the callback.
+	 * @param behaviours the behaviours that need to be initialised.
          */
         void initialiseBehaviours(const std::vector<Behaviour *> &behaviours);
 
@@ -177,9 +177,8 @@ class Scene
          * @return the GameObject whose id matches the argument, nullptr if the id is not found on any of this scene's GameObjects.
          */
         GameObject* getGameObjectById(int id) const;
+private:
 
-
-    private:
         /// @brief Method that removes the @c gameObject from the containers storing it
         bool removeGameObjectInternal(GameObject* gameObject);
 
@@ -190,6 +189,7 @@ class Scene
         std::map<const GameObject*, int> gameObjectIds;
 
         /// Incremented everytime a GameObject is added to this scene.
+	std::vector<Behaviour*> beforeEnableBehaviours;
         int currentGameObjectId;
         std::string name;
         std::vector<std::unique_ptr<GameObject> > gameObjects;
