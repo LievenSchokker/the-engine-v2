@@ -22,7 +22,7 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
     playerRenderer->setCircle(50);
     playerRenderer->setColor({0, 255, 0, 255});
     auto playerMovement = player->addComponent<SimpleMoveBehaviour>();
-    playerMovement->setMaxSpeed(250.0f);
+    playerMovement->setMaxSpeed(10.0f);
     player->getTransform()->setPosition({500, 500});
 
     /// Agent

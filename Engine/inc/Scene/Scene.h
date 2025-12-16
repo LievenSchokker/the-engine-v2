@@ -68,6 +68,11 @@ class Scene
         bool removeGameObject(const std::string &name);
 
         /**
+         * @brief Removes a GameObject from the scene (destroys it).
+         */
+        void removeGameObject(GameObject* obj);
+
+        /**
          * @brief Look up a game object by name.
          *
          * @param name Name of the game object to retrieve.
@@ -183,31 +188,28 @@ class Scene
 
         NavigationSystem* getNavigationSystem() const;
 
+        /**
+* @brief Removes a GameObject by pointer and returns it.
+*/
+        std::unique_ptr<GameObject> extractGameObject(GameObject* obj);
+
+        /**
+         * @brief Gets mutable access to all GameObjects.
+         */
+        std::vector<std::unique_ptr<GameObject>>& getGameObjects();
+        const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
+
+
     private:
         /// @brief Method that removes the @c gameObject from the containers storing it
         bool removeGameObjectInternal(GameObject* gameObject);
 
-	    /**
-	    * @brief Removes a GameObject by pointer and returns it.
-	    */
-	    std::unique_ptr<GameObject> extractGameObject(GameObject* obj);
-
-	    /**
-	     * @brief Removes a GameObject from the scene (destroys it).
-	     */
-	    void removeGameObject(GameObject* obj);
-
-	    /**
-	     * @brief Gets mutable access to all GameObjects.
-	     */
-	    std::vector<std::unique_ptr<GameObject>>& getGameObjects();
-	    const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
 
 
-    /// @brief Method that adds the @c gameObject to the internal containers storing it
-     bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
+        /// @brief Method that adds the @c gameObject to the internal containers storing it
+        bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
 
-     /// Map stores the GameObject and their scene id.
+        /// Map stores the GameObject and their scene id.
         std::map<const GameObject*, int> gameObjectIds;
 
         /// Incremented everytime a GameObject is added to this scene.
