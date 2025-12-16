@@ -4,6 +4,7 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "Core/IEngineLoop.h"
+#include "Networking/ITransport.h"
 #include "Networking/NetworkingIdentityRegistry.h"
 #include "Networking/Server/StateSyncSystem.h"
 
@@ -44,6 +45,7 @@ public:
 	 * @param applicationSpecifications Server configuration (tick rate, network settings)
 	 */
 	explicit ServerLoop(const std::unique_ptr<Game>& game);
+    ServerLoop(const std::unique_ptr<Game>& game, std::unique_ptr<ITransport> transport);
 	~ServerLoop() override;
 
 	GameWorld* getGameWorld() override;

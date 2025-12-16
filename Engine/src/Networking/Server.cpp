@@ -179,6 +179,10 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 
 void Server::handleNewClientConnected(int clientId) const
 {
+    if (!messageDispatcher)
+    {
+        return;
+    }
     auto message = std::make_unique<WelcomeMessage>(clientId);
     messageDispatcher->processMessage(std::move(message));
 }
