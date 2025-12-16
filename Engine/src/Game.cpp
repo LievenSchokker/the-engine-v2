@@ -24,3 +24,8 @@ std::unique_ptr<Scene> Game::getFirstScene()
 	if (scenes.empty()) return nullptr;
 	return std::move(scenes[0]);
 }
+
+std::vector<std::unique_ptr<Scene>> Game::getAllScenes()
+{
+	return std::move(scenes);
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 
+class AudioManager;
 class Server;
 class Client;
 class SceneManager;
@@ -21,6 +22,7 @@ public:
 	RenderSystem* render = nullptr;
 	InputManager* input = nullptr;
 	ApplicationClock* clock = nullptr;
+	AudioManager* audio = nullptr;
 
 	Client* client = nullptr;
 	Server* server = nullptr;

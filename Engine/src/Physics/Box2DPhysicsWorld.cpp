@@ -6,6 +6,8 @@
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"
 
+#include <iostream>
+
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
 	: worldId{}
 	  , tickRate(newTickRate)
@@ -14,8 +16,14 @@ Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
 
 void Box2DPhysicsWorld::initialize()
 {
-}
+	std::cout << "Box2DPhysicsWorld::initialize() called" << std::endl;
 
+	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = {0.0f, 30.0f};
+	worldId = b2CreateWorld(&worldDef);
+
+	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
+}
 
 void Box2DPhysicsWorld::step(float deltaTime)
 {

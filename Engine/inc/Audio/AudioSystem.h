@@ -14,8 +14,8 @@ public:
 	explicit AudioSystem(std::unique_ptr<IAudioBackend> backend);
 	~AudioSystem() override;
 
-	void start(GameWorld& gameWorld) override;
-	void update(float deltaTime, const GameWorld& gameWorld) override;
+	SystemStatus start(GameWorld& gameWorld) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 	void shutdown(GameWorld& gameWorld) override;
 
 	const std::string getName() const override { return "AudioSystem"; }

@@ -144,6 +144,10 @@ public:
 	Scene* getPersistentScene() const;
 
 	const std::string getName() const override;
+
+	SystemStatus start(GameWorld& gameWorld) override;
+
+	void setScenes(std::vector<std::unique_ptr<Scene>> scene);
 private:
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;

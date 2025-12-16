@@ -6,6 +6,8 @@
 class PhysicsSystem : public IEngineSystem
 {
 public:
+
+	PhysicsSystem();
 	/**
 	 * @brief Initializes the Box2D world.
 	 *
@@ -13,7 +15,7 @@ public:
 	 * world settings such as gravity. Must be called before update() or
 	 * body creation.
 	 */
-	void start(GameWorld& gameWorld) override;
+	SystemStatus start(GameWorld& gameWorld) override;
 
 	/**
 	 * @brief Steps the Box2D simulation forward by one fixed timestep.
@@ -21,7 +23,7 @@ public:
 	 * The timestep and substep count are typically configured internally.
 	 * This method is called by PhysicsSystem::update().
 	 */
-	void fixedUpdate(float deltaTime, const GameWorld& gameWorld) override;
+	void fixedUpdate(double deltaTime, const GameWorld& gameWorld) override;
 
 	/**
 	 * @brief Shuts down the physics world.

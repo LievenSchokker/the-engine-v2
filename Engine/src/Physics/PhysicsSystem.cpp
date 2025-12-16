@@ -1,13 +1,20 @@
 #include "Physics/PhysicsSystem.h"
 #include "Core/GameWorld.h"
+#include "Physics/Box2D/Box2DPhysicsWorld.h"
 
-void PhysicsSystem::start(GameWorld& gameWorld)
+PhysicsSystem::PhysicsSystem()
+	: physicsWorld(std::make_unique<Box2DPhysicsWorld>())
+{
+}
+
+SystemStatus PhysicsSystem::start(GameWorld& gameWorld)
 {
 	physicsWorld->initialize();
 	gameWorld.physics = physicsWorld.get();
+	return SystemStatus::Running;
 }
 
-void PhysicsSystem::fixedUpdate(const float deltaTime,
+void PhysicsSystem::fixedUpdate(const double deltaTime,
                                 const GameWorld& gameWorld)
 {
 	physicsWorld->step(deltaTime);

@@ -5,6 +5,12 @@
 #include <iostream>
 #include <utility>
 
+SystemStatus SceneManager::start(GameWorld& gameWorld)
+{
+	gameWorld.sceneManager = this;
+	return SystemStatus::Running;
+}
+
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
 	if (scene == nullptr)
@@ -213,4 +219,14 @@ Scene* SceneManager::getPersistentScene() const
 const std::string SceneManager::getName() const
 {
 	return "SceneManager";
+}
+
+void SceneManager::setScenes(std::vector<std::unique_ptr<Scene>> scenesVec)
+{
+	scenes.clear();
+	for (auto& scene : scenesVec)
+	{
+		std::string name = scene->getName();
+		scenes[name] = std::move(scene);
+	}
 }

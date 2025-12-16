@@ -41,6 +41,7 @@ public:
 
 
 	std::unique_ptr<Scene> getFirstScene();
+	std::vector<std::unique_ptr<Scene>> getAllScenes();
 private:
     ApplicationSpecifications specifications;
 

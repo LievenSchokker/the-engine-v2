@@ -1,29 +1,30 @@
+
 #include "Audio/AudioSystem.h"
 
 #include "Audio/AudioManager.h"
+#include "Audio/IAudioBackend.h"
 #include "Core/GameWorld.h"
 
 AudioSystem::AudioSystem(std::unique_ptr<IAudioBackend> backend)
-	: audioManager_(std::make_unique<AudioManager>())
-	, backend_(std::move(backend))
+	: audioManager(std::make_unique<AudioManager>())
+	, backend(std::move(backend))
 {
 }
 
 AudioSystem::~AudioSystem() = default;
 
-void AudioSystem::start(GameWorld& gameWorld)
+SystemStatus AudioSystem::start(GameWorld& gameWorld)
 {
-	audioManager_->initialize(std::move(backend_));
-	gameWorld.audio = audioManager_.get();
+	audioManager->initialize(std::move(backend));
+	return SystemStatus::Running;
 }
 
-void AudioSystem::update(float deltaTime, const GameWorld& gameWorld)
+void AudioSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
 	// Future: update audio listeners, 3D positioning, etc.
 }
 
 void AudioSystem::shutdown(GameWorld& gameWorld)
 {
-	gameWorld.audio = nullptr;
-	audioManager_->shutdown();
+	audioManager->shutdown();
 }
