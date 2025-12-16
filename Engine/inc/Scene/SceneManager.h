@@ -10,6 +10,7 @@
 #include "Component/NetworkIdentity.h"
 #include "Networking/PrefabLibrary.h"
 #include "Networking/Connection/ConnectionMode.h"
+#include "Rendering/Color.h"
 
 /**
  * @brief Coordinates ownership and activation of scenes.

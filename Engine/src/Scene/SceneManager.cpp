@@ -9,6 +9,11 @@
 #include <iostream>
 #include <utility>
 
+SceneManager::SceneManager()
+    : scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>())
+{
+}
+
 void SceneManager::configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnMgr)
 {
     networkMode = mode;

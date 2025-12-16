@@ -21,7 +21,7 @@
 
 ServerLoop::ServerLoop(const std::unique_ptr<Game>& game)
 	: specifications(game->getApplicationSpecifications())
-	  , sceneManager(std::make_unique<SceneManager>())
+	  , sceneManager(game->getSceneManager())
 	  , server(std::make_unique<Server>(
 		 Server::convertApplicationSettings(specifications),
 		 std::make_unique<TransportGNS>()))
@@ -36,10 +36,6 @@ ServerLoop::ServerLoop(const std::unique_ptr<Game>& game)
 		return duration<double>(steady_clock::now().time_since_epoch()).count();
 	};
 
-	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
-	std::string sceneName = scenePtr->getName();
-
-	sceneManager->addScene(std::move(scenePtr));
 
 	gameWorld->server = server.get();
 	gameWorld->sceneManager = sceneManager.get();
@@ -50,8 +46,6 @@ ServerLoop::ServerLoop(const std::unique_ptr<Game>& game)
 	gameWorld->spawnManager = spawnManager.get();
 
 	sceneManager->configureNetworking(ConnectionMode::Host, spawnManager.get());
-
-	sceneManager->setActiveScene(sceneName);
 
 	stateSync = std::make_unique<StateSyncSystem>(
 		server.get(),
@@ -75,10 +69,6 @@ ServerLoop::ServerLoop(const std::unique_ptr<Game>& game, std::unique_ptr<ITrans
         return duration<double>(steady_clock::now().time_since_epoch()).count();
     };
 
-    std::unique_ptr<Scene> scenePtr = game->getFirstScene();
-    std::string sceneName = scenePtr->getName();
-
-    sceneManager->addScene(std::move(scenePtr));
 
     gameWorld->server = server.get();
     gameWorld->sceneManager = sceneManager.get();
@@ -89,8 +79,6 @@ ServerLoop::ServerLoop(const std::unique_ptr<Game>& game, std::unique_ptr<ITrans
     gameWorld->spawnManager = spawnManager.get();
 
     sceneManager->configureNetworking(ConnectionMode::Host, spawnManager.get());
-
-    sceneManager->setActiveScene(sceneName);
 
     stateSync = std::make_unique<StateSyncSystem>(
         server.get(),

@@ -41,7 +41,6 @@ int main(int argc, char** argv)
     std::unique_ptr<IZandbak> zandbak = std::make_unique<AgentsZandbak>();
 	std::unique_ptr<Scene> scene = zandbak->getScene();
 
-	scene->addGameObject(std::move(profiler));
 	spel->addScene(std::move(scene));
 	spel->setApplicationSpecifications(spec);
 	return SpelMotorEntry::main(std::move(spel));

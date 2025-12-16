@@ -26,6 +26,11 @@ class GameWorld
 
 	NetworkSpawnManager* spawnManager = nullptr;
 
+    bool isClient() const
+    {
+        return client != nullptr;
+    }
+
 	bool isServer() const
 	{
 		return server != nullptr;

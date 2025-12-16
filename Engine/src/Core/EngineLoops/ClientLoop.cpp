@@ -7,10 +7,10 @@
 #include "Game.h"
 #include "Game.h"
 #include "Core/ApplicationClock.h"
-#include "External/SdlContext.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Networking/Client.h"
+#include "Networking/NetworkSpawnManager.h"
 #include "Networking/Server/ServerInformation.h"
 #include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Networking/TransportGNS.h"
@@ -50,12 +50,7 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	// Aduio
 	auto backend = std::make_unique<AudioBackendSDL>();
 	audioManager = std::make_unique<AudioManager>();
-	audioManager->initialize(std::move(backend));
 
-	std::unique_ptr<Scene> scenePtr = game->getFirstScene();
-	const std::string sceneName = scenePtr->getName();
-
-	sceneManager->addScene(std::move(scenePtr));
 
 	gameWorld->input = InputManager::getInstance();
 	gameWorld->client = client.get();
@@ -66,7 +61,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 
 	sceneManager->configureNetworking(ConnectionMode::Client, spawnManager.get());
 
-	sceneManager->setActiveScene(sceneName);
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -134,23 +128,6 @@ void ClientLoop::initializeNetworking()
 	client->injectMessageDispatcher(std::move(dispatcher));
 }
 
-void ClientLoop::update(double deltaTime)
-{
-	inputManager->update();
-	renderer->update(deltaTime, *sceneManager->getActiveScene());
-}
-
-void ClientLoop::fixedUpdate(double deltaTime)
-{
-	client->poll();
-	sceneManager->update(deltaTime, gameWorld.get());
-
-	if (inputManager->quitRequested())
-	{
-		shutdown();
-	}
-}
-
 void ClientLoop::shutdown()
 {
 	isShutdown = true;
@@ -173,18 +150,13 @@ GameWorld* ClientLoop::getGameWorld()
 
 SceneManager* ClientLoop::getSceneManager()
 {
-	return sceneManager.get();
+    if ( sceneManager ) return sceneManager.get();
+    return nullptr;
 }
 
 ClientLoop::ClockFunction ClientLoop::getClock()
 {
 	return clockFunction;
-}
-
-SceneManager* ClientLoop::getSceneManager()
-{
-	if ( sceneManager ) return sceneManager.get();
-	return nullptr;
 }
 
 void ClientLoop::setApplicationClock(ApplicationClock* clock)

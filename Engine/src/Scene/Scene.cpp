@@ -377,9 +377,6 @@ const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const
 {
     return gameObjects;
 }
-	gameObjects.clear();
-}
-
 
 int Scene::getSceneId(const GameObject& gameObject) const
 {
