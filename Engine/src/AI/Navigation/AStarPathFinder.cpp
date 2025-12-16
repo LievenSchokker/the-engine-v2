@@ -41,12 +41,6 @@ struct CompareAStarNodes
 };
 
 
-AStarPathFinder::AStarPathFinder()
-{
-    heuristicType = HeuristicType::EUCLIDIAN;
-}
-
-
 PathResult AStarPathFinder::findPath(const IPathfindingGraph& graph, Vector2 start, Vector2 end) const
 {
     if (!graph.isValid(start) || !graph.isValid(end))

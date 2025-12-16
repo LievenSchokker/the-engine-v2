@@ -6,6 +6,7 @@
 
 
 #include "BaseAgentModule.h"
+#include "Math/Vector2.h"
 #include <vector>
 
 /**
@@ -22,14 +23,14 @@ class FollowPathModule : public BaseAgentModule
          * Use overloaded constructor to set another value upon construction, or use the @c setWaypointRadius() method.
          * @param agent
          */
-        explicit FollowPathModule(const Agent& agent) : BaseAgentModule(agent), currentPathIndex(0), waypointRadius(1.0f), lastRawPath({}) {}
+        explicit FollowPathModule(const Agent& agent) : BaseAgentModule(agent), currentPathIndex(0), waypointRadius(2.0f) {}
 
         /**
          * @brief Overloaded constructor takes in a float to set as radius for agents to consider being at their next waypoint on the path.
          * @param agent
          * @param arriveRadius
          */
-        explicit FollowPathModule(const Agent& agent, float arriveRadius) : BaseAgentModule(agent), currentPathIndex(0), waypointRadius(arriveRadius), lastRawPath({}) {}
+        explicit FollowPathModule(const Agent& agent, float arriveRadius) : BaseAgentModule(agent), currentPathIndex(0), waypointRadius(arriveRadius) {}
         ~FollowPathModule() override = default;
 
         /**
@@ -50,17 +51,15 @@ class FollowPathModule : public BaseAgentModule
         void setWayPointRadius(float radius);
 
     private:
-        std::vector<Vector2> convertToWorldCoordinates(const std::vector<Vector2>& rawPathPoints);
-
         /// @brief Internally used to determine where the agent is on the current path.
         size_t currentPathIndex;
 
         /// @brief Used to determine when the agent has "reached" the next path waypoint.
         float waypointRadius;
 
-        /// @brief Store the previous path of the agent (raw == SurfacePoint coordinates, stored in PathResult)
-        std::vector<Vector2> lastRawPath;
+        /// @brief Store the previous path of the agent
+        std::vector<Vector2> lastKnownPath;
 
-        /// @brief Store the current path's world coordinates
-        std::vector<Vector2> currentPathWorldPoints;
+        /// @brief Store the current path's
+        std::vector<Vector2> currentPath;
 };

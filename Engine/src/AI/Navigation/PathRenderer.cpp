@@ -25,7 +25,7 @@ void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
         RenderCommand dot;
         dot.type = RenderCommandType::Circle;
 
-        dot.position = navigationSystem->getNavigationSurface()->toWorldPoint(node);
+        dot.position = node;
         dot.radius = circleRadius;
         dot.color = circleColor;
         queue.push(dot);

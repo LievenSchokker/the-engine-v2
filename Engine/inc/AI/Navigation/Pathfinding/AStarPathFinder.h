@@ -24,7 +24,7 @@ struct PathResult;
 class AStarPathFinder final : public IPathFinder
 {
     public:
-        explicit AStarPathFinder();
+        explicit AStarPathFinder() : heuristicType(HeuristicType::EUCLIDIAN) {}
         explicit AStarPathFinder(HeuristicType heuristic) :  heuristicType(heuristic){}
         ~AStarPathFinder() override = default;
 

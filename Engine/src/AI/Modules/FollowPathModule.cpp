@@ -8,6 +8,7 @@
 #include "Scene/Scene.h"
 
 
+
 Vector2 FollowPathModule::compute()
 {
     if (!agent.hasPath())
@@ -15,62 +16,40 @@ Vector2 FollowPathModule::compute()
 
     /// Note: We need to retrieve this every call because the agent's path might change.
     const PathResult& pathResult = agent.getCurrentPath();
-    const auto& agentPathRaw = pathResult.getPath();
+    const auto& agentPath = pathResult.getPath();
 
     /// Agent has a new path:
-    if (agentPathRaw != lastRawPath)
+    if (agentPath != lastKnownPath)
     {
-        lastRawPath = agentPathRaw;
+        currentPath = agentPath;
         currentPathIndex = 0;
-        currentPathWorldPoints = convertToWorldCoordinates(agentPathRaw);
+        lastKnownPath = currentPath;
     }
 
-    /// Agent has reached the end of his path, this module becomes "inactive".
-    if (currentPathIndex >= currentPathWorldPoints.size())
+    /// Agent is at last waypoint of this path:
+    if (currentPathIndex >= currentPath.size() - 1)
     {
+        const Vector2& finalWaypoint = currentPath.back();
+
+        if (Vector2::distance(agentTransform.getPosition(), finalWaypoint) < waypointRadius)
+            return Vector2::zero();
+    }
+
+    /// Agent is still following along the path.
+    const Vector2& currentWaypoint = currentPath[currentPathIndex];
+    if (Vector2::distance(agentTransform.getPosition(), currentWaypoint) < waypointRadius)
+    {
+        currentPathIndex++;
         return Vector2::zero();
     }
 
-    /// Keep track of where the agent is along the path by incrementing the index if the distance between agent and waypoint < radius.
-    const Vector2& currentWaypoint = currentPathWorldPoints[currentPathIndex];
-    if (Vector2::distance(agentTransform.getPosition(), currentWaypoint) < waypointRadius)
-    {
-        currentPathIndex = std::min(currentPathIndex + 1, currentPathWorldPoints.size() -1);
-    }
-
-    /// Return a normalised vector pointing from agent towards the current waypoint.
     return (currentWaypoint - agentTransform.getPosition()).normalised();
-}
-
-
-std::vector<Vector2> FollowPathModule::convertToWorldCoordinates(const std::vector<Vector2> &rawPathPoints)
-{
-    /// Need to lookup every frame to ensure the system and surface both still exist.
-    auto navSystem = agent.getGameObject()->getScene().getNavigationSystem();
-    if (!navSystem)
-        return {};
-
-    auto navSurface = navSystem->getNavigationSurface();
-    if (!navSurface)
-        return {};
-
-
-    std::vector<Vector2> worldPath;
-    worldPath.reserve(rawPathPoints.size());
-
-    /// Convert everu point in the path to world coordinates using the systems's INavSurface.
-    for (const auto& point : rawPathPoints)
-    {
-        worldPath.push_back(navSurface->toWorldPoint(point));
-    }
-
-    return worldPath;
 }
 
 
 void FollowPathModule::setWayPointRadius(float radius)
 {
-    waypointRadius = radius;
+    waypointRadius = std::max(1.0f, radius);
 }
 
 
