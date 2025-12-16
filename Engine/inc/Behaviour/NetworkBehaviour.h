@@ -173,4 +173,4 @@ private:
 	std::unordered_map<std::string, ActionCallback> commands;
 };
 
-#include "NetworkBehaviour.hpp"
+#include "NetworkBehaviour.inl"
