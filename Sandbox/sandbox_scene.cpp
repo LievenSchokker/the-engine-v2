@@ -1,4 +1,5 @@
 #include "Behaviour/Behaviour.h"
+#include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
@@ -50,11 +51,17 @@ class SandboxInputBehaviour: public Behaviour
 		{
 			return;
 		}
-		if ( inputManager->wasKeyPressed(KeyCode::D) )
+		if ( inputManager->wasKeyPressed(KeyCode::E) )
 		{
 			auto circle = scene->getGameObject("BlueCircle");
-			auto component = circle->getComponent<SimpleMoveBehaviour>();
-			component->setEnabled(!component->getIsEnabled());
+			if ( circle != nullptr )
+			{
+				auto component = circle->getComponent<SimpleMoveBehaviour>();
+				if ( component != nullptr )
+				{
+					component->setEnabled(!component->getIsEnabled());
+				}
+			}
 		}
 
 		// Handle SPACE key to toggle clear color
@@ -242,6 +249,21 @@ int main(int argc, char** argv)
 
 	auto prototypeScene = createPrototypeScene();
 	auto secondScene = createSecondScene();
+
+	// Create a debug controller and add it directly to the persistent scene
+	// This ensures debug controls work across all scene transitions
+	auto debugController = std::make_unique<GameObject>();
+	debugController->setName("DebugController");
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::NUMBER_1_AND_EXCLAMATION,	// Pause key
+		std::nullopt,						// Normal speed (disabled)
+		KeyCode::NUMBER_2_AND_AT,			// Slow (enabled)
+		KeyCode::NUMBER_3_AND_HASHMARK,		// Very slow (enabled)
+		KeyCode::NUMBER_4_AND_DOLLAR,		// Fast (enabled)
+		std::nullopt,						// Very fast (disabled)
+		true								// Print menu
+	);
+	game->addToPersistentScene(std::move(debugController));
 
 	// Attach behavior
 	auto goInputHandler = std::make_unique<GameObject>();

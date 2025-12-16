@@ -3,7 +3,10 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
+
 #include <memory>
+
+class GameObject;
 
 /**
  * @class Game
@@ -50,6 +53,17 @@ class Game
 	 * @return true when the scene exists and becomes active, false otherwise.
 	 */
 	bool setActiveScene(const std::string& name) const;
+
+	/**
+	 * @brief Add a game object directly to the persistent scene.
+	 *
+	 * The persistent scene is always active and never stopped, making it ideal
+	 * for debug controls and other cross-scene utilities. Objects added to the
+	 * persistent scene persist across all scene transitions.
+	 *
+	 * @param gameObject Game object instance to transfer ownership of.
+	 */
+	void addToPersistentScene(std::unique_ptr<GameObject> gameObject);
 
 	std::unique_ptr<SceneManager> getSceneManager();
 

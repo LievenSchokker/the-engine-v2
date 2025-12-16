@@ -92,7 +92,6 @@ class DebugTimeControlBehaviour: public Behaviour
 	InputManager* inputManager;
 	ApplicationClock* clock;
 	bool menuPrinted;
-	bool movedToPersistentScene;
 
 	// Configurable key bindings
 	std::optional<KeyCode> pauseKey;

@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include "GameObject/GameObject.h"
+
 Game::Game() : sceneManager(std::make_unique<SceneManager>()) {};
 Game::~Game() = default;
 
@@ -32,6 +34,19 @@ bool Game::setActiveScene(const std::string& name) const
 		return false;
 	}
 	return sceneManager->setActiveScene(name);
+}
+
+void Game::addToPersistentScene(std::unique_ptr<GameObject> gameObject)
+{
+	if ( sceneManager == nullptr )
+	{
+		return;
+	}
+	Scene* persistentScene = sceneManager->getOrCreatePersistentScene();
+	if ( persistentScene != nullptr )
+	{
+		persistentScene->addGameObject(std::move(gameObject));
+	}
 }
 
 std::unique_ptr<SceneManager> Game::getSceneManager()

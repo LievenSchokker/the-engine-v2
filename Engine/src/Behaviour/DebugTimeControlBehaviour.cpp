@@ -4,7 +4,6 @@
 #include "Core/GameWorld.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
-#include "Scene/SceneManager.h"
 
 #include <iostream>
 #include <optional>
@@ -17,7 +16,6 @@ DebugTimeControlBehaviour::DebugTimeControlBehaviour(
 	: inputManager(nullptr),
 	  clock(nullptr),
 	  menuPrinted(false),
-	  movedToPersistentScene(false),
 	  pauseKey(pauseKey),
 	  normalSpeedKey(normalSpeedKey),
 	  slowKey(slowKey),
@@ -45,41 +43,6 @@ void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 	if ( inputManager == nullptr )
 	{
 		return;
-	}
-
-	// Move to persistent scene on first update (if not already there)
-	// This ensures debug controls persist across scene transitions
-	if ( !movedToPersistentScene && world != nullptr &&
-		 world->sceneManager != nullptr )
-	{
-		SceneManager* sceneManager = world->sceneManager;
-		Scene* persistentScene = sceneManager->getOrCreatePersistentScene();
-		GameObject* thisObject = getGameObject();
-
-		if ( thisObject != nullptr && persistentScene != nullptr )
-		{
-			const std::string objectName = thisObject->getName();
-
-			// Check if object already exists in persistent scene
-			if ( persistentScene->getGameObject(objectName) == nullptr )
-			{
-				// Try to transfer from active scene if object is there
-				Scene* activeScene = sceneManager->getActiveScene();
-				if ( activeScene != nullptr && activeScene != persistentScene &&
-					 activeScene->getGameObject(objectName) != nullptr )
-				{
-					// Transfer from active scene to persistent scene
-					sceneManager->transferGameObject(activeScene->getName(),
-													 persistentScene->getName(),
-													 objectName);
-				}
-				// Note: If object is in a non-active scene, it won't be
-				// transferred automatically. Add debug controller directly to
-				// persistent scene for best results.
-			}
-		}
-		movedToPersistentScene =
-			true;  // Mark as attempted to avoid repeated checks
 	}
 
 	// Get clock from GameWorld
