@@ -135,7 +135,17 @@ public:
 	const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
 	void addComponent(std::unique_ptr<Component> component);
-private:
+
+	/**
+	 * @brief Retrieves all components of type T from @c components.
+	 *
+	 * @tparam T Type of the components to get (must inherit from Component)
+	 * @return Vector of pointers to all matching components
+	 */
+	template <typename T>
+	std::vector<T*> getAllComponentsOfType() const;
+
+   private:
 	/// Helper function to iterate through @c components
 	template <typename T>
 	std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();

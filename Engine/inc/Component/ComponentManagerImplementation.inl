@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Component/ComponentManager.h"
 
 #include <algorithm>
 #include <type_traits>
@@ -114,3 +115,17 @@ auto ComponentManager::getComponentIterator() const -> std::vector<
 	                    });
 }
 
+template <typename T>
+std::vector<T*> ComponentManager::getAllComponentsOfType() const
+{
+	std::vector<T*> result;
+	for ( const auto& comp : components )
+	{
+		T* casted = dynamic_cast<T*>(comp.get());
+		if ( casted != nullptr )
+		{
+			result.push_back(casted);
+		}
+	}
+	return result;
+}
