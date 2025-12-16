@@ -20,6 +20,7 @@ class SpelMotor
 {
    public:
 	explicit SpelMotor(std::unique_ptr<Game> game);
+    SpelMotor(std::unique_ptr<Game> game, std::unique_ptr<IEngineLoop> engineLoop);
 	~SpelMotor();
 	/**
 	 * @brief Starts the engine and enters the main game loop.

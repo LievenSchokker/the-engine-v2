@@ -240,30 +240,25 @@ void Scene::update(double deltaTime, GameWorld* world)
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
 {
-	/// First call awake on all behaviours:
-	for ( auto& behaviour : behaviours )
-	{
-		if ( behaviour == nullptr )
-		    continue;
-
-        /// Awake may only be called once per behaviour
+    for ( auto& behaviour : behaviours )
+    {
+        if ( behaviour == nullptr )
+            continue;
         if (!behaviour->getHasAwakened())
             behaviour->awake();
     }
 
-    /// Then call onEnable on all enabled behaviours on active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
             continue;
 
-		if ( behaviour->getIsActiveAndEnabled() && !behaviour->getIsEnabled() )
-		{
-			behaviour->setEnabled(true);
-		}
+        if (behaviour->getGameObject()->getIsActive() && behaviour->getIsEnabled())
+        {
+            behaviour->onEnable();
+        }
     }
 
-    /// Lastly call start on all enabled behaviours on Active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
@@ -272,34 +267,10 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
         if (!behaviour->getIsActiveAndEnabled())
             continue;
 
-        /// Start may only be called once per behaviour
         if (!behaviour->getHasStarted())
             behaviour->start();
     }
 }
-//
-// void Scene::collectRenderCommands(RenderQueue& queue) const
-// {
-// 	if ( !active )
-// 	{
-// 		return;
-// 	}
-//
-// 	// Collect commands from RenderComponents
-// 	for ( auto* component : getAllComponentsOfType<RenderComponent>() )
-// 	{
-// 		if ( component == nullptr ) continue;
-// 		component->fillRenderQueue(queue);
-// 	}
-//
-// 	// Collect commands from UserInterfaceRenderComponents
-// 	for ( auto* component :
-// 		  getAllComponentsOfType<UserInterfaceRenderComponent>() )
-// 	{
-// 		if ( component == nullptr ) continue;
-// 		component->fillUserInterfaceRenderQueue(queue);
-// 	}
-// }
 
 void Scene::queueDestroy(GameObject* obj)
 {
