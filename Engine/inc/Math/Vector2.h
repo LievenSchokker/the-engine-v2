@@ -95,7 +95,7 @@ struct Vector2
     /// Divides this vector's component by a scalar value (v1.x / scalar, v1.y / scalar)
     Vector2 &operator/=(float scalar);
 
-    /// Flips the components of this vector (1 -> -1, -2 -> 2)
+    /// Flips the components of this vector (1 -> -1, -2 -> 2)s
     Vector2 operator-() const;
 
     /// Returns wheter this and the other are equal (using float epsilon)
@@ -113,6 +113,6 @@ struct Vector2Hash
 {
     std::size_t operator()(const Vector2& v) const
     {
-        return std::hash<int>()(v.x) ^ (std::hash<int>()(v.y) << 1);
+        return std::hash<float>()(v.x) ^ (std::hash<float>()(v.y) << 1);
     }
 };
