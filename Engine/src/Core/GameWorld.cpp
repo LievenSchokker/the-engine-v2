@@ -3,7 +3,7 @@
 #include "Networking/Server/Server.h"
 #include "Networking/Messages/IMessage.h"
 
-bool GameWorld::sendToServer(const IMessage& message) const
+bool GameWorld::sendToServer(const IMessage& message)
 {
     if (client)
     {
@@ -12,7 +12,8 @@ bool GameWorld::sendToServer(const IMessage& message) const
     return false;
 }
 
-bool GameWorld::broadcastToClients(const IMessage& message) const
+
+bool GameWorld::broadcastToClients(const IMessage& message)
 {
     if (server)
     {
@@ -21,11 +22,13 @@ bool GameWorld::broadcastToClients(const IMessage& message) const
     return false;
 }
 
-bool GameWorld::sendToClient(int clientId, const IMessage& message) const
+
+bool GameWorld::sendToClient(int clientId, const IMessage& message)
 {
     if (server)
     {
         return server->sendMessage(clientId, message);
     }
     return false;
+
 }

@@ -43,14 +43,6 @@ class Game
 	 */
 	void addScene(std::unique_ptr<Scene> scene);
 
-	/**
-	 * @brief Activate a new scene.
-	 *
-	 * @param name Name of the scene to activate.
-	 * @return true when the scene exists and becomes active, false otherwise.
-	 */
-	bool setActiveScene(const std::string& name) const;
-
 	std::unique_ptr<SceneManager> getSceneManager();
 
    private:

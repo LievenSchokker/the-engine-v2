@@ -2,14 +2,19 @@
 
 
 #include "BaseMessageHandler.h"
-#include "Networking/Context/NetworkContext.h"
+#include "Networking/Client.h"
 
 
-class SpawnGameObjectMessageHandler : public BaseMessageHandler<spelmotor_networking::SpawnGameObjectMessage>
+class SpawnGameObjectMessageHandler: public BaseMessageHandler<
+		spelmotorNetworking::SpawnGameObjectMessage>
 {
-    public:
-        explicit SpawnGameObjectMessageHandler(NetworkContext& networkContext) : BaseMessageHandler(networkContext) {};
-        ~SpawnGameObjectMessageHandler() override;
+public:
+	explicit
+	SpawnGameObjectMessageHandler(NetworkContext& networkContext) :
+		BaseMessageHandler(networkContext)
+	{
+	};
+	~SpawnGameObjectMessageHandler() override;
 
-        void handleMessage(const IMessage &message) override;
+	void handle(const IMessage& message) override;
 };

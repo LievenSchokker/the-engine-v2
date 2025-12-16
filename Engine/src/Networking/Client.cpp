@@ -10,13 +10,11 @@
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
 #include "Networking/Messages/MessageDispatcherFactory.h"
-
 #include <iostream>
 
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
-    : transport(std::move(injectedTransport)),
-    gameWorld(nullptr)
+    : transport(std::move(injectedTransport))
 {
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 
@@ -29,8 +27,7 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
     {
         onConnectionChanged(connection);
     });
-
-    messageDispatcher = spelmotor_networking::MessageDispatcherFactory::createMessageDispatcher(ConnectionMode::Client, *gameWorld);
+    messageDispatcher = nullptr;
 }
 
 
@@ -69,13 +66,13 @@ bool Client::sendMessage(const IMessage& message) const
         return false;
     }
 
-    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
         message,
         currentConnection.transportConnectionId,
         SendMode::ReliableOrdered
     );
 
-    TransportResult result = transport->send(outgoing);
+    const TransportResult result = transport->send(outgoing);
     return result == TransportResult::SUCCESS;
 }
 
@@ -121,6 +118,11 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
     std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
+	if (message->getMessageType() == MessageTypes::SpawnMessage)
+	{
+		std::cout << rawMessage.length << std::endl;
+	}
+
     if (message == nullptr)
     {
         std::cerr << "Failed to parse message" << std::endl;
@@ -131,8 +133,7 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 }
 
 
-void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+void Client::injectMessageDispatcher(std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
 {
     messageDispatcher = std::move(dispatcher);
 }
-

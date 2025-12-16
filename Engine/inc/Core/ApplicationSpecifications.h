@@ -12,3 +12,4 @@ struct ApplicationSpecifications
 	RenderBackend renderBackend;
 	double maxFrameTime;
 };
+

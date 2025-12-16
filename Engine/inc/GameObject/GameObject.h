@@ -1,6 +1,11 @@
 #pragma once
+#include "Networking/Serialization/ISerializable.h"
 
+#include <cstdint>
 
+#include "Networking/Serialization/Serialization.h"
+
+enum class ComponentType : uint32_t;
 class Scene;
 class Transform;
 class Component;
@@ -25,7 +30,7 @@ class ScenePlaceholder;
  * tags, layers, and active/static state.
  *
  */
-class GameObject
+class GameObject : public ISerializable
 {
     public:
 	    /**
@@ -40,6 +45,22 @@ class GameObject
 	     * @brief Destructor. Cleans up all components and resources.
 	     */
 	    ~GameObject();
+
+	/**
+	 * @brief Serializes this GameObject and all its components.
+	 */
+	void serialize(WriteArchive& archive) const;
+
+	/**
+	 * @brief Deserializes a GameObject from an archive.
+	 */
+	void deserialize(ReadArchive& archive);
+
+	/**
+	 * @brief Creates a deep copy of this GameObject via serialization.
+	 */
+	std::unique_ptr<GameObject> clone() const;
+	Component* getComponentByType(ComponentType type) const;
 
 
 	    /**
@@ -278,18 +299,20 @@ class GameObject
          */
         int getSceneId() const;
 
+		void copyStateFrom(const GameObject& source);
+	
     private:
-	    std::unique_ptr<ComponentManager> componentManager;
-	    std::unique_ptr<Transform> transform;
-	    Scene* scene;
-	    std::string name;
-	    int layer;
-	    std::string tag;
-        int sceneId;
+        std::unique_ptr<ComponentManager> componentManager;
+        std::unique_ptr<Transform> transform;
+        Scene* scene;
+        std::string name;
+        int layer;
+        std::string tag;
 
-	    bool isActive;
-	    bool isStatic;
-	    bool isDestroyed;
+        bool isActive;
+        bool isStatic;
+        bool isDestroyed;
+        int sceneId;
 };
 
 #include "GameObjectImplementation.inl"
