@@ -110,7 +110,7 @@ protected:
         auto testScene = std::make_unique<Scene>("TestScene");
         game->addScene(std::move(testScene));
 
-        serverLoop = std::make_unique<ServerLoop>(game, std::move(mockTransport));
+        serverLoop = std::make_unique<ServerLoop>(std::move(game), std::move(mockTransport));
     }
 
     void TearDown() override
