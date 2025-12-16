@@ -2,6 +2,8 @@
 // Created by samle on 10/11/2025.
 //
 #include "GameObject/GameObject.h"
+
+#include "Game.h"
 #include "Behaviour/Behaviour.h"
 #include "Component/ComponentManager.h"
 #include "Component/Transform.h"
@@ -14,14 +16,13 @@ GameObject::GameObject()
 {
     componentManager = std::make_unique<ComponentManager>(this);
     transform = std::make_unique<Transform>();
+    transform->setGameObject(this);
     name = "GameObject";
     layer = 0;
     tag = "";
     isActive = true;
     isStatic = false;
     isDestroyed = false;
-
-    /// TODO: Remove this line:
     scene = nullptr;
 }
 
@@ -136,6 +137,15 @@ bool GameObject::getIsDestroyed() const
     return isDestroyed;
 }
 
+int GameObject::getSceneId() const
+{
+    if (scene == nullptr)
+        return -1;
+
+    return sceneId;
+}
+
+
 
 void GameObject::setName(const std::string &newName)
 {
@@ -176,6 +186,12 @@ void GameObject::setIsStatic(bool value)
 void GameObject::setScene(Scene& newScene)
 {
     scene = &newScene;
+    sceneId = scene->getSceneId(*this);
+}
+
+Scene* GameObject::getScene() const
+{
+    return scene;
 }
 
 

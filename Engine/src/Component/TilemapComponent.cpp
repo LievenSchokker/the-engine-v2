@@ -8,10 +8,6 @@
 #include <cmath>
 #include <iostream>
 
-TilemapComponent::TilemapComponent() : tileSize(0.0, 0.0)
-{
-	tileSize = {32.0, 32.0}; // Default tile size
-}
 
 void TilemapComponent::setTilemapAsset(TilemapAsset* asset)
 {

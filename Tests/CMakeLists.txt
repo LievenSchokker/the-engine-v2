@@ -32,14 +32,19 @@ add_executable(engine_tests
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
-        Math/TestsVector2.cpp
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
+        Math/TestsVector2.cpp
+        AI/tests_agent.cpp
+        AI/TestAgentModule.cpp
         Animation/AnimationCurveTest.cpp
         Animation/AnimationTrackTest.cpp
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
+        Audio/TestAudioManager.cpp
+        Audio/TestMusicSource.cpp
+        Audio/TestSoundSource.cpp
 )
 
 target_link_libraries(engine_tests PRIVATE

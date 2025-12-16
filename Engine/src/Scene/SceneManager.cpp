@@ -1,4 +1,5 @@
 #include "Scene/SceneManager.h"
+
 #include "GameObject/GameObject.h"
 #include "Component/Transform.h"
 #include "Component/NetworkIdentity.h"
@@ -150,16 +151,27 @@ bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 
 bool SceneManager::removeScene(const std::string& name)
 {
-	const auto it = scenes.find(name);
-	if ( it == scenes.end() ) {
+	// Prevent removal of persistent scene
+	if ( persistentScene != nullptr && persistentScene->getName() == name )
+	{
+		std::cerr << "[SceneManager] Error: Cannot remove persistent scene\n";
 		return false;
 	}
 
-	if ( it->second.get() == activeScene ) {
+	const auto it = scenes.find(name);
+	if ( it == scenes.end() )
+	{
+		return false;
+	}
+
+	if ( it->second.get() == activeScene )
+	{
 		activeScene->onStop();
 		activeScene = nullptr;
 		paused = false;
-	} else {
+	}
+	else
+	{
 		it->second->onStop();
 	}
 
@@ -170,7 +182,8 @@ bool SceneManager::removeScene(const std::string& name)
 Scene* SceneManager::getScene(const std::string& name) const
 {
 	const auto it = scenes.find(name);
-	if ( it != scenes.end() ) {
+	if ( it != scenes.end() )
+	{
 		return it->second.get();
 	}
 
@@ -205,7 +218,8 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
 
 	// Extract and transfer
 	auto gameObject = fromScene->extractGameObject(objectName);
-	if ( gameObject == nullptr ) {
+	if ( gameObject == nullptr )
+	{
 		return false;
 	}
 
@@ -233,8 +247,19 @@ bool SceneManager::setActiveScene(const std::string& name)
 		return false;
 	}
 
-	if ( activeScene != nullptr ) {
+	// Don't stop if it's the persistent scene (persistent scene is never
+	// stopped)
+	if ( activeScene != nullptr && activeScene != persistentScene.get() )
+	{
 		activeScene->onStop();
+	}
+
+	// Don't allow setting persistent scene as active scene
+	if ( nextScene == persistentScene.get() )
+	{
+		std::cerr << "[SceneManager] Error: Cannot set persistent scene as "
+					 "active scene\n";
+		return false;
 	}
 
 	activeScene = nextScene;
@@ -256,7 +281,8 @@ bool SceneManager::loadScene(const std::string& name)
 
 void SceneManager::pause()
 {
-	if ( activeScene == nullptr || paused ) {
+	if ( activeScene == nullptr || paused )
+	{
 		return;
 	}
 
@@ -266,7 +292,8 @@ void SceneManager::pause()
 
 void SceneManager::resume()
 {
-	if ( activeScene == nullptr || !paused ) {
+	if ( activeScene == nullptr || !paused )
+	{
 		return;
 	}
 
@@ -281,20 +308,41 @@ bool SceneManager::isPaused() const
 
 void SceneManager::update(float deltaTime, GameWorld* world)
 {
-	if (activeScene != nullptr && !paused)
+	if ( activeScene != nullptr && !paused )
 	{
 		activeScene->update(deltaTime, world);
 	}
 }
 
-void SceneManager::setClearColor(const Color& color)
+void SceneManager::updateAlways(float deltaTime, GameWorld* world)
 {
-	clearColor = color;
+	// Update persistent scene first (always active, never stopped)
+	if ( persistentScene != nullptr )
+	{
+		persistentScene->update(deltaTime, world);
+	}
+
+	// Update active scene
+	if ( activeScene != nullptr )
+	{
+		activeScene->update(deltaTime, world);
+	}
 }
 
-Color SceneManager::getClearColor() const
+Scene* SceneManager::getOrCreatePersistentScene()
 {
-	return clearColor;
+	if ( persistentScene == nullptr )
+	{
+		persistentScene = std::make_unique<Scene>("__PersistentScene__");
+		persistentScene
+			->onStart();  // Start it immediately so it's always active
+	}
+	return persistentScene.get();
+}
+
+Scene* SceneManager::getPersistentScene() const
+{
+	return persistentScene.get();
 }
 
 void SceneManager::applyNetworkSnapshot(const std::vector<std::unique_ptr<GameObject>>& receivedObjects)

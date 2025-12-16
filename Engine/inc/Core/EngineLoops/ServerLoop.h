@@ -51,6 +51,7 @@ public:
 	GameWorld* getGameWorld() override;
 	SceneManager* getSceneManager() override;
 	ClockFunction getClock() override;
+	void setApplicationClock(ApplicationClock* clock) override;
 	void start() override;
     void initializeNetworking();
     void update(double deltaTime) override;

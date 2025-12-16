@@ -1,7 +1,5 @@
 #pragma once
 
-
-#include "Game.h"
 #include "Core/SpelMotor.h"
 #include "Networking/Component/ComponentRegistry.h"
 

@@ -55,3 +55,26 @@ bool SDLImage::isLoaded() const
 {
 	return surface	!= nullptr;
 }
+
+int SDLImage::getWidth() const
+{
+	if (surface == nullptr)
+	{
+		return 0;
+	}
+	return surface->w;
+}
+
+int SDLImage::getHeight() const
+{
+	if (surface == nullptr)
+	{
+		return 0;
+	}
+	return surface->h;
+}
+
+SDL_Surface* SDLImage::getSurface() const
+{
+	return surface;
+}

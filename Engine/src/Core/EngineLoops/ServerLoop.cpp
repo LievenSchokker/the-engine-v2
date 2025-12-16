@@ -1,4 +1,11 @@
 #include "Core/EngineLoops/ServerLoop.h"
+
+#include "Core/ApplicationClock.h"
+#include "Core/EngineLoops/ClientLoop.h"
+#include "Game.h"
+#include "Networking/Client.h"
+#include "Networking/Server/Server.h"
+#include "Networking/TransportGNS.h"
 #include "Game.h"
 #include "Core/ApplicationClock.h"
 #include "Input/InputManager.h"
@@ -22,6 +29,7 @@ ServerLoop::ServerLoop(const std::unique_ptr<Game>& game)
 	  , stateSync(nullptr)
 	  , gameWorld(std::make_unique<GameWorld>())
 {
+	sceneManager = std::move(game->getSceneManager());
 	clockFunction = []()
 	{
 		using namespace std::chrono;
@@ -105,6 +113,14 @@ GameWorld* ServerLoop::getGameWorld()
 SceneManager* ServerLoop::getSceneManager()
 {
 	return sceneManager.get();
+}
+
+void ServerLoop::setApplicationClock(ApplicationClock* clock)
+{
+	if ( gameWorld )
+	{
+		gameWorld->clock = clock;
+	}
 }
 
 void ServerLoop::start()
