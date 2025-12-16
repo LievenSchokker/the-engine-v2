@@ -1,5 +1,7 @@
 #include "Core/EngineLoops/ClientLoop.h"
 
+#include "Audio/Components/MusicSource.h"
+#include "Audio/SDL/AudioBackendSDL.h"
 #include "Core/EngineLoops/ServerLoop.h"
 #include "External/SDLBackendContext.h"
 #include "Game.h"
@@ -20,8 +22,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
 	  isShutdown(false)
 {
-	// Transfer ownership of the scene manager and give gameWorld a non owning
-	// pointer
 	gameWorld->sceneManager = sceneManager.get();
 
 	clockFunction = []() { return 1.0; };
@@ -42,6 +42,11 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	gameWorld->sceneManager = sceneManager.get();
 	gameWorld->input = InputManager::getInstance();
 	inputManager = InputManager::getInstance();
+
+	// Aduio
+	auto backend = std::make_unique<AudioBackendSDL>();
+	audioManager = std::make_unique<AudioManager>();
+	audioManager->initialize(std::move(backend));
 }
 
 ClientLoop::~ClientLoop() = default;
