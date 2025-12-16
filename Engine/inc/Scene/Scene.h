@@ -169,7 +169,6 @@ class Scene
          */
         int getSceneId(const GameObject& gameObject) const;
 
-private:
         /**
          * @brief Returns a GameObject from  this scene by providing its scene id.
          *
@@ -178,6 +177,7 @@ private:
          * @return the GameObject whose id matches the argument, nullptr if the id is not found on any of this scene's GameObjects.
          */
         GameObject* getGameObjectById(int id) const;
+private:
 
         /// @brief Method that removes the @c gameObject from the containers storing it
         bool removeGameObjectInternal(GameObject* gameObject);
