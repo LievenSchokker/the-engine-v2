@@ -4,6 +4,7 @@
 #include "Core/GameWorld.h"
 #include "Core/IEngineSystems.h"
 #include "Game.h"
+#include "Input/InputManager.h"
 #include "Scene/SceneManager.h"
 
 #include <iostream>
@@ -36,6 +37,7 @@ void EngineLoop::start()
 		system->start(*gameWorld);
 	}
 
+	getGameWorld()->input = InputManager::getInstance();
 	// Cache scene manager pointer
 	sceneManagerPtr = gameWorld->sceneManager;
 }
@@ -46,6 +48,8 @@ void EngineLoop::update(double deltaTime)
 	{
 		system->update(deltaTime, *gameWorld);
 	}
+	
+	getGameWorld()->input->update();
 }
 
 void EngineLoop::fixedUpdate(double deltaTime)

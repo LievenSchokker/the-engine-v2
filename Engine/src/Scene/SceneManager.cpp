@@ -63,6 +63,11 @@ bool SceneManager::removeScene(const std::string& name)
 
 Scene* SceneManager::getScene(const std::string& name) const
 {
+	if (persistentScene != nullptr && persistentScene->getName() == name)
+	{
+		return persistentScene.get();
+	}
+
 	const auto it = scenes.find(name);
 	if (it != scenes.end())
 	{
