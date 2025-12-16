@@ -49,7 +49,6 @@ T* GameObject::getComponent() const
 }
 
 template <typename T>
-T* GameObject::getOrAddComponent()
 bool GameObject::tryGetComponent(T*& out) const
 {
     T* component = getComponent<T>();
