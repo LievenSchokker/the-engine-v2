@@ -41,7 +41,7 @@ void NavigationTest::update(float deltaTime, GameWorld *world)
        if (agent->requestPath(target->getPosition()))
        {
            if (pathRenderer != nullptr)
-               pathRenderer->setPath(agent->getCurrentPath().getPath());
+               pathRenderer->setPath(agent->getCurrentPath());
        }
     }
 }

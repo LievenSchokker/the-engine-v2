@@ -1,6 +1,4 @@
-//
-// Created by samle on 14/12/2025.
-//
+
 #include "AI/Navigation/Pathfinding/PathRenderer.h"
 
 #include "AI/Navigation/Pathfinding/PathResult.h"
@@ -13,32 +11,31 @@ void PathRenderer::onAwake()
 
     if (navigationSystem == nullptr)
     {
-        std::cout << "No nav system found";
         setEnabled(false);
     }
 }
 
 void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 {
-    if (path.empty())
-        return;
-
     const float circleRadius = pathRenderOptions.circleRadius;
 
-    for (const auto& node : path)
+    Color circleColor = currentPath.isValid() ? pathRenderOptions.validPathColor : pathRenderOptions.invalidPathColor;
+    for (const auto& node : currentPath.getPath())
     {
         RenderCommand dot;
         dot.type = RenderCommandType::Circle;
 
         dot.position = navigationSystem->getNavigationSurface()->toWorldPoint(node);
         dot.radius = circleRadius;
-        dot.color = pathRenderOptions.circleColor;
+        dot.color = circleColor;
         queue.push(dot);
     }
 }
 
 
-void PathRenderer::setPath(const std::vector<Vector2>& newPath)
+void PathRenderer::setPath(const PathResult &newPath)
 {
-    path = newPath;
+    currentPath = newPath;
 }
+
+

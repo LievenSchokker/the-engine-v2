@@ -43,7 +43,7 @@ class IPathfindingGraph
         *
         * @param from The starting node.
         * @param to   The destination node.
-        * @return The cost of moving from @p from to @p to.
+        * @return The cost of moving from @c from to @c to.
         */
         virtual float getCost(Vector2 from, Vector2 to) const = 0;
 

@@ -45,7 +45,7 @@ class AStarPathFinder final : public IPathFinder
         void setHeuristicType(HeuristicType heuristic);
 
     private:
-        /// Internally used method to calculate the heuristic from one node to another, using the selected heurisitc
+        /// Internally used method to calculate the heuristic from one node to another, using the selected heuristic
         int calculateHeuristic(Vector2 from, Vector2 to) const;
         HeuristicType heuristicType;
 };

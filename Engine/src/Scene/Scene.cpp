@@ -7,6 +7,7 @@
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
 #include "AI/Navigation/NavigationObstacle.h"
+#include "AI/Navigation/NavigationGrid.h"
 
 #include <algorithm>
 #include <iostream>

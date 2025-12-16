@@ -5,12 +5,13 @@
 #pragma once
 
 
-#include "Pathfinding/IPathFinder.h"
+#include "AI/Navigation/INavigationSurface.h"
 
-class INavigationSurface;
+class IPathFinder;
 class GameObject;
 class NavigationObstacle;
 class NavigationGrid;
+struct BoundingBox;
 struct PathResult;
 struct Vector2;
 

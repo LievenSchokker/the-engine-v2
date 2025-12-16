@@ -38,7 +38,7 @@ class FollowPathModule : public BaseAgentModule
          * The current waypoint gets tracked, increments when the agent comes within @c waypointRadius
          *
          *
-         * @return a nrmalised vector pointing from agent towards the current waypoint on his path.
+         * @return a normalised vector pointing from agent towards the current waypoint on his path.
          * @return returns Vector2::zero() if agent does not have a valid path, or if the waypoint reached the end.
          */
         Vector2 compute() override;
