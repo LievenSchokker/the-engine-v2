@@ -39,11 +39,6 @@ class GameWorld
     bool sendToServer(const IMessage& message);
     bool broadcastToClients(const IMessage& message);
     bool sendToClient(int clientId, const IMessage& message);
-
-
-	bool sendToServer(const IMessage& message) const;
-	bool broadcastToClients(const IMessage& message) const;
-	bool sendToClient(int clientId, const IMessage& message) const;
-
+    
 	int localClientId = -1;
 };
