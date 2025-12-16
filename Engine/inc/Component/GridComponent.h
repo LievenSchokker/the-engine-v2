@@ -232,8 +232,8 @@ public:
 		return ComponentType::Grid;
 	}
 
-	void serialize(CerealWriteArchive& archive) const override;
-	void deserialize(CerealReadArchive& archive) override;
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 
 private:
 	TilemapComponent* tilemapComponent = nullptr;

@@ -48,12 +48,12 @@ void PlayerMovement::update(float deltaTime, GameWorld* world)
     handleInput();
 }
 
-void PlayerMovement::serialize(CerealWriteArchive& archive) const
+void PlayerMovement::serialize(WriteArchive& archive) const
 {
     archive.process(const_cast<float&>(moveSpeed));
 }
 
-void PlayerMovement::deserialize(CerealReadArchive& archive)
+void PlayerMovement::deserialize(ReadArchive& archive)
 {
     archive.process(moveSpeed);
 }

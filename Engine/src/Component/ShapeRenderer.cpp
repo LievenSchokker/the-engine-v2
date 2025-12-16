@@ -81,7 +81,7 @@ void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 }
 
 
-void ShapeRenderer::serialize(CerealWriteArchive& archive) const
+void ShapeRenderer::serialize(WriteArchive& archive) const
 {
 	// Shape type
 	uint8_t shapeType = static_cast<uint8_t>(type);
@@ -113,7 +113,7 @@ ComponentType ShapeRenderer::getComponentType() const
 {
 	return ComponentType::ShapeRenderer;
 }
-void ShapeRenderer::deserialize(CerealReadArchive& archive)
+void ShapeRenderer::deserialize(ReadArchive& archive)
 {
 	// Shape type
 	uint8_t shapeType;

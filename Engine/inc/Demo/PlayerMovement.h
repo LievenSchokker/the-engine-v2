@@ -26,8 +26,8 @@ public:
 		return ComponentType::PlayerMovement;
 	}
 
-	void serialize(CerealWriteArchive& archive) const override;
-	void deserialize(CerealReadArchive& archive) override;
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 private:
     void handleInput();
     void applyMovement(float dirX, float dirY) const;

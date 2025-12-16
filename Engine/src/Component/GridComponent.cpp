@@ -447,7 +447,7 @@ void GridComponent::setOrderInLayer(int8_t order)
 	orderInLayer = order;
 }
 
-void GridComponent::serialize(CerealWriteArchive& archive) const
+void GridComponent::serialize(WriteArchive& archive) const
 {
     // Debug settings
     bool debugEnabled = debugRenderEnabled;
@@ -510,7 +510,7 @@ void GridComponent::serialize(CerealWriteArchive& archive) const
     archive.process(order);
 }
 
-void GridComponent::deserialize(CerealReadArchive& archive)
+void GridComponent::deserialize(ReadArchive& archive)
 {
     // Debug settings
     archive.process(debugRenderEnabled);

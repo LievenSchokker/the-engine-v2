@@ -207,7 +207,7 @@ void GameObject::setBehavioursEnabled(const bool value) const
     }
 }
 
-void GameObject::serialize(CerealWriteArchive& archive) const
+void GameObject::serialize(WriteArchive& archive) const
 {
 	std::string n = name;
 	archive.process(n);
@@ -255,7 +255,7 @@ void GameObject::serialize(CerealWriteArchive& archive) const
 	}
 }
 
-void GameObject::deserialize(CerealReadArchive& archive)
+void GameObject::deserialize(ReadArchive& archive)
 {
 	archive.process(name);
 
@@ -308,7 +308,7 @@ void GameObject::deserialize(CerealReadArchive& archive)
 std::unique_ptr<GameObject> GameObject::clone() const
 {
     // Serialize to bytes
-    CerealWriteArchive writer;
+    WriteArchive writer;
     serialize(writer);
 
     // Deserialize into new object

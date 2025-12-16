@@ -10,7 +10,6 @@ SpawnMessageHandler::SpawnMessageHandler(GameWorld& world, NetworkSpawnManager& 
 
 void SpawnMessageHandler::handleMessageInternal()
 {
-    std::cout << "Local client id: " << gameWorld->localClientId << std::endl;
 	SpawnMessage* spawnMessage = getMessage();
     spawnManager.handleSpawnMessage(*spawnMessage);
 }

@@ -1,8 +1,7 @@
 #pragma once
 #include "Networking/ComponentType.h"
-#include "Networking/Serialization/CerealReadArchive.h"
-#include "Networking/Serialization/CerealWriteArchive.h"
 #include "Networking/Serialization/ISerializable.h"
+#include "Networking/Serialization/Serialization.h"
 
 
 class Transform;
@@ -95,8 +94,8 @@ public:
 	*/
 	const Transform* getTransform() const;
     virtual ComponentType getComponentType() const;
-	void serialize(CerealWriteArchive& archive) const override;
-	void deserialize(CerealReadArchive& archive) override;
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 protected:
 	/// The @c GameObject this component is attached to, a component is always attached to a GameObject
 	GameObject* gameObject;

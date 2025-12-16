@@ -36,6 +36,6 @@ ComponentType Component::getComponentType() const
 {
 	return ComponentType::Unknown;
 }
-void Component::deserialize(CerealReadArchive& archive){}
-void Component::serialize(CerealWriteArchive& archive) const{}
+void Component::deserialize(ReadArchive& archive){}
+void Component::serialize(WriteArchive& archive) const{}
 

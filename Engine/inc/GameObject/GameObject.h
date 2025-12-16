@@ -3,6 +3,8 @@
 
 #include <cstdint>
 
+#include "Networking/Serialization/Serialization.h"
+
 enum class ComponentType : uint32_t;
 class Scene;
 class Transform;
@@ -47,12 +49,12 @@ class GameObject : public ISerializable
 	/**
 	 * @brief Serializes this GameObject and all its components.
 	 */
-	void serialize(CerealWriteArchive& archive) const;
+	void serialize(WriteArchive& archive) const;
 
 	/**
 	 * @brief Deserializes a GameObject from an archive.
 	 */
-	void deserialize(CerealReadArchive& archive);
+	void deserialize(ReadArchive& archive);
 
 	/**
 	 * @brief Creates a deep copy of this GameObject via serialization.

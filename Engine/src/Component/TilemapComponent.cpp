@@ -198,7 +198,7 @@ void TilemapComponent::setOrderInLayer(int8_t order)
 	orderInLayer = order;
 }
 
-void TilemapComponent::serialize(CerealWriteArchive& archive) const
+void TilemapComponent::serialize(WriteArchive& archive) const
 {
 	// Tile size
 	float tileSizeX = tileSize.x;
@@ -230,7 +230,7 @@ void TilemapComponent::serialize(CerealWriteArchive& archive) const
 	archive.process(order);
 }
 
-void TilemapComponent::deserialize(CerealReadArchive& archive)
+void TilemapComponent::deserialize(ReadArchive& archive)
 {
 	// Tile size
 	archive.process(tileSize.x);

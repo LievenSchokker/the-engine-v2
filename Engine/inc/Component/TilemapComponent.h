@@ -122,8 +122,8 @@ class TilemapComponent: public RenderComponent
 		return ComponentType::TileMap;
 	}
 
-	void serialize(CerealWriteArchive& archive) const override;
-	void deserialize(CerealReadArchive& archive) override;
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 private:
 	TilemapAsset* tilemapAsset = nullptr;
 	Vector2 tileSize;

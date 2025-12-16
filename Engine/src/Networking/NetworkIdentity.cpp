@@ -75,13 +75,13 @@ void NetworkIdentity::onNetworkDespawn()
 	networkBehaviours.clear();
 }
 
-void NetworkIdentity::serialize(CerealWriteArchive& archive) const
+void NetworkIdentity::serialize(WriteArchive& archive) const
 {
 	archive.process(const_cast<uint32_t&>(networkId));
 	archive.process(const_cast<int&>(ownerId));
 }
 
-void NetworkIdentity::deserialize(CerealReadArchive& archive)
+void NetworkIdentity::deserialize(ReadArchive& archive)
 {
 	archive.process(networkId);
 	archive.process(ownerId);

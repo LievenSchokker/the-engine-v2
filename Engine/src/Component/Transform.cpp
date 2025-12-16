@@ -33,7 +33,7 @@ void Transform::setScale(const Vector2 newScale) {
 }
 
 
-void Transform::serialize(CerealWriteArchive& archive) const
+void Transform::serialize(WriteArchive& archive) const
 {
 	// Position
 	float posX = static_cast<float>(position.x);
@@ -52,7 +52,7 @@ void Transform::serialize(CerealWriteArchive& archive) const
 	archive.process(scaleY);
 }
 
-void Transform::deserialize(CerealReadArchive& archive)
+void Transform::deserialize(ReadArchive& archive)
 {
 	// Position
 	float posX, posY;
