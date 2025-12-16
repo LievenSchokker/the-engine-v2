@@ -350,7 +350,17 @@ Scene* SceneManager::getPersistentScene() const
 	return persistentScene.get();
 }
 
-void SceneManager::applyNetworkSnapshot(const std::vector<std::unique_ptr<GameObject>>& receivedObjects)
+std::string SceneManager::getFirstSceneName() const
+{
+    if (!scenes.empty())
+    {
+        return scenes.begin()->first;
+    }
+    return "";
+}
+
+
+void SceneManager::applyNetworkSnapshot(const std::vector<std::unique_ptr<GameObject>>& receivedObjects) const
 {
     if (!spawnManager || !activeScene) return;
 

@@ -87,7 +87,7 @@ void PlayerMovement::handleInput()
     }
 }
 
-void PlayerMovement::applyMovement(float dirX, float dirY)
+void PlayerMovement::applyMovement(const float dirX, const float dirY) const
 {
 	if (!isServer())
 	{
@@ -112,6 +112,5 @@ void PlayerMovement::applyMovement(float dirX, float dirY)
 			currentRadius = 10.0f;
 		}
 		shapeRenderer->setCircle(currentRadius);
-		std::cerr << "[Server] Changed radius to " << currentRadius << "\n";
 	}
 }

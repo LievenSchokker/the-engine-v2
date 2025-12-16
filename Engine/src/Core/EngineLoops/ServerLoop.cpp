@@ -82,6 +82,15 @@ ServerLoop::ServerLoop(std::unique_ptr<Game> game, std::unique_ptr<ITransport> t
         server.get(),
         &spawnManager->getNetworkIdentityRegistry()
     );
+
+    if (sceneManager->getActiveScene() == nullptr)
+    {
+        std::string sceneName = sceneManager->getFirstSceneName();
+        if (!sceneName.empty())
+        {
+            sceneManager->setActiveScene(sceneName);
+        }
+    }
 }
 
 ServerLoop::~ServerLoop() = default;

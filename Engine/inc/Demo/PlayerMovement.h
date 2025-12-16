@@ -30,7 +30,7 @@ public:
 	void deserialize(CerealReadArchive& archive) override;
 private:
     void handleInput();
-    void applyMovement(float dirX, float dirY);
+    void applyMovement(float dirX, float dirY) const;
 
     float moveSpeed = 200.0f;
 };

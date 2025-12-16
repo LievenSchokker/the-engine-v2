@@ -18,7 +18,6 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Scene/SceneManager.h"
 
-// TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	: sceneManager(std::move(spel->getSceneManager())),
 	  gameWorld(std::make_unique<GameWorld>()),
@@ -31,7 +30,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	clockFunction = []() { return 1.0; };
 	if ( specifications.renderBackend == RenderBackend::SDL )
 	{
-		// TODO SDL Injection layer
 		backendContext = std::make_unique<SDLBackendContext>();
 		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
 		std::unique_ptr<IRenderer> sdlRenderer =
@@ -42,12 +40,10 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		gameWorld->render = renderer.get();
 	}
 
-	// Set GameWorld references for behaviors to access
 	gameWorld->sceneManager = sceneManager.get();
 	gameWorld->input = InputManager::getInstance();
 	inputManager = InputManager::getInstance();
 
-	// Aduio
 	auto backend = std::make_unique<AudioBackendSDL>();
 	audioManager = std::make_unique<AudioManager>();
 
@@ -61,6 +57,14 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 
 	sceneManager->configureNetworking(ConnectionMode::Client, spawnManager.get());
 
+    if (sceneManager->getActiveScene() == nullptr)
+    {
+        std::string sceneName = sceneManager->getFirstSceneName();
+        if (!sceneName.empty())
+        {
+            sceneManager->setActiveScene(sceneName);
+        }
+    }
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -142,6 +146,7 @@ bool ClientLoop::isShutdownRequested() const
 {
 	return isShutdown;
 }
+
 
 GameWorld* ClientLoop::getGameWorld()
 {

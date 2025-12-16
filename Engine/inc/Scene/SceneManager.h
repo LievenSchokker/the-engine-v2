@@ -166,7 +166,7 @@ class SceneManager
 	 */
 	Color getClearColor() const;
 	void applyNetworkSnapshot(
-		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
+		const std::vector<std::unique_ptr<GameObject>>& receivedObjects) const;
     bool isLocallyOwned(NetworkIdentity* identity) const;
 
     void setWorld(GameWorld* world) { gameWorld = world; }
@@ -178,6 +178,9 @@ class SceneManager
 	 * @return Pointer to the persistent scene, or nullptr if not created yet.
 	 */
 	Scene* getPersistentScene() const;
+
+
+    std::string getFirstSceneName() const;
 
    private:
 
