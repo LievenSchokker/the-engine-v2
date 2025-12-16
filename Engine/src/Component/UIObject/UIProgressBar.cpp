@@ -1,4 +1,4 @@
-#include "Component/UIObject/UIProgressBar.h"
+#include "Component/UIElement/UIProgressBar.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 #include "Rendering/UIRenderCommand.h"
 
@@ -13,7 +13,7 @@ UIProgressBar::UIProgressBar(
     float minValue,
     float maxValue
 )
-    : UIObject(x, y, width, height)
+    : UIElement(x, y, width, height)
     , value(initialValue)
     , minValue(minValue)
     , maxValue(maxValue)

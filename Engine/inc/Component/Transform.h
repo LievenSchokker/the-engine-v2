@@ -8,11 +8,12 @@
 /**
  * @brief Transform holds the position, rotation and scale.
  */
-class Transform : public Component
+class Transform: public Component
 {
-public:
-    Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0, Vector2 scale = {1.0, 1.0});
-    ~Transform();
+   public:
+	Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0,
+			  Vector2 scale = {1.0, 1.0});
+	~Transform();
 
     /**
      * @brief Get the current position.

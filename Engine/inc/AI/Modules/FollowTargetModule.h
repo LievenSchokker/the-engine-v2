@@ -7,6 +7,7 @@
 
 
 #include "BaseAgentModule.h"
+class Scene;
 
 /**
  * @brief This module attempts to follow a given target by moving the agent towards the position of the target
@@ -18,6 +19,8 @@ class FollowTargetModule final : public BaseAgentModule
         explicit FollowTargetModule(const Agent& agent) : BaseAgentModule(agent){}
         explicit FollowTargetModule(const Agent& agent, const Transform& target, float detectRadius_) : BaseAgentModule(agent), followTarget(&target), detectRadius(detectRadius_){}
         ~FollowTargetModule() override = default;
+
+        void initialise() override;
 
         /**
          * @brief Computes a vector pointing towards the @c followTarget
@@ -41,8 +44,12 @@ class FollowTargetModule final : public BaseAgentModule
 
     private:
         /// The target to follow, internally used.
+        /// Is retrieved every frame from the scene using the @c targetGameObjectId
         const Transform* followTarget = nullptr;
+        int targetGameObjectId = 0;
+        Scene* agentScene = nullptr;
 
         /// Radius in which this module computes a vector towards the target, internally used.
         float detectRadius = 0.0f;
+        bool canUpdate = false;
 };

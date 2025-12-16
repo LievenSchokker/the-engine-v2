@@ -18,8 +18,6 @@ void NavigationTest::onAwake()
 {
     input = InputManager::getInstance();
 
-    auto& scene = gameObject->getScene();
-
     if (gameObject->hasComponent<PathRenderer>())
     {
 

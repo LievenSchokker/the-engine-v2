@@ -1,23 +1,21 @@
 #pragma once
 
-#include "nuklear.h"
-
-#include <SDL_video.h>
-
 #include "Input/InputManager.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/SDL/SDLRenderer.h"
+#include "nuklear.h"
 
+#include <SDL_video.h>
 #include <queue>
 #include <unordered_map>
 
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.
  *
- * This hook bridges the engine's rendering pipeline with Nuklear's immediate-mode UI.
- * It exists as a separate class (rather than being built into SDLRenderer) to keep
- * UI concerns decoupled from core rendering, allowing the UI library to be swapped
- * without touching the renderer.
+ * This hook bridges the engine's rendering pipeline with Nuklear's
+ * immediate-mode UI. It exists as a separate class (rather than being built
+ * into SDLRenderer) to keep UI concerns decoupled from core rendering, allowing
+ * the UI library to be swapped without touching the renderer.
  */
 class NuklearSDLRenderHook: public IUIRenderHook
 {
@@ -110,7 +108,7 @@ private:
 	void renderImage(const UIRenderCommand& command);
 	void renderSpacer(const UIRenderCommand& command);
 	void renderText(const UIRenderCommand& command);
-	
+
 	InputManager* inputManager;
 	SDL_Window* sdlWindow;
 	SDL_Renderer* sdlRenderer;

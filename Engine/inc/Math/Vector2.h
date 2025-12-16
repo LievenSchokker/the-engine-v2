@@ -1,5 +1,9 @@
 #pragma once
+
+
 #include <cmath>
+
+
 /**
  * @brief A struct for storing 2D vector points.
  */

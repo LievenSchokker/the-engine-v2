@@ -1,36 +1,44 @@
 #pragma once
 
-
 class Server;
 class Client;
-class IRenderer;
 class SceneManager;
+class RenderSystem;
 class IPhysicsWorld;
 class InputManager;
 class NetworkSpawnManager;
 class IMessage;
+class ApplicationClock;
 
 class GameWorld
 {
-public:
-    GameWorld() = default;
+   public:
+	GameWorld() = default;
 
-    SceneManager* sceneManager = nullptr;
-    IPhysicsWorld* physics = nullptr;
-    IRenderer* renderer = nullptr;
-    InputManager* input = nullptr;
+	SceneManager* sceneManager = nullptr;
+	IPhysicsWorld* physics = nullptr;
+	RenderSystem* render = nullptr;
+	InputManager* input = nullptr;
+	ApplicationClock* clock = nullptr;
 
     Client* client = nullptr;
     Server* server = nullptr;
 
-    NetworkSpawnManager* spawnManager = nullptr;
+	NetworkSpawnManager* spawnManager = nullptr;
 
-    bool isServer() const { return server != nullptr; }
-    bool isClient() const { return client != nullptr; }
+	bool isServer() const
+	{
+		return server != nullptr;
+	}
 
-    bool sendToServer(const IMessage& message) const;
-    bool broadcastToClients(const IMessage& message) const;
-    bool sendToClient(int clientId, const IMessage& message) const;
+	bool isClient() const
+	{
+		return client != nullptr;
+	}
 
-    int localClientId = -1;
+	bool sendToServer(const IMessage& message) const;
+	bool broadcastToClients(const IMessage& message) const;
+	bool sendToClient(int clientId, const IMessage& message) const;
+
+	int localClientId = -1;
 };

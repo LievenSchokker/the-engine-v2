@@ -6,6 +6,7 @@
 #pragma once
 
 #include "AI/Modules/BaseAgentModule.h"
+#include "Scene/Scene.h"
 
 /**
  * @brief This module attempts to flee from a given Target, computing a vector in direct opposite towards the target
@@ -15,10 +16,12 @@ class AvoidTargetModule final : public BaseAgentModule
     public:
         /// Overloaded constructors so user can add this module without setting all values immediately.
         explicit AvoidTargetModule(const Agent& agent): BaseAgentModule(agent){}
-        explicit AvoidTargetModule(const Agent& agent, const Transform& followTarget): BaseAgentModule(agent), target(&followTarget){}
-        explicit AvoidTargetModule(const Agent& agent, const Transform& followTarget, float avoidRadius): BaseAgentModule(agent), target(&followTarget), avoidRadius(avoidRadius){}
+        explicit AvoidTargetModule(const Agent& agent, const Transform& followTarget): BaseAgentModule(agent), target(&followTarget) {}
+        explicit AvoidTargetModule(const Agent& agent, const Transform& followTarget, float avoidRadius): BaseAgentModule(agent), target(&followTarget), avoidRadius(avoidRadius) {}
 
         ~AvoidTargetModule() override = default;
+
+        void initialise() override;
 
         /**
          * @brief Computes a vector in direct opposite of towards the target
@@ -41,9 +44,13 @@ class AvoidTargetModule final : public BaseAgentModule
         void setAvoidRadius(float radius);
 
     private:
-        /// Target to avoid.
+        /// The target to avoid, internally used.
+        /// Is retrieved every frame from the scene using the @c targetGameObjectId
         const Transform* target = nullptr;
+        int targetGameObjectId = 0;
+        Scene* agentScene = nullptr;
 
         /// Radius in which this module 'activates' and attempts to avoid the target
         float avoidRadius = 0.0f;
+        bool canUpdate = false;
 };

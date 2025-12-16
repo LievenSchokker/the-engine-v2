@@ -1,17 +1,15 @@
 
-#include <iostream>
-
+#include "Core/ApplicationSpecifications.h"
 #include "EntryPoint.h"
+#include "Game.h"
+#include "GameObject/GameObject.h"
+#include "Scene/Scene.h"
 #include "Component/Profiler/Profiler.h"
-#include "Component/UIObject/UIPanelObject.h"
-#include "Component/UIObject/UIProgressBar.h"
-#include "Component/UIObject/UISpacer.h"
 
-#include <iostream>
-
-#include "AI/AgentsZandbak.h"
 #include "IZandbak.h"
-#include "AI/PathFindingZandbak.h"
+#include "Sandboxes//AgentsZandbak.h"
+#include "Sandboxes/PathFindingZandbak.h"
+
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's
 #undef main
@@ -31,7 +29,7 @@ int main(int argc, char** argv)
 
 	// Panel
 	std::unique_ptr<GameObject> profiler = std::make_unique<GameObject>();
-	// profiler->addComponent<Profiler>(480.0f, 10.0f, 210.0f, 320.0f);  // Top-right of 700x700 window
+	profiler->addComponent<Profiler>(480.0f, 10.0f, 210.0f, 320.0f);  // Top-right of 700x700 window
 
     /// Note: Change the unique_ptr to create the sandbox you want
     std::unique_ptr<IZandbak> zandbak = std::make_unique<PathFindingZandbak>();
@@ -41,7 +39,4 @@ int main(int argc, char** argv)
 	spel->addScene(std::move(scene));
 	spel->setApplicationSpecifications(spec);
 	return SpelMotorEntry::main(std::move(spel));
- 	spel->setApplicationSpecifications(spec);
-
-    return SpelMotorEntry::main(std::move(spel));
 }

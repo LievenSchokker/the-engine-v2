@@ -1,10 +1,10 @@
-#include "Scene/Scene.h"
-#include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Rendering/RenderSystem.h"
 
-#include "Component/UIObject/UIObject.h"
+#include "Component/BaseComponentTypes/RenderComponent.h"
+#include "Component/UIElement/UIElement.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
+#include "Scene/Scene.h"
 
 #include <iostream>
 
@@ -15,7 +15,7 @@ RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 
 void RenderSystem::update(float deltaTime, Scene& scene)
 {
-	if (!renderer || !renderer->isOpen())
+	if ( !renderer || !renderer->isOpen() )
 	{
 		return;
 	}
@@ -25,35 +25,35 @@ void RenderSystem::update(float deltaTime, Scene& scene)
 	queue.sortAll();
 	renderer->beginFrame(clearColor);
 
-	for (auto& command : queue.world().getCommands())
+	for ( auto& command : queue.world().getCommands() )
 	{
 		renderer->execute(command);
 	}
 
-	renderer->submitUI(queue.ui().getCommands());
+	// renderer->submitUI(queue.ui().getCommands());s
 
 	renderer->endFrame();
 }
 
 void RenderSystem::collectCommands(Scene& scene)
 {
-	for (auto* component : scene.getAllComponentsOfType<RenderComponent>())
+	for ( auto* component : scene.getAllComponentsOfType<RenderComponent>() )
 	{
-		if (component == nullptr) continue;
+		if ( component == nullptr ) continue;
 
 		auto* gameObject = component->getGameObject();
-		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
+		if ( gameObject == nullptr || !gameObject->getIsActive() ) continue;
 
 		component->fillRenderQueue(queue);
 	}
 
-	for (auto* component : scene.getAllComponentsOfType<
-		     UserInterfaceRenderComponent>())
+	for ( auto* component :
+		  scene.getAllComponentsOfType<UserInterfaceRenderComponent>() )
 	{
-		if (component == nullptr) continue;
+		if ( component == nullptr ) continue;
 
 		auto* gameObject = component->getGameObject();
-		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
+		if ( gameObject == nullptr || !gameObject->getIsActive() ) continue;
 
 		component->fillUserInterfaceRenderQueue(queue);
 	}
@@ -62,4 +62,9 @@ void RenderSystem::collectCommands(Scene& scene)
 void RenderSystem::setClearColor(const Color& color)
 {
 	clearColor = color;
+}
+
+const Color& RenderSystem::getClearColor() const
+{
+	return clearColor;
 }

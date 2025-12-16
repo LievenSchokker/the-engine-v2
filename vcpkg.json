@@ -3,6 +3,8 @@
     "gamenetworkingsockets",
     "sdl2",
     "sdl2-image",
-    "gtest"
+    "sdl2-mixer",
+    "gtest",
+    "cereal"
   ]
 }

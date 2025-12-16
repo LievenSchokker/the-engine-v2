@@ -9,6 +9,11 @@ void Agent::onAwake()
     {
         setEnabled(false);
     }
+
+    for (auto& moduleData  :  moduleDatas)
+    {
+        moduleData->getModule()->initialise();
+    }
 }
 
 
@@ -112,7 +117,7 @@ void Agent::setRotationTurnRate(float value)
 
 bool Agent::requestPath(const Vector2 &target)
 {
-    NavigationSystem* navSystem = gameObject->getScene().getNavigationSystem();
+    NavigationSystem* navSystem = gameObject->getScene()->getNavigationSystem();
 
     if (navSystem == nullptr)
         return false;

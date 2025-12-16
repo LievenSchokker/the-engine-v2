@@ -1,9 +1,9 @@
-#include "Component/UIObject/UISpacer.h"
+#include "Component/UIElement/UISpacer.h"
 #include "Rendering/UIRenderCommand.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
 
 UISpacer::UISpacer(float height)
-	: UIObject(0, 0, 0, height)
+	: UIElement(0, 0, 0, height)
 	, spacerHeight(height)
 {
 }

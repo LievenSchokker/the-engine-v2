@@ -1,9 +1,6 @@
 #pragma once
 
-#include "../Rendering/Color.h"
-#include "../Rendering/RenderQueue/RenderQueue.h"
 #include "Scene.h"
-#include "Rendering/IRenderer.h"
 
 #include <memory>
 #include <string>
@@ -18,7 +15,7 @@
 class SceneManager
 {
    public:
-	SceneManager() = default;
+	SceneManager();
 
 	/**
 	 * @brief Register a scene owned by the manager.
@@ -127,19 +124,39 @@ class SceneManager
 	void update(float deltaTime, GameWorld* world);
 
 	/**
-	 * @brief Change the clear color used at the start of each frame.
+	 * @brief Update the active scene unconditionally (even when paused).
+	 *
+	 * Used for behaviors that need to run every frame, such as debug controls
+	 * that must work even when the simulation is paused.
+	 *
+	 * Updates both the persistent scene (if it exists) and the active scene.
+	 *
+	 * @param deltaTime Seconds elapsed since the previous update call.
 	 */
-	void setClearColor(const Color& color);
+	void updateAlways(float deltaTime, GameWorld* world);
 
 	/**
-	 * @brief Retrieve the currently configured clear color.
+	 * @brief Get or create the persistent scene.
+	 *
+	 * The persistent scene is always active and never stopped, making it ideal
+	 * for debug controls and other cross-scene utilities. It persists across
+	 * all scene transitions.
+	 *
+	 * @return Pointer to the persistent scene
 	 */
-	Color getClearColor() const;
+	Scene* getOrCreatePersistentScene();
+
+	/**
+	 * @brief Get the persistent scene.
+	 *
+	 * @return Pointer to the persistent scene, or nullptr if not created yet.
+	 */
+	Scene* getPersistentScene() const;
 
    private:
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
+	std::unique_ptr<Scene>
+		persistentScene;  // Always-active scene for debug/utilities
 	bool paused = false;
-	IRenderer* renderer = nullptr;
-	Color clearColor = Color::black();
 };

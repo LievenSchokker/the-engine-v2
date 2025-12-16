@@ -1,8 +1,5 @@
-//
-// Created by samle on 10/11/2025.
-//
-
 #pragma once
+
 
 class Scene;
 class Transform;
@@ -129,20 +126,23 @@ public:
 	*/
 	bool compareTag(const std::string& other);
 
-	const std::vector<Behaviour*>& getAllBehaviours() const;
+        /**
+         * @brief Retrieves a vector of all Behaviours attached to this GameObject
+         */
+        const std::vector<Behaviour*>& getAllBehaviours() const;
 
-	/**
-	* @brief Returns all active Behaviour components attached to this GameObject.
-	* @return Vector of pointers to active Behaviour components
-	*/
-	const std::vector<Behaviour*>& getEnabledBehaviours() const;
+	    /**
+	    * @brief Returns all active Behaviour components attached to this GameObject.
+	    * @return Vector of pointers to active Behaviour components
+	    */
+	    const std::vector<Behaviour*>& getEnabledBehaviours() const;
 
 
-	/**
-	* @brief Returns the Transform of this GameObject.
-	* @return Pointer to the Transform
-	*/
-	Transform* getTransform() const;
+	    /**
+	    * @brief Returns the Transform of this GameObject.
+	    * @return Pointer to the Transform
+	    */
+	    Transform* getTransform() const;
 
 
 	/**
@@ -227,9 +227,18 @@ public:
 	 * @param newScene new owning scene of this GameObject
 	 */
 	void setScene(Scene& newScene);
-        Scene& getScene() const;
 
-	void setBehavioursEnabled(bool value) const;
+        /**
+         * @ Retrieves the scene this GameObject is currently owned by
+         * @return
+         */
+        Scene* getScene() const;
+
+        /**
+         * @brief Enables/Disables all behaviour components on this GameObject
+         * @param value true if they should be enabled, false if they should be disabled
+         */
+        void setBehavioursEnabled(bool value) const;
 
 	/**
 	 * @brief Helper function to get the @c componentManager directly,
@@ -259,13 +268,22 @@ public:
 	 */
 	bool getIsDestroyed() const;
 
-private:
-	std::unique_ptr<ComponentManager> componentManager;
-	std::unique_ptr<Transform> transform;
-	Scene* scene;
-	std::string name;
-	int layer;
-	std::string tag;
+        /**
+         * @brief Returns the sceneId of this GameObject
+         *
+         *
+         * @return the value of internally stored @c sceneId, which gets set when the @c setScene() method is called
+         */
+        int getSceneId() const;
+
+    private:
+	    std::unique_ptr<ComponentManager> componentManager;
+	    std::unique_ptr<Transform> transform;
+	    Scene* scene;
+	    std::string name;
+	    int layer;
+	    std::string tag;
+        int sceneId;
 
 	bool isActive;
 	bool isStatic;

@@ -6,7 +6,7 @@
 
 void NavigationGridRenderer::onAwake()
 {
-    grid = dynamic_cast<NavigationGrid*>(gameObject->getScene().getNavigationSystem()->getNavigationSurface());
+    grid = dynamic_cast<NavigationGrid*>(gameObject->getScene()->getNavigationSystem()->getNavigationSurface());
 
     if (grid == nullptr)
     {
