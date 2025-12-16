@@ -2,8 +2,9 @@
 
 
 #include "Core/GameWorld.h"
-#include "AI/Navigation/NavigationSystem.h"
+#include "AI/Navigation/NavigationGridOptions.h"
 
+class NavigationSystem;
 class GameObject;
 class Behaviour;
 struct RenderQueue;
@@ -188,6 +189,8 @@ class Scene
 
         NavigationSystem* getNavigationSystem() const;
 
+
+
         /**
 * @brief Removes a GameObject by pointer and returns it.
 */
@@ -204,13 +207,14 @@ class Scene
         /// @brief Method that removes the @c gameObject from the containers storing it
         bool removeGameObjectInternal(GameObject* gameObject);
 
-
-
         /// @brief Method that adds the @c gameObject to the internal containers storing it
         bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
 
         /// Map stores the GameObject and their scene id.
         std::map<const GameObject*, int> gameObjectIds;
+
+         void initialiseNavigationSystem(NavigationGridOptions options);
+         std::unique_ptr<NavigationSystem> navigationSystem;
 
         /// Incremented everytime a GameObject is added to this scene.
 		std::vector<Behaviour*> beforeEnableBehaviours;
@@ -220,7 +224,6 @@ class Scene
 	    std::string name;
 		bool active = false;
 	    GameWorld* gameWorld = nullptr;
-        std::unique_ptr<NavigationSystem> navigationSystem;
 
 };
 

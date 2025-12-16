@@ -9,10 +9,14 @@
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/NavigationGrid.h"
+#include "AI/Navigation/NavigationSystem.h"
+
 
 #include <algorithm>
 #include <iostream>
 #include <utility>
+
+#include "AI/Navigation/NavigationGridOptions.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -125,21 +129,8 @@ void Scene::onStart()
 		return;
 	}
 
-    /// Init navigation stuff hihi ^^.
-    std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(100, 100, Vector2{ 20.0f,20.0f });
-
-    std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<NavigationObstacle>();
-    std::vector<BoundingBox> obstacleBounds {};
-    for ( const auto& obstacle : obstacles )
-    {
-        obstacleBounds.push_back(obstacle->getBounds());
-    }
-    auto visuals = std::make_unique<GameObject>();
-    addGameObject(std::move(visuals));
-    navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
-    navigationSystem->bake(obstacleBounds);
-    ///
-
+    /// Note: Somehwere the settings should be configured?
+    initialiseNavigationSystem({100, 100, Vector2{15, 15}});
 
 	active = true;
 
@@ -424,6 +415,21 @@ bool Scene::addGameObjectInternal(std::unique_ptr<GameObject> gameObject)
     return true;
 }
 
+ void Scene::initialiseNavigationSystem(NavigationGridOptions options)
+{
+    std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(options.gridWidth, options.gridHeight, options.cellSize);
+    std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<NavigationObstacle>();
+
+    std::vector<BoundingBox> obstacleBounds {};
+
+    for ( const auto& obstacle : obstacles )
+    {
+        obstacleBounds.push_back(obstacle->getBounds());
+    }
+
+    navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
+    navigationSystem->bake(obstacleBounds);
+}
 
 
 NavigationSystem* Scene::getNavigationSystem() const

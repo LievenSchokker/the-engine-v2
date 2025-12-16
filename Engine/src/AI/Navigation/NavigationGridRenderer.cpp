@@ -1,6 +1,7 @@
 
 #include "AI/Navigation/NavigationGridRenderer.h"
 #include "AI/Navigation/NavigationGrid.h"
+#include "AI/Navigation/NavigationSystem.h"
 #include "Component/Transform.h"
 #include "Scene/Scene.h"
 

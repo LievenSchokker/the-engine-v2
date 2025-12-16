@@ -1,6 +1,7 @@
 #include "AI/Agent.h"
 #include "Component/Transform.h"
 #include "Scene/Scene.h"
+#include "AI/Navigation/NavigationSystem.h"
 
 
 void Agent::onAwake()
