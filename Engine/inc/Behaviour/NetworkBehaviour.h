@@ -46,16 +46,16 @@ public:
 	 */
 	NetworkIdentity* identity = nullptr;
 
-	/**
-	 * @brief Returns true if executing on the server.
-	 *
-	 * Uses NetworkContext/ProgramType to determine runtime mode.
-	 */;
+    /**
+     * @brief Returns true if executing on a client.
+     */
 	bool isClient() const;
 
-	/**
-	 * @brief Returns true if executing on a client.
-	 */
+    /**
+     * @brief Returns true if executing on the server.
+     *
+     * Uses NetworkContext/ProgramType to determine runtime mode.
+     */;
 	bool isServer() const;
 	/**
 	 * @brief Returns true if local machine has authority over this object.
