@@ -16,22 +16,8 @@ ApplicationSpecifications Game::getApplicationSpecifications() const
 
 void Game::addScene(std::unique_ptr<Scene> scene)
 {
-	std::string name = scene->getName();
-	sceneManager->addScene(std::move(scene));
-
-	if ( sceneManager->getActiveScene() == nullptr )
-	{
-		sceneManager->setActiveScene(name);
-	}
-}
-
-bool Game::setActiveScene(const std::string& name) const
-{
-	if ( sceneManager == nullptr )
-	{
-		return false;
-	}
-	return sceneManager->setActiveScene(name);
+    std::string name = scene->getName();
+    sceneManager->addScene(std::move(scene));
 }
 
 std::unique_ptr<SceneManager> Game::getSceneManager()

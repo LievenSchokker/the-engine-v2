@@ -116,3 +116,4 @@ auto ComponentManager::getComponentIterator() const -> std::vector<
 		                    return dynamic_cast<T*>(comp.get()) != nullptr;
 	                    });
 }
+

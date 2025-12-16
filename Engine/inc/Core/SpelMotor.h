@@ -20,6 +20,7 @@ class SpelMotor
 {
    public:
 	explicit SpelMotor(std::unique_ptr<Game> game);
+    SpelMotor(std::unique_ptr<Game> game, std::unique_ptr<IEngineLoop> engineLoop);
 	~SpelMotor();
 	/**
 	 * @brief Starts the engine and enters the main game loop.
@@ -66,6 +67,6 @@ class SpelMotor
 	/** @brief Tracks whether the game loop is active. */
 	mutable bool running;
 
-	std::unique_ptr<IEngineLoop> coreSystemLoop;
-	std::unique_ptr<ApplicationClock> coreClock;
+    std::unique_ptr<IEngineLoop> coreSystemLoop;
+    std::unique_ptr<ApplicationClock> coreClock;
 };

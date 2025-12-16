@@ -36,7 +36,7 @@ void ScenePlaceholder::processDestroyQueue()
     for (auto* obj : destroyQueue)
     {
         objects.erase(
-            std::remove(objects.begin(), objects.end(), obj),
+            std::ranges::remove(objects, obj).begin(),
             objects.end()
         );
 

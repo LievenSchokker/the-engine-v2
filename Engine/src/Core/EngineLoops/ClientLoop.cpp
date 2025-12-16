@@ -5,20 +5,22 @@
 #include "Core/EngineLoops/ServerLoop.h"
 #include "External/SDLBackendContext.h"
 #include "Game.h"
+#include "Core/ApplicationClock.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Networking/Client.h"
+#include "Networking/NetworkSpawnManager.h"
 #include "Networking/Server/ServerInformation.h"
+#include "Networking/Messages/MessageDispatcherFactory.h"
 #include "Networking/TransportGNS.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Scene/SceneManager.h"
 
-// TODO Create proper factory for each system that needs to be created
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-	: sceneManager(std::move(spel->getSceneManager())),
+	: specifications(spel->getApplicationSpecifications()),
 	  gameWorld(std::make_unique<GameWorld>()),
-	  specifications(spel->getApplicationSpecifications()),
+	  sceneManager(std::move(spel->getSceneManager())),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
 	  isShutdown(false)
 {
@@ -27,7 +29,6 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 	clockFunction = []() { return 1.0; };
 	if ( specifications.renderBackend == RenderBackend::SDL )
 	{
-		// TODO SDL Injection layer
 		backendContext = std::make_unique<SDLBackendContext>();
 		clockFunction = []() { return SDL_GetTicks() / 1000.0; };
 		std::unique_ptr<IRenderer> sdlRenderer =
@@ -38,15 +39,31 @@ ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
 		gameWorld->render = renderer.get();
 	}
 
-	// Set GameWorld references for behaviors to access
 	gameWorld->sceneManager = sceneManager.get();
 	gameWorld->input = InputManager::getInstance();
 	inputManager = InputManager::getInstance();
 
-	// Aduio
 	auto backend = std::make_unique<AudioBackendSDL>();
 	audioManager = std::make_unique<AudioManager>();
-	audioManager->initialize(std::move(backend));
+
+
+	gameWorld->input = InputManager::getInstance();
+	gameWorld->client = client.get();
+	gameWorld->sceneManager = sceneManager.get();
+
+	spawnManager = std::make_unique<NetworkSpawnManager>(gameWorld.get());
+	gameWorld->spawnManager = spawnManager.get();
+
+	sceneManager->configureNetworking(ConnectionMode::Client, spawnManager.get());
+
+    if (sceneManager->getActiveScene() == nullptr)
+    {
+        std::string sceneName = sceneManager->getFirstSceneName();
+        if (!sceneName.empty())
+        {
+            sceneManager->setActiveScene(sceneName);
+        }
+    }
 }
 
 ClientLoop::~ClientLoop() = default;
@@ -99,7 +116,19 @@ void ClientLoop::initializeNetworking()
 	ServerConnectionInformation serverInfo;
 	serverInfo.ip = specifications.networkingOptions.serverIP;
 	serverInfo.port = specifications.networkingOptions.port;
-	client->connectToServer(serverInfo);
+
+	if (!client->connectToServer(serverInfo))
+	{
+		std::cerr << "Failed to connect to server!" << std::endl;
+		return;
+	}
+
+	auto dispatcher =
+		spelmotorNetworking::MessageDispatcherFactory::createClientDispatcher(
+			*gameWorld,
+			*spawnManager,
+			spawnManager->getNetworkIdentityRegistry());
+	client->injectMessageDispatcher(std::move(dispatcher));
 }
 
 void ClientLoop::shutdown()
@@ -108,6 +137,8 @@ void ClientLoop::shutdown()
 	InputManager::shutdown();
 	renderer.release();
 	client->disconnect();
+	InputManager::shutdown();
+	renderer.reset();
 }
 
 bool ClientLoop::isShutdownRequested() const
@@ -115,20 +146,21 @@ bool ClientLoop::isShutdownRequested() const
 	return isShutdown;
 }
 
+
 GameWorld* ClientLoop::getGameWorld()
 {
 	return gameWorld.get();
 }
 
+SceneManager* ClientLoop::getSceneManager()
+{
+    if ( sceneManager ) return sceneManager.get();
+    return nullptr;
+}
+
 ClientLoop::ClockFunction ClientLoop::getClock()
 {
 	return clockFunction;
-}
-
-SceneManager* ClientLoop::getSceneManager()
-{
-	if ( sceneManager ) return sceneManager.get();
-	return nullptr;
 }
 
 void ClientLoop::setApplicationClock(ApplicationClock* clock)
