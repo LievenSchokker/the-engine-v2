@@ -211,7 +211,7 @@ private:
 		std::vector<Behaviour*> beforeEnableBehaviours;
 		std::vector<std::unique_ptr<GameObject> > gameObjects;
 		std::vector<GameObject*> destroyQueue;
-	    int currentGameObjectId;
+	    int currentGameObjectId{};
 	    std::string name;
 		bool active = false;
 	    GameWorld* gameWorld = nullptr;

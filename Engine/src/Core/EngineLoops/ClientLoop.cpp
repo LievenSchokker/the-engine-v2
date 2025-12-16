@@ -5,7 +5,6 @@
 #include "Core/EngineLoops/ServerLoop.h"
 #include "External/SDLBackendContext.h"
 #include "Game.h"
-#include "Game.h"
 #include "Core/ApplicationClock.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
@@ -19,9 +18,9 @@
 #include "Scene/SceneManager.h"
 
 ClientLoop::ClientLoop(std::unique_ptr<Game> spel)
-	: sceneManager(std::move(spel->getSceneManager())),
+	: specifications(spel->getApplicationSpecifications()),
 	  gameWorld(std::make_unique<GameWorld>()),
-	  specifications(spel->getApplicationSpecifications()),
+	  sceneManager(std::move(spel->getSceneManager())),
 	  client(std::make_unique<Client>(std::make_unique<TransportGNS>())),
 	  isShutdown(false)
 {

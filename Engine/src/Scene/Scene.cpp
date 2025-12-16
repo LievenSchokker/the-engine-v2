@@ -53,20 +53,20 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 bool Scene::removeGameObject(const std::string& name)
 {
 	const auto it =
-		std::remove_if(gameObjects.begin(), gameObjects.end(),
-					   [&](const std::unique_ptr<GameObject>& gameObject)
-					   {
-						   if ( gameObject->getName() == name )
-						   {
-							   if ( active && gameObject->getIsActive() )
-							   {
-							       gameObject->destroy();
-							       gameObject->onSceneDestroy();
-							   }
-							   return true;
-						   }
-						   return false;
-					   });
+		std::ranges::remove_if(gameObjects,
+                               [&](const std::unique_ptr<GameObject>& gameObject)
+                               {
+                                   if ( gameObject->getName() == name )
+                                   {
+                                       if ( active && gameObject->getIsActive() )
+                                       {
+                                           gameObject->destroy();
+                                           gameObject->onSceneDestroy();
+                                       }
+                                       return true;
+                                   }
+                                   return false;
+                               }).begin();
 
 	if ( it != gameObjects.end() )
 	{
@@ -93,9 +93,9 @@ GameObject* Scene::getGameObject(const std::string& name) const
 
 std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 {
-	auto it = std::find_if(gameObjects.begin(), gameObjects.end(),
-						   [&](const std::unique_ptr<GameObject>& gameObject)
-						   { return gameObject->getName() == name; });
+	const auto it = std::ranges::find_if(gameObjects,
+                                   [&](const std::unique_ptr<GameObject>& gameObject)
+                                   { return gameObject->getName() == name; });
 
 	if ( it == gameObjects.end() )
 	{
