@@ -1,9 +1,9 @@
 #pragma once
+
+
 #include "SystemStatus.h"
-#include "SystemUpdatePhase.h"
 
 #include <string>
-
 
 class GameWorld;
 
