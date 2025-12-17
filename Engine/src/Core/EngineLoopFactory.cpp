@@ -28,6 +28,12 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     std::unique_ptr<IBackendContext> backendContext{};
     IBackendContext* contextPtr = nullptr;
 
+    if (specs.renderBackend != RenderBackend::SDL)
+    {
+        throw std::runtime_error("Invalid render backend specified");
+    }
+
+    
     if (specs.renderBackend == RenderBackend::SDL)
     {
         backendContext = std::make_unique<SDLBackendContext>();

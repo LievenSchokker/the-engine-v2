@@ -11,6 +11,7 @@ EngineLoop::EngineLoop(std::unique_ptr<Game> game)
     : game(std::move(game))
     , gameWorld(std::make_unique<GameWorld>())
     , clockFunction([]() { return 0.0; })
+    , sceneManagerPtr(nullptr)
 {
 }
 
@@ -28,11 +29,15 @@ void EngineLoop::addSystem(std::unique_ptr<IEngineSystem> system)
 
 void EngineLoop::start()
 {
+
+    //This is where each system will give its reference to the gameWorld.
     for (const auto& system : systems)
     {
         system->start(*gameWorld);
     }
 
+    //I left the InputManager out of this for now since it's still a singleton
+    //TODO Remove singleton and use reference via GameWorld for polling.
     getGameWorld()->input = InputManager::getInstance();
     sceneManagerPtr = gameWorld->sceneManager;
 }
@@ -57,9 +62,9 @@ void EngineLoop::fixedUpdate(const double deltaTime)
 
 void EngineLoop::shutdown()
 {
-    for (auto it = systems.rbegin(); it != systems.rend(); ++it)
+    for (auto systemEntry = systems.rbegin(); systemEntry != systems.rend(); ++systemEntry)
     {
-        (*it)->shutdown(*gameWorld);
+        (*systemEntry)->shutdown(*gameWorld);
     }
     systems.clear();
 }
