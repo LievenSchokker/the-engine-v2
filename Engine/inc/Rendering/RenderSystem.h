@@ -43,7 +43,9 @@ class RenderSystem
 	void setClearColor(const Color& color);
 	void updateCameras(const Scene& scene);
 
-private:
+	const Color& getClearColor() const;
+
+   private:
 	std::unique_ptr<IRenderer> renderer;
 	std::vector<Camera*> cameras;
 	RenderQueue queue;

@@ -4,74 +4,79 @@
 
 #include "Behaviour/Behaviour.h"
 
-
 Behaviour::~Behaviour() = default;
-
 
 void Behaviour::awake()
 {
-    if (hasAwakened)
-        return;
+	if ( hasAwakened ) return;
 
-    hasAwakened = true;
-    onAwake();
+	hasAwakened = true;
+	onAwake();
 }
-
 
 void Behaviour::start()
 {
-    if (hasStarted)
-        return;
+	if ( hasStarted ) return;
 
-    hasStarted = true;
-    onStart();
+	hasStarted = true;
+	onStart();
 }
-
 
 void Behaviour::setEnabled(const bool value)
 {
-    if (isEnabled == value)
-        return;
+	if ( isEnabled == value ) return;
 
-    /// This might prevent crashes when attempting to enable a behaviour right after it has been deleted
-    if (value == true)
-        if (gameObject == nullptr || gameObject->getIsDestroyed())
-            return;
+	/// This might prevent crashes when attempting to enable a behaviour right
+	/// after it has been deleted
+	if ( value == true )
+		if ( gameObject == nullptr || gameObject->getIsDestroyed() ) return;
 
-    isEnabled = value;
+	isEnabled = value;
 
-    if (isEnabled)
-        onEnable();
-    else
-        onDisable();
+	if ( isEnabled )
+		onEnable();
+	else
+		onDisable();
 }
 
+bool Behaviour::shouldRunWhenPaused() const
+{
+	return false;
+}
 
 void Behaviour::onDestroy()
 {
-    Component::onDestroy();
+	Component::onDestroy();
 }
-
 
 bool Behaviour::getIsEnabled() const
 {
-    return isEnabled;
+	return isEnabled;
+}
+
+
+bool Behaviour::getIsActive() const
+{
+	if ( gameObject == nullptr ) return false;
+	return gameObject->getIsActive();
 }
 
 
 bool Behaviour::getIsActiveAndEnabled() const
 {
-    return (isEnabled && gameObject != nullptr && gameObject->getIsActive());
+	if ( isEnabled == false ) return false;
+	if ( gameObject == nullptr ) return false;
+
+	return gameObject->getIsActive();
 }
 
 
 bool Behaviour::getHasAwakened() const
 {
-    return hasAwakened;
+	return hasAwakened;
 }
-
 
 bool Behaviour::getHasStarted() const
 {
-    return hasStarted;
+	return hasStarted;
 }

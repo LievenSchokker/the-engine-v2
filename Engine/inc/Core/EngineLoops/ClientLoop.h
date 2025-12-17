@@ -4,6 +4,7 @@
 #include "Core/ApplicationSpecifications.h"
 #include "Core/IEngineLoop.h"
 #include "External/IBackendContext.h"
+#include "Networking/NetworkingIdentityRegistry.h"
 #include "Rendering/RenderSystem.h"
 
 class Game;
@@ -26,7 +27,7 @@ class InputManager;
  *
  * @see ServerLoop, IEngineLoop
  */
-class ClientLoop: public IEngineLoop
+class ClientLoop final: public IEngineLoop
 {
 	using ClockFunction = std::function<double()>;
 
@@ -38,14 +39,16 @@ class ClientLoop: public IEngineLoop
 	 * allows the engine to configure additional settings between construction
 	 * and the window becoming visible.
 	 *
-	 * @param applicationSpecifications Client configuration (resolution, server address)
+	 * @param applicationSpecifications Client configuration (resolution, server
+	 * address)
 	 */
-	explicit ClientLoop(std::unique_ptr<Game> game);
+	explicit ClientLoop(std::unique_ptr<Game> spel);
 	~ClientLoop() override;
 
 	GameWorld* getGameWorld() override;
 	SceneManager* getSceneManager() override;
 	ClockFunction getClock() override;
+	void setApplicationClock(ApplicationClock* clock) override;
 	void start() override;
 	void update(double deltaTime) override;
 	void fixedUpdate(double deltaTime) override;
@@ -61,9 +64,10 @@ class ClientLoop: public IEngineLoop
 	 */
 	void initializeNetworking();
 
-	std::unique_ptr<Game> game;
 	ApplicationSpecifications specifications;
 	std::unique_ptr<GameWorld> gameWorld;
+    std::unique_ptr<NetworkSpawnManager> spawnManager;
+
 	std::unique_ptr<SceneManager> sceneManager;
 	std::unique_ptr<Client> client;
 	std::unique_ptr<RenderSystem> renderer;

@@ -69,6 +69,14 @@ class Transform: public Component
     const Vector2& forward() const;
     const Vector2& right() const;
 
+
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Transform;
+	}
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 private:
     void updateDirectionVectors();
     Vector2 position;

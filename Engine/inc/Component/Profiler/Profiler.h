@@ -24,7 +24,7 @@ class GameWorld;
  * keep the displayed values readable (rapidly changing numbers are hard
  * to follow).
  */
-class Profiler: public UIElement, public Behaviour
+class Profiler  final : public UIElement, public Behaviour
 {
 public:
 	explicit Profiler(
@@ -48,6 +48,11 @@ public:
 	UIRenderCommand renderEntityLabel() const;
 	UIRenderCommand renderSceneLabel() const;
 	/// @}
+
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Unknown;
+	}
 
 	void update(float deltaTime, GameWorld* world) override;
 
