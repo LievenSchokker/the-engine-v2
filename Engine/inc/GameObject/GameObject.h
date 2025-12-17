@@ -54,14 +54,11 @@ public:
      */
     void deserialize(ReadArchive& archive);
 
-
+    Component* getComponentByTypeName(const std::string& typeName) const;
     /**
      * @brief Creates a deep copy of this GameObject via serialization.
      */
     std::unique_ptr<GameObject> clone() const;
-
-    Component* getComponentByType(ComponentType type) const;
-
 
     /**
     * @brief Adds a component of type T to this object's @c componentManager.

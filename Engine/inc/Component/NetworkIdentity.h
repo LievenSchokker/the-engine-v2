@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "BaseComponentTypes/ComponentBase.h"
+
 class NetworkBehaviour;
 class GameWorld;
 /**
@@ -17,20 +19,15 @@ class GameWorld;
  *
  * This corresponds to your diagram's NetworkIdentity class with netId and ownerId.
  */
-class NetworkIdentity final : public Component
+class NetworkIdentity final : public ComponentBase<NetworkIdentity>
 {
 public:
     NetworkIdentity() = default;
     ~NetworkIdentity() override;
 
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::NetworkIdentity;
-	}
-
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
-
+    static constexpr const char* name() { return "NetworkIdentity"; }
     /**
      * @brief Unique network identifier assigned at spawn.
      *

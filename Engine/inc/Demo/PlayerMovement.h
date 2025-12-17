@@ -2,6 +2,7 @@
 
 
 #include "Behaviour/NetworkBehaviour.h"
+#include "Behaviour/NetworkBehaviourBase.h"
 #include "Math/Vector2.h"
 
 class GameWorld;
@@ -12,21 +13,16 @@ class GameWorld;
  * Client: Reads input, sends movement commands to server
  * Server: Validates and applies movement, broadcasts to clients
  */
-class PlayerMovement final : public NetworkBehaviour
+class PlayerMovement final : public NetworkBehaviourBase<PlayerMovement>
 {
 public:
     PlayerMovement();
+    static constexpr const char* Name() { return "PlayerMovement"; }
     void onStart() override;
     void onNetworkSpawn() override;
     void registerNetworkMethods(NetworkBuilder& builder) override;
     void update(float deltaTime, GameWorld* world) override;
-
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::PlayerMovement;
-	}
-
-	void serialize(WriteArchive& archive) const override;
+    void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 private:
     void handleInput();

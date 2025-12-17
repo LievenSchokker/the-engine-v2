@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "BaseComponentTypes/ComponentBase.h"
 #include "GameObject/GameObject.h"
 #include "Math/Vector2.h"
 #include "Component/BaseComponentTypes/Component.h"
@@ -8,13 +9,13 @@
 /**
  * @brief Transform holds the position, rotation and scale.
  */
-class Transform: public Component
+class Transform: public ComponentBase<Transform>
 {
    public:
 	Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0,
 			  Vector2 scale = {1.0, 1.0});
 	~Transform();
-
+    static constexpr const char* name() { return "Transform"; }
     /**
      * @brief Get the current position.
      *
@@ -68,13 +69,6 @@ class Transform: public Component
 
     const Vector2& forward() const;
     const Vector2& right() const;
-
-
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::Transform;
-	}
-
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 private:

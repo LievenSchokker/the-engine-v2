@@ -2,6 +2,7 @@
 
 #include "Animation/SpritesheetDefinition.h"
 #include "Assets/IImage.h"
+#include "BaseComponentTypes/RenderComponentBase.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Math/Vector2.h"
 #include "Rendering/Color.h"
@@ -15,11 +16,11 @@
  * a grid layout definition. The frame index can be animated using the
  * animation system.
  */
-class SpriteComponent: public RenderComponent
+class SpriteComponent: public RenderComponentBase<SpriteComponent>
 {
    public:
 	SpriteComponent() = default;
-
+    static constexpr const char* name() { return "Sprite"; }
 	/**
 	 * @brief Sets the spritesheet image and grid definition.
 	 *

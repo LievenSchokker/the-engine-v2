@@ -189,15 +189,22 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 
 void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 {
-	if (!message.gameObject)
-	{
-		return;
-	}
+    std::cout << "[handleSpawnMessage] Received spawn for netId=" << message.netId << std::endl;
 
-	if (!getScene())
-	{
-		return;
-	}
+    if (!message.gameObject)
+    {
+        std::cerr << "[handleSpawnMessage] ERROR: No gameObject in message!" << std::endl;
+        return;
+    }
+
+    if (!getScene())
+    {
+        std::cerr << "[handleSpawnMessage] ERROR: No active scene!" << std::endl;
+        return;
+    }
+
+    std::cout << "[handleSpawnMessage] GameObject: " << message.gameObject->getName() << std::endl;
+    std::cout << "[handleSpawnMessage] Behaviours before scene: " << message.gameObject->getAllBehaviours().size() << std::endl;
 
 	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
 	if (!identity)
@@ -218,8 +225,16 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
+
 	getScene()->addGameObject(std::move(message.gameObject));
+
+    std::cout << "[handleSpawnMessage] Added to scene, calling onNetworkSpawn" << std::endl;
+
+
 	identity->onNetworkSpawn();
+
+
+    std::cout << "[handleSpawnMessage] Done" << std::endl;
 }
 
 void NetworkSpawnManager::CheckNewClientSpawnObject(int clientId)

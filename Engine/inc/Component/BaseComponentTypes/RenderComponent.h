@@ -7,6 +7,6 @@
 class RenderComponent : virtual public Component
 {
 public:
-	~RenderComponent() = default;
+	~RenderComponent() override = default;
 	virtual void fillRenderQueue(IRenderQueueWriter& queue) const = 0;
 };

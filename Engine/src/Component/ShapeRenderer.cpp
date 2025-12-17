@@ -105,10 +105,6 @@ void ShapeRenderer::serialize(WriteArchive& archive) const
 	archive.process(order);
 }
 
-ComponentType ShapeRenderer::getComponentType() const
-{
-	return ComponentType::ShapeRenderer;
-}
 void ShapeRenderer::deserialize(ReadArchive& archive)
 {
 	// Shape type

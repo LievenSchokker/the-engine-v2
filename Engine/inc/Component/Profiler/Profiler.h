@@ -49,11 +49,6 @@ public:
 	UIRenderCommand renderSceneLabel() const;
 	/// @}
 
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::Unknown;
-	}
-
 	void update(float deltaTime, GameWorld* world) override;
 
 	void toggle();

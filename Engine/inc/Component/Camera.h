@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseComponentTypes/Component.h"
+#include "BaseComponentTypes/ComponentBase.h"
 #include "Math/Vector2.h"
 
 /**
@@ -15,7 +16,7 @@
  * useful for screen shake effects or look-ahead behavior.
  *
  */
-class Camera final : public Component
+class Camera final : public ComponentBase<Camera>
 {
 public:
     /**
@@ -26,8 +27,9 @@ public:
      * @param viewHeight Height of the camera's view in pixels
      */
     Camera(float zoom, Vector2 offset, float viewWidth, float viewHeight);
-
+    Camera() = default;
     ~Camera() override = default;
+    static constexpr const char* name() { return "Camera"; }
 
     /**
      * @brief Gets the current zoom level.
@@ -94,6 +96,8 @@ public:
      */
     void setViewport(float x, float y);
 
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
 private:
     float zoom;
     Vector2 offset;

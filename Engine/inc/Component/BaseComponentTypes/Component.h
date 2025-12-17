@@ -19,11 +19,10 @@ class GameObject;
 class Component : public ISerializable
 {
 public:
-	Component() : gameObject(nullptr), transform(nullptr)
-	{
-	};
-	virtual ~Component() = 0;
+	Component() : gameObject(nullptr), transform(nullptr){};
+    ~Component();
 
+    virtual const char* getComponentTypeName() const { return "Component"; };
 	/**
 	* @brief Sets the GameObject that this component lives on.
 	* Also sets the @c transform field to the GameObject's Transform.
@@ -93,7 +92,6 @@ public:
 	* @return Pointer to the associated GameObject's Transform.
 	*/
 	const Transform* getTransform() const;
-    virtual ComponentType getComponentType() const;
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 protected:

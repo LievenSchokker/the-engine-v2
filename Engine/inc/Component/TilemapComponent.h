@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include "BaseComponentTypes/RenderComponentBase.h"
+
 class TilemapAsset;
 
 /**
@@ -20,7 +22,7 @@ class TilemapAsset;
  *
  * The tilemap is positioned based on the GameObject's Transform.
  */
-class TilemapComponent: public RenderComponent
+class TilemapComponent: public RenderComponentBase<TilemapComponent>
 {
    public:
 	TilemapComponent() :tileSize{32.0, 32.0}
@@ -28,7 +30,7 @@ class TilemapComponent: public RenderComponent
 
 	};
 	~TilemapComponent() override = default;
-
+    static constexpr const char* name() { return "Tilemap"; }
 	/**
 	 * @brief Set the tilemap asset to use.
 	 * @param asset Pointer to a loaded TilemapAsset
@@ -115,13 +117,6 @@ class TilemapComponent: public RenderComponent
 	bool isReady() const;
 	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
-
-
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::TileMap;
-	}
-
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 private:

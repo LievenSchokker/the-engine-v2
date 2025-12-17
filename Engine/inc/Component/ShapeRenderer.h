@@ -4,13 +4,15 @@
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "BaseComponentTypes/RenderComponent.h"
+#include "BaseComponentTypes/RenderComponentBase.h"
 
 /**
  * @brief Simple component that renders primitive shapes for a GameObject.
  */
-class ShapeRenderer: public RenderComponent
+class ShapeRenderer: public RenderComponentBase<ShapeRenderer>
 {
 public:
+    static constexpr const char* name() { return "ShapeRenderer"; }
 	ShapeRenderer() = default;
 
 	ShapeRenderer& setColor(const Color& newColor);
@@ -32,8 +34,6 @@ public:
 	 * @brief Builds a render command that the renderer can consume later.
 	 */
 	void fillRenderQueue(IRenderQueueWriter& queue) const override;
-
-	ComponentType getComponentType() const override;
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 private:

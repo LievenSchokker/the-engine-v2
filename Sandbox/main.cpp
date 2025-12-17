@@ -20,7 +20,6 @@
 int main(int argc, char** argv)
 {
     EngineMode mode = EngineMode::CLIENT;
-    registerSerializableComponents();
     for (int i = 1; i < argc; ++i)
     {
         if (std::strcmp(argv[i], "server") == 0)
