@@ -88,7 +88,9 @@ void RenderSystem::setClearColor(const Color& color)
 
 const Color& RenderSystem::getClearColor() const
 {
-	return clearColor;
+    return clearColor;
+}
+
 void RenderSystem::updateCameras(const Scene& scene)
 {
 	cameras = scene.getAllComponentsOfType<Camera>();
