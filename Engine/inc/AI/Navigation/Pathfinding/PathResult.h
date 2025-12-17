@@ -39,7 +39,7 @@ struct PathResult
     const std::vector<Vector2>& getPath() const;
 
     /**
-     * #@brief Returns the size of the path.
+     * @brief Returns the size of the path.
      * @return  the number of elements in the path
      */
     int getPathSize() const;

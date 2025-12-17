@@ -26,7 +26,7 @@ class IPathfindingGraph;
 class INavigationSurface
 {
     public:
-        virtual ~INavigationSurface() = 0 {}
+        virtual ~INavigationSurface() = default;
 
         /**
          * @brief Wrap a specified graph abstraction used only for the pathfinding systems
