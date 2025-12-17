@@ -27,17 +27,17 @@
  * @brief Behavior class that handles physics demo input.
  *
  * Handles:
- * - W: Destroy rectangle body
- * - SPACE: Apply force to rectangle
+ * - W: Destroy circle body
+ * - SPACE: Apply force to circle
  * - ESC: Exit
  */
 class PhysicsInputBehaviour: public Behaviour
 {
    public:
-	PhysicsInputBehaviour(IPhysicsWorld* physicsWorld, GameObject* rectangleGO)
+	PhysicsInputBehaviour(IPhysicsWorld* physicsWorld, GameObject* circleGO)
 		: inputManager(nullptr),
 		  physicsWorld(physicsWorld),
-		  rectangleGO(rectangleGO)
+		  circleGO(circleGO)
 	{
 	}
 
@@ -54,7 +54,7 @@ class PhysicsInputBehaviour: public Behaviour
 		(void)world;
 
 		if ( inputManager == nullptr || physicsWorld == nullptr ||
-			 rectangleGO == nullptr )
+			 circleGO == nullptr )
 		{
 			return;
 		}
@@ -62,8 +62,8 @@ class PhysicsInputBehaviour: public Behaviour
 		// Handle W key to destroy rectangle body
 		if ( inputManager->wasKeyPressed(KeyCode::W) )
 		{
-			physicsWorld->destroyBody(rectangleGO->getComponent<RigidBody>());
-			std::cout << "Body destroyed for " << rectangleGO->getName()
+			physicsWorld->destroyBody(circleGO->getComponent<RigidBody>());
+			std::cout << "Body destroyed for " << circleGO->getName()
 					  << std::endl;
 		}
 
@@ -71,9 +71,9 @@ class PhysicsInputBehaviour: public Behaviour
 		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
 		{
 			const Vector2 force = {0, -30000000};
-			physicsWorld->applyForce(rectangleGO->getComponent<RigidBody>(),
+			physicsWorld->applyForce(circleGO->getComponent<RigidBody>(),
 									 force);
-			std::cout << "Force applied to " << rectangleGO->getName()
+			std::cout << "Force applied to " << circleGO->getName()
 					  << " with force: " << force.x << ", " << force.y
 					  << std::endl;
 		}
@@ -89,7 +89,7 @@ class PhysicsInputBehaviour: public Behaviour
    private:
 	InputManager* inputManager;
 	IPhysicsWorld* physicsWorld;
-	GameObject* rectangleGO;
+	GameObject* circleGO;
 };
 
 void createCircle(std::unique_ptr<GameObject>& circle, float x, float y,
