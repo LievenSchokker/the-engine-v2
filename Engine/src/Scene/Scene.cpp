@@ -211,7 +211,6 @@ void Scene::update(double deltaTime, const GameWorld& world)
 		return;
 	}
 
-	int behaviorCount = 0;
 	bool clockPaused = (world.clock != nullptr &&
 						world.clock->isPaused());
 
