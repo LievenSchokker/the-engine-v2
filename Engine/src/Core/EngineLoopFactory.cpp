@@ -17,23 +17,19 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Scene/SceneManager.h"
 
+#include <iostream>
+
 std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     std::unique_ptr<Game> game)
 {
     const auto& specs = game->getApplicationSpecifications();
-
     auto loop = std::make_unique<EngineLoop>(std::move(game));
+
     Game* gamePtr = loop->getGame();
 
     std::unique_ptr<IBackendContext> backendContext{};
     IBackendContext* contextPtr = nullptr;
 
-    if (specs.renderBackend != RenderBackend::SDL)
-    {
-        throw std::runtime_error("Invalid render backend specified");
-    }
-
-    
     if (specs.renderBackend == RenderBackend::SDL)
     {
         backendContext = std::make_unique<SDLBackendContext>();
@@ -67,6 +63,12 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 
     auto sceneManager = std::make_unique<SceneManager>();
     std::unique_ptr<Scene> scenePtr = gamePtr->getFirstScene();
+
+    if (!scenePtr)
+    {
+        throw std::runtime_error("Game must have at least one scene");
+    }
+
     const std::string sceneName = scenePtr->getName();
     sceneManager->addScene(std::move(scenePtr));
     sceneManager->setActiveScene(sceneName);
@@ -80,9 +82,8 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
     {
         loop->addSystem(std::make_unique<Server>(
-            ServerConnectionInformation{ specs.networkingOptions.port, specs.networkingOptions.serverIP,},
+            ServerConnectionInformation{specs.networkingOptions.port, specs.networkingOptions.serverIP},
             std::make_unique<TransportGNS>()));
     }
-
     return loop;
 }

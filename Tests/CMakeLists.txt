@@ -10,6 +10,7 @@ add_executable(engine_tests
         Scene/SceneManagerTest.cpp
         Core/SpelMotorTest.cpp
         Core/TimerTest.cpp
+        Core/EngineSystemFlagTest.cpp
         Component/Profiler/ProfilerTest.cpp
         Component/tests_TestComponents.cpp
         Component/TestComponentBase.cpp
