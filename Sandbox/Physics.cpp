@@ -47,7 +47,7 @@ class PhysicsInputBehaviour: public Behaviour
 		inputManager = InputManager::getInstance();
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
