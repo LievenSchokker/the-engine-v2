@@ -161,14 +161,14 @@ void SceneManager::processForClient(Scene& scene)
 
 bool SceneManager::hasNetworkBehaviour(const GameObject& obj) const
 {
-    for (const auto& component : obj.getComponentManager()->getComponents())
-    {
-        if (dynamic_cast<NetworkBehaviour*>(component.get()))
-        {
-            return true;
-        }
-    }
-    return false;
+	for (const auto& component : obj.getComponents())
+	{
+		if (dynamic_cast<NetworkBehaviour*>(component.get()))
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 bool SceneManager::hasNetworkIdentity(const GameObject& obj) const

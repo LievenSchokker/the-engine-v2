@@ -27,7 +27,7 @@
  * - Mouse wheel Y: Rotates the YellowRectangle
  * - Mouse wheel X: Moves and scales the BlueCircle
  */
-class SandboxInputBehaviour: public Behaviour
+class SandboxInputBehaviour final : public Behaviour
 {
    public:
 	explicit SandboxInputBehaviour(Scene* scene)
