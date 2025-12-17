@@ -17,7 +17,7 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
     auto scene = std::make_unique<Scene>("PathFindingZandbak");
 
     /// Player
-    auto player = std::make_unique<GameObject>("Player");
+    auto player = std::make_unique<GameObject>();
     auto playerRenderer = player->addComponent<ShapeRenderer>();
     playerRenderer->setCircle(50);
     playerRenderer->setColor({0, 255, 0, 255});
@@ -26,7 +26,7 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
     player->getTransform()->setPosition({500, 500});
 
     /// Agent
-    auto agentGO = std::make_unique<GameObject>("Agent");
+    auto agentGO = std::make_unique<GameObject>();
     agentGO->getTransform()->setPosition({10, 10});
 
     auto agentRenderer = agentGO->addComponent<ShapeRenderer>();
@@ -40,7 +40,7 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
 
 
     /// Grid Renderer:
-    auto gridGO = std::make_unique<GameObject>("GridRenderer");
+    auto gridGO = std::make_unique<GameObject>();
     auto gridRenderer = gridGO->addComponent<NavigationGridRenderer>();
 
     // Add obstacles
@@ -48,7 +48,7 @@ std::unique_ptr<Scene> PathFindingZandbak::getScene()
         scene->addGameObject(std::move(obstacle));
 
     /// Test Object / PathRender:
-    auto inputGO = std::make_unique<GameObject>("Input");
+    auto inputGO = std::make_unique<GameObject>();
     auto navTest = inputGO->addComponent<NavigationTest>();
     auto pathRender = inputGO->addComponent<PathRenderer>();
     navTest->setAgent(*agentComp);
@@ -69,7 +69,7 @@ std::vector<std::unique_ptr<GameObject> > PathFindingZandbak::createObstacles()
 {
     std::vector<std::unique_ptr<GameObject>> obstacles;
 
-    auto obs1 = std::make_unique<GameObject>("Obstacle1");
+    auto obs1 = std::make_unique<GameObject>();
     auto render1 = obs1->addComponent<ShapeRenderer>();
     render1->setRectangle({100, 100});
     render1->setColor({255, 255, 255, 50});
@@ -78,7 +78,7 @@ std::vector<std::unique_ptr<GameObject> > PathFindingZandbak::createObstacles()
     navObs1->useManualBounds({100, 100});
     obstacles.push_back(std::move(obs1));
 
-    auto obs2 = std::make_unique<GameObject>("Obstacle2");
+    auto obs2 = std::make_unique<GameObject>();
     auto render2 = obs2->addComponent<ShapeRenderer>();
     render2->setRectangle({150, 80});
     render2->setColor({255, 255, 255, 50});
