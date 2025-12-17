@@ -1,4 +1,3 @@
-// Tests/Core/SpelMotorTest.cpp
 #include "Game.h"
 
 #include <gtest/gtest.h>
@@ -6,7 +5,7 @@
 #include <chrono>
 #include <SDL2/SDL.h>
 #include "Core/SpelMotor.h"
-#include "../../Engine/inc/Core/Options/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 
 class SpelMotorTest : public ::testing::Test
 {
