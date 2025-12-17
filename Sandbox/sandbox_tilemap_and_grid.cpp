@@ -59,7 +59,7 @@ class TilemapInputBehaviour: public Behaviour
 		}
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
