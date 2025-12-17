@@ -37,14 +37,12 @@ class SandboxInputBehaviour: public Behaviour
 
 	~SandboxInputBehaviour() override = default;
 
-	sceneManager.setClearColor(Color::black());
-
 	void onAwake() override
 	{
 		inputManager = InputManager::getInstance();
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 
@@ -62,20 +60,20 @@ class SandboxInputBehaviour: public Behaviour
 		// Handle SPACE key to toggle clear color
 		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
 		{
-			Color clearColor = world->render->getClearColor();
+			Color clearColor = world.render->getClearColor();
 			clearColor = (clearColor == Color::darkGreen())
 							 ? Color::darkPurple()
 							 : Color::darkGreen();
 			// Try to set clear color through RenderSystem if available
-			if ( world != nullptr && world->render != nullptr )
+			if ( world != nullptr && world.render != nullptr )
 			{
-				world->render->setClearColor(clearColor);
+				world.render->setClearColor(clearColor);
 			}
 		}
 
 		if ( inputManager->wasKeyPressed(KeyCode::ENTER) )
 		{
-			SceneManager* sm = world->sceneManager;
+			SceneManager* sm = world.sceneManager;
 			Scene* active = sm->getActiveScene();
 
 			if ( active->getName() == "PrototypeScene" )
@@ -237,6 +235,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
+    spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Shape Sandbox", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 

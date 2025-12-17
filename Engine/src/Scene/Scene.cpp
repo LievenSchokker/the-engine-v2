@@ -218,7 +218,7 @@ void Scene::update(double deltaTime, const GameWorld& world)
 	{
 		if (!gameObject->getIsActive())
 			continue;
-
+	    
 		for ( const auto& behaviour : gameObject->getEnabledBehaviours() )
 		{
 			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
