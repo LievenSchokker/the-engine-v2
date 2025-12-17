@@ -5,14 +5,11 @@
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/MessageReader.h"
 #include "Networking/Messages/MessageWriter.h"
-#include "Networking/Messages/ConnectionMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
-#include "Networking/Messages/MessageTypes.h"
 #include "Networking/SendMode.h"
 #include "Networking/TransportResult.h"
-
-
+#include "Networking/Messages/MessageDispatcherFactory.h"
 #include <iostream>
 
 
@@ -30,12 +27,15 @@ Client::Client(std::unique_ptr<ITransport> injectedTransport)
     {
         onConnectionChanged(connection);
     });
+    messageDispatcher = nullptr;
 }
+
 
 Client::~Client()
 {
     disconnect();
 }
+
 
 bool Client::connectToServer(const ServerConnectionInformation&  serverInformartion) const
 {
@@ -47,6 +47,7 @@ bool Client::connectToServer(const ServerConnectionInformation&  serverInformart
     return true;
 }
 
+
 void Client::disconnect()
 {
     if (currentConnection.connectionStatus == ConnectionStatus::Connected)
@@ -57,6 +58,7 @@ void Client::disconnect()
     currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
 
+
 bool Client::sendMessage(const IMessage& message) const
 {
     if (currentConnection.connectionStatus != ConnectionStatus::Connected)
@@ -64,25 +66,28 @@ bool Client::sendMessage(const IMessage& message) const
         return false;
     }
 
-    OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
         message,
         currentConnection.transportConnectionId,
         SendMode::ReliableOrdered
     );
 
-    TransportResult result = transport->send(outgoing);
+    const TransportResult result = transport->send(outgoing);
     return result == TransportResult::SUCCESS;
 }
+
 
 void Client::poll() const
 {
     transport->poll();
 }
 
+
 bool Client::isConnected() const
 {
     return currentConnection.connectionStatus == ConnectionStatus::Connected;
 }
+
 
 void Client::onConnectionChanged(const Connection& connection)
 {
@@ -108,27 +113,27 @@ void Client::onConnectionChanged(const Connection& connection)
     }
 }
 
-void Client::onMessageReceived(const IncomingRawMessage& rawMessage)
-{
-    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
-    if (!message)
+void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
+{
+    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+
+	if (message->getMessageType() == MessageTypes::SpawnMessage)
+	{
+		std::cout << rawMessage.length << std::endl;
+	}
+
+    if (message == nullptr)
     {
         std::cerr << "Failed to parse message" << std::endl;
         return;
     }
 
-    switch (MessageTypes messageType = message->getMessageType())
-    {
-    case MessageTypes::ConnectionMessage:
-        {
-            if (dynamic_cast<ConnectionMessage*>(message.get())->getStatus() == ConnectionStatus::Disconnected)
-            {
-                disconnect();
-            }
-            break;
-        }
-    default:
-        break;
-    }
+    messageDispatcher->processMessage(std::move(message));
+}
+
+
+void Client::injectMessageDispatcher(std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
+{
+    messageDispatcher = std::move(dispatcher);
 }

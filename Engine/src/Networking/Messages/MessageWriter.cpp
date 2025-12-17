@@ -1,24 +1,23 @@
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/IMessage.h"
-#include "Networking/Messages/ConnectionMessage.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/SendMode.h"
-
 
 #include <cstring>
 
 
 OutgoingRawMessage MessageWriter::writeMessage(
-    const IMessage& message,
-    int connectionId,
-    SendMode sendMode)
+	const IMessage& message,
+	int connectionId,
+	SendMode sendMode)
 {
-    std::vector<std::byte> payload = message.serialize();
+	const std::vector<std::byte> payload = message.serialize();
 
-    std::vector<std::byte> buffer(sizeof(uint8_t) + payload.size());
-    auto typeValue = static_cast<uint8_t>(message.getMessageType());
-    std::memcpy(buffer.data(), &typeValue, sizeof(uint8_t));
-    std::memcpy(buffer.data() + sizeof(uint8_t), payload.data(), payload.size());
+	std::vector<std::byte> buffer(sizeof(uint8_t) + payload.size());
+	auto typeValue = static_cast<uint8_t>(message.getMessageType());
+	std::memcpy(buffer.data(), &typeValue, sizeof(uint8_t));
+	std::memcpy(buffer.data() + sizeof(uint8_t), payload.data(),
+	            payload.size());
 
-    return {connectionId, std::move(buffer), sendMode};
+	return {connectionId, std::move(buffer), sendMode};
 }

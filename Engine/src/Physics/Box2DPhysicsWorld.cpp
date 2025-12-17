@@ -170,6 +170,7 @@ void Box2DPhysicsWorld::shutdown()
 		b2DestroyBody(box2DID);
 	}
 	bodies.clear();
+	b2DestroyWorld(worldId);
 	worldId = b2_nullWorldId;
 }
 

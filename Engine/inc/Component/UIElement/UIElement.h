@@ -20,6 +20,10 @@ public:
 	                  float height = 30);
 	~UIElement() override = default;
 
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Unknown;
+	}
 	/// @name Geometry accessors
 	/// @brief Screen-space coordinates. Origin is top-left; positive Y points down.
 	/// @{

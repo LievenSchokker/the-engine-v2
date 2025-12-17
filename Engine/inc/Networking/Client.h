@@ -1,17 +1,19 @@
 #pragma once
 
-
-#include <memory>
+namespace spelmotorNetworking
+{
+    class MessageDispatcher;
+}
 
 #include "Connection/Connection.h"
+#include "Core/GameWorld.h"
 #include "Server/ServerInformation.h"
-
+#include "Networking/Messages/MessageDispatcher.h"
+#include <memory>
 
 class ITransport;
 class TransportGNS;
 class IMessage;
-
-
 struct IncomingRawMessage;
 
 /**
@@ -35,8 +37,7 @@ public:
 
     /**
      * @brief Initiates a connection to a server.
-     * @param port The server port to connect to.
-     * @param serverIP The server IP address as a null-terminated string.
+     * @param serverInformartion
      * @return True if the connection attempt was initiated successfully,
      *         false otherwise.
      */
@@ -68,12 +69,14 @@ public:
      */
     bool isConnected() const;
 
-private:
-    /**
-     * @brief Callback invoked when a message is received from the server.
-     * @param rawMessage The incoming raw message data.
-     */
-    void onMessageReceived(const IncomingRawMessage& rawMessage);
+    void injectMessageDispatcher(std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher);
+
+    private:
+        /**
+         * @brief Callback invoked when a message is received from the server.
+         * @param rawMessage The incoming raw message data.
+         */
+        void onMessageReceived(const IncomingRawMessage &rawMessage) const;
 
     /**
      * @brief Callback invoked when the connection state changes.
@@ -81,6 +84,10 @@ private:
      */
     void onConnectionChanged(const Connection& connection);
 
-    std::unique_ptr<ITransport> transport;  ///< The underlying network transport.
-    Connection currentConnection{};            ///< The current server connection.
+	///< The underlying network transport.
+    std::unique_ptr<ITransport> transport;
+
+	///< The current server connection.
+    Connection currentConnection{};
+    std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
 };

@@ -1,8 +1,3 @@
-//
-// Created by samle on 19/11/2025.
-//
-
-
 #pragma once
 
 
@@ -13,19 +8,26 @@ namespace engine_tests
 {
     class TestComponentBase : public Component
     {
-        public:
-            TestComponentBase();
-            ~TestComponentBase() override;
+    public:
+        TestComponentBase();
+        ~TestComponentBase() override;
 
-            void onDestroy() override;
+        void onDestroy() override;
 
-            static int instanceCount;
-    		static int destroyCount;
-            bool destroyCalled = false;
-
+        static int instanceCount;
+        static int destroyCount;
+        bool destroyCalled = false;
     };
 
-    class TestComponentOne : public TestComponentBase {};
-    class TestComponentTwo : public TestComponentBase {};
-    class TestComponentThree : public TestComponentBase {};
+    class TestComponentOne : public TestComponentBase
+    {
+    };
+
+    class TestComponentTwo : public TestComponentBase
+    {
+    };
+
+    class TestComponentThree final : public TestComponentBase
+    {
+    };
 }

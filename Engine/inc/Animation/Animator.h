@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 class GameObject;
 struct SpritesheetAnimationClip;
@@ -151,17 +152,22 @@ class Animator: public Behaviour
 
 	/**
 	 * @brief Adds sprite frame tracks from a SpritesheetAnimationClip to an
-	 * existing AnimationClip.
+	 * AnimationClip and takes ownership of it.
 	 *
 	 * This allows combining sprite frame animation with other property
 	 * animations (like transform position) in a single clip. The frame tracks
 	 * will loop continuously throughout the clip's duration.
 	 *
-	 * @param targetClip The AnimationClip to add tracks to
+	 * The Animator takes ownership of the clip via std::move. The caller should
+	 * not use the clip after calling this method.
+	 *
+	 * @param targetClip Unique pointer to the AnimationClip to add tracks to
 	 * @param spritesheetClip The SpritesheetAnimationClip containing frame data
+	 * @return Raw pointer to the clip for use with play() (valid as long as
+	 *         Animator exists)
 	 */
-	void addSpritesheetTracksToClip(
-		AnimationClip* targetClip,
+	AnimationClip* addSpritesheetTracksToClip(
+		std::unique_ptr<AnimationClip> targetClip,
 		const SpritesheetAnimationClip& spritesheetClip);
 
    private:
@@ -173,6 +179,9 @@ class Animator: public Behaviour
 	/// Storage for spritesheet clips converted from SpritesheetAnimationClip
 	std::unordered_map<std::string, std::unique_ptr<AnimationClip>>
 		spritesheetClips;
+
+	/// Storage for clips added via addSpritesheetTracksToClip (no name)
+	std::vector<std::unique_ptr<AnimationClip>> ownedClips;
 
 	/// Reverse mapping from AnimationClip pointer to spritesheet clip name for
 	/// O(1) lookup
@@ -198,15 +207,16 @@ class Animator: public Behaviour
 	 * @brief Adds frame tracks from a SpritesheetAnimationClip to an
 	 * AnimationClip.
 	 *
-	 * Helper method that creates and adds frame animation tracks. Can repeat
-	 * the frame sequence multiple times.
+	 * Static helper method that creates and adds frame animation tracks. Can
+	 * repeat the frame sequence multiple times. Does not require an Animator
+	 * instance to use.
 	 *
 	 * @param clip The AnimationClip to add tracks to
 	 * @param spritesheetClip The SpritesheetAnimationClip containing frame data
 	 * @param repeatCount Number of times to repeat the frame sequence (default:
 	 * 1)
 	 */
-	void addFrameTracksToClip(AnimationClip* clip,
-							  const SpritesheetAnimationClip& spritesheetClip,
-							  int repeatCount = 1);
+	static void addFrameTracksToClip(
+		AnimationClip* clip, const SpritesheetAnimationClip& spritesheetClip,
+		int repeatCount = 1);
 };

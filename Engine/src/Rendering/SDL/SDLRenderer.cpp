@@ -1,9 +1,6 @@
-#include "Rendering/SDL/SDLRenderer.h"
-
 #include "Assets/IImage.h"
 #include "Assets/SDLImage.h"
-#include "Component/BaseComponentTypes/RenderComponent.h"
-#include "External/SdlContext.h"
+#include "External/IBackendContext.h"
 #include "Math/Vector2Utils.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
@@ -22,7 +19,7 @@ constexpr double kRotationThresholdDegrees = 0.01;
 constexpr int kMinWindowDimension = 1;
 }  // namespace
 
-SDLRenderer::SDLRenderer(SdlContext& context) : userInterfaceHook(nullptr)
+SDLRenderer::SDLRenderer(IBackendContext& context)
 {
 	assert(context.wasInit(SDL_INIT_VIDEO) &&
 		   "SDL video subsystem not initialized");
@@ -35,6 +32,7 @@ SDLRenderer::~SDLRenderer()
 
 void SDLRenderer::open(const WindowOptions& options)
 {
+	// Validate window dimensions
 	if ( options.width < kMinWindowDimension ||
 		 options.height < kMinWindowDimension )
 	{
@@ -47,6 +45,7 @@ void SDLRenderer::open(const WindowOptions& options)
 	Uint32 flags = SDL_WINDOW_SHOWN;
 
 #if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
+	// Disable compositor bypass
 	if ( !SDL_SetHint(SDL_HINT_VIDEO_X11_NET_WM_BYPASS_COMPOSITOR, "0") )
 	{
 		std::cerr << "SDL can not disable compositor bypass!" << std::endl;

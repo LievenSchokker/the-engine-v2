@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include "External/IBackendContext.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/IUIRenderHook.h"
 #include "Rendering/RenderCommand.h"
@@ -28,10 +29,6 @@
 #include <SDL.h>
 #include <memory>
 #include <unordered_map>
-
-class SdlContext;
-class IImage;
-struct Rect;
 
 class SDLRenderer: public IRenderer
 {
@@ -50,7 +47,7 @@ class SDLRenderer: public IRenderer
 	 * @throws assertion failure if video subsystem not initialized (debug
 	 * builds)
 	 */
-	explicit SDLRenderer(SdlContext& context);
+	explicit SDLRenderer(IBackendContext& context);
 
 	/**
 	 * @brief Ensures proper cleanup of SDL resources in correct order
@@ -118,9 +115,10 @@ class SDLRenderer: public IRenderer
 	 */
 	void endFrame() override;
 
-    void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
+	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
 	void submitUI(const std::vector<UIRenderCommand>& commands) override;
+
    private:
 	/**
 	 * @brief Draw a filled circle in window space.

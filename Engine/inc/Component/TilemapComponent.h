@@ -5,6 +5,7 @@
 #include "BaseComponentTypes/RenderComponent.h"
 
 #include <unordered_map>
+#include <vector>
 
 class TilemapAsset;
 
@@ -21,8 +22,11 @@ class TilemapAsset;
  */
 class TilemapComponent: public RenderComponent
 {
-public:
-	TilemapComponent();
+   public:
+	TilemapComponent() :tileSize{32.0, 32.0}
+	{
+
+	};
 	~TilemapComponent() override = default;
 
 	/**
@@ -112,6 +116,14 @@ public:
 	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
 
+
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::TileMap;
+	}
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 private:
 	TilemapAsset* tilemapAsset = nullptr;
 	Vector2 tileSize;

@@ -6,6 +6,7 @@
 #include "Assets/AssetManager.h"
 #include "Assets/SpritesheetLoader.h"
 #include "Behaviour/Behaviour.h"
+#include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Behaviours/PlayerControllerBehaviour.h"
 #include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
@@ -100,8 +101,7 @@ int main(int argc, char** argv)
 	// Rows: Down (0-5), Right (6-11), Left (12-17), Up (18-23)
 	auto* playerSprite = player->addComponent<SpriteComponent>();
 	bool playerLoaded = SpritesheetLoader::loadSpritesheet(
-		assetManager.get(), playerSprite, "Assets\\player.png", 4, 6, 64,
-		64);
+		assetManager.get(), playerSprite, "Assets/player.png", 4, 6, 64, 64);
 
 	if ( playerLoaded )
 	{
@@ -196,7 +196,7 @@ int main(int argc, char** argv)
 	// Load rat spritesheet (rat.png - 128x32, 4 frames horizontally)
 	auto* ratSprite = rat->addComponent<SpriteComponent>();
 	bool ratLoaded = SpritesheetLoader::loadSpritesheet(
-		assetManager.get(), ratSprite, "Assets\\rat.png", 1, 4, 32, 32);
+		assetManager.get(), ratSprite, "Assets/rat.png", 1, 4, 32, 32);
 
 	if ( ratLoaded )
 	{
@@ -216,59 +216,57 @@ int main(int argc, char** argv)
 		}
 
 		// Create ping-pong position animation for the rat
-		// Store clip as a static variable so it persists for the lifetime of
-		// main()
-		static AnimationClip ratMoveClip("RatMove", true);
+		// Create clip with ownership
+		auto ratMoveClip = std::make_unique<AnimationClip>("RatMove", true);
 		AnimationCurve ratCurve(EasingType::EaseInOutQuad);
 
 		Vector2 ratStartPos{200.0f, SCREEN_HEIGHT / 2.0f};
 		Vector2 ratEndPos{800.0f, SCREEN_HEIGHT / 2.0f};
 		float ratMoveDuration = 0.16f;
 
-		// Clear any existing tracks (in case this runs multiple times)
-		ratMoveClip.getTracks().clear();
-
 		// Forward track (plays from 0 to ratMoveDuration)
 		AnimationTrack ratForwardTrack(TargetType::Transform,
 									   PropertyType::Position, ratMoveDuration,
 									   false, ratStartPos, ratEndPos, ratCurve);
-		ratMoveClip.addTrack(ratForwardTrack);
+		ratMoveClip->addTrack(ratForwardTrack);
 
 		// Reverse track (plays from ratMoveDuration to 2*ratMoveDuration)
 		AnimationTrack ratReverseTrack(TargetType::Transform,
 									   PropertyType::Position, ratMoveDuration,
 									   false, ratEndPos, ratStartPos, ratCurve);
-		ratMoveClip.addTrack(ratReverseTrack);
+		ratMoveClip->addTrack(ratReverseTrack);
 
 		// FlipX tracks: face right during forward movement, left during reverse
 		// Forward flip track (0 to ratMoveDuration): facing right (FlipX = 0)
 		AnimationTrack ratFlipForwardTrack(TargetType::Sprite,
 										   PropertyType::FlipX, ratMoveDuration,
 										   false, 0, 0, ratCurve);
-		ratMoveClip.addTrack(ratFlipForwardTrack);
+		ratMoveClip->addTrack(ratFlipForwardTrack);
 
 		// Reverse flip track (ratMoveDuration to 2*ratMoveDuration): facing
 		// left (FlipX = 1)
 		AnimationTrack ratFlipReverseTrack(TargetType::Sprite,
 										   PropertyType::FlipX, ratMoveDuration,
 										   false, 1, 1, ratCurve);
-		ratMoveClip.addTrack(ratFlipReverseTrack);
+		ratMoveClip->addTrack(ratFlipReverseTrack);
 
 		// Add sprite frame animation tracks to the same clip
 		// This allows sprite frames and transform to animate simultaneously
+		// The Animator takes ownership of the clip
 		SpritesheetAnimationClip ratWalkClip;
 		ratWalkClip.name = "walk";
 		ratWalkClip.frames = {0, 1, 2, 3};
 		ratWalkClip.frameDuration = 0.1f;
 		ratWalkClip.loop = true;
-		ratAnimator->addSpritesheetTracksToClip(&ratMoveClip, ratWalkClip);
+		AnimationClip* ratMoveClipPtr = ratAnimator->addSpritesheetTracksToClip(
+			std::move(ratMoveClip), ratWalkClip);
 
 		// Play the combined clip (sprite frames + transform animation)
 		// The clip length will be 2 * ratMoveDuration = 6.0 seconds
-		ratAnimator->play(&ratMoveClip);
+		ratAnimator->play(ratMoveClipPtr);
 
 		std::cout << "Rat loaded successfully\n";
-		std::cout << "Rat movement clip length: " << ratMoveClip.getLength()
+		std::cout << "Rat movement clip length: " << ratMoveClipPtr->getLength()
 				  << " seconds\n";
 		std::cout << "Rat start pos: (" << ratStartPos.x << ", "
 				  << ratStartPos.y << ")\n";
@@ -284,6 +282,21 @@ int main(int argc, char** argv)
 	auto exitHandler = std::make_unique<GameObject>();
 	exitHandler->setName("ExitHandler");
 	exitHandler->addComponent<ExitBehaviour>();
+
+	// Create a debug behavior
+	auto debugController = std::make_unique<GameObject>();
+	debugController->setName("DebugController");
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::SPACE,					 // Pause key
+		std::nullopt,					 // Normal speed (disabled)
+		KeyCode::NUMBER_2_AND_AT,		 // Slow (enabled)
+		KeyCode::NUMBER_3_AND_HASHMARK,	 // Very slow (enabled)
+		KeyCode::NUMBER_4_AND_DOLLAR,	 // Fast (enabled)
+		std::nullopt,					 // Very fast (disabled)
+		true							 // Print menu
+	);
+
+	gameScene->addGameObject(std::move(debugController));
 
 	// Add GameObjects to scene
 	gameScene->addGameObject(std::move(player));

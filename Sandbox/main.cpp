@@ -1,42 +1,45 @@
 
-#include "Component/Profiler/Profiler.h"
-#include "Component/ShapeRenderer.h"
-#include "Component/Transform.h"
-#include "Component/UIElement/UIPanelElement.h"
-#include "Component/UIElement/UIProgressBar.h"
-#include "Component/UIElement/UISpacer.h"
 #include "Core/ApplicationSpecifications.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
-#include "Rendering/Color.h"
 #include "Scene/Scene.h"
+#include "Component/Profiler/Profiler.h"
 
 #include <iostream>
 
+#include "IZandbak.h"
+#include "Sandboxes/AgentsZandbak.h"
+
+// This has been added because sometimes SDL causes main to be redefined.
+// Which then causes linking error's
 #undef main
+
 
 int main(int argc, char** argv)
 {
-	ApplicationSpecifications spec = {};
-	spec.networkingOptions.port = 8080;
-	spec.networkingOptions.serverIP = "127.0.0.1";
-	spec.networkingOptions.mode = EngineMode::CLIENT;
-	spec.networkingOptions.tickRate = 60;
-	spec.renderBackend = RenderBackend::SDL;
-	spec.windowOptions = {"GameEngine", 700, 700};
+    // Parse command line arguments
+    EngineMode mode = EngineMode::CLIENT;  // Default to client
 
 	std::unique_ptr<Game> spel = std::make_unique<Game>();
-	std::unique_ptr<Scene> scene = std::make_unique<Scene>("Scene");
+	// std::unique_ptr<Scene> scene = std::make_unique<Scene>("Scene");
 
-	// Put a blue circle on the
-	std::unique_ptr<GameObject> circle = std::make_unique<GameObject>();
-	circle->setName("BlueCircle");
-	circle->getTransform()->setPosition({350.0, 350.0});
-	circle->getTransform()->setScale({1.0, 1.0});
-	circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(
-		Color::lightBlue());
-	scene->addGameObject(std::move(circle));
+    SceneManager sceneManager = SceneManager();
+    ApplicationSpecifications spec = {};
+    spec.networkingOptions.mode = mode;
+    spec.networkingOptions.port = 8080;
+    spec.networkingOptions.serverIP = "127.0.0.1";
+    spec.networkingOptions.tickRate = 60;
+    spec.renderBackend = RenderBackend::SDL;
+    spec.windowOptions = {
+        mode == EngineMode::SERVER ? "GameEngine - Server" : "GameEngine - Client",
+        700,
+        700
+    };
+
+    /// Note: Change the unique_ptr to create the sandbox you want
+    std::unique_ptr<IZandbak> zandbak = std::make_unique<AgentsZandbak>();
+	std::unique_ptr<Scene> scene = zandbak->getScene();
 
 	spel->addScene(std::move(scene));
 	spel->setApplicationSpecifications(spec);

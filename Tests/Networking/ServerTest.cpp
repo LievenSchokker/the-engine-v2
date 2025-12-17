@@ -8,15 +8,21 @@
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
 #include "Networking/Connection/ConnectionMode.h"
-#include "Networking/Messages/ConnectionMessage.h"
+#include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
+#include "Networking/Messages/OutgoingRawMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
+#include "Networking/TransportResult.h"
+#include "Networking/SendMode.h"
+#include <vector>
+#include "Networking/ITransport.h"
+#include "Networking/Connection/Connection.h"
+#include "Networking/Connection/ConnectionStatus.h"
+#include "Networking/Connection/ConnectionMode.h"
 #include "Networking/Messages/OutgoingRawMessage.h"
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/TransportResult.h"
 #include "Networking/SendMode.h"
 
-/**
- * @brief Record of a sent message for test verification.
- */
 struct SentMessageRecord
 {
     int connectionID;
@@ -24,9 +30,6 @@ struct SentMessageRecord
     SendMode sendMode;
 };
 
-/**
- * @brief Mock transport for testing Server and Client logic in isolation.
- */
 class MockTransport : public ITransport
 {
 public:
@@ -156,10 +159,8 @@ TEST_F(ServerTest, KickClientSendsDisconnectAndRemovesClient)
     server->start();
 
     mockTransportPtr->simulateClientConnected(42);
-
     server->kickClient(42);
-
-    ASSERT_EQ(mockTransportPtr->sentMessages.size(), 1);
+    ASSERT_EQ(mockTransportPtr->sentMessages.size(), 2);
     EXPECT_EQ(mockTransportPtr->sentMessages[0].connectionID, 42);
 
     ASSERT_EQ(mockTransportPtr->disconnectedClients.size(), 1);

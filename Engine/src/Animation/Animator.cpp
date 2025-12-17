@@ -301,21 +301,29 @@ void Animator::addFrameTracksToClip(
 	}
 }
 
-void Animator::addSpritesheetTracksToClip(
-	AnimationClip* targetClip, const SpritesheetAnimationClip& spritesheetClip)
+AnimationClip* Animator::addSpritesheetTracksToClip(
+	std::unique_ptr<AnimationClip> targetClip,
+	const SpritesheetAnimationClip& spritesheetClip)
 {
 	if ( targetClip == nullptr || spritesheetClip.frames.empty() )
 	{
-		return;
+		return nullptr;
 	}
 
+	AnimationClip* clipPtr = targetClip.get();
+
 	// Always add only one cycle - update() will handle looping automatically
-	addFrameTracksToClip(targetClip, spritesheetClip, 1);
+	addFrameTracksToClip(clipPtr, spritesheetClip, 1);
 
 	// Store loop flag if sprite animation should loop
 	// Cycle duration will be computed automatically from tracks in update()
 	if ( spritesheetClip.loop )
 	{
-		clipsWithLoopingFrames.insert(targetClip);
+		clipsWithLoopingFrames.insert(clipPtr);
 	}
+
+	// Take ownership of the clip
+	ownedClips.push_back(std::move(targetClip));
+
+	return clipPtr;
 }

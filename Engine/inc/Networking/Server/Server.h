@@ -2,12 +2,17 @@
 
 #include <memory>
 #include <unordered_set>
+#include <functional>
 
 #include "ServerInformation.h"
 #include "Core/ApplicationSpecifications.h"
+#include "Networking/Client.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
+#include "Networking/NetworkSpawnManager.h"
+#include "Networking/Messages/MessageDispatcher.h"
 #include "Networking/Server/ServerStatus.h"
+
 
 class TransportGNS;
 class IMessage;
@@ -17,7 +22,9 @@ struct ServerConnectionInformation;
 struct IncomingRawMessage;
 struct Connection;
 
+
 enum class ConnectionStatus : uint8_t;
+
 
 /**
  * @brief Manages game server networking with abstracted transport layer
@@ -83,6 +90,9 @@ public:
      */
     void kickClient(int clientId);
 
+    void injectMessageDispatcher(std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher);
+
+
     /**
      * @brief Sends message with explicit delivery guarantees
      *
@@ -119,6 +129,11 @@ public:
      */
     bool broadcastMessage(const IMessage& message, int excludeClientId) const;
 
+    using ClientConnectedCallback = std::function<void(int clientId)>;
+    using ClientDisconnectedCallback = std::function<void(int clientId)>;
+
+    void setClientConnectedCallback(ClientConnectedCallback callback);
+    void setClientDisconnectedCallback(ClientDisconnectedCallback callback);
     static ServerConnectionInformation convertApplicationSettings(const ApplicationSpecifications& specifications);
 private:
     /**
@@ -149,6 +164,7 @@ private:
      *          or kicks, enabling appropriate cleanup logic for each scenario.
      */
     void handleConnectionMessage(int clientId, ConnectionMessage* message);
+    void handleNewClientConnected(int clientId) const;
 
     /// @brief Abstracted transport layer for testing and multi-backend support
     std::unique_ptr<ITransport> transport;
@@ -161,4 +177,10 @@ private:
 
     /// @brief Fast lookup set for validating message sources and broadcast targets
     std::unordered_set<int> connectedClients;
+
+    std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
+
+    ClientConnectedCallback onClientConnected;
+    ClientDisconnectedCallback onClientDisconnected;
+    NetworkSpawnManager* spawnManager;
 };
