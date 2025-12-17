@@ -28,14 +28,9 @@ Matrix3::Matrix3(float m00, float m01, float m02, float m10, float m11,
 	m[8] = m22;
 }
 
-Matrix3 Matrix3::identity()
-{
-	return Matrix3();
-}
-
 Matrix3 Matrix3::translation(const Vector2& translation)
 {
-	Matrix3 result = identity();
+	Matrix3 result;
 	result.m[2] = translation.x;  // m02
 	result.m[5] = translation.y;  // m12
 	return result;
@@ -47,7 +42,7 @@ Matrix3 Matrix3::rotation(double angleDegrees)
 	const float cosA = static_cast<float>(std::cos(angleRadians));
 	const float sinA = static_cast<float>(std::sin(angleRadians));
 
-	Matrix3 result = identity();
+	Matrix3 result;
 	result.m[0] = cosA;	  // m00
 	result.m[1] = -sinA;  // m01
 	result.m[3] = sinA;	  // m10
@@ -57,7 +52,7 @@ Matrix3 Matrix3::rotation(double angleDegrees)
 
 Matrix3 Matrix3::scale(const Vector2& scale)
 {
-	Matrix3 result = identity();
+	Matrix3 result;
 	result.m[0] = scale.x;	// m00
 	result.m[4] = scale.y;	// m11
 	return result;
@@ -162,7 +157,7 @@ Matrix3 Matrix3::inverse() const
 	if ( std::abs(det) < 1e-6f )
 	{
 		// Singular matrix, return identity
-		return identity();
+		return Matrix3();
 	}
 
 	const float invDet = 1.0f / det;

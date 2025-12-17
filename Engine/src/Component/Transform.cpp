@@ -10,8 +10,8 @@ Transform::Transform(const Vector2 position, const double rotationAngle,
 	  scale(scale),
 	  parent(nullptr),
 	  hasEverHadParent(false),
-	  cachedLocalMatrix(Matrix3::identity()),
-	  cachedWorldMatrix(Matrix3::identity()),
+	  cachedLocalMatrix(Matrix3()),
+	  cachedWorldMatrix(Matrix3()),
 	  isLocalMatrixDirty(true),
 	  isWorldMatrixDirty(true)
 {

@@ -32,11 +32,6 @@ class Matrix3
 			float m20, float m21, float m22);
 
 	/**
-	 * @brief Creates an identity matrix.
-	 */
-	static Matrix3 identity();
-
-	/**
 	 * @brief Creates a translation matrix.
 	 * @param translation Translation vector
 	 */
