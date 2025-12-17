@@ -1,5 +1,5 @@
 #include "Behaviour/Behaviour.h"
-#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -50,7 +50,7 @@ class InputTestBehaviour: public Behaviour
 		std::cout << "- Press the escape key to quit" << std::endl;
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;

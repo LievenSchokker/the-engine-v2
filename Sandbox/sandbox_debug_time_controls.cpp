@@ -1,7 +1,7 @@
 #include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "Rendering/Color.h"

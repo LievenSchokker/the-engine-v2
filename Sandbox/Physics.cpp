@@ -147,7 +147,7 @@ int main(int argc, char** argv)
 	// --- Physics World ---
 	std::unique_ptr<IPhysicsWorld> physicsWorld =
 		std::make_unique<Box2DPhysicsWorld>();
-	physicsWorld->start();
+	physicsWorld->initialize();
 
 	// Register GameObjects with physics world
 	physicsWorld->createBody(circleGO->getComponent<RigidBody>());

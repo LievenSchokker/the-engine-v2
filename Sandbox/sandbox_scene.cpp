@@ -1,8 +1,8 @@
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Behaviour/Behaviour.h"
 #include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -27,7 +27,7 @@
  * - Mouse wheel Y: Rotates the YellowRectangle
  * - Mouse wheel X: Moves and scales the BlueCircle
  */
-class SandboxInputBehaviour final : public Behaviour
+class SandboxInputBehaviour final: public Behaviour
 {
    public:
 	explicit SandboxInputBehaviour(Scene* scene)
@@ -60,12 +60,14 @@ class SandboxInputBehaviour final : public Behaviour
 		// Handle SPACE key to toggle clear color
 		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
 		{
+			auto w = world;
 			Color clearColor = world.render->getClearColor();
 			clearColor = (clearColor == Color::darkGreen())
 							 ? Color::darkPurple()
 							 : Color::darkGreen();
+
 			// Try to set clear color through RenderSystem if available
-			if ( world != nullptr && world.render != nullptr )
+			if ( world.render != nullptr )
 			{
 				world.render->setClearColor(clearColor);
 			}
@@ -235,7 +237,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
-    spec.engineSystem = EngineSystem::Client;
+	spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Shape Sandbox", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 

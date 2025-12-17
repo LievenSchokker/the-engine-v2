@@ -10,7 +10,7 @@
 #include "Behaviours/PlayerControllerBehaviour.h"
 #include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
-#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
