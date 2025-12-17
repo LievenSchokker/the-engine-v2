@@ -36,11 +36,6 @@ void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 	renderer->endFrame();
 }
 
-Phase RenderSystem::getUpdatePhase() const
-{
-	return Phase::Late;
-}
-
 void RenderSystem::collectCommands(Scene& scene)
 {
 	for (auto* component : scene.getAllComponentsOfType<RenderComponent>())

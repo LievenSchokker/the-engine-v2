@@ -39,8 +39,6 @@ public:
 	 */
 	void update(double deltaTime, const GameWorld& gameWorld) override;
 
-	Phase getUpdatePhase() const override;
-
 	void setClearColor(const Color& color);
 
 	const Color& getClearColor() const;
