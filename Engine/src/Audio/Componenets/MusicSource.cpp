@@ -1,5 +1,7 @@
 #include "../../../inc/Audio/Components/MusicSource.h"
 
+#include <algorithm>
+
 #include "Audio/AudioManager.h"
 
 MusicSource::MusicSource(AudioManager* audioManagerPtr)

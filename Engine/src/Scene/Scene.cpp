@@ -4,7 +4,6 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Component/BaseComponentTypes/UIRenderComponent.h"
-#include "Component/ComponentManager.h"
 #include "Core/ApplicationClock.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "AI/Navigation/NavigationObstacle.h"

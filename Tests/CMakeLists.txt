@@ -5,6 +5,7 @@ add_executable(engine_tests
         Rendering/SDL/SDLRendererTest.cpp
         Rendering/ShapeRendererTest.cpp
         Rendering/UserInterface/TextCommandTest.cpp
+        Rendering/CameraTest.cpp
         Input/InputManagerTest.cpp
         Asset/AssetManagerTest.cpp
         Scene/SceneManagerTest.cpp

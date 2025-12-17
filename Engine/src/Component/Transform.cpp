@@ -1,5 +1,7 @@
 #include "Component/Transform.h"
 
+#include <algorithm>
+
 Transform::Transform(const Vector2 position, const double rotationAngle, const Vector2 scale) :
     position(position), rotationAngle(rotationAngle), scale(scale){}
 
