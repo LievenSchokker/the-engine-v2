@@ -29,15 +29,5 @@ public:
 	{
 	}
 
-	virtual Phase getUpdatePhase() const
-	{
-		return Phase::Normal;
-	}
-
-	virtual Phase getFixedUpdatePhase() const
-	{
-		return Phase::Normal;
-	}
-
 	virtual const std::string getName() const = 0;
 };
