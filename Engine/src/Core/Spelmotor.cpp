@@ -7,6 +7,8 @@
 #include "Core/IEngineLoop.h"
 #include "Game.h"
 
+#include <stdexcept>
+
 SpelMotor::SpelMotor(std::unique_ptr<Game> game)
 	: running(false),
 	  specifications(game->getApplicationSpecifications()),
