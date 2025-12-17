@@ -18,7 +18,7 @@ float Camera::getZoom() const
 
 void Camera::setZoom(float cameraZoom)
 {
-	zoom = cameraZoom;
+	zoom = std::fabsf(cameraZoom);
 }
 
 Vector2 Camera::getOffset() const
