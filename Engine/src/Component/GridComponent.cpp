@@ -403,7 +403,6 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		dot.layer = layer;
 		dot.orderInLayer = orderInLayer;
 		queue.push(dot);
-		queue.push(dot);
 	}
 
 	for (const auto& key : blockedCells)

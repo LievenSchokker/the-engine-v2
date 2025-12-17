@@ -37,8 +37,6 @@ class SandboxInputBehaviour: public Behaviour
 
 	~SandboxInputBehaviour() override = default;
 
-	sceneManager.setClearColor(Color::black());
-
 	void onAwake() override
 	{
 		inputManager = InputManager::getInstance();
