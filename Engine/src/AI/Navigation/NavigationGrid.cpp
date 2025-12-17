@@ -12,7 +12,7 @@
 #include "AI/Navigation/GridCell.h"
 #include "Math/Vector2.h"
 #include <algorithm>
-
+#include <stdexcept>
 
 const IPathfindingGraph* NavigationGrid::getPathfindingGraph() const
 {
@@ -96,14 +96,26 @@ Vector2 NavigationGrid::cellToWorldPosition(Vector2 cellPos) const
 GridCell& NavigationGrid::getCellAt(Vector2 positionInGrid)
 {
     int index = static_cast<int>(positionInGrid.y) * width + static_cast<int>(positionInGrid.x);
-    return cells[index];
+
+    if (index >= 0 && index < cells.size())
+        return cells[index];
+
+    throw std::out_of_range("[ NavigationGrid::getCallAt() ] Position is not in grid, cannot return a valid cell.");
 }
 
 
 Vector2 NavigationGrid::getCellPosition(const GridCell& cell) const
 {
     int index = &cell - &cells[0];
-    return Vector2{ float(index % width), float(index / width) };
+
+    Vector2 pos { float(index % width), float(index / width)};
+
+    if (isInGrid(pos))
+    {
+        return pos;
+    }
+
+    return Vector2::zero();
 }
 
 
