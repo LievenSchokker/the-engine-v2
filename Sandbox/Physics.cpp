@@ -103,7 +103,7 @@ void createCircle(std::unique_ptr<GameObject>& circle)
 
 	auto collider = circle->addComponent<Collider>();
 	collider->setCircle(50);
-	collider->isSensor(true);
+	collider->setSensor(true);
 	circle->addComponent<SensorListener>();
 }
 

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "../../Component/BaseComponentTypes/Component.h"
-#include "Physics/PhysicsShapes.h"
 #include "Math/Vector2.h"
+#include "Physics/PhysicsShapes.h"
 
 class Collider: public Component
 {
@@ -12,8 +12,8 @@ class Collider: public Component
 	float density = 1.0f;
 
    public:
-	float radius = 0.0f;	// circle
-	Vector2 size = Vector2();	// box
+	float radius = 0.0f;	   // circle
+	Vector2 size = Vector2();  // box
 
 	void setDensity(float _density)
 	{
@@ -25,7 +25,7 @@ class Collider: public Component
 		return this->density;
 	}
 
-	void isSensor(bool _sensor)
+	void setSensor(bool _sensor)
 	{
 		this->sensor = _sensor;
 	}
@@ -51,7 +51,7 @@ class Collider: public Component
 		size = fullSize;
 	}
 
-	PhysicsShapeType getShape()
+	PhysicsShapeType getShape() const
 	{
 		return shape;
 	}

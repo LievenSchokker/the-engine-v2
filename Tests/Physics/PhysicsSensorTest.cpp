@@ -108,7 +108,7 @@ TEST(ColliderSensorTests, SensorExitCallsBehaviour)
 TEST(ColliderTests, SensorFlagIsStoredCorrectly)
 {
 	Collider c;
-	c.isSensor(true);
+	c.setSensor(true);
 
 	EXPECT_TRUE(c.isSensor());
 }
