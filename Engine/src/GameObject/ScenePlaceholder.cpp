@@ -1,6 +1,9 @@
 
 
 #include "GameObject/ScenePlaceholder.h"
+
+#include <algorithm>
+
 #include "GameObject/GameObject.h"
 #include "../../inc/Component/BaseComponentTypes/Component.h"
 

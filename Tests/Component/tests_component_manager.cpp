@@ -3,11 +3,10 @@
 //
 
 #include "GameObject/GameObject.h"
-#include "../../Engine/inc/Component/BaseComponentTypes/Component.h"
+#include "Component/BaseComponentTypes/Component.h"
 #include "Component/Transform.h"
-#include "Component/ComponentManager.h"
 #include "../Behaviour/TestBehaviours.h"
-#include "../Component/TestComponents.h"
+#include "TestComponents.h"
 
 #include <gtest/gtest.h>
 
@@ -16,57 +15,49 @@ namespace engine_tests
 {
     TEST(ComponentManagerTests, AddComponentAddsToComponents)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
-        TestComponentOne* testComponentOne = componentManager.addComponent<TestComponentOne>();
-        EXPECT_TRUE(componentManager.hasComponent(testComponentOne));
+        GameObject go{};
+        TestComponentOne* testComponentOne = go.addComponent<TestComponentOne>();
+        EXPECT_TRUE(go.hasComponent(testComponentOne));
     }
 
 
     TEST(ComponentManagerTests, AddComponentPreventsDuplicates)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
-        TestComponentOne* first = componentManager.addComponent<TestComponentOne>();
+        GameObject go{};
+        TestComponentOne* first = go.addComponent<TestComponentOne>();
         TestComponentOne* second = nullptr;
 
-        EXPECT_NO_THROW(second = componentManager.addComponent<TestComponentOne>());
+        EXPECT_NO_THROW(second = go.addComponent<TestComponentOne>());
         EXPECT_NE(first, nullptr);
         EXPECT_EQ(first, second);
-        EXPECT_TRUE(componentManager.hasComponent<TestComponentOne>());
-        EXPECT_EQ(componentManager.getComponentCount(), 1);
+        EXPECT_TRUE(go.hasComponent<TestComponentOne>());
+        EXPECT_EQ(go.getComponentCount(), 1);
     }
 
 
     TEST(ComponentManagerTests, AddTransformComponentNotAllowed)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
-
-        Transform* transform = componentManager.addComponent<Transform>();
+        GameObject go{};
+        Transform* transform = go.addComponent<Transform>();
         EXPECT_EQ(transform, nullptr);
     }
 
 
     TEST(ComponentManagerTests, GetTransformReturnsGameObjectTransform)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
-
-        Transform* transform = componentManager.getComponent<Transform>();
+        GameObject go{};
+        Transform* transform = go.getComponent<Transform>();
         EXPECT_EQ(transform, go.getTransform());
     }
 
 
     TEST(ComponentManagerTests, GetComponentReturnsFromComponents)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
-
-        TestComponentOne* added = componentManager.addComponent<TestComponentOne>();
+        GameObject go{};
+        TestComponentOne* added = go.addComponent<TestComponentOne>();
         EXPECT_NE(added, nullptr);
 
-        TestComponentOne* retrieved = componentManager.getComponent<TestComponentOne>();
+        TestComponentOne* retrieved = go.getComponent<TestComponentOne>();
         EXPECT_NE(retrieved, nullptr);
         EXPECT_EQ(added, retrieved);
     }
@@ -74,31 +65,29 @@ namespace engine_tests
 
     TEST(ComponentManagerTests, GetComponentNoErrorOnMissingComponent)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
+        GameObject go{};
         TestComponentOne* comp =nullptr;
 
-        EXPECT_NO_THROW(comp = componentManager.getComponent<TestComponentOne>());
+        EXPECT_NO_THROW(comp = go.getComponent<TestComponentOne>());
         EXPECT_EQ(comp, nullptr);
     }
 
 
     TEST(ComponentManagerTests, TryGetComponentReturnsCorrectBool)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
+        GameObject go{};
 
-        componentManager.addComponent<TestComponentOne>();
-        EXPECT_TRUE(componentManager.hasComponent<TestComponentOne>());
-        EXPECT_FALSE(componentManager.hasComponent<TestComponentTwo>());
+        go.addComponent<TestComponentOne>();
+        EXPECT_TRUE(go.hasComponent<TestComponentOne>());
+        EXPECT_FALSE(go.hasComponent<TestComponentTwo>());
 
         TestComponentOne* outFirst = nullptr;
         TestComponentTwo* outSecond = nullptr;
         bool hasFirst = false;
         bool hasSecond = true;
 
-        EXPECT_NO_THROW(hasFirst = componentManager.tryGetComponent<TestComponentOne>(outFirst));
-        EXPECT_NO_THROW(hasSecond = componentManager.tryGetComponent<TestComponentTwo>(outSecond));
+        EXPECT_NO_THROW(hasFirst = go.tryGetComponent<TestComponentOne>(outFirst));
+        EXPECT_NO_THROW(hasSecond = go.tryGetComponent<TestComponentTwo>(outSecond));
 
         EXPECT_TRUE(hasFirst);
         EXPECT_FALSE(hasSecond);
@@ -108,12 +97,12 @@ namespace engine_tests
     TEST(ComponentManagerTests, TryGetComponentSetsOutParameterCorrect)
     {
         GameObject go;
-        ComponentManager componentManager(&go);
-        TestComponentOne* added = componentManager.addComponent<TestComponentOne>();
-        EXPECT_TRUE(componentManager.hasComponent<TestComponentOne>());
+
+        TestComponentOne* added = go.addComponent<TestComponentOne>();
+        EXPECT_TRUE(go.hasComponent<TestComponentOne>());
 
         TestComponentOne* outComponent = nullptr;
-        bool tryGet = componentManager.tryGetComponent<TestComponentOne>(outComponent);
+        bool tryGet = go.tryGetComponent<TestComponentOne>(outComponent);
 
         EXPECT_NE(outComponent, nullptr);
         EXPECT_EQ(added, outComponent);
@@ -122,51 +111,47 @@ namespace engine_tests
 
     TEST(ComponentManagerTests, RemoveComponentRemovesFromComponents)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
+        GameObject go{};
 
-        TestComponentOne* added = componentManager.addComponent<TestComponentOne>();
-        EXPECT_TRUE(componentManager.hasComponent(added));
+        TestComponentOne* added = go.addComponent<TestComponentOne>();
+        EXPECT_TRUE(go.hasComponent(added));
 
-        componentManager.removeComponent(added);
-        EXPECT_FALSE(componentManager.hasComponent(added));
+        go.removeComponent(added);
+        EXPECT_FALSE(go.hasComponent(added));
     }
 
 
     TEST(ComponentManagerTests, RemoveComponentNoErrorOnMissingComponent)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
+        GameObject go{};
 
-        EXPECT_NO_THROW(componentManager.removeComponent<TestComponentOne>());
+        EXPECT_NO_THROW(go.removeComponent<TestComponentOne>());
     }
 
     TEST(ComponentManagerTests, StoresBehavioursInComponents)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
+        GameObject go{};
 
-        componentManager.addComponent<TestComponentOne>();
-        componentManager.addComponent<TestBehaviourOne>();
-        componentManager.addComponent<TestBehaviourTwo>();
-        componentManager.addComponent<TestBehaviourThree>();
+        go.addComponent<TestComponentOne>();
+        go.addComponent<TestBehaviourOne>();
+        go.addComponent<TestBehaviourTwo>();
+        go.addComponent<TestBehaviourThree>();
 
-        EXPECT_EQ(componentManager.getComponentCount(), 4);
-        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourOne>());
-        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourTwo>());
-        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourThree>());
+        EXPECT_EQ(go.getComponentCount(), 4);
+        EXPECT_TRUE(go.hasComponent<TestBehaviourOne>());
+        EXPECT_TRUE(go.hasComponent<TestBehaviourTwo>());
+        EXPECT_TRUE(go.hasComponent<TestBehaviourThree>());
     }
 
     TEST(ComponentManagerTests, AddGetComponentWorksForBehaviours)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
+        GameObject go{};
 
-        TestBehaviourOne* addedBehaviour = componentManager.addComponent<TestBehaviourOne>();
+        TestBehaviourOne* addedBehaviour = go.addComponent<TestBehaviourOne>();
 
-        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourOne>());
+        EXPECT_TRUE(go.hasComponent<TestBehaviourOne>());
 
-        TestBehaviourBase* retrievedBehaviour = componentManager.getComponent<TestBehaviourOne>();
+        TestBehaviourBase* retrievedBehaviour = go.getComponent<TestBehaviourOne>();
 
         EXPECT_NE(retrievedBehaviour, nullptr);
         EXPECT_EQ(addedBehaviour, retrievedBehaviour);
@@ -174,39 +159,36 @@ namespace engine_tests
 
     TEST(ComponentManagerTests, GetAllBehavioursReturnsOnlyBehaviours)
     {
-        GameObject go;
-        ComponentManager componentManager(&go);
+        GameObject go{};
 
-        TestComponentOne* addedComponent = componentManager.addComponent<TestComponentOne>();
+        TestComponentOne* addedComponent = go.addComponent<TestComponentOne>();
+        TestBehaviourBase* addedBehaviour1 = go.addComponent<TestBehaviourOne>();
+        TestBehaviourBase* addedBehaviour2 = go.addComponent<TestBehaviourTwo>();
+        TestBehaviourBase* addedBehaviour3 = go.addComponent<TestBehaviourThree>();
 
-        TestBehaviourBase* addedBehaviour1 = componentManager.addComponent<TestBehaviourOne>();
-        TestBehaviourBase* addedBehaviour2 = componentManager.addComponent<TestBehaviourTwo>();
-        TestBehaviourBase* addedBehaviour3 = componentManager.addComponent<TestBehaviourThree>();
+        EXPECT_TRUE(go.hasComponent<TestBehaviourThree>());
 
-        EXPECT_TRUE(componentManager.hasComponent<TestBehaviourThree>());
+        auto allBehaviours = go.getAllBehaviours();
 
-        auto allBehaviours = componentManager.getAllBehaviours();
-
-        EXPECT_LT(allBehaviours.size(), componentManager.getComponentCount());
+        EXPECT_LT(allBehaviours.size(), go.getComponentCount());
         EXPECT_EQ(allBehaviours.size(), 3);
     }
 
     TEST(ComponentManagerTests, ComponentManagerDeletesAllComponentsOnGameObjectDestroy)
     {
-        GameObject go;
-        ComponentManager* componentManager = go.getComponentManager();
+        GameObject go{};
 
         go.addComponent<TestComponentOne>();
         go.addComponent<TestComponentTwo>();
         go.addComponent<TestComponentThree>();
 
-        EXPECT_EQ(componentManager->getComponentCount(), 3);
+        EXPECT_EQ(go.getComponentCount(), 3);
         EXPECT_EQ(go.getComponentCount(), 3);
 
         go.destroy();
         go.onSceneDestroy(); /// Normally scene would call this after go.destroy() was called, but then we dont have acces to the GO anymore, so simulate it instead.
 
-        EXPECT_EQ(componentManager->getComponentCount(), 0);
+        EXPECT_EQ(go.getComponentCount(), 0);
         EXPECT_EQ(go.getComponentCount(), 0);
     }
 }

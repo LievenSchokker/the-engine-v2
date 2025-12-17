@@ -13,59 +13,53 @@ namespace engine_tests
 {
     TEST(GameObjectTests, HasTransformAfterConstruction)
     {
-        GameObject go;
+        GameObject go{};
         EXPECT_NE(go.getTransform(), nullptr);
-    }
-
-    TEST(GameObjectTests, HasComponentManagerAfterConstruction)
-    {
-        GameObject go;
-        EXPECT_NE(go.getComponentManager(), nullptr);
     }
 
     TEST(GameObjectTests, TAddComponentAddsToComponentManager)
     {
-        GameObject go;
+        GameObject go{};
         TestComponentOne *comp = go.addComponent<TestComponentOne>();
-        bool exists = go.getComponentManager()->hasComponent(comp);
+        bool exists = go.hasComponent(comp);
         EXPECT_TRUE(exists);
     }
 
     TEST(GameObjectTests, GetComponentGetFromComponentManager)
     {
-        GameObject go;
+        GameObject go{};
         auto &createdComp = *go.addComponent<TestComponentOne>();
         auto *fromGO = go.getComponent<TestComponentOne>();
         ASSERT_NE(fromGO, nullptr);
         EXPECT_EQ(fromGO, &createdComp);
-        auto *fromManager = go.getComponentManager()->getComponent<TestComponentOne>();
+        auto *fromManager = go.getComponent<TestComponentOne>();
         ASSERT_NE(fromManager, nullptr);
         EXPECT_EQ(fromManager, &createdComp);
     }
 
     TEST(GameObjectTests, TRemoveComponentRemovesFromComponentManager)
     {
-        GameObject go;
+        GameObject go{};
         TestComponentOne *comp = go.addComponent<TestComponentOne>();
-        ASSERT_NE(go.getComponentManager()->getComponent<TestComponentOne>(), nullptr);
+        ASSERT_NE(go.getComponent<TestComponentOne>(), nullptr);
         go.removeComponent<TestComponentOne>();
-        TestComponentOne *managerComp = go.getComponentManager()->getComponent<TestComponentOne>();
+        TestComponentOne *managerComp = go.getComponent<TestComponentOne>();
         EXPECT_EQ(managerComp, nullptr);
     }
 
     TEST(GameObjectTests, RemoveComponentRemovesFromComponentManager)
     {
-        GameObject go;
+        GameObject go{};
         TestComponentOne *comp = go.addComponent<TestComponentOne>();
-        ASSERT_EQ(comp, go.getComponentManager()->getComponent<TestComponentOne>());
+        ASSERT_EQ(comp, go.getComponent<TestComponentOne>());
         go.removeComponent(comp);
-        TestComponentOne *managerComp = go.getComponentManager()->getComponent<TestComponentOne>();
+        TestComponentOne *managerComp = go.getComponent<TestComponentOne>();
         EXPECT_EQ(managerComp, nullptr);
     }
 
     TEST(GameObjectTests, GetComponentCount)
     {
-        GameObject go;
+        GameObject go{};
         go.addComponent<TestComponentOne>();
         go.addComponent<TestComponentTwo>();
         go.addComponent<TestComponentThree>();
@@ -74,7 +68,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, TryGetComponentSetsOutParam)
     {
-        GameObject go;
+        GameObject go{};
         TestComponentOne *addedComp = go.addComponent<TestComponentOne>();
         TestComponentOne *comp = nullptr;
         bool hasComponent = go.tryGetComponent<TestComponentOne>(comp);
@@ -85,7 +79,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GetOrAddFunctionAddsMissingComponent)
     {
-        GameObject go;
+        GameObject go{};
         ASSERT_EQ(go.getComponent<TestComponentOne>(), nullptr);
         TestComponentOne *comp = go.getOrAddComponent<TestComponentOne>();
         EXPECT_NE(comp, nullptr);
@@ -95,7 +89,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GetOrAddComponentReturnsExistingComponent)
     {
-        GameObject go;
+        GameObject go{};
         TestComponentOne *added = go.addComponent<TestComponentOne>();
         TestComponentOne *comp = go.getOrAddComponent<TestComponentOne>();
         EXPECT_NE(comp, nullptr);
@@ -106,7 +100,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GetSetName)
     {
-        GameObject go;
+        GameObject go{};
         // Note: Default name of a game object == GameObject (set in constructor).
         EXPECT_EQ(go.getName(), "GameObject");
         go.setName("Player");
@@ -115,7 +109,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GetSetCompareTag)
     {
-        GameObject go;
+        GameObject go{};
         // Note: Default tag == "" (empty), set via construcotr.
         EXPECT_EQ(go.getTag(), "");
         go.setTag("Enemy");
@@ -126,7 +120,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GetSetLayer)
     {
-        GameObject go;
+        GameObject go{};
         // Note: Default layer == 0, set via constructor.
         EXPECT_EQ(go.getLayer(), 0);
         go.setLayer(5);
@@ -135,7 +129,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GetSetIsStatic)
     {
-        GameObject go;
+        GameObject go{};
         EXPECT_EQ(go.getIsStatic(), false);
         go.setIsStatic(true);
         EXPECT_EQ(go.getIsStatic(), true);
@@ -143,7 +137,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, BehaviourGameObjectAssociation)
     {
-        GameObject go;
+        GameObject go{};
         TestBehaviourOne* added = go.addComponent<TestBehaviourOne>();
         TestBehaviourBase* retrieved;
 
@@ -157,7 +151,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GetActiveBehavioursReturnsOnlyActiveBehaviours)
     {
-        GameObject go;
+        GameObject go{};
         TestBehaviourOne* behaviour1 = go.addComponent<TestBehaviourOne>();
         TestBehaviourTwo* behaviour2 = go.addComponent<TestBehaviourTwo>();
         TestBehaviourThree* behaviour3 = go.addComponent<TestBehaviourThree>();
@@ -176,7 +170,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, GameObjectDestroySetsFlag)
     {
-        GameObject go;
+        GameObject go{};
 
         EXPECT_FALSE(go.getIsDestroyed());
         go.destroy();
@@ -185,7 +179,7 @@ namespace engine_tests
 
     TEST(GameObjectTests, SetInactiveWhenDestroyCalled)
     {
-        GameObject go;
+        GameObject go{};
 
         EXPECT_TRUE(go.getIsActive());
 

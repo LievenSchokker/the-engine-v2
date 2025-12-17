@@ -27,7 +27,7 @@
  * - Mouse wheel Y: Rotates the YellowRectangle
  * - Mouse wheel X: Moves and scales the BlueCircle
  */
-class SandboxInputBehaviour: public Behaviour
+class SandboxInputBehaviour final : public Behaviour
 {
    public:
 	explicit SandboxInputBehaviour(Scene* scene)
@@ -36,8 +36,6 @@ class SandboxInputBehaviour: public Behaviour
 	}
 
 	~SandboxInputBehaviour() override = default;
-
-	sceneManager.setClearColor(Color::black());
 
 	void onAwake() override
 	{

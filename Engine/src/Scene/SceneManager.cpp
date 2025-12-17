@@ -123,7 +123,7 @@ void SceneManager::processForClient(Scene& scene)
 
 bool SceneManager::hasNetworkBehaviour(const GameObject& obj) const
 {
-	for (const auto& component : obj.getComponentManager()->getComponents())
+	for (const auto& component : obj.getComponents())
 	{
 		if (dynamic_cast<NetworkBehaviour*>(component.get()))
 		{
