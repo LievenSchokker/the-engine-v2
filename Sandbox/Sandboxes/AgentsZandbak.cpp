@@ -21,7 +21,7 @@ std::unique_ptr<Scene> AgentsZandbak::getScene()
     renderer->setCircle(50);
     renderer->setColor(Color(0,255,0));
     auto movement = player->addComponent<SimpleMoveBehaviour>();
-	auto camera = player->addComponent<Camera>(1.0f, Vector2{0,0}, 700, 700);
+	auto camera = player->addComponent<Camera>(1.0f, Vector2::zero(), 700, 700);
     camera->setZoom(1);
     movement->setMaxSpeed(250.0f);
     player->getTransform()->setPosition((Vector2{500, 500}));

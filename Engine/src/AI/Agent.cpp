@@ -1,10 +1,7 @@
-//
-// Created by samle on 02/12/2025.
-//
-
-
 #include "AI/Agent.h"
 #include "Component/Transform.h"
+#include "Scene/Scene.h"
+#include "AI/Navigation/NavigationSystem.h"
 
 
 void Agent::onAwake()
@@ -25,8 +22,11 @@ void Agent::update(float deltaTime, GameWorld* gameWorld)
 {
     Vector2 velocity = computeDesiredVelocity();
 
-    transform->rotateTowards(velocity, rotationTurnRate, deltaTime);
-    transform->moveTowards(transform->getPosition() + velocity, velocity.magnitude() * deltaTime);
+    if (velocity.magnitude() > 0.0f)
+    {
+        transform->rotateTowards(velocity, rotationTurnRate, deltaTime);
+        transform->moveTowards(transform->getPosition() + velocity, velocity.magnitude() * deltaTime);
+    }
 }
 
 
@@ -114,6 +114,36 @@ void Agent::setRotationTurnRate(float value)
 {
     rotationTurnRate = value;
 }
+
+
+bool Agent::requestPath(const Vector2 &target)
+{
+    NavigationSystem* navSystem = gameObject->getScene()->getNavigationSystem();
+
+    if (navSystem == nullptr)
+        return false;
+
+    PathResult pathResult = navSystem->computePath(*pathFinder, transform->getPosition(), target);
+
+    if (!pathResult.isValid())
+        return false;
+
+    currentPath = pathResult;
+
+    return pathResult.isValid();
+}
+
+
+const PathResult &Agent::getCurrentPath() const
+{
+    return currentPath;
+}
+
+bool Agent::hasPath() const
+{
+    return currentPath.isValid();
+}
+
 
 
 

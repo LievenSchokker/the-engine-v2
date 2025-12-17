@@ -5,7 +5,7 @@
 std::optional<RenderCommand> WorldToCameraSpaceAdapter::Transform(
     const Camera& camera, const RenderCommand& command)
 {
-    Vector2 cameraPos;
+    Vector2 cameraPos = Vector2::zero();
     if (camera.getTransform() != nullptr)
     {
         cameraPos = camera.getTransform()->getPosition();
