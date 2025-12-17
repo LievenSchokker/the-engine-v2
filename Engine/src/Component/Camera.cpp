@@ -1,4 +1,3 @@
-// Camera.cpp
 #include "Component/Camera.h"
 
 Camera::Camera(float zoom, Vector2 offset, float viewWidth, float viewHeight)
