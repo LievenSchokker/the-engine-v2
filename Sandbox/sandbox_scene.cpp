@@ -1,4 +1,5 @@
 #include "Behaviour/Behaviour.h"
+#include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
 #include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
@@ -30,11 +31,13 @@ class SandboxInputBehaviour: public Behaviour
 {
    public:
 	explicit SandboxInputBehaviour(Scene* scene)
-		: scene(scene), inputManager(nullptr), clearColor(Color::darkGray())
+		: scene(scene), inputManager(nullptr)
 	{
 	}
 
 	~SandboxInputBehaviour() override = default;
+
+	sceneManager.setClearColor(Color::black());
 
 	void onAwake() override
 	{
@@ -49,10 +52,17 @@ class SandboxInputBehaviour: public Behaviour
 		{
 			return;
 		}
+		if ( inputManager->wasKeyPressed(KeyCode::D) )
+		{
+			auto circle = scene->getGameObject("BlueCircle");
+			auto component = circle->getComponent<SimpleMoveBehaviour>();
+			component->setEnabled(!component->getIsEnabled());
+		}
 
 		// Handle SPACE key to toggle clear color
 		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
 		{
+			Color clearColor = world->render->getClearColor();
 			clearColor = (clearColor == Color::darkGreen())
 							 ? Color::darkPurple()
 							 : Color::darkGreen();
@@ -60,6 +70,30 @@ class SandboxInputBehaviour: public Behaviour
 			if ( world != nullptr && world->render != nullptr )
 			{
 				world->render->setClearColor(clearColor);
+			}
+		}
+
+		if ( inputManager->wasKeyPressed(KeyCode::ENTER) )
+		{
+			SceneManager* sm = world->sceneManager;
+			Scene* active = sm->getActiveScene();
+
+			if ( active->getName() == "PrototypeScene" )
+				sm->setActiveScene("SecondScene");
+			else
+			{
+				bool hardReset = false;
+				if ( hardReset )
+				{
+					sm->removeScene("PrototypeScene");
+					auto newScene = createPrototypeScene();
+					sm->addScene(std::move(newScene));
+					sm->setActiveScene("PrototypeScene");
+				}
+				else
+				{
+					sm->setActiveScene("PrototypeScene");
+				}
 			}
 		}
 
@@ -99,11 +133,96 @@ class SandboxInputBehaviour: public Behaviour
 		}
 	}
 
+	std::unique_ptr<Scene> createPrototypeScene()
+	{
+		auto scene = std::make_unique<Scene>("PrototypeScene");
+
+		auto circle = std::make_unique<GameObject>();
+		circle->setName("BlueCircle");
+		circle->getTransform()->setPosition({150.0, 140.0});
+		circle->getTransform()->setScale({1.0, 1.0});
+		circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(
+			Color::lightBlue());
+		circle->addComponent<SimpleMoveBehaviour>();
+
+		auto rectangle = std::make_unique<GameObject>();
+		rectangle->setName("YellowRectangle");
+		rectangle->getTransform()->setPosition({320.0, 240.0});
+		rectangle->getTransform()->setRotationAngle(25.0);
+		rectangle->getTransform()->setScale({1.0, 1.0});
+		rectangle->addComponent<ShapeRenderer>()
+			->setRectangle({140.0, 80.0})
+			.setColor(Color::lightRed());
+
+		scene->addGameObject(std::move(circle));
+		scene->addGameObject(std::move(rectangle));
+
+		return scene;
+	}
+
    private:
 	Scene* scene;
 	InputManager* inputManager;
-	Color clearColor;
 };
+
+//////////////////////////////
+/// Create Scenes
+//////////////////////////////
+
+std::unique_ptr<Scene> createPrototypeScene()
+{
+	auto scene = std::make_unique<Scene>("PrototypeScene");
+
+	auto circle = std::make_unique<GameObject>();
+	circle->setName("BlueCircle");
+	circle->getTransform()->setPosition({150.0, 140.0});
+	circle->getTransform()->setScale({1.0, 1.0});
+	circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(
+		Color::lightBlue());
+	circle->addComponent<SimpleMoveBehaviour>();
+
+	auto rectangle = std::make_unique<GameObject>();
+	rectangle->setName("YellowRectangle");
+	rectangle->getTransform()->setPosition({320.0, 240.0});
+	rectangle->getTransform()->setRotationAngle(25.0);
+	rectangle->getTransform()->setScale({1.0, 1.0});
+	rectangle->addComponent<ShapeRenderer>()
+		->setRectangle({140.0, 80.0})
+		.setColor(Color::lightRed());
+
+	scene->addGameObject(std::move(circle));
+	scene->addGameObject(std::move(rectangle));
+
+	return scene;
+}
+
+std::unique_ptr<Scene> createSecondScene()
+{
+	auto scene = std::make_unique<Scene>("SecondScene");
+
+	auto rectA = std::make_unique<GameObject>();
+	rectA->setName("RectA");
+	rectA->getTransform()->setPosition({200.0f, 200.0f});
+	rectA->addComponent<ShapeRenderer>()
+		->setRectangle({140.0, 80.0})
+		.setColor(Color::yellow());
+	scene->addGameObject(std::move(rectA));
+
+	auto rectB = std::make_unique<GameObject>();
+	rectB->setName("RectB");
+	rectB->getTransform()->setPosition({500.0f, 200.0f});
+	rectB->addComponent<ShapeRenderer>()
+		->setRectangle({140.0, 80.0})
+		.setColor(Color::green());
+	scene->addGameObject(std::move(rectB));
+
+	// auto handler = std::make_unique<GameObject>();
+	// handler->setName("InputHandler");
+	// handler->addComponent<SandboxInputBehaviour>(scene.get());
+	// scene->addGameObject(std::move(handler));
+
+	return scene;
+}
 
 #undef main
 
@@ -123,45 +242,24 @@ int main(int argc, char** argv)
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 
-	auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
+	auto prototypeScene = createPrototypeScene();
+	auto secondScene = createSecondScene();
 
-	auto circle = std::make_unique<GameObject>();
-	circle->setName("BlueCircle");
-	circle->getTransform()->setPosition({150.0, 140.0});
-	circle->getTransform()->setScale({1.0, 1.0});
-	auto* circleRenderer = circle->addComponent<ShapeRenderer>();
-	if ( circleRenderer == nullptr )
-	{
-		std::cerr << "[Sandbox] Failed to add ShapeRenderer to BlueCircle\n";
-		return 1;
-	}
-	circleRenderer->setCircle(50.0).setColor(Color::lightBlue());
-
-	auto rectangle = std::make_unique<GameObject>();
-	rectangle->setName("YellowRectangle");
-	rectangle->getTransform()->setPosition({320.0, 240.0});
-	rectangle->getTransform()->setRotationAngle(25.0);
-	rectangle->getTransform()->setScale({1.0, 1.0});
-	auto* rectangleRenderer = rectangle->addComponent<ShapeRenderer>();
-	if ( rectangleRenderer == nullptr )
-	{
-		std::cerr
-			<< "[Sandbox] Failed to add ShapeRenderer to YellowRectangle\n";
-		return 1;
-	}
-	rectangleRenderer->setRectangle({140.0, 80.0}).setColor(Color::lightRed());
-
-	// Create a GameObject for input handling
-	auto inputHandler = std::make_unique<GameObject>();
-	inputHandler->setName("InputHandler");
-	// Add the behavior with a reference to the scene
-	inputHandler->addComponent<SandboxInputBehaviour>(prototypeScene.get());
-
-	prototypeScene->addGameObject(std::move(circle));
-	prototypeScene->addGameObject(std::move(rectangle));
-	prototypeScene->addGameObject(std::move(inputHandler));
-
+	// Attach behavior
+	auto goInputHandler = std::make_unique<GameObject>();
+	goInputHandler->setName("InputHandler");
+	goInputHandler->addComponent<SandboxInputBehaviour>(prototypeScene.get());
+	prototypeScene->addGameObject(std::move(goInputHandler));
 	game->addScene(std::move(prototypeScene));
+
+	// Attach behavior
+	auto goInputHandler2 = std::make_unique<GameObject>();
+	goInputHandler2->setName("InputHandler");
+	goInputHandler2->addComponent<SandboxInputBehaviour>(secondScene.get());
+	secondScene->addGameObject(std::move(goInputHandler2));
+	game->addScene(std::move(secondScene));
+
+	// game->addScene(createSecondScene());
 	game->setApplicationSpecifications(spec);
 
 	return SpelMotorEntry::main(std::move(game));

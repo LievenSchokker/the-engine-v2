@@ -48,23 +48,49 @@ protected:
     }
 };
 
+// Tests/Mocks/MockEngineLoop.h
+#pragma once
+
+#include "Core/IEngineLoop.h"
+
+class MockEngineLoop : public IEngineLoop
+{
+public:
+    using ClockFunction = std::function<double()>;
+
+    ClockFunction getClock() override
+    {
+        return []() { return 0.0; };
+    }
+
+    void start() override {}
+    void update(double) override {}
+    void fixedUpdate(double) override {}
+    void shutdown() override {}
+    void setApplicationClock(ApplicationClock*) override {}
+
+    GameWorld* getGameWorld() override { return nullptr; }
+    SceneManager* getSceneManager() override { return nullptr; }
+};
 
 TEST_F(SpelMotorTest, ConstructionInitializesEngineLoop)
 {
+    auto mockLoop = std::make_unique<MockEngineLoop>();
+
     ASSERT_NO_THROW({
-        SpelMotor engine(std::move(game));
+        SpelMotor engine(std::move(game), std::move(mockLoop));
     });
 }
 
 TEST_F(SpelMotorTest, ThrowsOnInvalidConfiguration)
 {
-	ApplicationSpecifications invalidSpecs{};
-	invalidSpecs.renderBackend = static_cast<RenderBackend>(-1);  // Invalid
-	
-	auto invalidGame = std::make_unique<Game>();
-	invalidGame->setApplicationSpecifications(invalidSpecs);
+    ApplicationSpecifications invalidSpecs{};
+    invalidSpecs.renderBackend = static_cast<RenderBackend>(-1);
 
-	ASSERT_THROW({
-		SpelMotor engine(std::move(invalidGame));
-	}, std::runtime_error);
+    auto invalidGame = std::make_unique<Game>();
+    invalidGame->setApplicationSpecifications(invalidSpecs);
+
+    ASSERT_THROW({
+        SpelMotor engine(std::move(invalidGame), nullptr);
+    }, std::runtime_error);
 }

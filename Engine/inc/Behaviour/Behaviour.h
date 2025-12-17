@@ -20,6 +20,10 @@ class Behaviour: virtual public Component
 	{
 	}
 
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Unknown;
+	}
 	/**
 	 * @brief Pure virtual destructor makes this class Abstract.
 	 */
@@ -117,9 +121,10 @@ class Behaviour: virtual public Component
 	void onDestroy() override;
 
 	/**
-	 * @brief Sets the @c isEnabled field of this Behaviour
-	 * @param value new value to set
-	 */
+	* @brief Sets the @c isEnabled field of this Behaviour
+	* Also calls the @c onEnable or @c onDisable function.
+	* @param value new value to set
+	*/
 	void setEnabled(bool value);
 
 	/**
@@ -142,6 +147,11 @@ class Behaviour: virtual public Component
 	 */
 	bool getHasAwakened() const;
 
+	/**
+		* @brief Retrieves if the gameobject is active
+		* @return whether the gameobject exists and is active.
+		*/
+	bool getIsActive() const;
 	/**
 	 * #brief Checks whether start has been called yet
 	 * @return true if this behaviour's start function has been called, false

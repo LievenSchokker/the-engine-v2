@@ -16,9 +16,14 @@
 
 #include <iostream>
 
+#include "Networking/Messages/ConcreteMessages/WelcomeMessage.h"
+
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
 	: transport(std::move(injectedTransport))
+	  , status(ServerStatus::Stopping),
+	  messageDispatcher(nullptr)
+	  , spawnManager(nullptr)
 	  , status(SystemStatus::Stopping),
 	  messageDispatcher(nullptr)
 {
@@ -28,7 +33,6 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
 	}
 	setupInformation = serverConnectionInformation;
 }
-
 
 Server::~Server()
 {
@@ -87,16 +91,26 @@ void Server::onConnectionChanged(const Connection& connection)
 
 	switch (connection.connectionStatus)
 	{
-		case ConnectionStatus::Connected:
-			connectedClients.insert(clientId);
-			std::cout << "Client " << clientId << " connected" << std::endl;
-			break;
-
+	case ConnectionStatus::Connected:
+	    {
+	        connectedClients.insert(clientId);
+	        handleNewClientConnected(clientId);
+	        if (onClientConnected)
+	        {
+	            onClientConnected(clientId);
+	        }
+	        WelcomeMessage msg(clientId);
+	        sendMessage(clientId, msg, SendMode::ReliableOrdered);
+	        break;
+	    }
 		case ConnectionStatus::Terminated:
 			break;
 		case ConnectionStatus::Error:
 			connectedClients.erase(clientId);
-			std::cout << "Client " << clientId << " disconnected" << std::endl;
+			if (onClientDisconnected)
+			{
+				onClientDisconnected(clientId);
+			}
 			break;
 
 		default:
@@ -117,6 +131,7 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
 
 	const std::unique_ptr<IMessage> message = MessageReader::readMessage(
 		rawMessage);
+	std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
 	if (!message)
 	{
@@ -141,6 +156,22 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
 			std::cerr << "Unknown message type: " << static_cast<int>(
 				messageType) << std::endl;
 			break;
+	if (messageType == MessageTypes::ConnectionMessage)
+	{
+		if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
+		{
+			handleConnectionMessage(clientId, connMsg);
+		}
+		return;
+	}
+
+	if (messageDispatcher)
+	{
+		messageDispatcher->processMessage(std::move(message));
+	}
+	else
+	{
+		std::cerr << "No message dispatcher set!" << std::endl;
 	}
 }
 
@@ -159,6 +190,30 @@ void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 	}
 }
 
+
+bool Server::sendMessage(const int clientId, const IMessage& message,
+                         const SendMode& mode) const
+{
+	if (!connectedClients.contains(clientId))
+	{
+		return false;
+	}
+
+	const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+		message,
+		clientId,
+		mode
+		);
+
+void Server::handleNewClientConnected(int clientId) const
+{
+    if (!messageDispatcher)
+    {
+        return;
+    }
+    auto message = std::make_unique<WelcomeMessage>(clientId);
+    messageDispatcher->processMessage(std::move(message));
+}
 
 bool Server::sendMessage(const int clientId, const IMessage& message,
                          const SendMode& mode) const
@@ -241,10 +296,23 @@ void Server::kickClient(const int clientId)
 
 void Server::injectMessageDispatcher(
 	std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+	std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
 {
 	messageDispatcher = std::move(dispatcher);
 }
 
+void Server::setClientConnectedCallback(ClientConnectedCallback callback)
+{
+	onClientConnected = std::move(callback);
+const std::string Server::getName() const
+{
+	return "Server";
+}
+
+void Server::setClientDisconnectedCallback(ClientDisconnectedCallback callback)
+{
+	onClientDisconnected = std::move(callback);
+}
 
 ServerConnectionInformation Server::convertApplicationSettings(
 	const ApplicationSpecifications& specifications)
@@ -253,9 +321,4 @@ ServerConnectionInformation Server::convertApplicationSettings(
 	server.ip = specifications.networkingOptions.serverIP;
 	server.port = specifications.networkingOptions.port;
 	return server;
-}
-
-const std::string Server::getName() const
-{
-	return "Server";
 }

@@ -6,6 +6,12 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
+
+#include "Component/NetworkIdentity.h"
+#include "Networking/PrefabLibrary.h"
+#include "Networking/Connection/ConnectionMode.h"
+#include "Rendering/Color.h"
 
 /**
  * @brief Coordinates ownership and activation of scenes.
@@ -15,6 +21,22 @@
  */
 class SceneManager : public IEngineSystem
 {
+   public:
+	SceneManager();
+
+    /**
+     * @brief Configures the SceneManager for networking.
+     * Must be called before setActiveScene() for network processing to work.
+     *
+     * @param mode Server or Client mode
+     * @param spawnManager Required for server to auto-spawn objects (can be nullptr for client)
+     */
+    void configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnManager = nullptr);
+
+    /**
+     * @brief Checks if network processing has been configured.
+     */
+    bool isNetworkConfigured() const;
 public:
 	SceneManager() = default;
 
@@ -134,6 +156,12 @@ public:
 	 *
 	 * @return Pointer to the persistent scene
 	 */
+	Color getClearColor() const;
+	void applyNetworkSnapshot(
+		const std::vector<std::unique_ptr<GameObject>>& receivedObjects) const;
+    bool isLocallyOwned(NetworkIdentity* identity) const;
+
+    void setWorld(GameWorld* world) { gameWorld = world; }
 	Scene* getOrCreatePersistentScene();
 
 	/**
@@ -143,12 +171,47 @@ public:
 	 */
 	Scene* getPersistentScene() const;
 
-	const std::string getName() const override;
+
+    std::string getFirstSceneName() const;
+    
+   private:
+
+    /**
+ * @brief Processes a scene for networking based on configured mode.
+ */
+    void processSceneForNetwork(Scene& scene);
+
+    /**
+     * @brief Server: Extract NetworkBehaviour objects as prefabs.
+     */
+    void processForServer(Scene& scene);
+
+    /**
+     * @brief Client: Remove NetworkBehaviour objects.
+     */
+    void processForClient(Scene& scene);
+
+    /**
+     * @brief Checks if a GameObject has any NetworkBehaviour components.
+     */
+    bool hasNetworkBehaviour(const GameObject& obj) const;
+
+    /**
+     * @brief Checks if a GameObject has a NetworkIdentity.
+     */
+    bool hasNetworkIdentity(const GameObject& obj) const;
+
+    bool networkConfigured = false;
+    ConnectionMode networkMode = ConnectionMode::Client;
+    NetworkSpawnManager* spawnManager = nullptr;
+    std::unordered_set<std::string> processedScenes;
+
+    GameWorld* gameWorld = nullptr;
+	void setScenes(std::vector<std::unique_ptr<Scene>> scene);
 
 	SystemStatus start(GameWorld& gameWorld) override;
 
-	void setScenes(std::vector<std::unique_ptr<Scene>> scene);
-private:
+	const std::string getName() const override;
 	std::unordered_map<std::string, std::unique_ptr<Scene>> scenes;
 	Scene* activeScene = nullptr;
 	std::unique_ptr<Scene> persistentScene; // Always-active scene for debug/utilities

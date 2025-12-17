@@ -74,3 +74,7 @@ const std::string RenderSystem::getName() const
 {
 	return "RenderSystem";
 }
+const Color& RenderSystem::getClearColor() const
+{
+	return clearColor;
+}

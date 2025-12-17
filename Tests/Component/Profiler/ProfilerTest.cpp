@@ -1,11 +1,11 @@
 #include "Component/Profiler/Profiler.h"
-#include "Rendering/UIRenderCommand.h"
 #include "Core/GameWorld.h"
 #include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
+#include "Rendering/UIRenderCommand.h"
 
-#include <vector>
 #include <cmath>
 #include <gtest/gtest.h>
+#include <vector>
 
 class MockUIRenderQueueWriter : public IUserInterfaceRenderQueueWriter
 {

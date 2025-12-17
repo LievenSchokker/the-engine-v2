@@ -8,6 +8,8 @@
 #include "Component/ComponentManager.h"
 #include "Component/Transform.h"
 #include "GameObject/ScenePlaceholder.h"
+#include "Networking/Component/ComponentFactory.h"
+#include "Networking/Serialization/Serialization.h"
 #include "Scene/Scene.h"
 
 GameObject::GameObject()
@@ -203,4 +205,141 @@ void GameObject::setBehavioursEnabled(const bool value) const
     {
         componentManager->disableAllBehaviours();
     }
+}
+
+void GameObject::serialize(WriteArchive& archive) const
+{
+	std::string n = name;
+	archive.process(n);
+
+	Transform* t = getTransform();
+	float posX = t->getPosition().x;
+	float posY = t->getPosition().y;
+	double rotation = t->getRotationAngle();
+	float scaleX = t->getScale().x;
+	float scaleY = t->getScale().y;
+
+	archive.process(posX);
+	archive.process(posY);
+	archive.process(rotation);
+	archive.process(scaleX);
+	archive.process(scaleY);
+
+	uint32_t count = 0;
+	for (const auto& comp : componentManager->getComponents())
+	{
+		if (dynamic_cast<Transform*>(comp.get())) continue;
+
+		ComponentType type = comp->getComponentType();
+
+		if (ComponentFactory::instance().isRegistered(type))
+		{
+			count++;
+		}
+	}
+	archive.process(count);
+
+	for (const auto& comp : componentManager->getComponents())
+	{
+		if (dynamic_cast<Transform*>(comp.get())) continue;
+
+		ComponentType type = comp->getComponentType();
+		if (!ComponentFactory::instance().isRegistered(type))
+		{
+			continue;
+		}
+
+		uint32_t typeId = static_cast<uint32_t>(type);
+		archive.process(typeId);
+		comp->serialize(archive);
+	}
+}
+
+void GameObject::deserialize(ReadArchive& archive)
+{
+	archive.process(name);
+
+	float posX, posY;
+	double rotation;
+	float scaleX, scaleY;
+
+	archive.process(posX);
+	archive.process(posY);
+	archive.process(rotation);
+	archive.process(scaleX);
+	archive.process(scaleY);
+
+	getTransform()->setPosition({posX, posY});
+	getTransform()->setRotationAngle(rotation);
+	getTransform()->setScale({scaleX, scaleY});
+
+	uint32_t count;
+	archive.process(count);
+
+	for (uint32_t i = 0; i < count; ++i)
+	{
+		uint32_t typeId;
+		archive.process(typeId);
+		ComponentType type = static_cast<ComponentType>(typeId);
+
+		// Try to find existing component first
+		Component* existing = getComponentByType(type);
+
+		if (existing)
+		{
+			// Update existing component
+			existing->deserialize(archive);
+		}
+		else
+		{
+			// Create new component only if it doesn't exist
+			auto comp = ComponentFactory::instance().create(type);
+			if (!comp)
+			{
+				break;
+			}
+
+			comp->deserialize(archive);
+			componentManager->addComponent(std::move(comp));
+		}
+	}
+}
+
+std::unique_ptr<GameObject> GameObject::clone() const
+{
+    // Serialize to bytes
+    WriteArchive writer;
+    serialize(writer);
+
+    // Deserialize into new object
+    std::vector<std::byte> bytes = writer.getBytes();
+    CerealReadArchive reader(bytes.data(), bytes.size());
+
+    auto cloned = std::make_unique<GameObject>();
+    cloned->deserialize(reader);
+
+    return cloned;
+}
+
+Component* GameObject::getComponentByType(ComponentType type) const
+{
+	for (const auto& comp : componentManager->getComponents())
+	{
+		if (comp->getComponentType() == type)
+		{
+			return comp.get();
+		}
+	}
+	return nullptr;
+}
+
+void GameObject::copyStateFrom(const GameObject& source)
+{
+
+	WriteArchive writeArchive;
+	source.serialize(writeArchive);
+
+	std::vector<std::byte> bytes = writeArchive.getBytes();
+	ReadArchive readArchive(bytes.data(), bytes.size());
+	deserialize(readArchive);
 }

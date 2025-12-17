@@ -225,6 +225,16 @@ public:
 	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
 
+
+
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Grid;
+	}
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
+
 private:
 	TilemapComponent* tilemapComponent = nullptr;
 	bool debugRenderEnabled = false;

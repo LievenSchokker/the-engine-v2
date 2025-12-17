@@ -16,6 +16,11 @@ add_executable(engine_tests
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
+        GameObject/tests_game_object.cpp
+        Behaviour/TestBehaviourBase.cpp
+        Behaviour/tests_behaviour.cpp
+        Scene/SceneManagerTest.cpp
+        Physics/PhysicsSystemTest.cpp
         Component/GridComponentTest.cpp
         Scene/SceneManagerTest.cpp
         Networking/Messages/ActionMessageTest.cpp

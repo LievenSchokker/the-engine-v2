@@ -4,7 +4,7 @@
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/ConcreteMessages/MessageTypes.h"
 
-using namespace spelmotor_networking;
+using namespace spelmotorNetworking;
 
 class FakeMessage : public IMessage
 {

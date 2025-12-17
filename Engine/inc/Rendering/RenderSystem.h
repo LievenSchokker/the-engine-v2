@@ -43,9 +43,10 @@ public:
 
 	void setClearColor(const Color& color);
 
-	const std::string getName() const override;
+	const Color& getClearColor() const;
 
-private:
+   private:
+	const std::string getName() const override;
 	std::unique_ptr<IRenderer> renderer;
 	RenderQueue queue;
 	Color clearColor = Color::black();

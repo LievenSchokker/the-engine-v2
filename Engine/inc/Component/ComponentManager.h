@@ -132,7 +132,9 @@ public:
 	* @return Number of components
 	*/
 	size_t getComponentCount() const;
+	const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
+	void addComponent(std::unique_ptr<Component> component);
 private:
 	/// Helper function to iterate through @c components
 	template <typename T>
@@ -141,7 +143,6 @@ private:
 	template <typename T>
 	std::vector<std::unique_ptr<Component>>::const_iterator
 	getComponentIterator() const;
-
 private:
 	/// The @c GameObject this ComponentManager belongs to
 	GameObject* const gameObject;

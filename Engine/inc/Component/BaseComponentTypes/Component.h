@@ -1,4 +1,7 @@
 #pragma once
+#include "Networking/ComponentType.h"
+#include "Networking/Serialization/ISerializable.h"
+#include "Networking/Serialization/Serialization.h"
 
 
 class Transform;
@@ -13,7 +16,7 @@ class GameObject;
  * and can access its Transform for position, rotation, and scale.
  *
  */
-class Component
+class Component : public ISerializable
 {
 public:
 	Component() : gameObject(nullptr), transform(nullptr)
@@ -90,7 +93,9 @@ public:
 	* @return Pointer to the associated GameObject's Transform.
 	*/
 	const Transform* getTransform() const;
-
+    virtual ComponentType getComponentType() const;
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 protected:
 	/// The @c GameObject this component is attached to, a component is always attached to a GameObject
 	GameObject* gameObject;

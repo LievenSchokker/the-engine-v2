@@ -17,6 +17,9 @@ namespace engine_tests
             TestComponentBase();
             ~TestComponentBase() override;
 
+            ComponentType getComponentType() const override {
+                return ComponentType::Unknown;
+            }
             void onDestroy() override;
 
             static int instanceCount;
