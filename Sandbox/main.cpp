@@ -10,6 +10,7 @@
 
 #include "IZandbak.h"
 #include "Sandboxes/AgentsZandbak.h"
+#include "Sandboxes/Multiplayer/MultiplayerZandbak.h"
 
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's
@@ -18,8 +19,19 @@
 
 int main(int argc, char** argv)
 {
-    // Parse command line arguments
-    EngineMode mode = EngineMode::CLIENT;  // Default to client
+    EngineMode mode = EngineMode::CLIENT;
+    registerSerializableComponents();
+    for (int i = 1; i < argc; ++i)
+    {
+        if (std::strcmp(argv[i], "server") == 0)
+        {
+            mode = EngineMode::SERVER;
+        }
+        else if (std::strcmp(argv[i], "client") == 0)
+        {
+            mode = EngineMode::CLIENT;
+        }
+    }
 
 	std::unique_ptr<Game> spel = std::make_unique<Game>();
 	// std::unique_ptr<Scene> scene = std::make_unique<Scene>("Scene");
@@ -38,7 +50,7 @@ int main(int argc, char** argv)
     };
 
     /// Note: Change the unique_ptr to create the sandbox you want
-    std::unique_ptr<IZandbak> zandbak = std::make_unique<AgentsZandbak>();
+    std::unique_ptr<IZandbak> zandbak = std::make_unique<MultiplayerZandbak>();
 	std::unique_ptr<Scene> scene = zandbak->getScene();
 
 	spel->addScene(std::move(scene));

@@ -54,6 +54,7 @@ public:
      */
     void deserialize(ReadArchive& archive);
 
+
     /**
      * @brief Creates a deep copy of this GameObject via serialization.
      */
@@ -297,6 +298,8 @@ public:
     const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
 private:
+    void fixupPointersAfterClone();
+
     void internalAddComponent(std::unique_ptr<Component> component);
     /// Helper function to iterate through @c components
     template <typename T>

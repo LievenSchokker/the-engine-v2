@@ -312,17 +312,12 @@ void GameObject::deserialize(ReadArchive& archive)
         uint32_t typeId;
         archive.process(typeId);
         const auto type = static_cast<ComponentType>(typeId);
-
-        // Try to find existing component first
-
         if (Component* existing = getComponentByType(type))
         {
-            // Update existing component
             existing->deserialize(archive);
         }
         else
         {
-            // Create new component only if it doesn't exist
             auto comp = ComponentFactory::instance().create(type);
             if (!comp)
             {
@@ -333,20 +328,47 @@ void GameObject::deserialize(ReadArchive& archive)
             internalAddComponent(std::move(comp));
         }
     }
+    fixupPointersAfterClone();
 }
+
+void GameObject::fixupPointersAfterClone()
+{
+    for (auto& component : components)
+    {
+        if (component)
+        {
+            component->setGameObject(this);
+        }
+    }
+}
+
 
 std::unique_ptr<GameObject> GameObject::clone() const
 {
-    // Serialize to bytes
     WriteArchive writer;
     serialize(writer);
 
-    // Deserialize into new object
     std::vector<std::byte> bytes = writer.getBytes();
     CerealReadArchive reader(bytes.data(), bytes.size());
 
     auto cloned = std::make_unique<GameObject>();
     cloned->deserialize(reader);
+
+    for (auto& component : cloned->components)
+    {
+        if (component)
+        {
+            component->setGameObject(cloned.get());
+        }
+    }
+
+    for (auto& behaviour : cloned->behaviours)
+    {
+        if (behaviour)
+        {
+            behaviour->setGameObject(cloned.get());
+        }
+    }
 
     return cloned;
 }
