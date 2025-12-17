@@ -5,7 +5,7 @@
 #include <unordered_set>
 
 #include "ServerInformation.h"
-#include "Core/ApplicationSpecifications.h"
+#include "../../Core/Options/ApplicationSpecifications.h"
 #include "Core/IEngineSystems.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"

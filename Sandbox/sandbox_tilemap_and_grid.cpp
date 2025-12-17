@@ -5,7 +5,7 @@
 #include "Component/ShapeRenderer.h"
 #include "Component/TilemapComponent.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
+#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"

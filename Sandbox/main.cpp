@@ -1,5 +1,5 @@
 
-#include "Core/ApplicationSpecifications.h"
+#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"

@@ -1,6 +1,6 @@
 #include "Networking/Server/Server.h"
 
-#include "Core/ApplicationSpecifications.h"
+#include "../../inc/Core/Options/ApplicationSpecifications.h"
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
 #include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"

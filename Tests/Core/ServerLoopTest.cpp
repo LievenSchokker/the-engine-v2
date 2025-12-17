@@ -1,7 +1,5 @@
 #include <gtest/gtest.h>
-#include "Core/EngineLoops/ServerLoop.h"
-#include "Core/EngineLoops/ClientLoop.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Game.h"
 
 class ServerLoopTest : public ::testing::Test

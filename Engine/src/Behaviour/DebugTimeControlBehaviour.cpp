@@ -47,7 +47,6 @@ void DebugTimeControlBehaviour::update(double deltaTime,
 	{
 		return;
 	}
-
 	// Move to persistent scene on first update (if not already there)
 	// This ensures debug controls persist across scene transitions
 	if (!movedToPersistentScene &&

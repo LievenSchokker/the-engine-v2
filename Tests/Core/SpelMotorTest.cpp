@@ -6,7 +6,7 @@
 #include <chrono>
 #include <SDL2/SDL.h>
 #include "Core/SpelMotor.h"
-#include "Core/ApplicationSpecifications.h"
+#include "../../Engine/inc/Core/Options/ApplicationSpecifications.h"
 
 class SpelMotorTest : public ::testing::Test
 {

@@ -1,8 +1,11 @@
+#include <iostream>
+#include <stdexcept>
+
 #include "Core/SpelMotor.h"
 
 #include "Audio/Components/MusicSource.h"
 #include "Core/ApplicationClock.h"
-#include "Core/ApplicationSpecifications.h"
+#include "../../inc/Core/Options/ApplicationSpecifications.h"
 #include "Core/EngineLoopFactory.h"
 #include "Core/IEngineLoop.h"
 #include "Game.h"
@@ -56,7 +59,6 @@ void SpelMotor::run()
 				break;
 			}
 		}
-
 		coreSystemLoop->update(coreClock->getDeltaTime());
 	}
 	shutdown();

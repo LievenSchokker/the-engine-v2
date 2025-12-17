@@ -113,8 +113,10 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
 		return false;
 	}
 
-	toScene->addGameObject(std::move(gameObject));
-	return true;
+    gameObject->setBehavioursEnabled(true);
+
+    toScene->addGameObject(std::move(gameObject));
+    return true;
 }
 
 Scene* SceneManager::getActiveScene() const

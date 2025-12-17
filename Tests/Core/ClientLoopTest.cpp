@@ -1,5 +1,3 @@
-#include "Core/EngineLoops/ClientLoop.h"
-#include "Core/EngineLoops/ServerLoop.h"
 #include "Game.h"
 
 #include <SDL_timer.h>
