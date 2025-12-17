@@ -19,7 +19,7 @@ public:
     void onStart() override;
     void onNetworkSpawn() override;
     void registerNetworkMethods(NetworkBuilder& builder) override;
-    void update(float deltaTime, GameWorld* world) override;
+    void update(double deltaTime,const GameWorld& world) override;
 
 	ComponentType getComponentType() const override
 	{

@@ -132,7 +132,7 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
     messageDispatcher->processMessage(std::move(message));
 }
 
-void Client::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+void Client::injectMessageDispatcher(std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
 {
     messageDispatcher = std::move(dispatcher);
 }

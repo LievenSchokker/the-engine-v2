@@ -5,6 +5,8 @@
 #include <memory>
 #include <string>
 
+#include "IAudioBackend.h"
+
 class AudioSource;
 class MusicSource;
 

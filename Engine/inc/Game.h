@@ -43,9 +43,7 @@ class Game
 	 */
 	void addScene(std::unique_ptr<Scene> scene);
 
-	std::unique_ptr<SceneManager> getSceneManager();
-
-	std::unique_ptr<Scene> getFirstScene();
+    std::unique_ptr<Scene> getFirstScene();
 	std::vector<std::unique_ptr<Scene>> getAllScenes();
 private:
     ApplicationSpecifications specifications;

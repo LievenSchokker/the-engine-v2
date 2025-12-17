@@ -5,7 +5,6 @@
 
 #include "Audio/Components/MusicSource.h"
 #include "Core/ApplicationClock.h"
-#include "Core/ApplicationSpecifications.h"
 #include "Networking/TransportGNS.h"
 
 #include <iostream>
