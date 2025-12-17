@@ -160,46 +160,14 @@ class Behaviour: virtual public Component
 	 */
 	bool getHasStarted() const;
 
-   private:
-	/// Enabled components are Updated, disabled Beahviours are not.
-	bool isEnabled;
-
-	/// Keeps track if awake has been called for this Behaviour.
-	bool hasAwakened;
-
-	/**
-		* @brief Retrieves the state of the @c isEnabled field
-		* @return whether this Behaviour is enabled, value of @c isEnabled
-		*/
-	bool getIsEnabled() const;
-
-
-	/**
-		* @brief Checks whether this Behaviour is enabled, and its associated GameObject is active.
-		* @return whether this behaviour is Enabled and on an active GameObject.
-		*/
-	bool getIsActiveAndEnabled() const;
-
-	/**
-		* #brief Checks whether awake has been called yet
-		* @return true if this behaviour's awake function has been called, false otherwise
-		*/
-	bool getHasAwakened() const;
-
-
-	/**
-	* #brief Checks whether start has been called yet
-	* @return true if this behaviour's start function has been called, false otherwise
-	*/
-	bool getHasStarted() const;
-
+   // protected:
 	// Called when this GameObject's collider enters a sensor
 	virtual void onSensorEnter(Collider* other) {}
 
 	// Called when this GameObject's collider exits a sensor
 	virtual void onSensorExit(Collider* other) {}
 
-private:
+   private:
 	/// Enabled components are Updated, disabled Beahviours are not.
 	bool isEnabled;
 
