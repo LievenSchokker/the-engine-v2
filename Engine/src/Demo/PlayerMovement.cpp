@@ -40,7 +40,6 @@ void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
 
 void PlayerMovement::update(float deltaTime, GameWorld* world)
 {
-    std::cout << "PlayerMovement::update" << std::endl;
     if (!hasAuthority())
     {
         return;

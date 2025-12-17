@@ -429,6 +429,13 @@ void GameObject::internalAddComponent(std::unique_ptr<Component> component)
 {
     if (component != nullptr)
     {
+        component->setxGameObject(this);
+
+        if (auto* behaviour = dynamic_cast<Behaviour*>(component.get()))
+        {
+            behaviours.push_back(behaviour);
+        }
+
         components.push_back(std::move(component));
     }
 }
