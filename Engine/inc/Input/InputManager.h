@@ -152,7 +152,7 @@ public:
 	 */
 	int wheelDeltaY() const;
 
-	const std::string getName() const;
+	const std::string getName() const override;
 private:
 	void disconnect(EventDispatcher& dispatcher);
 	void onKeyPressed(const KeyPressedEvent& e);

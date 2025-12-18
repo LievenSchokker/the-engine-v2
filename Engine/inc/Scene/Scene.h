@@ -125,21 +125,21 @@ public:
 	 */
 	void onResume();
 
-        /**
-         * @brief Update all game objects when the scene is active.
-         *
-         * @param deltaTime Seconds elapsed since the previous update.
-         * @param world
-         */
-        void update(double deltaTime, const GameWorld& world);
+    /**
+     * @brief Update all game objects when the scene is active.
+     *
+     * @param deltaTime Seconds elapsed since the previous update.
+     * @param world
+     */
+    void update(double deltaTime, const GameWorld& world);
 
-        /**
-	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
-	 * Does not enable the behaviours on their own only calls the callback.
-	 * @param behaviours the behaviours that need to be initialised.
-	 * @param world
-         */
-        void initialiseBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world);
+    /**
+	* @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
+	* Does not enable the behaviours on their own only calls the callback.
+	* @param behaviours the behaviours that need to be initialised.
+	* @param world
+     */
+    void initialiseBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world);
 
 	/**
 	 * @brief Adds the provided GameObject to the @c destroyQueue vector, in order to delete and destroy the object when @c processDestroyQueue is called.

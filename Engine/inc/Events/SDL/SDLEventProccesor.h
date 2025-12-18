@@ -15,7 +15,7 @@
  * Polls SDL events during update() and dispatches them through
  * the EventDispatcher. Can also be used standalone via IEventProcessor.
  */
-class SDLEventProcessor: public IEngineSystems, public IEventProccesor
+class SDLEventProcessor : public IEngineSystems, public IEventProccesor
 {
 public:
 	SDLEventProcessor() = default;
@@ -28,14 +28,6 @@ public:
 	bool pollEvents(EventDispatcher& dispatcher) override;
 
 	/**
-	 * @brief Get the internal event dispatcher for subscribing to events.
-	 */
-	EventDispatcher& getDispatcher()
-	{
-		return internalDispatcher;
-	}
-
-	/**
 	 * @brief Set callback for unhandled SDL events.
 	 */
 	void setUnhandledEventCallback(
@@ -45,7 +37,7 @@ private:
 	template <typename Handler>
 	bool processEvents(Handler handler);
 	MouseButton mouseButtonAdaption(Uint8 button);
-	EventDispatcher internalDispatcher;
+	EventDispatcher* internalDispatcher;
 	EventDispatcher* activeDispatcher = nullptr;
 	std::function<void(const SDL_Event&)> unhandledCallback;
 

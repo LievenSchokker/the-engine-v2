@@ -41,12 +41,10 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
         return false;
     }
 
-    bool isGameObjectActive = gameObject->getIsActive();
-
-    gameObjects.emplace_back(std::move(gameObject));
-    GameObject* addedObject = gameObjects.back().get();
-    addedObject->setScene(*this);
-
+	GameObject* addedObject = gameObject.get();
+	addGameObjectInternal(std::move(gameObject));
+	addedObject->setScene(*this);
+	
     return true;
 }
 

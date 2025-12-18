@@ -25,26 +25,28 @@ public:
 	InputManager* input = nullptr;
 	ApplicationClock* clock = nullptr;
 	AudioManager* audio = nullptr;
-
-	EventDispatcher* dispatcher = nullptr;
-    Client* client = nullptr;
-    Server* server = nullptr;
+	Client* client = nullptr;
+	Server* server = nullptr;
 
 	NetworkSpawnManager* spawnManager = nullptr;
 
-    bool isClient() const
-    {
-        return client != nullptr;
-    }
+	bool isClient() const
+	{
+		return client != nullptr;
+	}
 
 	bool isServer() const
 	{
 		return server != nullptr;
 	}
 
-    bool sendToServer(const IMessage& message);
-    bool broadcastToClients(const IMessage& message);
-    bool sendToClient(int clientId, const IMessage& message);
-
+	bool sendToServer(const IMessage& message);
+	bool broadcastToClients(const IMessage& message);
+	bool sendToClient(int clientId, const IMessage& message);
+	void setDispatcher(std::unique_ptr<EventDispatcher> dispatcher);
+	EventDispatcher* getDispatcher();
 	int localClientId = -1;
+
+private:
+	std::unique_ptr<EventDispatcher> dispatcher = nullptr;
 };

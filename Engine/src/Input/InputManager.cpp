@@ -1,7 +1,8 @@
 #include "Input/InputManager.h"
-
 #include "Core/GameWorld.h"
 #include "Events/EventImplementations/ApplicationEvents.h"
+
+#include <ostream>
 
 InputManager::InputManager() = default;
 
@@ -62,9 +63,9 @@ SystemStatus InputManager::start(GameWorld& gameWorld)
 {
 	gameWorld.input = this;
 
-	if (gameWorld.dispatcher != nullptr)
+	if (gameWorld.getDispatcher() != nullptr)
 	{
-		initialize(*gameWorld.dispatcher);
+		initialize(*gameWorld.getDispatcher());
 	}else
 	{
 		return SystemStatus::ERROR;
@@ -114,7 +115,7 @@ void InputManager::update(double deltaTime, const GameWorld& gameWorld)
     wheelY = 0;
 }
 
-// Event handlers - these get called by EventDispatcher
+
 void InputManager::onKeyPressed(const KeyPressedEvent& e)
 {
     if (!e.isRepeat)

@@ -4,22 +4,22 @@
 #include "Core/SystemStatus.h"
 #include "Events/SDL/SDLEventProccesor.h"
 
+#include <iostream>
+#include <ostream>
+
 SystemStatus SDLEventProcessor::start(GameWorld& gameWorld)
 {
-    gameWorld.dispatcher = &internalDispatcher;
-    activeDispatcher = &internalDispatcher;
+	internalDispatcher = gameWorld.getDispatcher();
     return SystemStatus::RUNNING;
 }
 
 void SDLEventProcessor::update(double deltaTime, const GameWorld& gameWorld)
 {
-    pollEvents(internalDispatcher);
+    pollEvents(*internalDispatcher);
 }
 
 void SDLEventProcessor::shutdown(GameWorld& gameWorld)
 {
-    gameWorld.dispatcher = nullptr;
-    activeDispatcher = nullptr;
 }
 
 const std::string SDLEventProcessor::getName() const

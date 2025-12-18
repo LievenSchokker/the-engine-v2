@@ -70,6 +70,8 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 	{
 		if (contextPtr != nullptr)
 		{
+			auto dispatcher = std::make_unique<EventDispatcher>();
+			gameWorld->setDispatcher(std::move(dispatcher));
 			auto events = std::make_unique<SDLEventProcessor>();
 			loop->addSystem(std::move(events));
 		}

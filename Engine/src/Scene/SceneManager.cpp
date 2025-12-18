@@ -313,17 +313,12 @@ bool SceneManager::setActiveScene(const std::string& name)
         return false;
     }
 
-    activeScene = nextScene;
-    paused = false;
-
     if (networkConfigured && !processedScenes.contains(name))
     {
         processSceneForNetwork(*activeScene);
         processedScenes.insert(name);
     }
 
-    activeScene->onStart(*gameWorld);
-    return true;
 	activeScene = nextScene;
 	paused = false;
 	activeScene->onStart(*gameWorld);
