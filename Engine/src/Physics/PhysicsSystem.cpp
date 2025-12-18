@@ -24,7 +24,7 @@ void PhysicsSystem::fixedUpdate(const double deltaTime,
 void PhysicsSystem::shutdown(GameWorld& gameWorld)
 {
 	gameWorld.physics = nullptr;
-	physicsWorld->destroy();
+	physicsWorld->shutdown();
 }
 
 const std::string PhysicsSystem::getName() const

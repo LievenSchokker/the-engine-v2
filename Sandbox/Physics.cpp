@@ -1,8 +1,7 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
-#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -55,9 +54,6 @@ class PhysicsInputBehaviour: public Behaviour
 	{
 		(void)deltaTime;
 		(void)world;
-
-		//#TODO Super hacky way to update the physics world
-		physicsWorld->fixedUpdate();
 
 		if ( inputManager == nullptr || physicsWorld == nullptr ||
 			 rectangleGO == nullptr )

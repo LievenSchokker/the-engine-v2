@@ -66,7 +66,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 
 	void initialize() override;
 	void step(float deltaTime) override;
-	void destroy() override;
+	void shutdown() override;
 
 private:
 	/**

@@ -12,8 +12,8 @@ class Collider: public Component
 	float density = 1.0f;
 
    public:
-	float radius = 0.0f;	   // circle
-	Vector2 size = Vector2();  // box
+	float radius = 0.0f;			 // circle
+	Vector2 size = Vector2::zero();  // box
 
 	void setDensity(float _density)
 	{
