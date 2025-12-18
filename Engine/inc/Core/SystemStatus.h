@@ -3,7 +3,7 @@
 
 enum class SystemStatus
 {
-	Running,
-	Stopping,
-	Error,
+	RUNNING,
+	STOPPPED,
+	ERROR,
 };
