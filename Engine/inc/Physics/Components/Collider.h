@@ -1,20 +1,39 @@
 #pragma once
 
-
 #include "../../Component/BaseComponentTypes/Component.h"
+#include "Math/Vector2.h"
 #include "Physics/PhysicsShapes.h"
-
 
 class Collider: public Component
 {
-public:
+   private:
 	PhysicsShapeType shape = PhysicsShapeType::None;
-
-	float radius = 0.0f; // circle
-	Vector2 size = {0, 0}; // box
-
+	bool sensor = false;
 	float density = 1.0f;
-	bool isSensor = false;
+
+   public:
+	float radius = 0.0f;			 // circle
+	Vector2 size = Vector2::zero();  // box
+
+	void setDensity(float _density)
+	{
+		this->density = _density;
+	}
+
+	float getDensity() const
+	{
+		return this->density;
+	}
+
+	void setSensor(bool _sensor)
+	{
+		this->sensor = _sensor;
+	}
+
+	bool isSensor() const
+	{
+		return this->sensor;
+	}
 
 	void setCircle(const float radiusNew)
 	{
@@ -31,4 +50,19 @@ public:
 		shape = PhysicsShapeType::Rectangle;
 		size = fullSize;
 	}
+
+	PhysicsShapeType getShape() const
+	{
+		return shape;
+	}
+
+	/**
+	 * @brief Calls all onSensorEnter on all behaviours
+	 */
+	void onSensorEnter(Collider* other);
+
+	/**
+	 * @brief Calls all onSensorExit on all behaviours
+	 */
+	void onSensorExit(Collider* other);
 };

@@ -30,7 +30,6 @@ TEST(Box2DPhysicsWorldTest, PhysicsSimulationUpdatesTransform)
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.step(FIXED_TIMESTEP);
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_NE(initialPos.y, newPos.y);
@@ -85,7 +84,6 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.step(FIXED_TIMESTEP);
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_EQ(initialPos.y, newPos.y);
@@ -110,7 +108,6 @@ TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
     world.step(FIXED_TIMESTEP);
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_GT(newPos.x, initialPos.x);
@@ -140,7 +137,6 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
     for (int i = 0; i < 120; ++i)
     {
         world.step(FIXED_TIMESTEP);
-        world.syncTransforms();
     }
 
     Vector2 ballPos = ball.getTransform()->getPosition();
@@ -166,7 +162,6 @@ TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
 
     world.step(FIXED_TIMESTEP);
-    world.syncTransforms();
 
     Vector2 pos = obj.getTransform()->getPosition();
     EXPECT_GT(pos.x, 0);
@@ -194,7 +189,6 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
     world.step(FIXED_TIMESTEP);
-    world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_EQ(newPos.y, initialPos.y);
@@ -223,7 +217,6 @@ TEST(Box2DPhysicsWorldTest, DestroyDynamicObject)
     {
         world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
         world.step(FIXED_TIMESTEP);
-        world.syncTransforms();
     }
 
     Vector2 newPos = obj.getTransform()->getPosition();

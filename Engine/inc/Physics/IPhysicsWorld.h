@@ -61,5 +61,5 @@ public:
 
 	virtual void initialize() = 0;
 	virtual void step(float deltaTime) = 0;
-	virtual void destroy() = 0;
+	virtual void shutdown() = 0;
 };
