@@ -214,5 +214,4 @@ private:
     std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
     ClientConnectedCallback onClientConnected;
     ClientDisconnectedCallback onClientDisconnected;
-    NetworkSpawnManager* spawnManager = nullptr;
 };

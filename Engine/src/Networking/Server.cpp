@@ -22,7 +22,6 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
     : transport(std::move(injectedTransport))
     , status(SystemStatus::Stopping)
     , messageDispatcher(nullptr)
-    , spawnManager(nullptr)
 {
     if (serverConnectionInformation.port == 0)
     {
