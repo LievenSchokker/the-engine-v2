@@ -105,7 +105,7 @@ public:
 
 private:
 	float zoom;
-	Vector2 offset;
+	Vector2 offset{0,0};
 	float viewWidth;
 	float viewHeight;
 	float viewportX;

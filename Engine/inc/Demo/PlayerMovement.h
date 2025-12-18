@@ -23,6 +23,7 @@ public:
 		return "PlayerMovement";
 	}
 	void onStart() override;
+	
 	void onNetworkSpawn() override;
 	void registerNetworkMethods(NetworkBuilder& builder) override;
 	void update(float deltaTime, GameWorld* world) override;
