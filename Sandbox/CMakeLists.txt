@@ -9,6 +9,7 @@ file(GLOB_RECURSE BEHAVIOUR_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Examples/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/Sandboxes/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Sandboxes/*.h"
+
 )
 
 # Helper function to create a sandbox executable

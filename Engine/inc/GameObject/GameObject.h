@@ -4,6 +4,7 @@
 #include "Networking/Serialization/Serialization.h"
 
 enum class ComponentType : uint32_t;
+
 class Scene;
 class Transform;
 class Component;
@@ -54,11 +55,13 @@ public:
      */
     void deserialize(ReadArchive& archive);
 
-    Component* getComponentByTypeName(const std::string& typeName) const;
     /**
      * @brief Creates a deep copy of this GameObject via serialization.
      */
     std::unique_ptr<GameObject> clone() const;
+
+    Component* getComponentByType(ComponentType type) const;
+
 
     /**
     * @brief Adds a component of type T to this object's @c componentManager.
@@ -289,13 +292,13 @@ public:
     int getSceneId() const;
 
     void copyStateFrom(const GameObject& source);
-    void enableAllBehaviours() const;
-    void disableAllBehaviours() const;
+
     void destroyAllComponents();
     const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
 private:
-    void fixupPointersAfterClone();
+        void enableAllBehaviours() const;
+        void disableAllBehaviours() const;
 
     void internalAddComponent(std::unique_ptr<Component> component);
     /// Helper function to iterate through @c components
