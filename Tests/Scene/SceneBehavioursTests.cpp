@@ -16,11 +16,12 @@
 TEST(SceneBehaviourTests, SceneInitialisesBehavioursOnStart)
 {
     /// Setup.
+    auto gameWorld = std::make_unique<GameWorld>();
     Scene scene {"TestScene"};
     auto go = std::make_unique<GameObject>();
     auto* behaviour = go->addComponent<engine_tests::TestBehaviourOne>();
 
-    scene.addGameObject(std::move(go));
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
 
     /// Scene hasnt started yet, behaviours should not have started.
     EXPECT_FALSE(behaviour->awakeCalled);
@@ -29,7 +30,7 @@ TEST(SceneBehaviourTests, SceneInitialisesBehavioursOnStart)
     EXPECT_FALSE(behaviour->updateCalled);
 
     /// Start the scene
-    scene.onStart();
+    scene.onStart(*gameWorld);
 
     /// Behaviours should now be initialised correctly.
     EXPECT_TRUE(behaviour->awakeCalled);
@@ -46,13 +47,13 @@ TEST(SceneBehaviourTests, BehaviourUpdateAfterSceneUpdate)
     auto go = std::make_unique<GameObject>();
     auto* behaviour = go->addComponent<engine_tests::TestBehaviourOne>();
 
-    scene.addGameObject(std::move(go));
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
 
     EXPECT_FALSE(behaviour->updateCalled);
-    scene.onStart();
+    scene.onStart(*gameWorld);
     EXPECT_FALSE(behaviour->updateCalled);
 
-    scene.update(0.016f, gameWorld.get());
+    scene.update(0.016f, *gameWorld.get());
     EXPECT_TRUE(behaviour->updateCalled);
 }
 
@@ -72,9 +73,8 @@ TEST(SceneBehaviourTests, ActiveSceneInitialisesNewBehaviours)
     EXPECT_FALSE(behaviour->updateCalled);
 
     /// Start and update the scene
-    scene.onStart();
-    scene.update(0.016f, gameWorld.get());
-
+    scene.onStart(*gameWorld);
+	scene.update(0.016f, *gameWorld.get());
     /// Expect all false; Scene does not have the GO yet.
     EXPECT_FALSE(behaviour->awakeCalled);
     EXPECT_FALSE(behaviour->enableCalled);
@@ -82,8 +82,8 @@ TEST(SceneBehaviourTests, ActiveSceneInitialisesNewBehaviours)
     EXPECT_FALSE(behaviour->updateCalled);
 
     /// Now add the GO to the scene
-    scene.addGameObject(std::move(go));
-    scene.update(0.016f, gameWorld.get()); /// Call Update manually, normally handled by SceneManager,
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
+	scene.update(0.016f, *gameWorld.get()); /// Call Update manually, normally handled by SceneManager,
 
     /// Expect all true; GO has been added to a scene that has started, its behaviours should be initialised correctly now.
     EXPECT_TRUE(behaviour->awakeCalled);
@@ -101,10 +101,9 @@ TEST(SceneBehaviourTests, UpdateOnlyActiveGameObjectBehaviours)
     Scene scene{"TestScene"};
     auto go = std::make_unique<GameObject>();
     auto* behaviour = go->addComponent<engine_tests::TestBehaviourOne>();
-    scene.addGameObject(std::move(go));
-    scene.onStart();
-    scene.update(0.016f, gameWorld.get());
-
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
+    scene.onStart(*gameWorld);
+	scene.update(0.016f, *gameWorld.get());
     /// Scene has started and updated, behaviours should be updated as well.
     ASSERT_TRUE(behaviour->updateCalled);
 
@@ -113,7 +112,7 @@ TEST(SceneBehaviourTests, UpdateOnlyActiveGameObjectBehaviours)
     behaviour->updateCalled = false; /// Manually set to false so we can use it again.
 
     /// Update the scene again, which should NOT update behaviours on the now deactivated GO.
-    scene.update(0.016f, gameWorld.get());
+    scene.update(0.016f, *gameWorld.get());
 
     /// Should still be false, GO is not active.
     ASSERT_FALSE(behaviour->updateCalled);
@@ -128,10 +127,9 @@ TEST(SceneBehaviourTests, UpdateOnlyEnabledBehaviours)
 	std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
     auto go = std::make_unique<GameObject>();
     auto* behaviour = go->addComponent<engine_tests::TestBehaviourOne>();
-    scene.addGameObject(std::move(go));
-    scene.onStart();
-    scene.update(0.016f, gameWorld.get());
-
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
+    scene.onStart(*gameWorld);
+	scene.update(0.016f, *gameWorld.get());
     /// Update should be called on behaviours.
     ASSERT_TRUE(behaviour->updateCalled);
 
@@ -140,7 +138,7 @@ TEST(SceneBehaviourTests, UpdateOnlyEnabledBehaviours)
     behaviour->updateCalled = false;
 
     /// Update the scene again, should now skip the disabled behaviour's update
-    scene.update(0.016f, gameWorld.get());
+    scene.update(0.016f, *gameWorld.get());
 
     /// Behaviour should not be updated, it is disabled.
     ASSERT_FALSE(behaviour->updateCalled);
@@ -151,10 +149,11 @@ TEST(SceneBehaviourTests, UpdateOnlyEnabledBehaviours)
 TEST(SceneBehaviourTests, DestroyedGameObjectGoesToDestroyQueue)
 {
     /// Setup:
+    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
     Scene scene{"TestScene"};
     std::unique_ptr<GameObject> go = std::make_unique<GameObject>();
     GameObject* goRaw = go.get();
-    scene.addGameObject(std::move(go));
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
 
     /// Call destroy on the GameObject, which should add it to the destroyqueue of the scene.
     goRaw->destroy();
@@ -173,10 +172,9 @@ TEST(SceneBehaviourTests, SceneProcessesDestroyQueueEachFrame)
     std::unique_ptr<GameObject> go = std::make_unique<GameObject>();
     go->setName("ToDestroy");
     GameObject* goRaw = go.get();
-    scene.addGameObject(std::move(go));
-    scene.onStart();
-    scene.update(0.016f, gameWorld.get());
-
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
+    scene.onStart(*gameWorld);
+	scene.update(0.016f, *gameWorld.get());
     /// Should not be in the Q yet, no destroy() function called.
     EXPECT_FALSE(scene.isInDestroyQueue(goRaw));
 
@@ -185,7 +183,7 @@ TEST(SceneBehaviourTests, SceneProcessesDestroyQueueEachFrame)
     EXPECT_TRUE(scene.isInDestroyQueue(goRaw));
 
     /// scene.update processes the queue each frame, so call update here manually.
-    scene.update(0.016f, gameWorld.get());
+    scene.update(0.016f, *gameWorld.get());
 
     /// The GO should now be deleted, and be removed from the Q.
     EXPECT_FALSE(scene.isInDestroyQueue(goRaw));
@@ -203,15 +201,15 @@ TEST(SceneBehaviourTests, DestroyCallsOnDisableBeforeRemoval)
     GameObject* goRaw = go.get();
     auto* behaviour = go->addComponent<engine_tests::TestBehaviourOne>();
     go->setName("ToDestroy");
-    scene.addGameObject(std::move(go));
-    scene.onStart();
+    scene.addRunTimeGameObject(std::move(go), *gameWorld);
+    scene.onStart(*gameWorld);
 
     EXPECT_FALSE(behaviour->disableCalled);
     goRaw->destroy();
     EXPECT_TRUE(behaviour->disableCalled);
 
     /// Scene processes its destroyqueue in update, so all GameObjects and their components inside the Q get deleted.
-    scene.update(0.016f, gameWorld.get());
+    scene.update(0.016f, *gameWorld.get());
 
     /// GO should now not exist anymore in the scene
     EXPECT_EQ(scene.getGameObject("ToDestroy"), nullptr);

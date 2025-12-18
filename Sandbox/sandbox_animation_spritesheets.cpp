@@ -10,7 +10,7 @@
 #include "Behaviours/PlayerControllerBehaviour.h"
 #include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -43,11 +43,12 @@ class ExitBehaviour: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
+		inputManager = world.input;
+
 		(void)deltaTime;
 		(void)world;
 
@@ -75,6 +76,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.serverIP = "127.0.0.1";
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
+    spec.engineSystem = EngineSystem::Client;
 	spec.renderBackend = RenderBackend::SDL;
 	spec.windowOptions = {"Player Game", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time

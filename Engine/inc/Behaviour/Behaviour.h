@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Component/BaseComponentTypes/Component.h"
+#include "Component/BaseComponentTypes/Component.h"
+#include "Events/Subscriptions/SubscriptionScope.h"
 
 class GameWorld;
 
@@ -31,16 +33,17 @@ class Behaviour: virtual public Component
 	 * - Regardless of @c isEnabled status
 	 * - Outside of this constructor
 	 *
-	 * Use Awake instead of the constructor for initialisation, always called by
-	 * the engine once per scene instance. Awake is always called by the engine
-	 * before @c onEnable() and @c start() functions.
+	 * Use Awake instead of the constructor for initialisation, always called by the engine once per scene instance.
+	 * Awake is always called by the engine before @c onEnable() and @c start() functions.
 	 */
-	void awake();
+	void awake(GameWorld& world);
 
 	/**
 	 * Callback for when @c awake() is called by the engine on this behaviour.
 	 */
-	virtual void onAwake() {};
+	virtual void onAwake()
+	{
+	}
 
 	/**
 	 * @brief Called when this component is enabled:
@@ -52,11 +55,9 @@ class Behaviour: virtual public Component
 	}
 
 	/**
-	 * @brief start is called after @c awake, and before the first @c update
-	 * call.
+	 * @brief start is called after @c awake, and before the first @c update call.
 	 *
-	 * Start on any component is guaranteed to be called by the engine after all
-	 * awake functions on all behaviours in the scene have been called,
+	 * Start on any component is guaranteed to be called by the engine after all awake functions on all behaviours in the scene have been called,
 	 *
 	 * Start is only called on enabled behaviours.
 	 */
@@ -65,7 +66,9 @@ class Behaviour: virtual public Component
 	/**
 	 * Callback when @ref start() is called by the engine on this behaviour.
 	 */
-	virtual void onStart() {};
+	virtual void onStart()
+	{
+	};
 
 	/**
 	 * Update is called every frame when:
@@ -74,8 +77,9 @@ class Behaviour: virtual public Component
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	virtual void update(float deltaTime, GameWorld* world) {};
+	virtual void update(double deltaTime, const GameWorld& world) {};
 
+	virtual bool shouldRunWhenPaused() const{return false;};
 	/**
 	 * @brief fixedUpdate is called at regular and fixed intervals as part of
 	 * the engine's physics loop.
@@ -90,72 +94,91 @@ class Behaviour: virtual public Component
 	virtual void fixedUpdate() {};
 
 	/**
-	 * @brief Determines whether this behaviour should run when the simulation
-	 * is paused.
-	 *
-	 * @return true if this behaviour should run when paused, false otherwise
-	 * (default: false)
-	 *
-	 * @example
-	 * // In a debug control behaviour:
-	 * bool shouldRunWhenPaused() const override { return true; }
-	 */
-	virtual bool shouldRunWhenPaused() const;
-
-	/**
-	 * @brief Called when this component is disabled:
-	 * - Only on active GameObjects
-	 * - after @c isEnabled turns false.
-	 */
+	* @brief Called when this component is disabled:
+	* - Only on active GameObjects
+	* - after @c isEnabled turns false.
+	*/
 	virtual void onDisable()
 	{
 	}
 
-	/**
-	 * @brief Called when this Behaviour's @c GameObject gets destroyed.
-	 */
-	void onDestroy() override;
+
+        /**
+         * @brief Called when this Behaviour's @c GameObject gets destroyed.
+         */
+        void onDestroy() override;
+
 
 	/**
-	* @brief Sets the @c isEnabled field of this Behaviour
-	* Also calls the @c onEnable or @c onDisable function.
-	* @param value new value to set
-	*/
+	 * @brief Sets the @c isEnabled field of this Behaviour
+	 * @param value new value to set
+	 */
 	void setEnabled(bool value);
+
 
 	/**
 	 * @brief Retrieves the state of the @c isEnabled field
 	 * @return whether this Behaviour is enabled, value of @c isEnabled
 	 */
 	bool getIsEnabled() const;
+	bool getIsActive() const;
+
 
 	/**
-	 * @brief Checks whether this Behaviour is enabled, and its associated
-	 * GameObject is active.
+	 * @brief Checks whether this Behaviour is enabled, and its associated GameObject is active.
 	 * @return whether this behaviour is Enabled and on an active GameObject.
 	 */
 	bool getIsActiveAndEnabled() const;
 
 	/**
 	 * #brief Checks whether awake has been called yet
-	 * @return true if this behaviour's awake function has been called, false
-	 * otherwise
+	 * @return true if this behaviour's awake function has been called, false otherwise
 	 */
 	bool getHasAwakened() const;
 
+
 	/**
-		* @brief Retrieves if the gameobject is active
-		* @return whether the gameobject exists and is active.
-		*/
-	bool getIsActive() const;
-	/**
-	 * #brief Checks whether start has been called yet
-	 * @return true if this behaviour's start function has been called, false
-	 * otherwise
-	 */
+	* #brief Checks whether start has been called yet
+	* @return true if this behaviour's start function has been called, false otherwise
+	*/
 	bool getHasStarted() const;
 
-   private:
+	/**
+	* #brief check's if this behaviour has any subscriptions.
+	*
+	* @return true if it has a subscription else false.
+	*
+	*/
+	bool hasSubscriptions() const;
+protected:
+    void setGameWorld(GameWorld* world);
+    GameWorld* getWorld();
+	/**
+	 * @brief Subscribe to an event with automatic cleanup on destruction.
+	 *
+	 * Usage:
+	 * subscribe<UIButtonClickedEvent>(&ObjectSpawnerBehaviour::onButtonClicked);
+	 *
+	 */
+	template <class EventType, class T>
+	void subscribe(void (T::*method)(const EventType&) const);
+
+	/**
+	 * @brief Subscribe to an event with automatic cleanup on destruction.
+	 *
+	 * This is the non-const alternative of the same method
+	 * Usage:
+	 * subscribe<UIButtonClickedEvent>(&ObjectSpawnerBehaviour::onButtonClicked);
+	 *
+	 */
+	template <class EventType, class T>
+	void subscribe(void (T::*method)(const EventType&));
+
+private:
+	GameWorld* gameWorld = nullptr;
+
+	/// A RAII Wrapper for subscription handles. (This automatically manages subscription's)
+	SubscriptionScope subscriptions;
 	/// Enabled components are Updated, disabled Beahviours are not.
 	bool isEnabled;
 

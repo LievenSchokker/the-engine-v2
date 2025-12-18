@@ -1,5 +1,5 @@
 
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
@@ -23,13 +23,13 @@ int main(int argc, char** argv)
 
 	std::unique_ptr<Game> spel = std::make_unique<Game>();
 
-    SceneManager sceneManager = SceneManager();
     ApplicationSpecifications spec = {};
     spec.networkingOptions.mode = mode;
     spec.networkingOptions.port = 8080;
     spec.networkingOptions.serverIP = "127.0.0.1";
     spec.networkingOptions.tickRate = 60;
     spec.renderBackend = RenderBackend::SDL;
+	spec.engineSystem = EngineSystem::Client;
     spec.windowOptions = {
         mode == EngineMode::SERVER ? "GameEngine - Server" : "GameEngine - Client",
         700,

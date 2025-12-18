@@ -9,6 +9,7 @@ class Scene;
 class Transform;
 class Component;
 class Behaviour;
+class ComponentManager;
 class ScenePlaceholder;
 
 #include <memory>
@@ -82,6 +83,8 @@ public:
     template <typename T>
     T* getComponent() const;
 
+	template <typename T>
+	std::vector<T*> getComponents() const;
 
     /**
     * @brief Attempts to retrieve a component of type T from this GameObject's @c componentManager.
@@ -295,6 +298,7 @@ public:
 
     void destroyAllComponents();
     const std::vector<std::unique_ptr<Component>>& getComponents() const;
+
 private:
 	void fixupPointersAfterClone();
 	Component* getComponentByTypeName(const std::string& typeName) const;

@@ -16,8 +16,6 @@
 
 void NavigationTest::onAwake()
 {
-    input = InputManager::getInstance();
-
     if (gameObject->hasComponent<PathRenderer>())
     {
 
@@ -29,8 +27,9 @@ void NavigationTest::onAwake()
     }
 }
 
-void NavigationTest::update(float deltaTime, GameWorld *world)
+void NavigationTest::update(double deltaTime, const GameWorld& world)
 {
+	input = world.input;
     if (input == nullptr)
         return;
 

@@ -15,6 +15,9 @@
 #include <iostream>
 #include <utility>
 
+#include "Game.h"
+#include "Behaviour/Behaviour.h"
+
 #include "AI/Navigation/NavigationGridOptions.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
@@ -33,20 +36,31 @@ const std::string& Scene::getName() const
 
 bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
-	if ( gameObject == nullptr )
-	{
+    if ( gameObject == nullptr ) {
+        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
+        return false;
+    }
+
+	GameObject* addedObject = gameObject.get();
+	addGameObjectInternal(std::move(gameObject));
+	addedObject->setScene(*this);
+	
+    return true;
+}
+
+bool Scene::addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWorld& world)
+{
+	if (gameObject == nullptr) {
 		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
 		return false;
 	}
 
-    GameObject* addedObject = gameObject.get();
-    addGameObjectInternal(std::move(gameObject));
-    addedObject->setScene(*this);
+	GameObject* addedObject = gameObject.get();
+	addGameObjectInternal(std::move(gameObject));
+	addedObject->setScene(*this);
 
-	if ( active )
-	{
-	    /// Call awake, onEnable and start methods on each behaviour of the added GO:
-	    initialiseBehaviours(addedObject->getAllBehaviours());
+	if (active) {
+		initialiseBehaviours(addedObject->getAllBehaviours(), world);
 	}
 
 	return true;
@@ -56,19 +70,19 @@ bool Scene::removeGameObject(const std::string& name)
 {
 	const auto it =
 		std::ranges::remove_if(gameObjects,
-                               [&](const std::unique_ptr<GameObject>& gameObject)
-                               {
-                                   if ( gameObject->getName() == name )
-                                   {
-                                       if ( active && gameObject->getIsActive() )
-                                       {
-                                           gameObject->destroy();
-                                           gameObject->onSceneDestroy();
-                                       }
-                                       return true;
-                                   }
-                                   return false;
-                               }).begin();
+							   [&](const std::unique_ptr<GameObject>& gameObject)
+							   {
+								   if ( gameObject->getName() == name )
+								   {
+									   if ( active && gameObject->getIsActive() )
+									   {
+										   gameObject->destroy();
+										   gameObject->onSceneDestroy();
+									   }
+									   return true;
+								   }
+								   return false;
+							   }).begin();
 
 	if ( it != gameObjects.end() )
 	{
@@ -116,17 +130,13 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 	auto result = std::move(*it);
 	gameObjectIds.erase(gameObject);
 	gameObjects.erase(it);
-    removeGameObjectInternal(gameObject);
 
 	return result;
 }
 
-void Scene::onStart()
+void Scene::onStart(GameWorld& world)
 {
-	if ( active )
-	{
-		return;
-	}
+	if (active) return;
 
     /// Note: Somehwere the settings should be configured?
     initialiseNavigationSystem({100, 100, Vector2{15, 15}});
@@ -158,7 +168,7 @@ void Scene::onStart()
 
 	/// Initialise all the behaviours by calling their lifetime functions in the
 	/// correct order.
-	initialiseBehaviours(allBehaviours);
+	initialiseBehaviours(allBehaviours, world);
 }
 
 void Scene::onStop()
@@ -169,7 +179,6 @@ void Scene::onStop()
 	}
 
 	active = false;
-	beforeEnableBehaviours.clear();
 	for ( auto& gameObject : gameObjects )
 	{
 		const auto& enabledBehaviours = gameObject->getEnabledBehaviours();
@@ -207,50 +216,69 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(double deltaTime, GameWorld* world)
+void Scene::update(double deltaTime, const GameWorld& world)
 {
 	if ( !active )
 	{
 		return;
 	}
 
-	int behaviorCount = 0;
-	bool clockPaused = (world != nullptr && world->clock != nullptr &&
-						world->clock->isPaused());
-	for ( auto& gameObject : gameObjects )
-	{
-		if (!gameObject->getIsActive())
-			continue;
+	bool clockPaused = (world.clock != nullptr &&
+						world.clock->isPaused());
 
-		for ( const auto& behaviour : gameObject->getEnabledBehaviours() )
-		{
-			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
-				continue;
-			// Skip simulation behaviors when paused, but allow behaviors that
-			// override shouldRunWhenPaused() to return true (e.g., debug
-			// controls)
-			if ( clockPaused && !behaviour->shouldRunWhenPaused() )
-			{
-				continue;  // Skip simulation behaviors when paused
-			}
-			behaviorCount++;
-			behaviour->update(deltaTime, world);
-		}
-	}
+    std::vector<GameObject*> objectsToUpdate;
+    objectsToUpdate.reserve(gameObjects.size());
+
+    for (auto& gameObject : gameObjects)
+    {
+        if (gameObject && gameObject->getIsActive())
+        {
+            objectsToUpdate.push_back(gameObject.get());
+        }
+    }
+
+    for (GameObject* gameObject : objectsToUpdate)
+    {
+        if (!gameObject || isInDestroyQueue(gameObject))
+        {
+            continue;
+        }
+
+        if (!gameObjectIds.contains(gameObject))
+        {
+            continue;
+        }
+
+        for (Behaviour* behaviour : gameObject->getEnabledBehaviours())
+        {
+            if (!behaviour || !behaviour->getHasAwakened() || !behaviour->getHasStarted())
+            {
+                continue;
+            }
+
+            if (clockPaused && !behaviour->shouldRunWhenPaused())
+            {
+                continue;
+            }
+
+            behaviour->update(deltaTime, world);
+        }
+    }
 
 	processDestroyQueue();
 }
 
-void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
+void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, GameWorld& world)
 {
     for ( auto& behaviour : behaviours )
     {
         if ( behaviour == nullptr )
             continue;
         if (!behaviour->getHasAwakened())
-            behaviour->awake();
+            behaviour->awake(world);
     }
 
+    /// Then call onEnable on all enabled behaviours on active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
@@ -308,6 +336,7 @@ bool Scene::isInDestroyQueue(GameObject* obj)
     return std::find(destroyQueue.begin(), destroyQueue.end(), obj)
             != destroyQueue.end();
 }
+
 
 void Scene::destroyAllGameObjects()
 {

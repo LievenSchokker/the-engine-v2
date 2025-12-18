@@ -52,7 +52,7 @@ void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
     });
 }
 
-void PlayerMovement::update(float deltaTime, GameWorld* world)
+void PlayerMovement::update(double deltaTime,const GameWorld& world)
 {
     if (!hasAuthority())
     {

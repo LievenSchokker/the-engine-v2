@@ -23,7 +23,7 @@ class SimpleMoveBehaviour: public Behaviour
 	void onAwake() override;
 	void onEnable() override;
 	void onStart() override;
-	void update(float deltaTime, GameWorld* world) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 	void onDisable() override;
 	void setMaxSpeed(float speed) { maxSpeed = speed; }
 

@@ -35,14 +35,14 @@ Profiler::Profiler(float x, float y, float width, float height)
 	panelId = 9999;
 }
 
-void Profiler::update(float deltaTime, GameWorld* world)
+void Profiler::update(double deltaTime, const GameWorld& gameWorld)
 {
 	calculateFPS(deltaTime);
 
 	timeSinceLastUpdate += deltaTime;
 	if ( timeSinceLastUpdate >= updateInterval )
 	{
-		updateStats(world);
+		updateStats(gameWorld);
 		timeSinceLastUpdate = 0.0f;
 	}
 }
@@ -67,9 +67,9 @@ void Profiler::calculateFPS(float deltaTime)
 	}
 }
 
-void Profiler::updateStats(GameWorld* world)
+void Profiler::updateStats(const GameWorld& world)
 {
-	if ( world != nullptr && world->sceneManager != nullptr )
+	if (world.sceneManager != nullptr )
 	{
 		entityCount = 0;
 		activeSceneCount = 1;
