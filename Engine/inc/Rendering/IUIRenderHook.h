@@ -3,6 +3,7 @@
 
 #include "UIRenderCommand.h"
 #include "Events/EventDispatcher/EventDispatcher.h"
+#include "Input/InputManager.h"
 
 struct UserInterfaceSettings;
 
@@ -34,7 +35,7 @@ public:
 	 */
 	virtual void beginFrame() = 0;
 
-	virtual void process(const std::vector<UIRenderCommand>& commands) = 0;
+	virtual void process(const std::vector<UIRenderCommand>& commands, InputManager& inputmanager) = 0;
 	/**
 	 * @brief Submits UI draw commands to the renderer.
 	 *

@@ -8,6 +8,7 @@
 #include "Core/Options/ApplicationSpecifications.h"
 #include "Core/EngineLoop.h"
 #include "Game.h"
+#include "Events/SDL/SDLEventProccesor.h"
 #include "External/SDLBackendContext.h"
 #include "Input/InputManager.h"
 #include "Networking/Client.h"
@@ -47,7 +48,6 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 	if (hasFlag(specs.engineSystem, EngineSystem::Input))
 	{
 		auto input = std::make_unique<InputManager>();
-		gameWorld->input = input.get();
 		loop->addSystem(std::move(input));
 	}
 
@@ -66,13 +66,21 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 		}
 	}
 
+	if (hasFlag(specs.engineSystem, EngineSystem::Events))
+	{
+		if (contextPtr != nullptr)
+		{
+			auto events = std::make_unique<SDLEventProcessor>();
+			loop->addSystem(std::move(events));
+		}
+	}
+
 	if (hasFlag(specs.engineSystem, EngineSystem::Audio))
 	{
 		if (contextPtr != nullptr)
 		{
 			auto audioSystem = std::make_unique<AudioSystem>(
 				std::make_unique<AudioBackendSDL>());
-			gameWorld->audio = audioSystem->getAudioManager();
 			loop->addSystem(std::move(audioSystem));
 		}
 	}
@@ -80,7 +88,6 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 	if (hasFlag(specs.engineSystem, EngineSystem::Physics))
 	{
 		auto physicsSystem = std::make_unique<PhysicsSystem>();
-		gameWorld->physics = physicsSystem->getPhysicsWorld();
 		loop->addSystem(std::move(physicsSystem));
 	}
 
@@ -95,14 +102,12 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 	const std::string sceneName = scenePtr->getName();
 	sceneManager->addScene(std::move(scenePtr));
 	sceneManager->setActiveScene(sceneName);
-	gameWorld->sceneManager = sceneManager.get();
 	loop->addSystem(std::move(sceneManager));
 
 	if (hasFlag(specs.engineSystem, EngineSystem::NetClient))
 	{
 		auto client = std::make_unique<
 			Client>(std::make_unique<TransportGNS>());
-		gameWorld->client = client.get();
 		loop->addSystem(std::move(client));
 	}
 
@@ -114,7 +119,6 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 			                                       serverIP},
 		                                       std::make_unique<
 			                                       TransportGNS>());
-		gameWorld->server = server.get();
 		loop->addSystem(std::move(server));
 	}
 

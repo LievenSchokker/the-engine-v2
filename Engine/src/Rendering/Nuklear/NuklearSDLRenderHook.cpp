@@ -16,7 +16,7 @@
 
 NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
                                            SDL_Renderer* renderer)
-	: inputManager()
+	: inputManager(nullptr)
 	  , sdlWindow(window)
 	  , sdlRenderer(renderer)
 	  , nuklearContext(nullptr),
@@ -209,8 +209,9 @@ void NuklearSDLRenderHook::presentFrame()
 	nk_clear(nuklearContext);
 }
 
-void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands)
+void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands, InputManager& inputManager)
 {
+	this->inputManager = &inputManager;
 	for (auto command : commands)
 	{
 		commandQueue.push_back(std::move(command));

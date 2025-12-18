@@ -4,6 +4,7 @@
 #include "SimpleMoveBehaviour.h"
 
 #include "Component/Transform.h"
+#include "Core/GameWorld.h"
 
 void SimpleMoveBehaviour::onAwake()
 {
@@ -22,6 +23,7 @@ void SimpleMoveBehaviour::onStart()
 
 void SimpleMoveBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
+	inputManager = gameWorld.input;
 	pollInput();
 
 	if ( canMove ) move();

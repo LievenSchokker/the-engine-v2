@@ -118,7 +118,7 @@ class SDLRenderer: public IRenderer
 
 	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
-	void submitUI(const std::vector<UIRenderCommand>& commands) override;
+	void submitUI(const std::vector<UIRenderCommand>& commands, InputManager& input) override;
 
    private:
 	/**

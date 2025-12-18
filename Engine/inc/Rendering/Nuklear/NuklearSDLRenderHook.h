@@ -86,7 +86,7 @@ public:
 	* reserved size of 250 elements.
 	*
 	*/
-	void process(const std::vector<UIRenderCommand>& commands) override;
+	void process(const std::vector<UIRenderCommand>& commands, InputManager& inputManager) override;
 
 private:
 	void flushCommands();

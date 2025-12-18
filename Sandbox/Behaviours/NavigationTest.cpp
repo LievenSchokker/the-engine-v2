@@ -29,6 +29,7 @@ void NavigationTest::onAwake()
 
 void NavigationTest::update(double deltaTime, const GameWorld& world)
 {
+	input = world.input;
     if (input == nullptr)
         return;
 

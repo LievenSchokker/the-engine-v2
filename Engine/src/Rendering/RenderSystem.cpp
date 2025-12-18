@@ -40,7 +40,7 @@ void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 
 	processWorldCommands();
 
-	renderer->submitUI(queue.ui().getCommands());
+	renderer->submitUI(queue.ui().getCommands(), *gameWorld.input);
 	renderer->endFrame();
 }
 
