@@ -184,8 +184,10 @@ public:
 	 * The shutdown will occur at the end of the current frame.
 	 */
 	void requestShutdown();
+	void setPendingSceneName(const std::string& name) { pendingSceneName = name; }
 
 private:
+	std::string pendingSceneName;
 	std::unique_ptr<IBackendContext> backendContext;
 	std::unique_ptr<Game> game;
 	std::unique_ptr<GameWorld> gameWorld;

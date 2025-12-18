@@ -11,7 +11,8 @@
 #include <ostream>
 
 EngineLoop::EngineLoop(std::unique_ptr<Game> game)
-	: game(std::move(game))
+	: pendingSceneName()
+	  , game(std::move(game))
 	  , gameWorld(std::make_unique<GameWorld>())
 	  , spawnManager(std::make_unique<NetworkSpawnManager>(gameWorld.get()))
 	  , sceneManagerPtr(nullptr)
@@ -19,8 +20,7 @@ EngineLoop::EngineLoop(std::unique_ptr<Game> game)
 	  {
 		  return 0.0;
 	  })
-{
-}
+{}
 
 EngineLoop::~EngineLoop() = default;
 
@@ -37,21 +37,25 @@ void EngineLoop::addSystem(std::unique_ptr<IEngineSystems> system)
 void EngineLoop::start()
 {
 	gameWorld->spawnManager = spawnManager.get();
-	//This is where each system will give its reference to the gameWorld.
+
 	for (const auto& system : systems)
 	{
 		system->start(*gameWorld);
 	}
 
-	//I left the InputManager out of this for now since it's still a singleton
-	//TODO Remove singleton and use reference via GameWorld for polling.
 	sceneManagerPtr = gameWorld->sceneManager;
 
 	if (gameWorld->getDispatcher() != nullptr)
 	{
 		initializeCloseEvent(*gameWorld->getDispatcher());
 	}
+
 	initNetwork();
+
+	if (!pendingSceneName.empty() && sceneManagerPtr)
+	{
+		sceneManagerPtr->setActiveScene(pendingSceneName);
+	}
 }
 
 void EngineLoop::initNetwork() const
