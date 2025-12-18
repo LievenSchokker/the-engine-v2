@@ -25,9 +25,10 @@ enum class EngineSystem : uint32_t
     Input    = 1 << 3,
     NetClient = 1 << 4,
     NetServer = 1 << 5,
+	Events = 1 << 6,
 
-    Client = Renderer | Physics | Audio | Input | NetClient,
-    Server = Physics | NetServer,
+    Client = Renderer | Physics | Audio | Input | NetClient | Events,
+    Server = Physics | NetServer | Events,
 };
 
 

@@ -4,15 +4,28 @@
 
 #include "Behaviour/Behaviour.h"
 
+#include "Core/GameWorld.h"
+
+
 Behaviour::~Behaviour() = default;
 
-void Behaviour::awake()
+void Behaviour::awake(GameWorld& world)
 {
-	if ( hasAwakened ) return;
+    if (hasAwakened)
+        return;
 
-	hasAwakened = true;
-	onAwake();
+    hasAwakened = true;
+
+    setGameWorld(&world);
+
+    if (gameWorld->getDispatcher() != nullptr)
+    {
+        subscriptions.setDispatcher(*gameWorld->getDispatcher());
+    }
+
+    onAwake();
 }
+
 
 void Behaviour::start()
 {
@@ -22,9 +35,11 @@ void Behaviour::start()
 	onStart();
 }
 
+
 void Behaviour::setEnabled(const bool value)
 {
-	if ( isEnabled == value ) return;
+    if (isEnabled == value)
+        return;
 
 	/// This might prevent crashes when attempting to enable a behaviour right
 	/// after it has been deleted
@@ -39,10 +54,6 @@ void Behaviour::setEnabled(const bool value)
 		onDisable();
 }
 
-bool Behaviour::shouldRunWhenPaused() const
-{
-	return false;
-}
 
 void Behaviour::onDestroy()
 {
@@ -79,4 +90,20 @@ bool Behaviour::getHasAwakened() const
 bool Behaviour::getHasStarted() const
 {
 	return hasStarted;
+}
+
+
+bool Behaviour::hasSubscriptions() const
+{
+	return !subscriptions.empty();
+}
+
+void Behaviour::setGameWorld(GameWorld* world)
+{
+	gameWorld = world;
+}
+
+GameWorld* Behaviour::getWorld()
+{
+	return gameWorld;
 }

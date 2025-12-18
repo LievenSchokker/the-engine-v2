@@ -15,6 +15,16 @@ RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 {
 }
 
+
+
+void RenderSystem::setupEvents(EventDispatcher& dispatcher) const
+{
+	if (renderer != nullptr)
+	{
+		renderer->setupEvents(dispatcher);
+	}
+}
+
 void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
 	if (!renderer || !renderer->isOpen())
@@ -30,7 +40,7 @@ void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 
 	processWorldCommands();
 
-	renderer->submitUI(queue.ui().getCommands());
+	renderer->submitUI(queue.ui().getCommands(), *gameWorld.input);
 	renderer->endFrame();
 }
 

@@ -30,7 +30,6 @@ DebugTimeControlBehaviour::DebugTimeControlBehaviour(
 
 void DebugTimeControlBehaviour::onAwake()
 {
-	inputManager = InputManager::getInstance();
 }
 
 bool DebugTimeControlBehaviour::shouldRunWhenPaused() const
@@ -43,10 +42,12 @@ void DebugTimeControlBehaviour::update(double deltaTime,
 {
 	(void)deltaTime;
 
+	inputManager = gameWorld.input;
 	if (inputManager == nullptr)
 	{
 		return;
 	}
+
 	// Move to persistent scene on first update (if not already there)
 	// This ensures debug controls persist across scene transitions
 	if (!movedToPersistentScene &&

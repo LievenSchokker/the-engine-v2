@@ -33,6 +33,7 @@ public:
 	 */
 	void shutdown(GameWorld& gameWorld) override;
 	const std::string getName() const override;
+	IPhysicsWorld* getPhysicsWorld() const;
 
 private:
 	std::unique_ptr<IPhysicsWorld> physicsWorld;

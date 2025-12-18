@@ -7,6 +7,7 @@
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 #include "TestAgentModule.h"
+#include "Core/GameWorld.h"
 
 #include <gtest/gtest.h>
 
@@ -39,7 +40,8 @@ class AgentTest : public ::testing::Test
 /// Meaning addComponent<agent> has been used on a GO, and Agent::onAwake has been called
 TEST_F(AgentTest, AgentIsEnabledAfterAwake)
 {
-    agent->awake();
+	auto world = std::make_unique<GameWorld>();
+    agent->awake(*world);
     ASSERT_TRUE(agent->getIsEnabled());
 }
 
@@ -48,11 +50,11 @@ TEST_F(AgentTest, AgentIsEnabledAfterAwake)
 TEST(AgentTests, AgentIsDisabledAfterAwakeIfTransformIsMissing)
 {
     Agent* agent = new Agent();
-
+	auto world = std::make_unique<GameWorld>();
     EXPECT_EQ(agent->getGameObject(), nullptr);
     EXPECT_EQ(agent->getTransform(), nullptr);
 
-    agent->awake();
+    agent->awake(*world);
 
     ASSERT_FALSE(agent->getIsEnabled());
 }

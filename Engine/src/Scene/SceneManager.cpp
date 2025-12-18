@@ -9,10 +9,11 @@
 #include <iostream>
 #include <utility>
 
-SceneManager::SceneManager()
-    : scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>())
-{
-}
+SceneManager::SceneManager(GameWorld& gameWorld)
+    : gameWorld(&gameWorld), scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>())
+{}
+
+
 
 SystemStatus SceneManager::start(GameWorld& gameWorld)
 {
@@ -210,23 +211,24 @@ bool SceneManager::removeScene(const std::string& name)
         return false;
     }
 
-    if (it->second.get() == activeScene)
-    {
-        activeScene->onStop();
-        activeScene = nullptr;
-        paused = false;
-    }
-    else
-    {
-        it->second->onStop();
-    }
+	if ( it->second.get() == activeScene )
+	{
+		activeScene->onStop();
+		activeScene = nullptr;
+		paused = false;
+	}
+	else
+	{
+		it->second->onStop();
+	}
 
-    scenes.erase(it);
-    return true;
+	scenes.erase(it);
+	return true;
 }
 
 Scene* SceneManager::getScene(const std::string& name) const
 {
+
     if (persistentScene != nullptr && persistentScene->getName() == name)
     {
         return persistentScene.get();
@@ -245,8 +247,8 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
                                       const std::string& toSceneName,
                                       const std::string& objectName) const
 {
-    Scene* fromScene = getScene(fromSceneName);
-    Scene* toScene = getScene(toSceneName);
+	Scene* fromScene = getScene(fromSceneName);
+	Scene* toScene = getScene(toSceneName);
 
     if (fromScene == nullptr || toScene == nullptr)
     {
@@ -274,9 +276,9 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
         return false;
     }
 
-    gameObject->setBehavioursEnabled(true);
-    toScene->addGameObject(std::move(gameObject));
-    return true;
+	gameObject->setBehavioursEnabled(true);
+	toScene->addGameObject(std::move(gameObject));
+	return true;
 }
 
 Scene* SceneManager::getActiveScene() const
@@ -313,17 +315,16 @@ bool SceneManager::setActiveScene(const std::string& name)
         return false;
     }
 
-    activeScene = nextScene;
-    paused = false;
-
     if (networkConfigured && !processedScenes.contains(name))
     {
         processSceneForNetwork(*activeScene);
         processedScenes.insert(name);
     }
 
-    activeScene->onStart();
-    return true;
+	activeScene = nextScene;
+	paused = false;
+	activeScene->onStart(*gameWorld);
+	return true;
 }
 
 bool SceneManager::loadScene(const std::string& name)
@@ -360,10 +361,11 @@ bool SceneManager::isPaused() const
 
 Scene* SceneManager::getOrCreatePersistentScene()
 {
+	std::cout << "[SceneManager] Error: Scene not found\n";
     if (persistentScene == nullptr)
     {
         persistentScene = std::make_unique<Scene>("__PersistentScene__");
-        persistentScene->onStart();
+        persistentScene->onStart(*gameWorld);
     }
     return persistentScene.get();
 }

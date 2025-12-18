@@ -4,7 +4,7 @@
 #include "Core/IEngineSystems.h"
 #include "Game.h"
 #include "Input/InputManager.h"
-
+#include "Events/EventImplementations/ApplicationEvents.h"
 #include <ostream>
 
 EngineLoop::EngineLoop(std::unique_ptr<Game> game)
@@ -38,8 +38,21 @@ void EngineLoop::start()
 
     //I left the InputManager out of this for now since it's still a singleton
     //TODO Remove singleton and use reference via GameWorld for polling.
-    getGameWorld()->input = InputManager::getInstance();
     sceneManagerPtr = gameWorld->sceneManager;
+
+
+	if (gameWorld->getDispatcher() != nullptr)
+	{
+		initializeCloseEvent(*gameWorld->getDispatcher());
+	}
+}
+
+void EngineLoop::initializeCloseEvent(EventDispatcher& dispatcher)
+{
+	dispatcher.subscribe<WindowCloseEvent>([this](const WindowCloseEvent& e)
+	{
+		requestShutdown();
+	});
 }
 
 void EngineLoop::update(const double deltaTime)
@@ -48,8 +61,6 @@ void EngineLoop::update(const double deltaTime)
     {
         system->update(deltaTime, *gameWorld);
     }
-
-    getGameWorld()->input->update();
 }
 
 void EngineLoop::fixedUpdate(const double deltaTime)
@@ -82,6 +93,11 @@ EngineLoop::ClockFunction EngineLoop::getClock()
 GameWorld* EngineLoop::getGameWorld()
 {
     return gameWorld.get();
+}
+
+void EngineLoop::setGameWorld(std::unique_ptr<GameWorld> gameWorld)
+{
+	gameWorld = std::move(gameWorld);
 }
 
 SceneManager* EngineLoop::getSceneManager()

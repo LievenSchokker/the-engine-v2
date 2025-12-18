@@ -22,7 +22,6 @@ int main(int argc, char** argv)
 
 	std::unique_ptr<Game> spel = std::make_unique<Game>();
 
-    SceneManager sceneManager = SceneManager();
     ApplicationSpecifications spec = {};
     spec.networkingOptions.mode = mode;
     spec.networkingOptions.port = 8080;

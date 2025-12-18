@@ -2,6 +2,8 @@
 
 
 #include "UIRenderCommand.h"
+#include "Events/EventDispatcher/EventDispatcher.h"
+#include "Input/InputManager.h"
 
 struct UserInterfaceSettings;
 
@@ -26,14 +28,6 @@ public:
 	virtual void initialize() = 0;
 
 	/**
-	 * @brief Feeds input state to the UI library.
-	 *
-	 * Called before beginFrame to ensure UI has current input state.
-	 *
-	 */
-	virtual void updateInput() = 0;
-
-	/**
 	 * @brief Starts a new UI frame.
 	 *
 	 * Called at the start of each frame before any UI drawing.
@@ -41,7 +35,7 @@ public:
 	 */
 	virtual void beginFrame() = 0;
 
-	virtual void process(const std::vector<UIRenderCommand>& commands) = 0;
+	virtual void process(const std::vector<UIRenderCommand>& commands, InputManager& inputmanager) = 0;
 	/**
 	 * @brief Submits UI draw commands to the renderer.
 	 *
@@ -60,4 +54,6 @@ public:
 	 *
 	 */
 	virtual void close() = 0;
+
+	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 };

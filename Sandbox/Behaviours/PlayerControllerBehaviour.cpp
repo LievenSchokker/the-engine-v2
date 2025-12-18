@@ -2,6 +2,7 @@
 
 #include "Animation/Animator.h"
 #include "Component/Transform.h"
+#include "Core/GameWorld.h"
 
 #include <cmath>
 
@@ -17,7 +18,6 @@ PlayerControllerBehaviour::PlayerControllerBehaviour()
 
 void PlayerControllerBehaviour::onAwake()
 {
-	inputManager = InputManager::getInstance();
 	animator = gameObject->getComponent<Animator>();
 }
 
@@ -32,6 +32,7 @@ void PlayerControllerBehaviour::onStart()
 
 void PlayerControllerBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
+	inputManager = gameWorld.input;
 	if ( inputManager == nullptr || transform == nullptr )
 	{
 		return;
