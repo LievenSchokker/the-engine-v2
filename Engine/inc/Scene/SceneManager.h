@@ -197,13 +197,11 @@ private:
 
     /**
      * @brief Server: Extract NetworkBehaviour objects as prefabs.
-     * @param scene The scene to process.
      */
     void processForServer(Scene& scene);
 
     /**
      * @brief Client: Remove NetworkBehaviour objects.
-     * @param scene The scene to process.
      */
     void processForClient(Scene& scene);
 

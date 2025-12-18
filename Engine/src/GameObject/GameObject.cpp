@@ -228,6 +228,7 @@ Scene* GameObject::getScene() const
 }
 
 
+
 void GameObject::setBehavioursEnabled(const bool value) const
 {
     if (value)

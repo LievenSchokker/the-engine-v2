@@ -3,9 +3,10 @@
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Component/UIElement/UIElement.h"
 #include "Rendering/IRenderer.h"
+#include "Rendering/SDL/SDLRenderer.h"
+#include "Rendering/ViewAdapters/WorldToCameraSpaceAdapter.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
-#include "Core/IEngineSystems.h"
 
 #include <iostream>
 
@@ -16,19 +17,44 @@ RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 
 void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
-	if (!renderer || !renderer->isOpen())
+	if ( !renderer || !renderer->isOpen() )
 	{
 		return;
 	}
 
+	updateCameras(*gameWorld.sceneManager->getActiveScene());
 	queue.clearAll();
 	collectCommands(*gameWorld.sceneManager->getActiveScene());
 	queue.sortAll();
 	renderer->beginFrame(clearColor);
 
+	processWorldCommands();
+
+	// renderer->submitUI(queue.ui().getCommands());
+
+	renderer->endFrame();
+}
+
+void RenderSystem::processWorldCommands()
+{
 	for (auto& command : queue.world().getCommands())
 	{
-		renderer->execute(command);
+		if (cameras.empty())
+		{
+			renderer->execute(command);
+		}
+		else
+		{
+			for (const auto camera : cameras)
+			{
+				//Transform returns optional because camera culling happens here
+				if (auto transformed = WorldToCameraSpaceAdapter::Transform(
+					*camera, command); transformed.has_value())
+				{
+					renderer->execute(transformed.value());
+				}
+			}
+		}
 	}
 
 	// renderer->submitUI(queue.ui().getCommands());s
@@ -71,5 +97,10 @@ const std::string RenderSystem::getName() const
 }
 const Color& RenderSystem::getClearColor() const
 {
-	return clearColor;
+    return clearColor;
+}
+
+void RenderSystem::updateCameras(const Scene& scene)
+{
+	cameras = scene.getAllComponentsOfType<Camera>();
 }

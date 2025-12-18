@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Component/Camera.h"
 #include "Core/IEngineSystems.h"
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
@@ -38,14 +39,16 @@ public:
 	 *
 	 */
 	void update(double deltaTime, const GameWorld& gameWorld) override;
-
+	void processWorldCommands();
 	void setClearColor(const Color& color);
+	void updateCameras(const Scene& scene);
 
 	const Color& getClearColor() const;
 
    private:
 	const std::string getName() const override;
 	std::unique_ptr<IRenderer> renderer;
+	std::vector<Camera*> cameras;
 	RenderQueue queue;
 	Color clearColor = Color::black();
 	void collectCommands(Scene& scene);
