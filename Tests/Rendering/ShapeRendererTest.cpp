@@ -30,7 +30,7 @@ struct FakeRenderer : public IRenderer
         ++endCalls;
     }
 
-    void submitUI(const std::vector<UIRenderCommand>& commands) override
+    void submitUI(const std::vector<UIRenderCommand>& command, InputManager& inputs) override
     {
     }
 
@@ -156,7 +156,8 @@ TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
     shape2->setLayer(1);  // Layer 1
     scene->addRunTimeGameObject(std::move(circle2), *gameworld);
 
-    auto sceneManager = std::make_unique<SceneManager>();
+	auto world = std::make_unique<GameWorld>();
+    auto sceneManager = std::make_unique<SceneManager>(*world);
     gameworld->sceneManager = sceneManager.get();
     sceneManager->addScene(std::move(scene));
     sceneManager->setActiveScene("TestScene");
@@ -191,7 +192,8 @@ TEST(RenderSystemTest, SkipsInactiveGameObjects)
     inactiveObj->setActive(false);
     scene->addRunTimeGameObject(std::move(inactiveObj), *gameworld);
 
-    auto sceneManager = std::make_unique<SceneManager>();
+	auto world = std::make_unique<GameWorld>();
+    auto sceneManager = std::make_unique<SceneManager>(*world);
     gameworld->sceneManager = sceneManager.get();
     sceneManager->addScene(std::move(scene));
     sceneManager->setActiveScene("TestScene");
