@@ -265,7 +265,7 @@ void GameObject::serialize(WriteArchive& archive) const
     for (const auto& comp : getComponents())
     {
         if (dynamic_cast<Transform*>(comp.get())) continue;
-        const char* typeName = comp->getComponentTypeName();
+        const char* typeName = comp->getName();
         if (typeName && ComponentFactory::instance().isRegistered(typeName))
         {
             count++;
@@ -277,7 +277,7 @@ void GameObject::serialize(WriteArchive& archive) const
     for (const auto& comp : getComponents())
     {
         if (dynamic_cast<Transform*>(comp.get())) continue;
-        const char* typeName = comp->getComponentTypeName();
+        const char* typeName = comp->getName();
         if (!typeName || !ComponentFactory::instance().isRegistered(typeName))
         {
             continue;
@@ -415,7 +415,7 @@ Component* GameObject::getComponentByTypeName(const std::string& typeName) const
 {
     for (const auto& comp : getComponents())
     {
-        const char* compTypeName = comp->getComponentTypeName();
+        const char* compTypeName = comp->getName();
         if (compTypeName && typeName == compTypeName)
         {
             return comp.get();

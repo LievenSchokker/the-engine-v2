@@ -20,15 +20,19 @@ class Component : public ISerializable
 {
 public:
 	Component() : gameObject(nullptr), transform(nullptr){};
-    ~Component();
-
-    virtual const char* getComponentTypeName() const { return "Component"; };
+    ~Component() override;
 	/**
 	* @brief Sets the GameObject that this component lives on.
 	* Also sets the @c transform field to the GameObject's Transform.
 	* @param object Pointer to the GameObject to associate with this component.
 	*/
 	void setGameObject(GameObject* object);
+
+	static constexpr const char* name() {
+		return "component";
+	}
+
+	virtual const char* getName() const { return name(); }
 
 	/**
 	* @brief Adds a new component of type T to the owning GameObject.

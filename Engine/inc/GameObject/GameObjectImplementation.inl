@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameObject.h"
+
 template <typename T, typename... Args>
 T* GameObject::addComponent(Args&&... args)
 {

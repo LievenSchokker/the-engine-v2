@@ -4,15 +4,20 @@
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "BaseComponentTypes/RenderComponent.h"
-#include "BaseComponentTypes/RenderComponentBase.h"
+#include "Networking/Serialization/RegistrationBase.h"
 
 /**
  * @brief Simple component that renders primitive shapes for a GameObject.
  */
-class ShapeRenderer: public RenderComponentBase<ShapeRenderer>
+class ShapeRenderer: public RenderComponent, RegistrationBase<ShapeRenderer>
 {
 public:
-    static constexpr const char* name() { return "ShapeRenderer"; }
+	static constexpr const char* name()
+	{
+		return "ShapeRenderer";
+	}
+	const char* getName() const override { return name(); }
+
 	ShapeRenderer() = default;
 
 	ShapeRenderer& setColor(const Color& newColor);
@@ -36,6 +41,7 @@ public:
 	void fillRenderQueue(IRenderQueueWriter& queue) const override;
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
+
 private:
 	Color color = Color::white();
 	float radius = 25.0;

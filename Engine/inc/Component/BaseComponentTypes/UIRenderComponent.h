@@ -9,6 +9,5 @@ class UserInterfaceRenderComponent: virtual public Component
 {
 public:
 	~UserInterfaceRenderComponent() override = default;
-	virtual void fillUserInterfaceRenderQueue(
-		IUserInterfaceRenderQueueWriter& queue) const = 0;
+	virtual void fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const = 0;
 };

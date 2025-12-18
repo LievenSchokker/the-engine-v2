@@ -20,18 +20,6 @@
 int main(int argc, char** argv)
 {
     EngineMode mode = EngineMode::CLIENT;
-    for (int i = 1; i < argc; ++i)
-    {
-        if (std::strcmp(argv[i], "server") == 0)
-        {
-            mode = EngineMode::SERVER;
-        }
-        else if (std::strcmp(argv[i], "client") == 0)
-        {
-            mode = EngineMode::CLIENT;
-        }
-    }
-
 	std::unique_ptr<Game> spel = std::make_unique<Game>();
 	// std::unique_ptr<Scene> scene = std::make_unique<Scene>("Scene");
 
@@ -43,7 +31,7 @@ int main(int argc, char** argv)
     spec.networkingOptions.tickRate = 60;
     spec.renderBackend = RenderBackend::SDL;
     spec.windowOptions = {
-        mode == EngineMode::SERVER ? "GameEngine - Server" : "GameEngine - Client",
+        "Server",
         700,
         700
     };

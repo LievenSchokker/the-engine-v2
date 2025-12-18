@@ -189,22 +189,15 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 
 void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 {
-    std::cout << "[handleSpawnMessage] Received spawn for netId=" << message.netId << std::endl;
-
     if (!message.gameObject)
     {
-        std::cerr << "[handleSpawnMessage] ERROR: No gameObject in message!" << std::endl;
         return;
     }
 
     if (!getScene())
     {
-        std::cerr << "[handleSpawnMessage] ERROR: No active scene!" << std::endl;
         return;
     }
-
-    std::cout << "[handleSpawnMessage] GameObject: " << message.gameObject->getName() << std::endl;
-    std::cout << "[handleSpawnMessage] Behaviours before scene: " << message.gameObject->getAllBehaviours().size() << std::endl;
 
 	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
 	if (!identity)

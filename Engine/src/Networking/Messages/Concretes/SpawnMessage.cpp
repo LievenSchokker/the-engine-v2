@@ -34,27 +34,18 @@ bool SpawnMessage::deserialize(const std::byte* data, size_t length)
         archive.process(assetId);
         archive.process(ownerId);
 
-        std::cout << "[SpawnMessage] netId=" << netId << " assetId=" << assetId << " ownerId=" << ownerId << std::endl;
-
         bool hasGameObject = false;
         archive.process(hasGameObject);
-        std::cout << "[SpawnMessage] hasGameObject=" << hasGameObject << std::endl;
 
         if (hasGameObject)
         {
             gameObject = std::make_unique<GameObject>();
             gameObject->deserialize(archive);
-
-            std::cout << "[SpawnMessage] GameObject created: " << gameObject->getName() << std::endl;
-            std::cout << "[SpawnMessage] Components: " << gameObject->getComponentCount() << std::endl;
-            std::cout << "[SpawnMessage] Behaviours: " << gameObject->getAllBehaviours().size() << std::endl;
         }
         return validate();
     } catch (const std::exception& e) {
-        std::cerr << "[SpawnMessage] Exception: " << e.what() << std::endl;
         return false;
     } catch (...) {
-        std::cerr << "[SpawnMessage] Unknown exception" << std::endl;
         return false;
     }
 }
