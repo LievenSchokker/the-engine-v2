@@ -23,10 +23,8 @@ void SimpleMoveBehaviour::onStart()
 	std::cout << "SimpleMoveBehaviour is now started" << std::endl;
 }
 
-void SimpleMoveBehaviour::update(float deltaTime, GameWorld* world)
+void SimpleMoveBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
-	(void)deltaTime;
-	(void)world;
 	pollInput();
 
 	if ( canMove ) move();

@@ -39,7 +39,7 @@ class Agent final : public Behaviour
          * @param deltaTime
          * @param gameWorld Unused for Agent
          */
-        void update(float deltaTime, GameWorld* gameWorld) override;
+        void update(double deltaTime, const GameWorld& gameWorld) override;
 
         /**
          * @brief Uses all enabled modules to compute a Vector2 in which the agent should move.

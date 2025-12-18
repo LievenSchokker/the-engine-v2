@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/IEngineSystems.h"
 
 struct b2BodyId;
 
@@ -23,31 +24,6 @@ class IPhysicsWorld
 {
 public:
 	virtual ~IPhysicsWorld() = default;
-
-	/**
-	 * @brief Initializes the physics world.
-	 *
-	 * Must be called before update() or creating any bodies.
-	 * Implementations should set up gravity.
-	 */
-	virtual void start() = 0;
-
-	/**
-	 * @brief Steps the physics simulation forward.
-	 *
-	 * The concrete implementation decides the timestep size (fixed, variable, etc.)
-	 * and should update all physics bodies accordingly.
-	 */
-	virtual void fixedUpdate() = 0;
-
-	/**
-	 * @brief Cleans up and shuts down the physics world.
-	 *
-	 * Implementations may free resources, destroy bodies, or reset world state.
-	 * After this call, the world may be restarted with start().
-	 */
-	virtual void shutdown() = 0;
-
 	/**
 	 * @brief Creates a physics body for the given RigidBody.
 	 *
@@ -82,4 +58,8 @@ public:
 	 * Transform component to match the corresponding physics body's position and rotation.
 	 */
 	virtual void syncTransforms() = 0;
+
+	virtual void initialize() = 0;
+	virtual void step(float deltaTime) = 0;
+	virtual void destroy() = 0;
 };

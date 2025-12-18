@@ -6,6 +6,7 @@
 #include "Rendering/SDL/SDLRenderer.h"
 #include "Rendering/ViewAdapters/WorldToCameraSpaceAdapter.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 
 #include <iostream>
 
@@ -14,23 +15,22 @@ RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 {
 }
 
-void RenderSystem::update(float deltaTime, Scene& scene)
+void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
 	if (!renderer || !renderer->isOpen())
 	{
 		return;
 	}
 
-	updateCameras(scene);
+	updateCameras(*gameWorld.sceneManager->getActiveScene());
 	queue.clearAll();
-	collectCommands(scene);
+	collectCommands(*gameWorld.sceneManager->getActiveScene());
 	queue.sortAll();
 	renderer->beginFrame(clearColor);
 
 	processWorldCommands();
 
-	// renderer->submitUI(queue.ui().getCommands());
-
+	renderer->submitUI(queue.ui().getCommands());
 	renderer->endFrame();
 }
 
@@ -86,9 +86,14 @@ void RenderSystem::setClearColor(const Color& color)
 	clearColor = color;
 }
 
+const std::string RenderSystem::getName() const
+{
+	return "RenderSystem";
+}
+
 const Color& RenderSystem::getClearColor() const
 {
-    return clearColor;
+	return clearColor;
 }
 
 void RenderSystem::updateCameras(const Scene& scene)

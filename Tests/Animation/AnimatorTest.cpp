@@ -70,7 +70,7 @@ TEST_F(AnimatorTest, Stop)
 	std::unique_ptr<GameWorld> world = std::make_unique<GameWorld>();
 	AnimationClip clip("TestClip", false);
 	animator->play(&clip);
-	animator->update(0.5f, world.get());	 // Advance time
+	animator->update(0.5f, *world);	 // Advance time
 
 	animator->stop();
 
@@ -101,10 +101,10 @@ TEST_F(AnimatorTest, UpdateAdvancesTime)
 
 	animator->play(&clip);
 
-	animator->update(0.5f, world.get());
+	animator->update(0.5f, *world);
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 0.5f);
 
-	animator->update(0.5f, world.get());
+	animator->update(0.5f, *world);
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 1.0f);
 }
 
@@ -115,7 +115,7 @@ TEST_F(AnimatorTest, TimeScaleAffectsUpdate)
 	animator->play(&clip);
 	animator->setTimeScale(2.0f);
 
-	animator->update(0.5f, world.get());
+	animator->update(0.5f, *world);
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(),
 					1.0f);	// Should advance 2x faster
 }
@@ -133,7 +133,7 @@ TEST_F(AnimatorTest, LoopingClip)
 	clip.addTrack(track);
 
 	animator->play(&clip);
-	animator->update(1.5f, world.get());	 // Go past end
+	animator->update(1.5f, *world);	 // Go past end
 
 	// Should loop back
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 0.5f);
@@ -153,7 +153,7 @@ TEST_F(AnimatorTest, NonLoopingClipStops)
 	clip.addTrack(track);
 
 	animator->play(&clip);
-	animator->update(1.5f,  world.get());	 // Go past end
+	animator->update(1.5f,  *world);	 // Go past end
 
 	EXPECT_FLOAT_EQ(animator->getCurrentTime(), 1.0f);	// Clamped to length
 	EXPECT_FALSE(animator->getIsPlaying());				// Should stop

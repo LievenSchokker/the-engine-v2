@@ -1,5 +1,7 @@
 #pragma once
 
+
+class AudioManager;
 class Server;
 class Client;
 class SceneManager;
@@ -12,7 +14,7 @@ class ApplicationClock;
 
 class GameWorld
 {
-   public:
+public:
 	GameWorld() = default;
 
 	SceneManager* sceneManager = nullptr;
@@ -20,6 +22,7 @@ class GameWorld
 	RenderSystem* render = nullptr;
 	InputManager* input = nullptr;
 	ApplicationClock* clock = nullptr;
+	AudioManager* audio = nullptr;
 
     Client* client = nullptr;
     Server* server = nullptr;

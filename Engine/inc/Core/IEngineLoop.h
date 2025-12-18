@@ -15,11 +15,11 @@
  * any loop type uniformly, enabling the same timing and update logic to work
  * across all configurations.
  *
- * The split between client and server loops allows each to initialize only the
- * subsystems they need (e.g., servers skip rendering, clients skip
- * authoritative game state) while sharing the same update contract.
+ * The unified EngineLoop implementation allows different configurations to
+ * initialize only the subsystems they need (e.g., servers skip rendering,
+ * clients skip authoritative game state) while sharing the same update contract.
  *
- * @see ClientLoop, ServerLoop, SpelMotor
+ * @see EngineLoop, SpelMotor
  */
 class IEngineLoop
 {

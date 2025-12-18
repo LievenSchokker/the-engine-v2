@@ -85,7 +85,7 @@ class DebugTimeControlBehaviour: public Behaviour
 	~DebugTimeControlBehaviour() override = default;
 
 	void onAwake() override;
-	void update(float deltaTime, GameWorld* world) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 	bool shouldRunWhenPaused() const override;
 
    private:

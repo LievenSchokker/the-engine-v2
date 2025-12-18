@@ -207,36 +207,54 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(double deltaTime, GameWorld* world)
+void Scene::update(double deltaTime, const GameWorld& world)
 {
 	if ( !active )
 	{
 		return;
 	}
 
-	int behaviorCount = 0;
-	bool clockPaused = (world != nullptr && world->clock != nullptr &&
-						world->clock->isPaused());
-	for ( auto& gameObject : gameObjects )
-	{
-		if (!gameObject->getIsActive())
-			continue;
+	bool clockPaused = (world.clock != nullptr &&
+						world.clock->isPaused());
 
-		for ( const auto& behaviour : gameObject->getEnabledBehaviours() )
-		{
-			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
-				continue;
-			// Skip simulation behaviors when paused, but allow behaviors that
-			// override shouldRunWhenPaused() to return true (e.g., debug
-			// controls)
-			if ( clockPaused && !behaviour->shouldRunWhenPaused() )
-			{
-				continue;  // Skip simulation behaviors when paused
-			}
-			behaviorCount++;
-			behaviour->update(deltaTime, world);
-		}
-	}
+    std::vector<GameObject*> objectsToUpdate;
+    objectsToUpdate.reserve(gameObjects.size());
+
+    for (auto& gameObject : gameObjects)
+    {
+        if (gameObject && gameObject->getIsActive())
+        {
+            objectsToUpdate.push_back(gameObject.get());
+        }
+    }
+
+    for (GameObject* gameObject : objectsToUpdate)
+    {
+        if (!gameObject || isInDestroyQueue(gameObject))
+        {
+            continue;
+        }
+
+        if (!gameObjectIds.contains(gameObject))
+        {
+            continue;
+        }
+
+        for (Behaviour* behaviour : gameObject->getEnabledBehaviours())
+        {
+            if (!behaviour || !behaviour->getHasAwakened() || !behaviour->getHasStarted())
+            {
+                continue;
+            }
+
+            if (clockPaused && !behaviour->shouldRunWhenPaused())
+            {
+                continue;
+            }
+
+            behaviour->update(deltaTime, world);
+        }
+    }
 
 	processDestroyQueue();
 }

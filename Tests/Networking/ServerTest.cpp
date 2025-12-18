@@ -130,7 +130,8 @@ TEST_F(ServerTest, ConstructorThrowsOnZeroPort)
 TEST_F(ServerTest, SendMessageFailsForUnknownClient)
 {
     auto server = createServerWithMock(7777);
-    server->start();
+    auto world = std::make_unique<GameWorld>();
+    server->start(*world);
 
     ConnectionMessage message;
     message.setStatus(ConnectionStatus::Connected);
@@ -143,7 +144,8 @@ TEST_F(ServerTest, SendMessageFailsForUnknownClient)
 TEST_F(ServerTest, BroadcastMessageSucceedsWithNoClients)
 {
     auto server = createServerWithMock(7777);
-    server->start();
+    auto world = std::make_unique<GameWorld>();
+    server->start(*world);
 
     ConnectionMessage message;
     message.setStatus(ConnectionStatus::Connected);
@@ -156,7 +158,8 @@ TEST_F(ServerTest, BroadcastMessageSucceedsWithNoClients)
 TEST_F(ServerTest, KickClientSendsDisconnectAndRemovesClient)
 {
     auto server = createServerWithMock(7777);
-    server->start();
+    auto world = std::make_unique<GameWorld>();
+    server->start(*world);
 
     mockTransportPtr->simulateClientConnected(42);
     server->kickClient(42);

@@ -22,7 +22,7 @@ class NavigationTest : public Behaviour
         ~NavigationTest() override = default;
 
         void onAwake() override;
-        void update(float deltaTime, GameWorld *world) override;
+        void update(double deltaTime, const GameWorld& world) override;
 
         void setTarget(const Transform& targetTransform);
         void setAgent(Agent& agent);
