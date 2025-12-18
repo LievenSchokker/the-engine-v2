@@ -7,6 +7,7 @@
 #include "Events/EventImplementations/ApplicationEvents.h"
 #include "Networking/Client.h"
 #include "Networking/NetworkSpawnManager.h"
+#include "Networking/Server/Server.h"
 
 #include <ostream>
 
@@ -20,7 +21,8 @@ EngineLoop::EngineLoop(std::unique_ptr<Game> game)
 	  {
 		  return 0.0;
 	  })
-{}
+{
+}
 
 EngineLoop::~EngineLoop() = default;
 
@@ -82,6 +84,18 @@ void EngineLoop::initNetwork() const
 	{
 		sceneManagerPtr->configureNetworking(ConnectionMode::Host,
 		                                     spawnManager.get());
+	}
+	if (gameWorld->server != nullptr)
+	{
+		NetworkSpawnManager* spawnMgr = spawnManager.get();
+
+		gameWorld->server->setClientConnectedCallback(
+			[spawnMgr](int clientId)
+			{
+				spawnMgr->syncExistingObjects(clientId);
+				spawnMgr->CheckNewClientSpawnObject(clientId);
+			}
+			);
 	}
 }
 

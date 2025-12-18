@@ -124,14 +124,12 @@ void SceneManager::processForServer(Scene& scene)
 
 void SceneManager::processForClient(Scene& scene)
 {
-	std::cout << "SALl" << std::endl;
     std::vector<GameObject*> toProcess;
 
     for (auto& obj : scene.getGameObjects())
     {
         if (hasNetworkBehaviour(*obj) && !hasNetworkIdentity(*obj))
         {
-        	std::cout << "Found an object" << std::endl;
             toProcess.push_back(obj.get());
         }
     }
