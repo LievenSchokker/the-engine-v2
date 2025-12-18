@@ -8,11 +8,9 @@
 #include <functional>
 
 /**
- * @brief Thread-safe event queue for deferred event processing
- *
  * Events are queued and processed later in a controlled manner,
- * typically once per frame. This decouples event producers from
- * consumers and allows for thread-safe event pushing.
+ * typically once per frame.
+ * 
  */
 class EventQueue
 {
@@ -77,5 +75,4 @@ private:
 	using EventAction = std::function<void(EventDispatcher&)>;
 
 	std::queue<EventAction> pendingEvents;
-	mutable std::mutex mutex;
 };
