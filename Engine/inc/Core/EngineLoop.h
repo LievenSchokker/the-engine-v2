@@ -66,6 +66,7 @@ public:
 	 * order they were added.
 	 */
 	void start() override;
+	void initNetwork() const;
 	void initializeCloseEvent(EventDispatcher& dispatcher);
 
 	/**
@@ -189,6 +190,7 @@ private:
 	std::unique_ptr<Game> game;
 	std::unique_ptr<GameWorld> gameWorld;
 	std::vector<std::unique_ptr<IEngineSystems>> systems;
+	std::unique_ptr<NetworkSpawnManager> spawnManager;
 	SceneManager* sceneManagerPtr;
 	ClockFunction clockFunction;
 	bool shutdownRequested = false;

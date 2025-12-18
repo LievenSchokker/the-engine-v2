@@ -312,6 +312,5 @@ int main(int argc, char** argv)
 	std::cout << "Controls:\n";
 	std::cout << "  WASD or Arrow Keys - Move player\n";
 	std::cout << "  ESC - Exit\n\n";
-
 	return SpelMotorEntry::main(std::move(game));
 }

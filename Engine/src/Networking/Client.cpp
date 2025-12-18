@@ -16,17 +16,6 @@
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport))
 {
-    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
-
-    transport->setOnMessageReceived([this](const IncomingRawMessage& message)
-    {
-        onMessageReceived(message);
-    });
-
-    transport->setOnConnectionChanged([this](const Connection& connection)
-    {
-        onConnectionChanged(connection);
-    });
     messageDispatcher = nullptr;
 }
 
@@ -47,6 +36,23 @@ bool Client::connectToServer(const ServerConnectionInformation&  serverInformart
     return true;
 }
 
+SystemStatus Client::start(GameWorld& gameWorld)
+{
+	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
+
+	transport->setOnMessageReceived([this](const IncomingRawMessage& message)
+	{
+		onMessageReceived(message);
+	});
+
+	transport->setOnConnectionChanged([this](const Connection& connection)
+	{
+		onConnectionChanged(connection);
+	});
+
+	gameWorld.client = this;
+	return SystemStatus::RUNNING;
+}
 
 void Client::disconnect()
 {

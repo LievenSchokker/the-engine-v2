@@ -19,11 +19,10 @@
 int main(int argc, char** argv)
 {
     // Parse command line arguments
-    EngineMode mode = EngineMode::CLIENT;
-
 	std::unique_ptr<Game> spel = std::make_unique<Game>();
 
     ApplicationSpecifications spec = {};
+	EngineMode mode = EngineMode::CLIENT;
     spec.networkingOptions.mode = mode;
     spec.networkingOptions.port = 8080;
     spec.networkingOptions.serverIP = "127.0.0.1";
@@ -31,7 +30,7 @@ int main(int argc, char** argv)
     spec.renderBackend = RenderBackend::SDL;
 	spec.engineSystem = EngineSystem::Client;
     spec.windowOptions = {
-        mode == EngineMode::SERVER ? "GameEngine - Server" : "GameEngine - Client",
+        "GameEngine",
         700,
         700
     };
