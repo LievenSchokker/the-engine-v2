@@ -22,6 +22,8 @@ public:
 	{
 		return "PlayerMovement";
 	}
+	const char* getName() const override { return name(); }
+
 	void onStart() override;
 
 	void onNetworkSpawn() override;

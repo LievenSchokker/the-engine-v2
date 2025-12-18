@@ -54,8 +54,14 @@ void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
 
 void PlayerMovement::update(double deltaTime,const GameWorld& world)
 {
+	std::cout << "[PlayerMovement::update] Called!" << std::endl;
+	std::cout << "  hasAuthority()=" << hasAuthority() << std::endl;
+	std::cout << "  identity=" << identity << std::endl;
+	std::cout << "  world=" << getWorld() << std::endl;
+
     if (!hasAuthority())
     {
+    	std::cout << "  -> No authority, returning" << std::endl;
         return;
     }
 

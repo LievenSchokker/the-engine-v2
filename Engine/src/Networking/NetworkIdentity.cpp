@@ -21,6 +21,7 @@ bool NetworkIdentity::hasAuthority() const
 	{
 		return true;
 	}
+	std::cout << gameWorld->localClientId << "gameWorld->localClientId" << std::endl;
 	return ownerId == gameWorld->localClientId;
 }
 
