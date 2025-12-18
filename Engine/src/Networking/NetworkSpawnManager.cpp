@@ -220,14 +220,7 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 
 
 	getScene()->addGameObject(std::move(message.gameObject));
-
-    std::cout << "[handleSpawnMessage] Added to scene, calling onNetworkSpawn" << std::endl;
-
-
 	identity->onNetworkSpawn();
-
-
-    std::cout << "[handleSpawnMessage] Done" << std::endl;
 }
 
 void NetworkSpawnManager::CheckNewClientSpawnObject(int clientId)

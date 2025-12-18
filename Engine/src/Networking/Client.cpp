@@ -120,7 +120,6 @@ void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 
 	if (message->getMessageType() == MessageTypes::SpawnMessage)
 	{
-		std::cout << rawMessage.length << std::endl;
 	}
 
     if (message == nullptr)
