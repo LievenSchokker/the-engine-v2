@@ -63,14 +63,15 @@ SystemStatus InputManager::start(GameWorld& gameWorld)
 {
 	gameWorld.input = this;
 
-	if (gameWorld.getDispatcher() != nullptr)
+	EventDispatcher* dispatcher = gameWorld.getDispatcher();
+
+	if (dispatcher != nullptr)
 	{
-		initialize(*gameWorld.getDispatcher());
-	}else
-	{
-		return SystemStatus::ERROR;
+		initialize(*dispatcher);
+		return SystemStatus::RUNNING;
 	}
-	return SystemStatus::RUNNING;
+
+	return SystemStatus::ERROR;
 }
 
 void InputManager::update(double deltaTime, const GameWorld& gameWorld)

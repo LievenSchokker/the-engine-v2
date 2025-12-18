@@ -75,6 +75,7 @@ class AnimationInputBehaviour: public Behaviour
 
 	void update(double deltaTime, const GameWorld& world) override
 	{
+		inputManager = world.input;
 		(void)deltaTime;
 		(void)world;
 

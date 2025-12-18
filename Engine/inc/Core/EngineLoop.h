@@ -66,6 +66,7 @@ public:
 	 * order they were added.
 	 */
 	void start() override;
+	void initializeCloseEvent(EventDispatcher& dispatcher);
 
 	/**
 	 * @brief Performs a variable timestep update on all systems.

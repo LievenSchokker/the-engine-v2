@@ -37,8 +37,7 @@ private:
 	template <typename Handler>
 	bool processEvents(Handler handler);
 	MouseButton mouseButtonAdaption(Uint8 button);
-	EventDispatcher* internalDispatcher;
-	EventDispatcher* activeDispatcher = nullptr;
+	EventDispatcher* internalDispatcher = nullptr;
 	std::function<void(const SDL_Event&)> unhandledCallback;
 
 	int lastMouseX = 0;

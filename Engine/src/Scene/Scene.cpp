@@ -130,7 +130,6 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 	auto result = std::move(*it);
 	gameObjectIds.erase(gameObject);
 	gameObjects.erase(it);
-    removeGameObjectInternal(gameObject);
 
 	return result;
 }

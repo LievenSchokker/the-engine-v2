@@ -10,12 +10,21 @@
 SystemStatus SDLEventProcessor::start(GameWorld& gameWorld)
 {
 	internalDispatcher = gameWorld.getDispatcher();
-    return SystemStatus::RUNNING;
+
+	if (internalDispatcher == nullptr)
+	{
+		return SystemStatus::ERROR;
+	}
+
+	return SystemStatus::RUNNING;
 }
 
 void SDLEventProcessor::update(double deltaTime, const GameWorld& gameWorld)
 {
-    pollEvents(*internalDispatcher);
+	if (internalDispatcher != nullptr)
+	{
+		pollEvents(*internalDispatcher);
+	}
 }
 
 void SDLEventProcessor::shutdown(GameWorld& gameWorld)

@@ -228,6 +228,7 @@ bool SceneManager::removeScene(const std::string& name)
 
 Scene* SceneManager::getScene(const std::string& name) const
 {
+
     if (persistentScene != nullptr && persistentScene->getName() == name)
     {
         return persistentScene.get();
@@ -246,8 +247,8 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
                                       const std::string& toSceneName,
                                       const std::string& objectName) const
 {
-    Scene* fromScene = getScene(fromSceneName);
-    Scene* toScene = getScene(toSceneName);
+	Scene* fromScene = getScene(fromSceneName);
+	Scene* toScene = getScene(toSceneName);
 
     if (fromScene == nullptr || toScene == nullptr)
     {
@@ -275,6 +276,7 @@ bool SceneManager::transferGameObject(const std::string& fromSceneName,
         return false;
     }
 
+	gameObject->setBehavioursEnabled(true);
 	toScene->addGameObject(std::move(gameObject));
 	return true;
 }
@@ -359,6 +361,7 @@ bool SceneManager::isPaused() const
 
 Scene* SceneManager::getOrCreatePersistentScene()
 {
+	std::cout << "[SceneManager] Error: Scene not found\n";
     if (persistentScene == nullptr)
     {
         persistentScene = std::make_unique<Scene>("__PersistentScene__");
