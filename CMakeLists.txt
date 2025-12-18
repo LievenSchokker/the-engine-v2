@@ -8,7 +8,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 find_package(SDL2 2.0.18 REQUIRED CONFIG)
 find_package(SDL2_image REQUIRED CONFIG)
 find_package(SDL2_mixer REQUIRED CONFIG)
-find_package(GameNetworkingSockets REQUIRED CONFIG)
+#find_package(GameNetworkingSockets REQUIRED CONFIG)
 find_package(GTest REQUIRED)
 
 enable_testing()

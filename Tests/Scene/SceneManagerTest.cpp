@@ -69,14 +69,14 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Activate Scene1
     sceneManager.loadScene("Scene1");
-    sceneManager.update(0.1f, gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld.get());
 
     // Assert
     EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene1");
 
     // Act - Pause
     sceneManager.pause();
-    sceneManager.update(0.1f, gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld.get());
 
     // Assert
     EXPECT_TRUE(sceneManager.isPaused());
@@ -89,7 +89,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Resume
     sceneManager.resume();
-    sceneManager.update(0.1f, gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld.get());
 
     // Assert
     EXPECT_FALSE(sceneManager.isPaused());
@@ -102,7 +102,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Switch to Scene2
     sceneManager.setActiveScene("Scene2");
-    sceneManager.update(0.2f, gameWorld.get());
+    sceneManager.update(0.2f, *gameWorld.get());
 
     // Assert
     EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene2");
@@ -190,7 +190,7 @@ TEST(SceneManagerTest, UpdateWithNoActiveScene)
     sceneManager.addScene(std::move(scene1));
 
     // Act - Should not crash with no active scene
-    sceneManager.update(0.1f, gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld.get());
 
     // Assert - Scene should still be retrievable
     EXPECT_NE(sceneManager.getScene("Scene1"), nullptr);

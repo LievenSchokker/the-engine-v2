@@ -1,46 +1,48 @@
 #include "Component/Profiler/Profiler.h"
 
-#include "Rendering/UIRenderCommand.h"
 #include "Core/GameWorld.h"
+#include "Rendering/UIRenderCommand.h"
 #include "Scene/SceneManager.h"
+#include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
+#include "Rendering/UIRenderCommand.h"
 
-#include <sstream>
-#include <iomanip>
-#include <numeric>
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
+#include <numeric>
+#include <sstream>
 
 Profiler::Profiler(float x, float y, float width, float height)
-	: UIElement(x, y, width, height)
-	  , updateInterval(0.25f)
-	  , timeSinceLastUpdate(0.0f)
-	  , currentFPS(0.0f)
-	  , averageFrameTime(0.0f)
-	  , minFrameTime(0.0f)
-	  , maxFrameTime(0.0f)
-	  , entityCount(0)
-	  , activeSceneCount(0)
-	  , showFPS(true)
-	  , showFrameTime(true)
-	  , showFrameGraph(true)
-	  , showEntityCount(true)
-	  , titleColor(Color::yellow())
-	  , labelColor(Color::white())
-	  , goodColor(Color::green())
-	  , warningColor(Color::yellow())
-	  , badColor(Color::red())
+	: UIElement(x, y, width, height),
+	  updateInterval(0.25f),
+	  timeSinceLastUpdate(0.0f),
+	  currentFPS(0.0f),
+	  averageFrameTime(0.0f),
+	  minFrameTime(0.0f),
+	  maxFrameTime(0.0f),
+	  entityCount(0),
+	  activeSceneCount(0),
+	  showFPS(true),
+	  showFrameTime(true),
+	  showFrameGraph(true),
+	  showEntityCount(true),
+	  titleColor(Color::yellow()),
+	  labelColor(Color::white()),
+	  goodColor(Color::green()),
+	  warningColor(Color::yellow()),
+	  badColor(Color::red())
 {
 	panelId = 9999;
 }
 
-void Profiler::update(float deltaTime, GameWorld* world)
+void Profiler::update(double deltaTime, const GameWorld& gameWorld)
 {
 	calculateFPS(deltaTime);
 
 	timeSinceLastUpdate += deltaTime;
-	if (timeSinceLastUpdate >= updateInterval)
+	if ( timeSinceLastUpdate >= updateInterval )
 	{
-		updateStats(world);
+		updateStats(gameWorld);
 		timeSinceLastUpdate = 0.0f;
 	}
 }
@@ -49,12 +51,12 @@ void Profiler::calculateFPS(float deltaTime)
 {
 	// Real frame time tracking
 	frameTimes.push_back(deltaTime);
-	if (frameTimes.size() > kMaxFrameSamples)
+	if ( frameTimes.size() > kMaxFrameSamples )
 	{
 		frameTimes.pop_front();
 	}
 
-	if (!frameTimes.empty())
+	if ( !frameTimes.empty() )
 	{
 		float sum = std::accumulate(frameTimes.begin(), frameTimes.end(), 0.0f);
 		averageFrameTime = sum / static_cast<float>(frameTimes.size());
@@ -63,34 +65,33 @@ void Profiler::calculateFPS(float deltaTime)
 		minFrameTime = *std::min_element(frameTimes.begin(), frameTimes.end());
 		maxFrameTime = *std::max_element(frameTimes.begin(), frameTimes.end());
 	}
-
 }
 
-void Profiler::updateStats(GameWorld* world)
+void Profiler::updateStats(const GameWorld& world)
 {
-    if (world != nullptr && world->sceneManager != nullptr)
-    {
-        entityCount = 0;
-        activeSceneCount = 1;
-    }
+	if (world.sceneManager != nullptr )
+	{
+		entityCount = 0;
+		activeSceneCount = 1;
+	}
 }
 
 void Profiler::fillUserInterfaceRenderQueue(
 	IUserInterfaceRenderQueueWriter& queue) const
 {
-	if (!visible)
+	if ( !visible )
 	{
 		return;
 	}
 
 	queue.push(renderPanel());
 
-	if (showFPS)
+	if ( showFPS )
 	{
 		queue.push(renderFps());
 	}
 
-	if (showFrameTime)
+	if ( showFrameTime )
 	{
 		queue.push(renderFrameTime());
 		queue.push(renderMinMaxLabel());
@@ -101,7 +102,7 @@ void Profiler::fillUserInterfaceRenderQueue(
 	sep1.panelId = panelId;
 	queue.push(sep1);
 
-	if (showEntityCount)
+	if ( showEntityCount )
 	{
 		queue.push(renderEntityLabel());
 		queue.push(renderSceneLabel());
@@ -143,8 +144,8 @@ UIRenderCommand Profiler::renderFrameTime() const
 	UIRenderCommand frameTimeLabel;
 	frameTimeLabel.type = UICommandType::Text;
 	frameTimeLabel.panelId = panelId;
-	frameTimeLabel.text = "Frame: " + formatFloat(averageFrameTime * 1000.0f, 2)
-	                      + " ms";
+	frameTimeLabel.text =
+		"Frame: " + formatFloat(averageFrameTime * 1000.0f, 2) + " ms";
 	frameTimeLabel.color = getFrameTimeColor();
 	frameTimeLabel.alignment = Alignment::Left;
 
@@ -157,7 +158,7 @@ UIRenderCommand Profiler::renderMinMaxLabel() const
 	minMaxLabel.type = UICommandType::Text;
 	minMaxLabel.panelId = panelId;
 	minMaxLabel.text = "Min/Max: " + formatFloat(minFrameTime * 1000.0f, 2) +
-	                   " / " + formatFloat(maxFrameTime * 1000.0f, 2) + " ms";
+					   " / " + formatFloat(maxFrameTime * 1000.0f, 2) + " ms";
 	minMaxLabel.color = labelColor;
 	minMaxLabel.alignment = Alignment::Left;
 	return minMaxLabel;
@@ -212,15 +213,15 @@ void Profiler::setShowEntityCount(bool show)
 
 Color Profiler::getFPSColor() const
 {
-	if (currentFPS >= 60.0f) return goodColor;
-	if (currentFPS >= 30.0f) return warningColor;
+	if ( currentFPS >= 60.0f ) return goodColor;
+	if ( currentFPS >= 30.0f ) return warningColor;
 	return badColor;
 }
 
 Color Profiler::getFrameTimeColor() const
 {
-	if (averageFrameTime <= 0.016f) return goodColor;
-	if (averageFrameTime <= 0.033f) return warningColor;
+	if ( averageFrameTime <= 0.016f ) return goodColor;
+	if ( averageFrameTime <= 0.033f ) return warningColor;
 	return badColor;
 }
 

@@ -1,24 +1,28 @@
 #include "Input/InputManager.h"
 
-#include "../../inc/Events/EventImplementations/ApplicationEvents.h"
+#include "Input/SDLInputAdapter.h"
 
-#include <iostream>
+#include <utility>
 #include <ostream>
-#include <SDL_keycode.h>
 
 InputManager* InputManager::instance = nullptr;
 
 InputManager* InputManager::getInstance()
 {
-    if (!instance)
-    {
-        instance = new InputManager();
-    }
-    return instance;
+	if ( !instance )
+	{
+		instance = new InputManager();
+	}
+	return instance;
 }
 
 void InputManager::shutdown()
 {
+	if ( instance )
+	{
+		delete instance;
+		instance = nullptr;
+	}
     if (instance)
     {
         if (instance->initialized && instance->cachedDispatcher)
@@ -195,67 +199,67 @@ bool InputManager::quitRequested() const
 
 bool InputManager::isKeyDown(KeyCode key) const
 {
-    return keysCurrent.find(key) != keysCurrent.end();
+	return keysCurrent.find(key) != keysCurrent.end();
 }
 
 bool InputManager::wasKeyPressed(KeyCode key) const
 {
-    return keysPressed.find(key) != keysPressed.end();
+	return keysPressed.find(key) != keysPressed.end();
 }
 
 bool InputManager::wasKeyReleased(KeyCode key) const
 {
-    return keysReleased.find(key) != keysReleased.end();
+	return keysReleased.find(key) != keysReleased.end();
 }
 
 bool InputManager::isMouseDown(MouseButton button) const
 {
-    return mouseCurrent.find(button) != mouseCurrent.end();
+	return mouseCurrent.find(button) != mouseCurrent.end();
 }
 
 bool InputManager::wasMousePressed(MouseButton button) const
 {
-    return mousePressed.find(button) != mousePressed.end();
+	return mousePressed.find(button) != mousePressed.end();
 }
 
 bool InputManager::wasMouseReleased(MouseButton button) const
 {
-    return mouseReleased.find(button) != mouseReleased.end();
+	return mouseReleased.find(button) != mouseReleased.end();
 }
 
 int InputManager::mouseX() const
 {
-    return currentMouseX;
+	return currentMouseX;
 }
 
 int InputManager::mouseY() const
 {
-    return currentMouseY;
+	return currentMouseY;
 }
 
 int InputManager::mouseDeltaX() const
 {
-    return currentMouseX - previousMouseX;
+	return currentMouseX - previousMouseX;
 }
 
 int InputManager::mouseDeltaY() const
 {
-    return currentMouseY - previousMouseY;
+	return currentMouseY - previousMouseY;
 }
 
 bool InputManager::mouseMovedThisFrame() const
 {
-    return mouseMovedInFrame;
+	return mouseMovedInFrame;
 }
 
 int InputManager::wheelDeltaX() const
 {
-    return wheelX;
+	return wheelX;
 }
 
 int InputManager::wheelDeltaY() const
 {
-    return wheelY;
+	return wheelY;
 }
 
 void InputManager::setKeyDown(KeyCode key, bool isDown)

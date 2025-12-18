@@ -12,7 +12,7 @@ CerealWriteArchive::~CerealWriteArchive() = default;
 
 std::vector<std::byte> CerealWriteArchive::getBytes() const
 {
-	auto data = stream.str();
-	auto span = std::as_bytes(std::span{data});
-	return {span.begin(), span.end()};
+    auto data = stream.str();
+    auto span = std::as_bytes(std::span{data});
+    return {span.begin(), span.end()};
 }

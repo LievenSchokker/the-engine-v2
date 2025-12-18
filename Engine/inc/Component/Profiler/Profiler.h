@@ -24,7 +24,7 @@ class GameWorld;
  * keep the displayed values readable (rapidly changing numbers are hard
  * to follow).
  */
-class Profiler: public UIElement, public Behaviour
+class Profiler  final : public UIElement, public Behaviour
 {
 public:
 	explicit Profiler(
@@ -49,7 +49,12 @@ public:
 	UIRenderCommand renderSceneLabel() const;
 	/// @}
 
-	void update(float deltaTime, GameWorld* world) override;
+	void update(double deltaTime, const GameWorld& world) override;
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Unknown;
+	}
+
 
 	void toggle();
 
@@ -97,7 +102,7 @@ private:
 	Color badColor;
 	/// @}
 
-	void updateStats(GameWorld* world);
+	void updateStats(const GameWorld& world);
 	void calculateFPS(float deltaTime);
 	Color getFPSColor() const;
 	Color getFrameTimeColor() const;

@@ -2,10 +2,10 @@
 // Created by samle on 10/11/2025.
 //
 
-#include "../../inc/Component/BaseComponentTypes/Component.h"
+#include "Component/BaseComponentTypes/Component.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
-
+#include "Scene/Scene.h"
 
 Component::~Component()
 {
@@ -27,7 +27,15 @@ GameObject* Component::getGameObject() const
 }
 
 
-const Transform* Component::getTransform() const
+ Transform* Component::getTransform() const
 {
     return transform;
 }
+
+ComponentType Component::getComponentType() const
+{
+	return ComponentType::Unknown;
+}
+void Component::deserialize(ReadArchive& archive){}
+void Component::serialize(WriteArchive& archive) const{}
+

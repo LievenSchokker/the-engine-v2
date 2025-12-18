@@ -6,10 +6,11 @@
 #include "Assets/AssetManager.h"
 #include "Assets/SpritesheetLoader.h"
 #include "Behaviour/Behaviour.h"
+#include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Behaviours/PlayerControllerBehaviour.h"
 #include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -45,7 +46,7 @@ class ExitBehaviour: public Behaviour
 		inputManager = InputManager::getInstance();
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
@@ -74,6 +75,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.serverIP = "127.0.0.1";
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
+    spec.engineSystem = EngineSystem::Client;
 	spec.renderBackend = RenderBackend::SDL;
 	spec.windowOptions = {"Player Game", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
@@ -281,6 +283,21 @@ int main(int argc, char** argv)
 	auto exitHandler = std::make_unique<GameObject>();
 	exitHandler->setName("ExitHandler");
 	exitHandler->addComponent<ExitBehaviour>();
+
+	// Create a debug behavior
+	auto debugController = std::make_unique<GameObject>();
+	debugController->setName("DebugController");
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::SPACE,					 // Pause key
+		std::nullopt,					 // Normal speed (disabled)
+		KeyCode::NUMBER_2_AND_AT,		 // Slow (enabled)
+		KeyCode::NUMBER_3_AND_HASHMARK,	 // Very slow (enabled)
+		KeyCode::NUMBER_4_AND_DOLLAR,	 // Fast (enabled)
+		std::nullopt,					 // Very fast (disabled)
+		true							 // Print menu
+	);
+
+	gameScene->addGameObject(std::move(debugController));
 
 	// Add GameObjects to scene
 	gameScene->addGameObject(std::move(player));

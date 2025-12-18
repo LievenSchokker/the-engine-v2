@@ -11,6 +11,8 @@
 
 #include <gtest/gtest.h>
 
+#include "Core/GameWorld.h"
+
 
 class AgentTest : public ::testing::Test
 {
@@ -100,7 +102,7 @@ TEST_F(AgentTest, UpdateMovesTransformAsExpected)
     Vector2 initialPos = agent->getTransform()->getPosition();
     float deltaTime = 0.016f;
 
-    agent->update(deltaTime, nullptr);
+    agent->update(deltaTime, GameWorld{});
 
     Vector2 newPos = agent->getTransform()->getPosition();
     Vector2 delta = newPos - initialPos;

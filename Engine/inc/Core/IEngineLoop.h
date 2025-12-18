@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "ApplicationClock.h"
 #include "GameWorld.h"
 
@@ -10,22 +9,23 @@
  * @interface IEngineLoop
  * @brief Abstract interface for engine loop implementations
  *
- * This interface exists to support different runtime configurations (client, server,
- * or hybrid) without coupling the core engine to any specific implementation. By
- * programming against this interface, SpelMotor can drive any loop type uniformly,
- * enabling the same timing and update logic to work across all configurations.
+ * This interface exists to support different runtime configurations (client,
+ * server, or hybrid) without coupling the core engine to any specific
+ * implementation. By programming against this interface, SpelMotor can drive
+ * any loop type uniformly, enabling the same timing and update logic to work
+ * across all configurations.
  *
- * The split between client and server loops allows each to initialize only the
- * subsystems they need (e.g., servers skip rendering, clients skip authoritative
- * game state) while sharing the same update contract.
+ * The unified EngineLoop implementation allows different configurations to
+ * initialize only the subsystems they need (e.g., servers skip rendering,
+ * clients skip authoritative game state) while sharing the same update contract.
  *
- * @see ClientLoop, ServerLoop, SpelMotor
+ * @see EngineLoop, SpelMotor
  */
 class IEngineLoop
 {
 	using ClockFunction = std::function<double()>;
 
-public:
+   public:
 	virtual ~IEngineLoop() = default;
 
 	/**
@@ -56,6 +56,16 @@ public:
 	 * and remain decoupled from the specific clock implementation.
 	 */
 	virtual ApplicationClock::ClockFunction getClock() = 0;
+
+	/**
+	 * @brief Sets the application clock reference for debug time controls.
+	 *
+	 * This allows GameWorld to access the clock for debug functionality.
+	 * Called by SpelMotor after clock creation.
+	 *
+	 * @param clock Pointer to the ApplicationClock instance
+	 */
+	virtual void setApplicationClock(ApplicationClock* clock) = 0;
 
 	/**
 	 * @brief Performs one-time initialization after construction
@@ -99,4 +109,18 @@ public:
 	 * a server) may need error handling.
 	 */
 	virtual void shutdown() = 0;
+
+	/**
+	 * @brief Checks if shutdown has been requested
+	 *
+	 * Allows SpelMotor to detect when the loop has initiated shutdown
+	 * and stop the main loop gracefully. Default implementation returns
+	 * false for loops that don't support shutdown detection.
+	 *
+	 * @return true if shutdown has been requested, false otherwise
+	 */
+	virtual bool isShutdownRequested() const
+	{
+		return false;
+	}
 };

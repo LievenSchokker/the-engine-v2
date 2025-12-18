@@ -1,9 +1,12 @@
 #pragma once
 
+#include "Core/IEngineSystems.h"
+
 #include <memory>
 #include <string>
 
-class IAudioBackend;
+#include "IAudioBackend.h"
+
 class AudioSource;
 class MusicSource;
 

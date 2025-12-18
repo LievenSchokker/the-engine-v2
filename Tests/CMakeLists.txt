@@ -5,18 +5,23 @@ add_executable(engine_tests
         Rendering/SDL/SDLRendererTest.cpp
         Rendering/ShapeRendererTest.cpp
         Rendering/UserInterface/TextCommandTest.cpp
+        Rendering/CameraTest.cpp
         Input/InputManagerTest.cpp
         Asset/AssetManagerTest.cpp
         Scene/SceneManagerTest.cpp
         Core/SpelMotorTest.cpp
-        Core/ServerLoopTest.cpp
-        Core/ClientLoopTest.cpp
         Core/TimerTest.cpp
+        Core/EngineSystemFlagTest.cpp
         Component/Profiler/ProfilerTest.cpp
         Component/tests_TestComponents.cpp
         Component/TestComponentBase.cpp
         Component/tests_component.cpp
         Component/tests_component_manager.cpp
+        GameObject/tests_game_object.cpp
+        Behaviour/TestBehaviourBase.cpp
+        Behaviour/tests_behaviour.cpp
+        Scene/SceneManagerTest.cpp
+        Physics/PhysicsSystemTest.cpp
         Component/GridComponentTest.cpp
         Scene/SceneManagerTest.cpp
         Networking/Messages/ActionMessageTest.cpp
@@ -31,8 +36,6 @@ add_executable(engine_tests
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
         Math/TestsVector2.cpp
-        AI/tests_agent.cpp
-        AI/TestAgentModule.cpp
         Animation/AnimationCurveTest.cpp
         Animation/AnimationTrackTest.cpp
         Animation/AnimationClipTest.cpp
@@ -43,6 +46,8 @@ add_executable(engine_tests
         Audio/TestMusicSource.cpp
         Audio/TestSoundSource.cpp
 )
+
+add_subdirectory(AI)
 
 target_link_libraries(engine_tests PRIVATE
         Engine::Core

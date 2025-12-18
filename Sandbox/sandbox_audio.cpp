@@ -74,11 +74,11 @@ int main()
 	// auto music = std::make_unique<MusicSource>(audioManager.get());
 	MusicSource* music = new MusicSource(audioManager.get());
 	music->setLoop(true);
-	music->loadMusic("Sandbox/Assets/music_jam.wav");
+	music->loadMusic("Assets/music_jam.wav");
 	music->play();
 
 	auto effect = std::make_unique<SoundSource>(audioManager.get());
-	effect->loadSound("Sandbox/Assets/audio_effect_pigeons_flying.wav");
+	effect->loadSound("Assets/audio_effect_pigeons_flying.wav");
 
 	// --- MAIN LOOP ---
 	bool running = true;

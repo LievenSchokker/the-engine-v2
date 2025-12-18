@@ -30,9 +30,8 @@ void PlayerControllerBehaviour::onStart()
 	}
 }
 
-void PlayerControllerBehaviour::update(float deltaTime, GameWorld* world)
+void PlayerControllerBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
-	(void)world;  // Not used in this implementation
 	if ( inputManager == nullptr || transform == nullptr )
 	{
 		return;

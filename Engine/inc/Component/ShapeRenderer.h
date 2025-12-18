@@ -33,6 +33,9 @@ public:
 	 */
 	void fillRenderQueue(IRenderQueueWriter& queue) const override;
 
+	ComponentType getComponentType() const override;
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 private:
 	Color color = Color::white();
 	float radius = 25.0;

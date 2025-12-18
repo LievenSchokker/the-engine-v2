@@ -1,17 +1,20 @@
 #pragma once
 
+namespace spelmotorNetworking
+{
+    class MessageDispatcher;
+}
+
 #include "Connection/Connection.h"
 #include "Core/GameWorld.h"
+#include "Core/IEngineSystems.h"
 #include "Server/ServerInformation.h"
 #include "Networking/Messages/MessageDispatcher.h"
-
 #include <memory>
 
 class ITransport;
 class TransportGNS;
 class IMessage;
-class NetworkContext;
-
 struct IncomingRawMessage;
 
 /**
@@ -20,7 +23,7 @@ struct IncomingRawMessage;
  * Manages a single server connection, handling message sending/receiving
  * and connection state changes through the underlying transport layer.
  */
-class Client
+class Client : public IEngineSystems
 {
 public:
     /**
@@ -40,7 +43,8 @@ public:
      * @return True if the connection attempt was initiated successfully,
      *         false otherwise.
      */
-    bool connectToServer(const ServerConnectionInformation&  serverInformartion) const;
+    bool connectToServer(
+        const ServerConnectionInformation& serverInformartion) const;
 
     /**
      * @brief Disconnects from the server.
@@ -60,7 +64,7 @@ public:
      * Should be called regularly (e.g., each frame) to handle incoming
      * messages and connection state changes.
      */
-    void poll() const;
+    void update(double deltaTime, const GameWorld& gameWorld) override;
 
     /**
      * @brief Checks if the client is currently connected to a server.
@@ -68,7 +72,13 @@ public:
      */
     bool isConnected() const;
 
-    void injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher);
+    void injectMessageDispatcher(
+        std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher);
+
+
+    void shutdown(GameWorld& gameWorld) override;
+    const std::string getName() const override;
+
 private:
     /**
      * @brief Callback invoked when a message is received from the server.
@@ -82,12 +92,10 @@ private:
      */
     void onConnectionChanged(const Connection& connection);
 
-    std::unique_ptr<GameWorld> gameWorld;
-
-	///< The underlying network transport.
+    ///< The underlying network transport.
     std::unique_ptr<ITransport> transport;
 
-	///< The current server connection.
+    ///< The current server connection.
     Connection currentConnection{};
-    std::unique_ptr<spelmotor_networking::MessageDispatcher> messageDispatcher;
+    std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
 };

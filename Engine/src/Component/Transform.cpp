@@ -1,5 +1,7 @@
 #include "Component/Transform.h"
 
+#include <algorithm>
+
 Transform::Transform(const Vector2 position, const double rotationAngle, const Vector2 scale) :
     position(position), rotationAngle(rotationAngle), scale(scale){}
 
@@ -33,6 +35,42 @@ void Transform::setScale(const Vector2 newScale) {
 }
 
 
+void Transform::serialize(WriteArchive& archive) const
+{
+	// Position
+	float posX = static_cast<float>(position.x);
+	float posY = static_cast<float>(position.y);
+	archive.process(posX);
+	archive.process(posY);
+
+	// Rotation
+	double rotation = rotationAngle;
+	archive.process(rotation);
+
+	// Scale
+	float scaleX = static_cast<float>(scale.x);
+	float scaleY = static_cast<float>(scale.y);
+	archive.process(scaleX);
+	archive.process(scaleY);
+}
+
+void Transform::deserialize(ReadArchive& archive)
+{
+	// Position
+	float posX, posY;
+	archive.process(posX);
+	archive.process(posY);
+	position = {posX, posY};
+
+	// Rotation
+	archive.process(rotationAngle);
+
+	// Scale
+	float scaleX, scaleY;
+	archive.process(scaleX);
+	archive.process(scaleY);
+	scale = {scaleX, scaleY};
+}
 void Transform::moveTowards(Vector2 targetPosition, float maxDistance)
 {
     Vector2 direction = targetPosition - position;

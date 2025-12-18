@@ -23,10 +23,8 @@ void SimpleMoveBehaviour::onStart()
 	std::cout << "SimpleMoveBehaviour is now started" << std::endl;
 }
 
-void SimpleMoveBehaviour::update(float deltaTime, GameWorld* world)
+void SimpleMoveBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
-	(void)deltaTime;
-	(void)world;
 	pollInput();
 
 	if ( canMove ) move();
@@ -60,10 +58,5 @@ void SimpleMoveBehaviour::pollInput()
 	if (inputManager->isKeyDown(KeyCode::D))
 	    currentDirection.x += 1.0f;
 
-	float length = std::sqrt(currentDirection.x * currentDirection.x +
-	currentDirection.y * currentDirection.y); if (length > 0.0f)
-	{
-	    currentDirection.x /= length;
-	    currentDirection.y /= length;
-	}
+    currentDirection = currentDirection.normalised();
 }

@@ -1,7 +1,3 @@
-//
-// Created by samle on 10/11/2025.
-//
-
 #pragma once
 
 #include "Component/BaseComponentTypes/Component.h"
@@ -9,21 +5,27 @@
 #include "Events/Subscriptions/SubscriptionScope.h"
 
 class GameWorld;
+
 /**
- * @brief This class serves as an abstract component that custom behaviour can derive from.
+ * @brief This class serves as an abstract component that custom behaviour can
+ * derive from.
  *
  * Implements lifetime functions that get called by the Engine internally
  *
- * Behaviour differs from Component because they can be enabled and disabled, and implement lifetime functions.
+ * Behaviour differs from Component because they can be enabled and disabled,
+ * and implement lifetime functions.
  */
 class Behaviour: virtual public Component
 {
-public:
-	Behaviour() :
-		isEnabled(true), hasAwakened(false), hasStarted(false)
+   public:
+	Behaviour() : isEnabled(true), hasAwakened(false), hasStarted(false)
 	{
 	}
 
+	ComponentType getComponentType() const override
+	{
+		return ComponentType::Unknown;
+	}
 	/**
 	 * @brief Pure virtual destructor makes this class Abstract.
 	 */
@@ -74,25 +76,25 @@ public:
 
 	/**
 	 * Update is called every frame when:
-	 * - @c isActiveAndEnabled == true, meaning the GameObject is active, and the Behaviour is enabled
+	 * - @c isActiveAndEnabled == true, meaning the GameObject is active, and
+	 * the Behaviour is enabled
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	virtual void update(float deltaTime, GameWorld* world)
-	{
-	};
+	virtual void update(double deltaTime, const GameWorld& world) {};
 
 	/**
-	 * @brief fixedUpdate is called at regular and fixed intervals as part of the engine's physics loop.
+	 * @brief fixedUpdate is called at regular and fixed intervals as part of
+	 * the engine's physics loop.
 	 *
-	 * Use fixedUpdate to perform physics calculations, like applying force to a Rigidbody.
+	 * Use fixedUpdate to perform physics calculations, like applying force to a
+	 * Rigidbody.
 	 *
-	 * FixedUpdate may be called zero, one or multiple times per frame depending on the frame rate of the simulation,
-	 * to ensure consistent and deterministic physics calculations, regardless of rendering speed.
+	 * FixedUpdate may be called zero, one or multiple times per frame depending
+	 * on the frame rate of the simulation, to ensure consistent and
+	 * deterministic physics calculations, regardless of rendering speed.
 	 */
-	virtual void fixedUpdate()
-	{
-	};
+	virtual void fixedUpdate() {};
 
 	/**
 	* @brief Called when this component is disabled:
@@ -104,10 +106,10 @@ public:
 	}
 
 
-	/**
-	 * @brief Called when this Behaviour's @c GameObject gets destroyed.
-	 */
-	void onDestroy() override;
+        /**
+         * @brief Called when this Behaviour's @c GameObject gets destroyed.
+         */
+        void onDestroy() override;
 
 
 	/**

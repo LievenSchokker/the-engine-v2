@@ -1,6 +1,6 @@
 #include "Networking/Server/Server.h"
 
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
 #include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"
@@ -13,14 +13,15 @@
 #include "Networking/SendMode.h"
 #include "Networking/TransportGNS.h"
 #include "Networking/TransportResult.h"
+#include "Networking/Messages/ConcreteMessages/WelcomeMessage.h"
 
 #include <iostream>
 
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport))
-    , status(ServerStatus::Stopping),
-    messageDispatcher(nullptr)
+    , status(SystemStatus::STOPPPED)
+    , messageDispatcher(nullptr)
 {
     if (serverConnectionInformation.port == 0)
     {
@@ -29,14 +30,9 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
     setupInformation = serverConnectionInformation;
 }
 
+Server::~Server() = default;
 
-Server::~Server()
-{
-    stop();
-}
-
-
-ServerStatus Server::start()
+SystemStatus Server::start(GameWorld& gameWorld)
 {
     transport->setOnMessageReceived([this](const IncomingRawMessage& message)
     {
@@ -52,37 +48,40 @@ ServerStatus Server::start()
 
     if (result == TransportResult::SUCCESS)
     {
-        status = ServerStatus::Running;
-        std::cout << "Started successfully on port " << setupInformation.port << std::endl;
+        status = SystemStatus::RUNNING;
+        gameWorld.server = this;
+        std::cout << "Server started successfully on port " << setupInformation.port << std::endl;
     }
     else
     {
-        status = ServerStatus::Error;
-        std::cerr << "Failed to start" << std::endl;
+        status = SystemStatus::ERROR;
+        std::cerr << "Server failed to start" << std::endl;
     }
 
     return status;
 }
 
-
-void Server::update() const
+void Server::update(double deltaTime, const GameWorld& gameWorld)
 {
     transport->poll();
 }
 
-
-ServerStatus Server::stop()
+void Server::shutdown(GameWorld& gameWorld)
 {
-    if (status == ServerStatus::Running)
+    if (status == SystemStatus::RUNNING)
     {
         transport->closeOpenSocket();
         connectedClients.clear();
-        status = ServerStatus::Stopping;
-        std::cout << "Stopped" << std::endl;
+        status = SystemStatus::STOPPPED;
+        gameWorld.server = nullptr;
+        std::cout << "Server stopped" << std::endl;
     }
-    return status;
 }
 
+const std::string Server::getName() const
+{
+    return "Server";
+}
 
 void Server::onConnectionChanged(const Connection& connection)
 {
@@ -90,34 +89,41 @@ void Server::onConnectionChanged(const Connection& connection)
 
     switch (connection.connectionStatus)
     {
-    case ConnectionStatus::Connected:
-        connectedClients.insert(clientId);
-        std::cout << "Client " << clientId << " connected" << std::endl;
-        break;
-
-    case ConnectionStatus::Terminated:
-    	break;
-    case ConnectionStatus::Error:
-        connectedClients.erase(clientId);
-        std::cout << "Client " << clientId << " disconnected" << std::endl;
-        break;
-
-    default:
-        break;
+        case ConnectionStatus::Connected:
+        {
+            connectedClients.insert(clientId);
+            handleNewClientConnected(clientId);
+            if (onClientConnected)
+            {
+                onClientConnected(clientId);
+            }
+            WelcomeMessage msg(clientId);
+            sendMessage(clientId, msg, SendMode::ReliableOrdered);
+            break;
+        }
+        case ConnectionStatus::Terminated:
+            break;
+        case ConnectionStatus::Error:
+            connectedClients.erase(clientId);
+            if (onClientDisconnected)
+            {
+                onClientDisconnected(clientId);
+            }
+            break;
+        default:
+            break;
     }
 }
 
-
 void Server::onMessage(const IncomingRawMessage& rawMessage)
 {
-    // Ignore messages from unknown connections
     if (!connectedClients.contains(rawMessage.connectionID))
     {
         std::cerr << "Message from unknown client " << rawMessage.connectionID << std::endl;
         return;
     }
 
-    const std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
     if (!message)
     {
@@ -128,38 +134,50 @@ void Server::onMessage(const IncomingRawMessage& rawMessage)
     MessageTypes messageType = message->getMessageType();
     const int clientId = rawMessage.connectionID;
 
-    switch (messageType)
+    if (messageType == MessageTypes::ConnectionMessage)
     {
-    case MessageTypes::ConnectionMessage:
         if (auto* connMsg = dynamic_cast<ConnectionMessage*>(message.get()))
         {
             handleConnectionMessage(clientId, connMsg);
         }
-        break;
+        return;
+    }
 
-    default:
-        std::cerr << "Unknown message type: " << static_cast<int>(messageType) << std::endl;
-        break;
+    if (messageDispatcher)
+    {
+        messageDispatcher->processMessage(std::move(message));
+    }
+    else
+    {
+        std::cerr << "No message dispatcher set!" << std::endl;
     }
 }
-
 
 void Server::handleConnectionMessage(int clientId, ConnectionMessage* message)
 {
     switch (message->getStatus())
     {
-    case ConnectionStatus::Disconnected:
-        transport->disconnectFromSocket(clientId);
-        connectedClients.erase(clientId);
-        break;
-
-    default:
-        break;
+        case ConnectionStatus::Disconnected:
+            transport->disconnectFromSocket(clientId);
+            connectedClients.erase(clientId);
+            break;
+        default:
+            break;
     }
 }
 
+void Server::handleNewClientConnected(int clientId) const
+{
+    if (!messageDispatcher)
+    {
+        return;
+    }
+    auto message = std::make_unique<WelcomeMessage>(clientId);
+    messageDispatcher->processMessage(std::move(message));
+}
 
-bool Server::sendMessage(const int clientId, const IMessage& message, const SendMode& mode) const
+bool Server::sendMessage(const int clientId, const IMessage& message,
+                         const SendMode& mode) const
 {
     if (!connectedClients.contains(clientId))
     {
@@ -175,12 +193,10 @@ bool Server::sendMessage(const int clientId, const IMessage& message, const Send
     return transport->send(outgoing) == TransportResult::SUCCESS;
 }
 
-
 bool Server::sendMessage(const int clientId, const IMessage& message) const
 {
     return sendMessage(clientId, message, SendMode::Unreliable);
 }
-
 
 bool Server::broadcastMessage(const IMessage& message) const
 {
@@ -197,8 +213,8 @@ bool Server::broadcastMessage(const IMessage& message) const
     return allSucceeded;
 }
 
-
-bool Server::broadcastMessage(const IMessage& message, const int excludeClientId) const
+bool Server::broadcastMessage(const IMessage& message,
+                              const int excludeClientId) const
 {
     bool allSucceeded = true;
 
@@ -215,7 +231,6 @@ bool Server::broadcastMessage(const IMessage& message, const int excludeClientId
 
     return allSucceeded;
 }
-
 
 void Server::kickClient(const int clientId)
 {
@@ -235,14 +250,24 @@ void Server::kickClient(const int clientId)
     }
 }
 
-
-void Server::injectMessageDispatcher(std::unique_ptr<spelmotor_networking::MessageDispatcher> dispatcher)
+void Server::injectMessageDispatcher(
+    std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
 {
-	messageDispatcher = std::move(dispatcher);
+    messageDispatcher = std::move(dispatcher);
 }
 
+void Server::setClientConnectedCallback(ClientConnectedCallback callback)
+{
+    onClientConnected = std::move(callback);
+}
 
-ServerConnectionInformation Server::convertApplicationSettings(const ApplicationSpecifications& specifications)
+void Server::setClientDisconnectedCallback(ClientDisconnectedCallback callback)
+{
+    onClientDisconnected = std::move(callback);
+}
+
+ServerConnectionInformation Server::convertApplicationSettings(
+    const ApplicationSpecifications& specifications)
 {
     ServerConnectionInformation server;
     server.ip = specifications.networkingOptions.serverIP;

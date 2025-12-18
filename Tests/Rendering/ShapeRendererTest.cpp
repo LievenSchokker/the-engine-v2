@@ -7,8 +7,8 @@
 #include "Rendering/RenderSystem.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Scene/Scene.h"
-#include "Rendering/RenderSystem.h"
 
+#include "Scene/SceneManager.h"
 #include <gtest/gtest.h>
 #include <memory>
 
@@ -19,50 +19,50 @@ struct FakeRenderer : public IRenderer
 	bool isOpen() override { return isWindowOpen; }
 	void setTitle(const std::string&) override {}
 
-	void beginFrame(const Color& color) override
-	{
-		lastClearColor = color;
-		++beginCalls;
-	}
+    void beginFrame(const Color& color) override
+    {
+        lastClearColor = color;
+        ++beginCalls;
+    }
 
-	void endFrame() override
-	{
-		++endCalls;
-	}
+    void endFrame() override
+    {
+        ++endCalls;
+    }
 
+    void submitUI(const std::vector<UIRenderCommand>& commands) override
+    {
+    }
 
-	void submitUI(const std::vector<UIRenderCommand>& commands) override
-	{
-		// Empty stub for testing
-	}
+    void execute(const RenderCommand& command) override
+    {
+        executedCommands.push_back(command);
 
-	void execute(const RenderCommand& command) override
-	{
-		executedCommands.push_back(command);
+        switch (command.type)
+        {
+            case RenderCommandType::Circle:
+                ++circleCalls;
+                break;
+            case RenderCommandType::Rectangle:
+                ++rectangleCalls;
+                break;
+            default:
+                break;
+        }
+    }
 
-		switch (command.type)
-		{
-			case RenderCommandType::Circle:
-				++circleCalls;
-				break;
-			case RenderCommandType::Rectangle:
-				++rectangleCalls;
-				break;
-			default:
-				break;
-		}
-	}
-    void setupEvents(EventDispatcher&) override {}
-	// Add this - missing from your FakeRenderer
-	void setUIRenderHook(std::unique_ptr<IUIRenderHook>) override {}
+    void setUIRenderHook(std::unique_ptr<IUIRenderHook>) override
+    {
+    }
+	void setupEvents(EventDispatcher&) override {}
 
 	bool isWindowOpen = true;
-	int beginCalls = 0;
-	int endCalls = 0;
-	int circleCalls = 0;
-	int rectangleCalls = 0;
-	Color lastClearColor = Color::black();
-	std::vector<RenderCommand> executedCommands;
+    int beginCalls = 0;
+    int endCalls = 0;
+    int circleCalls = 0;
+    int rectangleCalls = 0;
+    Color lastClearColor = Color::black();
+    std::vector<RenderCommand> executedCommands;
 };
 
 
@@ -130,7 +130,6 @@ TEST(ShapeRendererTest, FillsQueueWithRectangleCommand)
     EXPECT_EQ(commands[0].color.g, Color::yellow().g);
 }
 
-
 // Test RenderSystem executes commands through renderer
 TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
 {
@@ -141,52 +140,14 @@ TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
 	RenderSystem renderSystem{std::move(fakeRenderer)};
 
 
-    Scene scene("TestScene");
-    scene.onStart(*gameworld);
+	std::unique_ptr<Scene> scene = std::make_unique<Scene>("TestScene");
+    scene->onStart(*gameworld);
 
     auto circle = std::make_unique<GameObject>();
     circle->getTransform()->setPosition({42.0, 24.0});
     circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(Color::blue());
-    scene.addRunTimeGameObject(std::move(circle), *gameworld);
-
-    // Act
-    renderSystem.update(0.016f, scene);
-
-    // Assert
-    EXPECT_EQ(rendererPtr->beginCalls, 1);
-    EXPECT_EQ(rendererPtr->endCalls, 1);
-    EXPECT_EQ(rendererPtr->circleCalls, 1);
-    EXPECT_EQ(rendererPtr->rectangleCalls, 0);
-
-    ASSERT_EQ(rendererPtr->executedCommands.size(), 1);
-    EXPECT_EQ(rendererPtr->executedCommands[0].type, RenderCommandType::Circle);
-    EXPECT_DOUBLE_EQ(rendererPtr->executedCommands[0].radius, 25.0);
-}
-
-
-// Test RenderSystem respects layer ordering
-TEST(RenderSystemTest, SortsCommandsByLayer)
-{
-    // Arrange
-    auto gameworld = std::make_unique<GameWorld>();
-	auto fakeRenderer = std::make_unique<FakeRenderer>();
-	FakeRenderer* rendererPtr = fakeRenderer.get();
-	RenderSystem renderSystem{std::move(fakeRenderer)};
-
-    Scene scene("TestScene");
-    scene.onStart(*gameworld);
-
-    // Add objects in wrong order (layer 2, then layer 1)
-    auto backObject = std::make_unique<GameObject>();
-    backObject->addComponent<ShapeRenderer>()->setCircle(10.0).setLayer(2);
-    scene.addRunTimeGameObject(std::move(backObject), *gameworld);
-
-    auto frontObject = std::make_unique<GameObject>();
-    frontObject->addComponent<ShapeRenderer>()->setRectangle({20.0, 20.0}).setLayer(1);
-    scene.addRunTimeGameObject(std::move(frontObject), *gameworld);
-
-    // Act
-    renderSystem.update(0.016f, scene);
+    scene->addRunTimeGameObject(std::move(circle), *gameworld);
+    auto sceneManager = std::make_unique<SceneManager>(*gameworld);
 
     // Assert - Layer 1 should render before Layer 2
     ASSERT_EQ(rendererPtr->executedCommands.size(), 2);
@@ -204,18 +165,40 @@ TEST(RenderSystemTest, SkipsInactiveGameObjects)
     auto gameworld = std::make_unique<GameWorld>();
     Scene scene("TestScene");
     scene.onStart(*gameworld);
+    // Arrange
+    auto fakeRenderer = std::make_unique<FakeRenderer>();
+    FakeRenderer* rendererPtr = fakeRenderer.get();
+    RenderSystem renderSystem{std::move(fakeRenderer)};
+
+    std::unique_ptr<Scene> scene = std::make_unique<Scene>("TestScene");
+    scene->onStart();
 
     auto activeObj = std::make_unique<GameObject>();
     activeObj->addComponent<ShapeRenderer>()->setCircle(10.0);
     scene.addRunTimeGameObject(std::move(activeObj), *gameworld);
+    auto activeObj = std::make_unique<GameObject>();
+    activeObj->addComponent<ShapeRenderer>()->setCircle(10.0);
+    scene->addGameObject(std::move(activeObj));
 
     auto inactiveObj = std::make_unique<GameObject>();
     inactiveObj->addComponent<ShapeRenderer>()->setCircle(20.0);
     inactiveObj->setActive(false);
     scene.addRunTimeGameObject(std::move(inactiveObj), *gameworld);
+    auto inactiveObj = std::make_unique<GameObject>();
+    inactiveObj->addComponent<ShapeRenderer>()->setCircle(20.0);
+    inactiveObj->setActive(false);
+    scene->addGameObject(std::move(inactiveObj));
+
+    GameWorld game{};
+    auto sceneManager = std::make_unique<SceneManager>();
+    game.sceneManager = sceneManager.get();
+    sceneManager->addScene(std::move(scene));
+    sceneManager->setActiveScene("TestScene");
 
     // Act
     renderSystem.update(0.016f, scene);
+    // Act
+    renderSystem.update(0.016f, game);
 
     // Assert
     EXPECT_EQ(rendererPtr->executedCommands.size(), 1);

@@ -6,6 +6,7 @@
 #include <vector>
 #include <cstdint>
 
+#include "Networking/Messages/IMessage.h"
 #include "Networking/Serialization/Serialization.h"
 #include "Networking/Messages/IMessage.h"
 
@@ -19,11 +20,11 @@
  *
  *
  */
-class ActionMessage : public IMessage {
+class ActionMessage final: public IMessage {
 public:
 
     //Need default construction for deserialization.
-    ActionMessage() = default;
+    ActionMessage();
 
     /**
      * @brief Constructs a fully-specified action ready for transmission.
@@ -41,7 +42,7 @@ public:
      *
      * Used by messageWriter to serialize into RawMessageFormat
      */
-    std::vector<std::byte> serialize() const;
+    std::vector<std::byte> serialize() const override;
 
     /**
      * @brief Reconstructs the message from received network data.
@@ -52,7 +53,7 @@ public:
      * gracefully without exception overhead in the hot path.
      *
      */
-    bool deserialize(const std::byte* data, size_t length);
+    bool deserialize(const std::byte* data, size_t length) override;
 
     MessageTypes getMessageType() const override;
 
@@ -60,7 +61,7 @@ public:
      * @brief Checks whether this message represents a coherent, executable action.
      *
      */
-    bool validate() const;
+    bool validate() const override;
 
     /**
      * @brief Identifies which component on the target object should handle this action.
@@ -99,7 +100,7 @@ public:
     /// @}
 
 private:
-    uint32_t networkComponentIdentity;  ///< Routes to the handling component
+    uint32_t networkComponentIdentity; ///< Routes to the handling component
     uint32_t networkGameObjectIdentity; ///< Routes to the target entity
     std::string actionKey;              ///< Identifies the RPC to invoke
     uint32_t tick;                      ///< Simulation frame for temporal ordering
