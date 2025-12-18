@@ -32,6 +32,7 @@ add_executable(engine_tests
         Networking/ServerTest.cpp
         Behaviour/TestBehaviourBase.cpp
         Behaviour/tests_behaviour.cpp
+        Math/TestsVector2.cpp
         Scene/SceneManagerTest.cpp
         Physics/PhysicsSystemTest.cpp
         Math/TestsVector2.cpp
@@ -40,6 +41,7 @@ add_executable(engine_tests
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
         Scene/SceneBehavioursTests.cpp
+        Events/EventTest.cpp
         Audio/TestAudioManager.cpp
         Audio/TestMusicSource.cpp
         Audio/TestSoundSource.cpp

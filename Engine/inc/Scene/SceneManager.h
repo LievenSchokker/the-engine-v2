@@ -1,17 +1,15 @@
 #pragma once
 
 #include "Scene.h"
-#include "Core/IEngineSystems.h"
-
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
 
 #include "Component/NetworkIdentity.h"
-#include "Networking/PrefabLibrary.h"
+#include "Core/IEngineSystems.h"
+#include "Core/SystemStatus.h"
 #include "Networking/Connection/ConnectionMode.h"
-#include "Rendering/Color.h"
 
 class NetworkSpawnManager;
 
@@ -24,13 +22,13 @@ class NetworkSpawnManager;
 class SceneManager : public IEngineSystems
 {
 public:
-    SceneManager();
+	SceneManager(GameWorld& world);
     ~SceneManager() override = default;
 
-    SystemStatus start(GameWorld& gameWorld) override;
-    void update(double deltaTime, const GameWorld& gameWorld) override;
-    void shutdown(GameWorld& gameWorld) override;
-    [[nodiscard]] const std::string getName() const override;
+	SystemStatus start(GameWorld& gameWorld) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
+	void shutdown(GameWorld& gameWorld) override;
+	[[nodiscard]] const std::string getName() const override;
 
     /**
      * @brief Configures the SceneManager for networking.
@@ -45,7 +43,6 @@ public:
      * @brief Checks if network processing has been configured.
      */
     [[nodiscard]] bool isNetworkConfigured() const;
-
     /**
      * @brief Register a scene owned by the manager.
      *
@@ -188,7 +185,7 @@ public:
      */
     [[nodiscard]] std::string getFirstSceneName() const;
 
-private:
+   private:
     /**
      * @brief Processes a scene for networking based on configured mode.
      * @param scene The scene to process.

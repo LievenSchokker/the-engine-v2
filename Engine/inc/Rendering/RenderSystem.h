@@ -3,7 +3,10 @@
 #include "Component/Camera.h"
 #include "Core/IEngineSystems.h"
 #include "Rendering/Color.h"
+#include "Events/EventDispatcher/EventDispatcher.h"
+#include "External/SDLBackendContext.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
+#include "Rendering/Color.h"
 #include "Scene/Scene.h"
 
 class IRenderer;
@@ -30,6 +33,8 @@ public:
 	 */
 	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
 
+
+	void setupEvents(EventDispatcher& dispatcher) const;
 	/**
 	 * @brief Executes a full render frame: collect, sort, draw, present.
 	 *

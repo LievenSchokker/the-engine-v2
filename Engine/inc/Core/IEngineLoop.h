@@ -25,7 +25,7 @@ class IEngineLoop
 {
 	using ClockFunction = std::function<double()>;
 
-   public:
+public:
 	virtual ~IEngineLoop() = default;
 
 	/**
@@ -36,6 +36,8 @@ class IEngineLoop
 	 * update cycle when needed.
 	 */
 	virtual GameWorld* getGameWorld() = 0;
+
+	virtual void setGameWorld(std::unique_ptr<GameWorld> gameWorld) = 0;
 
 	/**
 	 * @brief Provides access to the scene management system

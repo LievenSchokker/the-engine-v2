@@ -2,12 +2,13 @@
 
 #include "Networking/Serialization/ISerializable.h"
 #include "Networking/Serialization/Serialization.h"
-enum class ComponentType : uint32_t;
 
+enum class ComponentType : uint32_t;
 class Scene;
 class Transform;
 class Component;
 class Behaviour;
+class ComponentManager;
 class ScenePlaceholder;
 
 #include <memory>
@@ -81,6 +82,8 @@ public:
     template <typename T>
     T* getComponent() const;
 
+	template <typename T>
+	std::vector<T*> getComponents() const;
 
     /**
     * @brief Attempts to retrieve a component of type T from this GameObject's @c componentManager.

@@ -65,6 +65,7 @@ public:
     void fixedUpdate(double) override {}
     void shutdown() override {}
     void setApplicationClock(ApplicationClock*) override {}
+	void setGameWorld(std::unique_ptr<GameWorld> gameWorld) override {}
 
     GameWorld* getGameWorld() override { return nullptr; }
     SceneManager* getSceneManager() override { return nullptr; }

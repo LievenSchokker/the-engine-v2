@@ -8,7 +8,9 @@
 #include "Core/Options/ApplicationSpecifications.h"
 #include "Core/EngineLoop.h"
 #include "Game.h"
+#include "Events/SDL/SDLEventProccesor.h"
 #include "External/SDLBackendContext.h"
+#include "Input/InputManager.h"
 #include "Networking/Client.h"
 #include "Networking/TransportGNS.h"
 #include "Networking/Server/Server.h"
@@ -25,43 +27,78 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     const auto& specs = game->getApplicationSpecifications();
     auto loop = std::make_unique<EngineLoop>(std::move(game));
 
+    GameWorld* gameWorld = loop->getGameWorld();
     Game* gamePtr = loop->getGame();
 
     std::unique_ptr<IBackendContext> backendContext{};
     IBackendContext* contextPtr = nullptr;
 
+	// BACKEND CONTEXT
     if (specs.renderBackend == RenderBackend::SDL)
     {
         backendContext = std::make_unique<SDLBackendContext>();
         contextPtr = backendContext.get();
-        loop->setClockFunction([]() { return SDL_GetTicks() / 1000.0; });
+        loop->setClockFunction([]()
+        {
+            return SDL_GetTicks() / 1000.0;
+        });
         loop->setBackendContext(std::move(backendContext));
     }
 
+	// EVENTS
+    if (hasFlag(specs.engineSystem, EngineSystem::Events))
+    {
+        gameWorld->setDispatcher(std::make_unique<EventDispatcher>());
+
+        if (contextPtr != nullptr)
+        {
+            auto events = std::make_unique<SDLEventProcessor>();
+            loop->addSystem(std::move(events));
+        }
+
+    	// INPUT (needs the event dispatcher)
+    	if (hasFlag(specs.engineSystem, EngineSystem::Input))
+    	{
+    		auto input = std::make_unique<InputManager>();
+    		loop->addSystem(std::move(input));
+    	}
+
+    }
+
+	// RENDERING
     if (hasFlag(specs.engineSystem, EngineSystem::Renderer))
     {
         if (contextPtr != nullptr)
         {
             auto sdlRenderer = std::make_unique<SDLRenderer>(*contextPtr);
             sdlRenderer->open(specs.windowOptions);
-            loop->addSystem(std::make_unique<RenderSystem>(std::move(sdlRenderer)));
+
+            auto system = std::make_unique<RenderSystem>(std::move(sdlRenderer));
+            gameWorld->render = system.get();
+
+            loop->addSystem(std::move(system));
         }
     }
 
+	// AUDIO
     if (hasFlag(specs.engineSystem, EngineSystem::Audio))
     {
         if (contextPtr != nullptr)
         {
-            loop->addSystem(std::make_unique<AudioSystem>(std::make_unique<AudioBackendSDL>()));
+            auto audioSystem = std::make_unique<AudioSystem>(
+                std::make_unique<AudioBackendSDL>());
+            loop->addSystem(std::move(audioSystem));
         }
     }
 
+	// PHYSICS
     if (hasFlag(specs.engineSystem, EngineSystem::Physics))
     {
-        loop->addSystem(std::make_unique<PhysicsSystem>());
+        auto physicsSystem = std::make_unique<PhysicsSystem>();
+        loop->addSystem(std::move(physicsSystem));
     }
 
-    auto sceneManager = std::make_unique<SceneManager>();
+    auto sceneManager = std::make_unique<SceneManager>(*gameWorld);
     std::unique_ptr<Scene> scenePtr = gamePtr->getFirstScene();
 
     if (!scenePtr)
@@ -74,16 +111,23 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     sceneManager->setActiveScene(sceneName);
     loop->addSystem(std::move(sceneManager));
 
+    // NETWORKING
     if (hasFlag(specs.engineSystem, EngineSystem::NetClient))
     {
-        loop->addSystem(std::make_unique<Client>(std::make_unique<TransportGNS>()));
+        auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
+        loop->addSystem(std::move(client));
     }
 
     if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
     {
-        loop->addSystem(std::make_unique<Server>(
-            ServerConnectionInformation{specs.networkingOptions.port, specs.networkingOptions.serverIP},
-            std::make_unique<TransportGNS>()));
+        auto server = std::make_unique<Server>(
+            ServerConnectionInformation{
+                specs.networkingOptions.port,
+                specs.networkingOptions.serverIP
+            },
+            std::make_unique<TransportGNS>());
+        loop->addSystem(std::move(server));
     }
+
     return loop;
 }

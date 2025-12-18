@@ -4,17 +4,15 @@
 #include "SimpleMoveBehaviour.h"
 
 #include "Component/Transform.h"
+#include "Core/GameWorld.h"
 
 void SimpleMoveBehaviour::onAwake()
 {
 	canMove = true;
-	inputManager = InputManager::getInstance();
-	std::cout << "SimpleMoveBehaviour is now awake" << std::endl;
 }
 
 void SimpleMoveBehaviour::onEnable()
 {
-	std::cout << "SimpleMoveBehaviour is now enabled" << std::endl;
 	currentSpeed = maxSpeed;
 }
 
@@ -25,6 +23,7 @@ void SimpleMoveBehaviour::onStart()
 
 void SimpleMoveBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
+	inputManager = gameWorld.input;
 	pollInput();
 
 	if ( canMove ) move();

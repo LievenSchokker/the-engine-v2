@@ -21,7 +21,7 @@ public:
     void registerNetworkMethods(NetworkBuilder& builder) override;
     void update(double deltaTime,const GameWorld& world) override;
 
-	ComponentType getComponentType() const override
+	[[nodiscard]] ComponentType getComponentType() const override
 	{
 		return ComponentType::PlayerMovement;
 	}

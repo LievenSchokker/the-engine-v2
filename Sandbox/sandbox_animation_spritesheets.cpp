@@ -43,11 +43,12 @@ class ExitBehaviour: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
 	}
 
 	void update(double deltaTime, const GameWorld& world) override
 	{
+		inputManager = world.input;
+
 		(void)deltaTime;
 		(void)world;
 

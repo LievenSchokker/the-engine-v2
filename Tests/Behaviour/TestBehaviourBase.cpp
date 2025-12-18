@@ -1,9 +1,5 @@
-//
-// Created by samle on 18/11/2025.
-//
-
 #include "TestBehaviours.h"
-
+#include "Core/GameWorld.h"
 
 namespace engine_tests
 {
@@ -15,7 +11,8 @@ namespace engine_tests
 
     void TestBehaviourBase::onAwake()
     {
-        Behaviour::awake();
+        auto world = std::make_shared<GameWorld>();
+        Behaviour::awake(*world);
         awakeCalled = true;
     }
 
