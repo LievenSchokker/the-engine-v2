@@ -2,6 +2,8 @@
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
 #include "Core/ApplicationSpecifications.h"
+#include "../Engine/inc/Core/Options/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
@@ -49,7 +51,7 @@ class PhysicsInputBehaviour: public Behaviour
 		inputManager = InputManager::getInstance();
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
@@ -157,7 +159,7 @@ int main(int argc, char** argv)
 	// --- Physics World ---
 	std::unique_ptr<IPhysicsWorld> physicsWorld =
 		std::make_unique<Box2DPhysicsWorld>();
-	physicsWorld->start();
+	physicsWorld->initialize();
 
 	// Register GameObjects with physics world
 	physicsWorld->createBody(circleGO->getComponent<RigidBody>());

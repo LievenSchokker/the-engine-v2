@@ -27,7 +27,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 *
 	 * The actual Box2D world is not created until start() is called.
 	 */
-	Box2DPhysicsWorld(float newTickRate = 60);
+	explicit Box2DPhysicsWorld(float newTickRate = 60);
 
 	/**
 	 * @brief Destructor.
@@ -35,31 +35,6 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 * Currently defaulted. All cleanup should be handled in shutdown().
 	 */
 	~Box2DPhysicsWorld() override = default;
-
-	/**
-	 * @brief Initializes the Box2D world.
-	 *
-	 * This creates the internal b2WorldId instance and applies default
-	 * world settings such as gravity. Must be called before update() or
-	 * body creation.
-	 */
-	void start() override;
-
-	/**
-	 * @brief Steps the Box2D simulation forward by one fixed timestep.
-	 *
-	 * The timestep and substep count are typically configured internally.
-	 * This method is called by PhysicsSystem::update().
-	 */
-	void fixedUpdate() override;
-
-	/**
-	 * @brief Shuts down the physics world.
-	 *
-	 * All Box2D bodies are destroyed and the world is cleared. After this call,
-	 * the world must be restarted with start() to simulate again.
-	 */
-	void shutdown() override;
 
 	/**
 	 * @brief Creates a physics body for the given GameObject.
@@ -87,9 +62,13 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 * force.
 	 * @param force Force vector in world units.
 	 */
-	void applyForce(const RigidBody* rigitBody, Vector2 force) override;
+	void applyForce(const RigidBody* rigidBody, Vector2 force) override;
 
-   private:
+	void initialize() override;
+	void step(float deltaTime) override;
+	void destroy() override;
+
+private:
 	/**
 	 * @brief Box2D world identifier.
 	 *

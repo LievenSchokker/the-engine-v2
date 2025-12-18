@@ -8,21 +8,26 @@
 
 #include <iostream>
 
+#include <iostream>
+
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
-	: worldId{}, tickRate(newTickRate)
+	: worldId{}
+	  , tickRate(newTickRate)
 {
 }
 
-void Box2DPhysicsWorld::start()
+void Box2DPhysicsWorld::initialize()
 {
+	std::cout << "Box2DPhysicsWorld::initialize() called" << std::endl;
+
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = {0.0f, 30.0f};
+	worldId = b2CreateWorld(&worldDef);
 
-	b2WorldId box2dWorldId = b2CreateWorld(&worldDef);
-	worldId = box2dWorldId;
+	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
 }
 
-void Box2DPhysicsWorld::fixedUpdate()
+void Box2DPhysicsWorld::step(float deltaTime)
 {
 	float timeStep = 1.0f / tickRate;
 	int subStepCount = 4;
@@ -79,22 +84,31 @@ void Box2DPhysicsWorld::fixedUpdate()
 	}
 
 	// Sync transforms to gameobjects
+
+	for (auto body : bodies)
+	{
+		RigidBody* rigid_body = const_cast<RigidBody*>(body.first);
+		rigid_body->fixedUpdate();
+	}
+
 	syncTransforms();
 }
 
 void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
 {
-	if ( !rigidBody ) return;
+	if (!rigidBody) return;
 
+	// RigidBody always knows its owning GameObject
 	GameObject* gameObject = rigidBody->getGameObject();
-	if ( !gameObject ) return;
+	if (!gameObject) return;
 
-	Transform* transform = gameObject->getTransform();
-	Collider* collider = gameObject->getComponent<Collider>();
+	auto* transform = gameObject->getTransform();
+	auto* collider = gameObject->getComponent<Collider>();
 
-	if ( !collider || !transform ) return;
+	// Cannot create a physics body without a collider
+	if (!collider || !transform) return;
 
-	// Body definition
+	//  Body definition
 	b2BodyDef def = b2DefaultBodyDef();
 	def.type = rigidBody->isDynamic ? b2_dynamicBody : b2_staticBody;
 
@@ -163,9 +177,10 @@ void Box2DPhysicsWorld::applyForce(const RigidBody* rigidBody, Vector2 force)
 	b2Body_ApplyForceToCenter(it->second, b2Force, true);
 }
 
+
 void Box2DPhysicsWorld::shutdown()
 {
-	for ( auto& [gameObject, box2DID] : bodies )
+	for (auto& [gameObject, box2DID] : bodies)
 	{
 		b2DestroyBody(box2DID);
 	}

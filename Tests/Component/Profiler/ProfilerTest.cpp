@@ -40,9 +40,10 @@ protected:
 
     void simulateFrames(int count, float deltaTime)
     {
+        auto world = std::make_unique<GameWorld>();
         for (int i = 0; i < count; ++i)
         {
-            profiler->update(deltaTime, nullptr);
+            profiler->update(deltaTime, *world);
         }
     }
 
@@ -255,9 +256,10 @@ TEST_F(ProfilerTest, RenderMinMaxLabelContainsMinMax)
 
 TEST_F(ProfilerTest, RenderMinMaxLabelTracksVariation)
 {
-    profiler->update(0.010f, nullptr);
-    profiler->update(0.030f, nullptr);
-    profiler->update(0.020f, nullptr);
+    auto world = std::make_unique<GameWorld>();
+    profiler->update(0.010f, *world);
+    profiler->update(0.030f, *world);
+    profiler->update(0.020f, *world);
 
     UIRenderCommand minMax = profiler->renderMinMaxLabel();
 
@@ -433,7 +435,8 @@ TEST_F(ProfilerTest, FPSCalculationWithVariableFrameTime)
 
 TEST_F(ProfilerTest, HandleZeroDeltaTime)
 {
-    EXPECT_NO_THROW(profiler->update(0.0f, nullptr));
+    auto world = std::make_unique<GameWorld>();
+    EXPECT_NO_THROW(profiler->update(0.0f, *world));
 
     UIRenderCommand fps = profiler->renderFps();
     EXPECT_EQ(fps.type, UICommandType::Text);
@@ -441,7 +444,8 @@ TEST_F(ProfilerTest, HandleZeroDeltaTime)
 
 TEST_F(ProfilerTest, HandleVerySmallDeltaTime)
 {
-    EXPECT_NO_THROW(profiler->update(0.0001f, nullptr));
+    auto world = std::make_unique<GameWorld>();
+    EXPECT_NO_THROW(profiler->update(0.0001f, *world));
 
     UIRenderCommand fps = profiler->renderFps();
     EXPECT_EQ(fps.type, UICommandType::Text);
@@ -449,7 +453,8 @@ TEST_F(ProfilerTest, HandleVerySmallDeltaTime)
 
 TEST_F(ProfilerTest, HandleVeryLargeDeltaTime)
 {
-    EXPECT_NO_THROW(profiler->update(10.0f, nullptr));
+    auto world = std::make_unique<GameWorld>();
+    EXPECT_NO_THROW(profiler->update(10.0f, *world));
 
     UIRenderCommand fps = profiler->renderFps();
     // Should show red for very slow frames
@@ -458,7 +463,8 @@ TEST_F(ProfilerTest, HandleVeryLargeDeltaTime)
 
 TEST_F(ProfilerTest, HandleNullGameWorld)
 {
-    EXPECT_NO_THROW(profiler->update(0.016f, nullptr));
+    auto world = std::make_unique<GameWorld>();
+    EXPECT_NO_THROW(profiler->update(0.016f, *world));
 }
 
 TEST_F(ProfilerTest, ManyFramesDoNotCrash)
@@ -484,9 +490,10 @@ TEST_F(ProfilerTest, SetUpdateIntervalDoesNotCrash)
 
 TEST_F(ProfilerTest, ProfilerCanBeUsedAsBehaviour)
 {
+    auto world = std::make_unique<GameWorld>();
     Behaviour* behaviour = profiler.get();
 
-    EXPECT_NO_THROW(behaviour->update(0.016f, nullptr));
+    EXPECT_NO_THROW(behaviour->update(0.016f, *world));
 }
 
 TEST_F(ProfilerTest, ProfilerCanBeUsedAsUIObject)

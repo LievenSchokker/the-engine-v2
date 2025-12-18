@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component/Camera.h"
+#include "Core/IEngineSystems.h"
 #include "Rendering/Color.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
 #include "Scene/Scene.h"
@@ -16,9 +17,9 @@ class IRenderer;
  * entities are organized in the scene.
  *
  */
-class RenderSystem
+class RenderSystem: public IEngineSystems
 {
-   public:
+public:
 	/**
 	 * @brief Takes ownership of a renderer implementation.
 	 * @param renderer The backend-specific renderer to delegate drawing to.
@@ -37,15 +38,15 @@ class RenderSystem
 	 * boilerplate out of core loop code.
 	 *
 	 */
-	void update(float deltaTime, Scene& scene);
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 	void processWorldCommands();
-
 	void setClearColor(const Color& color);
 	void updateCameras(const Scene& scene);
 
 	const Color& getClearColor() const;
 
    private:
+	const std::string getName() const override;
 	std::unique_ptr<IRenderer> renderer;
 	std::vector<Camera*> cameras;
 	RenderQueue queue;

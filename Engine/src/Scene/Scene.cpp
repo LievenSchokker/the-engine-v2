@@ -1,18 +1,21 @@
 #include "Scene/Scene.h"
 
-#include "Component/GridComponent.h"
 #include "GameObject/GameObject.h"
-#include "Behaviour/Behaviour.h"
 #include "Behaviour/Behaviour.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Core/ApplicationClock.h"
-#include "GameObject/GameObject.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
+#include "AI/Navigation/NavigationObstacle.h"
+#include "AI/Navigation/NavigationGrid.h"
+#include "AI/Navigation/NavigationSystem.h"
+
 
 #include <algorithm>
 #include <iostream>
 #include <utility>
+
+#include "AI/Navigation/NavigationGridOptions.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -125,6 +128,9 @@ void Scene::onStart()
 		return;
 	}
 
+    /// Note: Somehwere the settings should be configured?
+    initialiseNavigationSystem({100, 100, Vector2{15, 15}});
+
 	active = true;
 
 	/// Store all behaviours from all gameobjects in this scene
@@ -135,7 +141,8 @@ void Scene::onStart()
 	{
 		for ( auto& behaviour : gameObject->getAllBehaviours() )
 		{
-			if ( behaviour == nullptr ) continue;
+			if ( behaviour == nullptr )
+			    continue;
 
 			allBehaviours.emplace_back(behaviour);
 		}
@@ -165,9 +172,6 @@ void Scene::onStop()
 	beforeEnableBehaviours.clear();
 	for ( auto& gameObject : gameObjects )
 	{
-		// TODO: call gameobject on stop
-		/// GO does not have (and shouldn't have) an onStop, but we can
-		/// deactivate all behaviours:
 		const auto& enabledBehaviours = gameObject->getEnabledBehaviours();
 		beforeEnableBehaviours.insert(beforeEnableBehaviours.end(),
 									  enabledBehaviours.begin(),
@@ -203,36 +207,54 @@ void Scene::onResume()
 	}
 }
 
-void Scene::update(double deltaTime, GameWorld* world)
+void Scene::update(double deltaTime, const GameWorld& world)
 {
 	if ( !active )
 	{
 		return;
 	}
 
-	int behaviorCount = 0;
-	bool clockPaused = (world != nullptr && world->clock != nullptr &&
-						world->clock->isPaused());
-	for ( auto& gameObject : gameObjects )
-	{
-		if (!gameObject->getIsActive())
-			continue;
+	bool clockPaused = (world.clock != nullptr &&
+						world.clock->isPaused());
 
-		for ( const auto& behaviour : gameObject->getEnabledBehaviours() )
-		{
-			if ( !behaviour->getHasAwakened() || !behaviour->getHasStarted() )
-				continue;
-			// Skip simulation behaviors when paused, but allow behaviors that
-			// override shouldRunWhenPaused() to return true (e.g., debug
-			// controls)
-			if ( clockPaused && !behaviour->shouldRunWhenPaused() )
-			{
-				continue;  // Skip simulation behaviors when paused
-			}
-			behaviorCount++;
-			behaviour->update(deltaTime, world);
-		}
-	}
+    std::vector<GameObject*> objectsToUpdate;
+    objectsToUpdate.reserve(gameObjects.size());
+
+    for (auto& gameObject : gameObjects)
+    {
+        if (gameObject && gameObject->getIsActive())
+        {
+            objectsToUpdate.push_back(gameObject.get());
+        }
+    }
+
+    for (GameObject* gameObject : objectsToUpdate)
+    {
+        if (!gameObject || isInDestroyQueue(gameObject))
+        {
+            continue;
+        }
+
+        if (!gameObjectIds.contains(gameObject))
+        {
+            continue;
+        }
+
+        for (Behaviour* behaviour : gameObject->getEnabledBehaviours())
+        {
+            if (!behaviour || !behaviour->getHasAwakened() || !behaviour->getHasStarted())
+            {
+                continue;
+            }
+
+            if (clockPaused && !behaviour->shouldRunWhenPaused())
+            {
+                continue;
+            }
+
+            behaviour->update(deltaTime, world);
+        }
+    }
 
 	processDestroyQueue();
 }
@@ -258,6 +280,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
         }
     }
 
+    /// Lastly call start on all enabled behaviours on Active GameObjects:
     for (auto& behaviour : behaviours)
     {
         if (behaviour == nullptr)
@@ -266,6 +289,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour*>& behaviours)
         if (!behaviour->getIsActiveAndEnabled())
             continue;
 
+        /// Start may only be called once per behaviour
         if (!behaviour->getHasStarted())
             behaviour->start();
     }
@@ -406,4 +430,26 @@ bool Scene::addGameObjectInternal(std::unique_ptr<GameObject> gameObject)
     currentGameObjectId++;
 
     return true;
+}
+
+ void Scene::initialiseNavigationSystem(NavigationGridOptions options)
+{
+    std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(options.gridWidth, options.gridHeight, options.cellSize);
+    std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<NavigationObstacle>();
+
+    std::vector<BoundingBox> obstacleBounds {};
+
+    for ( const auto& obstacle : obstacles )
+    {
+        obstacleBounds.push_back(obstacle->getBounds());
+    }
+
+    navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
+    navigationSystem->bake(obstacleBounds);
+}
+
+
+NavigationSystem* Scene::getNavigationSystem() const
+{
+    return navigationSystem.get();
 }

@@ -5,7 +5,7 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -75,7 +75,7 @@ class AnimationInputBehaviour: public Behaviour
 		std::cout << "  ESC - Exit\n\n";
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
@@ -211,6 +211,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
+    spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Animation Example", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 

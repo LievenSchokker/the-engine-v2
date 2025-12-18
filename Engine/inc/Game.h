@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 #include <memory>
@@ -43,9 +43,12 @@ class Game
 	 */
 	void addScene(std::unique_ptr<Scene> scene);
 
-	std::unique_ptr<SceneManager> getSceneManager();
+    std::unique_ptr<Scene> getFirstScene();
+	std::vector<std::unique_ptr<Scene>> getAllScenes();
+private:
+    ApplicationSpecifications specifications;
 
-   private:
-	ApplicationSpecifications specifications;
-	std::unique_ptr<SceneManager> sceneManager;
+    /// Owning container for all registered scenes. Using unique_ptr ensures
+    /// deterministic destruction order during engine shutdown.
+    std::vector<std::unique_ptr<Scene>> scenes;
 };
