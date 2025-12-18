@@ -28,6 +28,7 @@ int main(int argc, char** argv)
     spec.networkingOptions.serverIP = "127.0.0.1";
     spec.networkingOptions.tickRate = 60;
     spec.renderBackend = RenderBackend::SDL;
+	spec.engineSystem = EngineSystem::Client;
     spec.windowOptions = {
         mode == EngineMode::SERVER ? "GameEngine - Server" : "GameEngine - Client",
         700,
