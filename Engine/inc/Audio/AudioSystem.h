@@ -8,7 +8,7 @@
 class AudioManager;
 class IAudioBackend;
 
-class AudioSystem : public IEngineSystem
+class AudioSystem : public IEngineSystems
 {
 public:
 	explicit AudioSystem(std::unique_ptr<IAudioBackend> backend);

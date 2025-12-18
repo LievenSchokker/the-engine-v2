@@ -18,7 +18,7 @@ SystemStatus SceneManager::start(GameWorld& gameWorld)
 {
     this->gameWorld = &gameWorld;
     gameWorld.sceneManager = this;
-    return SystemStatus::Running;
+    return SystemStatus::RUNNING;
 }
 
 void SceneManager::update(double deltaTime, const GameWorld& gameWorld)

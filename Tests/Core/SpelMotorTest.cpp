@@ -47,8 +47,6 @@ protected:
     }
 };
 
-// Tests/Mocks/MockEngineLoop.h
-#pragma once
 
 #include "Core/IEngineLoop.h"
 

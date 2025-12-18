@@ -22,7 +22,7 @@ ApplicationSpecifications EngineLoop::getSpecifications() const
     return game->getApplicationSpecifications();
 }
 
-void EngineLoop::addSystem(std::unique_ptr<IEngineSystem> system)
+void EngineLoop::addSystem(std::unique_ptr<IEngineSystems> system)
 {
     systems.push_back(std::move(system));
 }
@@ -99,7 +99,7 @@ IBackendContext* EngineLoop::getBackendContext() const
     return backendContext.get();
 }
 
-const std::vector<std::unique_ptr<IEngineSystem>>& EngineLoop::getSystems() const
+const std::vector<std::unique_ptr<IEngineSystems>>& EngineLoop::getSystems() const
 {
     return systems;
 }

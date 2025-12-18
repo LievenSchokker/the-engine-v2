@@ -20,7 +20,7 @@
 Server::Server(const ServerConnectionInformation& serverConnectionInformation,
                std::unique_ptr<ITransport> injectedTransport)
     : transport(std::move(injectedTransport))
-    , status(SystemStatus::Stopping)
+    , status(SystemStatus::STOPPPED)
     , messageDispatcher(nullptr)
 {
     if (serverConnectionInformation.port == 0)
@@ -48,13 +48,13 @@ SystemStatus Server::start(GameWorld& gameWorld)
 
     if (result == TransportResult::SUCCESS)
     {
-        status = SystemStatus::Running;
+        status = SystemStatus::RUNNING;
         gameWorld.server = this;
         std::cout << "Server started successfully on port " << setupInformation.port << std::endl;
     }
     else
     {
-        status = SystemStatus::Error;
+        status = SystemStatus::ERROR;
         std::cerr << "Server failed to start" << std::endl;
     }
 
@@ -68,11 +68,11 @@ void Server::update(double deltaTime, const GameWorld& gameWorld)
 
 void Server::shutdown(GameWorld& gameWorld)
 {
-    if (status == SystemStatus::Running)
+    if (status == SystemStatus::RUNNING)
     {
         transport->closeOpenSocket();
         connectedClients.clear();
-        status = SystemStatus::Stopping;
+        status = SystemStatus::STOPPPED;
         gameWorld.server = nullptr;
         std::cout << "Server stopped" << std::endl;
     }

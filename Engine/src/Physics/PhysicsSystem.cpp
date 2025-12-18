@@ -11,7 +11,7 @@ SystemStatus PhysicsSystem::start(GameWorld& gameWorld)
 {
 	physicsWorld->initialize();
 	gameWorld.physics = physicsWorld.get();
-	return SystemStatus::Running;
+	return SystemStatus::RUNNING;
 }
 
 void PhysicsSystem::fixedUpdate(const double deltaTime,

@@ -16,7 +16,7 @@ AudioSystem::~AudioSystem() = default;
 SystemStatus AudioSystem::start(GameWorld& gameWorld)
 {
 	audioManager->initialize(std::move(backend));
-	return SystemStatus::Running;
+	return SystemStatus::RUNNING;
 }
 
 void AudioSystem::update(double deltaTime, const GameWorld& gameWorld)

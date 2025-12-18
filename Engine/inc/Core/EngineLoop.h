@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-class IEngineSystem;
+class IEngineSystems;
 class Game;
 class GameWorld;
 class SceneManager;
@@ -57,7 +57,7 @@ public:
      *
      * @param system Unique pointer to the system to add.
      */
-    void addSystem(std::unique_ptr<IEngineSystem> system);
+    void addSystem(std::unique_ptr<IEngineSystems> system);
 
     /**
      * @brief Initializes all registered systems.
@@ -147,7 +147,7 @@ public:
      *
      * @return Const reference to the vector of registered systems.
      */
-    [[nodiscard]] const std::vector<std::unique_ptr<IEngineSystem>>& getSystems() const;
+    [[nodiscard]] const std::vector<std::unique_ptr<IEngineSystems>>& getSystems() const;
 
     /**
      * @brief Sets the application clock for the game world.
@@ -185,7 +185,7 @@ private:
     std::unique_ptr<IBackendContext> backendContext;
     std::unique_ptr<Game> game;
     std::unique_ptr<GameWorld> gameWorld;
-    std::vector<std::unique_ptr<IEngineSystem>> systems;
+    std::vector<std::unique_ptr<IEngineSystems>> systems;
     SceneManager* sceneManagerPtr;
     ClockFunction clockFunction;
     bool shutdownRequested = false;

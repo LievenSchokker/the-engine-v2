@@ -16,7 +16,7 @@ class IRenderer;
  * entities are organized in the scene.
  *
  */
-class RenderSystem: public IEngineSystem
+class RenderSystem: public IEngineSystems
 {
 public:
 	/**

@@ -28,7 +28,7 @@ enum class ConnectionStatus : uint8_t;
  * @details Designed to decouple high-level server logic from transport implementation.
  *          Maintains authoritative list of connected clients for validation and routing.
  */
-class Server : public IEngineSystem
+class Server : public IEngineSystems
 {
 public:
     /**

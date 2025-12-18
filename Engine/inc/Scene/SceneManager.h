@@ -21,7 +21,7 @@ class NetworkSpawnManager;
  * Stores scenes by name, forwards lifecycle calls, and keeps track of the
  * active scene along with a simple paused state.
  */
-class SceneManager : public IEngineSystem
+class SceneManager : public IEngineSystems
 {
 public:
     SceneManager();

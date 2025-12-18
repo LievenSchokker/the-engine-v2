@@ -23,7 +23,7 @@ struct IncomingRawMessage;
  * Manages a single server connection, handling message sending/receiving
  * and connection state changes through the underlying transport layer.
  */
-class Client : public IEngineSystem
+class Client : public IEngineSystems
 {
 public:
     /**

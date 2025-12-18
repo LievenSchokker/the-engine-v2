@@ -3,7 +3,7 @@
 #include "Core/IEngineSystems.h"
 
 
-class PhysicsSystem : public IEngineSystem
+class PhysicsSystem : public IEngineSystems
 {
 public:
 

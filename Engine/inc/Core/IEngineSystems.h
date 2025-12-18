@@ -7,14 +7,14 @@
 
 class GameWorld;
 
-class IEngineSystem
+class IEngineSystems
 {
 public:
-	virtual ~IEngineSystem() = default;
+	virtual ~IEngineSystems() = default;
 
 	virtual SystemStatus start(GameWorld& gameWorld)
 	{
-		return SystemStatus::Error;
+		return SystemStatus::ERROR;
 	}
 
 	virtual void update(double deltaTime, const GameWorld& gameWorld)
