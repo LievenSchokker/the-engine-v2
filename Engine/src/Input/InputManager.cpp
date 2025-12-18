@@ -2,6 +2,7 @@
 #include "Core/GameWorld.h"
 #include "Events/EventImplementations/ApplicationEvents.h"
 
+#include <iostream>
 #include <ostream>
 
 InputManager::InputManager() = default;
@@ -15,6 +16,7 @@ void InputManager::initialize(EventDispatcher& dispatcher)
     {
         return;
     }
+	std::cout << "[InputManager::initialize] Subscribing to events" << std::endl;
     cachedDispatcher = &dispatcher;
 
     keyPressedHandle = dispatcher.subscribe<KeyPressedEvent>(
@@ -121,6 +123,8 @@ void InputManager::onKeyPressed(const KeyPressedEvent& e)
 {
     if (!e.isRepeat)
     {
+    	std::cout << "[InputManager::onKeyPressed] this=" << this
+				  << " key=" << static_cast<int>(e.keyCode) << std::endl;
         keysCurrent.insert(static_cast<KeyCode>(e.scanCode));
     }
 }
@@ -159,7 +163,16 @@ void InputManager::onWindowClose(const WindowCloseEvent& e)
 }
 
 bool InputManager::quitRequested() const { return quitSignaled; }
-bool InputManager::isKeyDown(KeyCode key) const { return keysCurrent.contains(key); }
+bool InputManager::isKeyDown(KeyCode key) const
+{
+	bool result = keysCurrent.count(key) > 0;
+	if (key == KeyCode::W) {
+		std::cout << "[isKeyDown] this=" << this
+				  << " keysCurrent.size()=" << keysCurrent.size()
+				  << " result=" << result << std::endl;
+	}
+	return keysCurrent.contains(key);
+}
 bool InputManager::wasKeyPressed(KeyCode key) const { return keysPressed.contains(key); }
 bool InputManager::wasKeyReleased(KeyCode key) const { return keysReleased.contains(key); }
 bool InputManager::isMouseDown(MouseButton button) const { return mouseCurrent.contains(button); }

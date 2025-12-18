@@ -15,6 +15,7 @@ public:
 protected:
     void handleMessageInternal() override
     {
+    	std::cout << "Setting Welcome message to" << getMessage()->getClientId() << std::endl;
         gameWorld->localClientId = getMessage()->getClientId();
     }
 };

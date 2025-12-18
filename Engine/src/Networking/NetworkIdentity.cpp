@@ -49,7 +49,6 @@ void NetworkIdentity::onNetworkSpawn()
 	{
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
-			netBehaviour->setWorldRefrence(gameWorld);
 			netBehaviour->identity = this;
 
 			if (std::ranges::find(networkBehaviours, netBehaviour) == networkBehaviours.end())

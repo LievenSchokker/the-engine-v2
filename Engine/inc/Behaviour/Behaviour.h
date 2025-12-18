@@ -174,9 +174,9 @@ protected:
 	template <class EventType, class T>
 	void subscribe(void (T::*method)(const EventType&));
 
-private:
+protected:
 	GameWorld* gameWorld = nullptr;
-
+private:
 	/// A RAII Wrapper for subscription handles. (This automatically manages subscription's)
 	SubscriptionScope subscriptions;
 	/// Enabled components are Updated, disabled Beahviours are not.

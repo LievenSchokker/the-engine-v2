@@ -54,18 +54,12 @@ void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
 
 void PlayerMovement::update(double deltaTime,const GameWorld& world)
 {
-	std::cout << "[PlayerMovement::update] Called!" << std::endl;
-	std::cout << "  hasAuthority()=" << hasAuthority() << std::endl;
-	std::cout << "  identity=" << identity << std::endl;
-	std::cout << "  world=" << getWorld() << std::endl;
+	if (!hasAuthority())
+	{
+		return;
+	}
 
-    if (!hasAuthority())
-    {
-    	std::cout << "  -> No authority, returning" << std::endl;
-        return;
-    }
-
-    handleInput();
+	handleInput();
 }
 
 void PlayerMovement::serialize(WriteArchive& archive) const
@@ -80,13 +74,17 @@ void PlayerMovement::deserialize(ReadArchive& archive)
 
 void PlayerMovement::handleInput()
 {
-    auto* world = getWorld();
-    if (!world || !world->input) return;
+	if (!gameWorld || !gameWorld->input) {
+		return;
+	}
 
-    auto* input = world->input;
 
+    auto* input = gameWorld->input;
+
+	std::cout << input << std::endl;
     if (input->isKeyDown(KeyCode::W) || input->isKeyDown(KeyCode::UP_ARROW))
     {
+    	std::cout << "W/UP pressed! Applying velocity..." << std::endl;
         callCommand("MoveUp");
         applyMovement(0, -1);
     }
@@ -109,12 +107,7 @@ void PlayerMovement::handleInput()
 
 void PlayerMovement::applyMovement(const float dirX, const float dirY) const
 {
-    if (!isServer())
-    {
-        return;
-    }
-
-    Transform* transform = getGameObject()->getTransform();
+	Transform* transform = getGameObject()->getTransform();
 
     float dt = 1.0f / 60.0f;
     Vector2 pos = transform->getPosition();

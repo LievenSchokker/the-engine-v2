@@ -13,7 +13,7 @@ void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
 		return;
 	}
 
-	if (!world)
+	if (!gameWorld)
 	{
 		return;
 	}
@@ -25,7 +25,7 @@ void NetworkBehaviour::callCommand(const std::string& name, Args&&... args)
 		0
 		);
 
-	world->sendToServer(message);
+	gameWorld->sendToServer(message);
 }
 
 inline void NetworkBehaviour::addCommand(const std::string& name,
