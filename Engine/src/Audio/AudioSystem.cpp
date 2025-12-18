@@ -21,7 +21,6 @@ SystemStatus AudioSystem::start(GameWorld& gameWorld)
 
 void AudioSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
-	// Future: update audio listeners, 3D positioning, etc.
 }
 
 void AudioSystem::shutdown(GameWorld& gameWorld)
