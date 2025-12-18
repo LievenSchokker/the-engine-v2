@@ -31,3 +31,8 @@ const std::string PhysicsSystem::getName() const
 {
 	return "PhysicsSystem";
 }
+
+IPhysicsWorld* PhysicsSystem::getPhysicsWorld() const
+{
+	return physicsWorld.get();
+}

@@ -83,6 +83,7 @@ class Behaviour: virtual public Component
 	 */
 	virtual void update(double deltaTime, const GameWorld& world) {};
 
+	virtual bool shouldRunWhenPaused() const{return false;};
 	/**
 	 * @brief fixedUpdate is called at regular and fixed intervals as part of
 	 * the engine's physics loop.
@@ -124,6 +125,7 @@ class Behaviour: virtual public Component
 	 * @return whether this Behaviour is enabled, value of @c isEnabled
 	 */
 	bool getIsEnabled() const;
+	bool getIsActive() const;
 
 
 	/**

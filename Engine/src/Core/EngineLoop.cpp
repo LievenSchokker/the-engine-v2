@@ -38,7 +38,6 @@ void EngineLoop::start()
 
     //I left the InputManager out of this for now since it's still a singleton
     //TODO Remove singleton and use reference via GameWorld for polling.
-    getGameWorld()->input = InputManager::getInstance();
     sceneManagerPtr = gameWorld->sceneManager;
 }
 
@@ -48,8 +47,6 @@ void EngineLoop::update(const double deltaTime)
     {
         system->update(deltaTime, *gameWorld);
     }
-
-    getGameWorld()->input->update();
 }
 
 void EngineLoop::fixedUpdate(const double deltaTime)
@@ -82,6 +79,11 @@ EngineLoop::ClockFunction EngineLoop::getClock()
 GameWorld* EngineLoop::getGameWorld()
 {
     return gameWorld.get();
+}
+
+void EngineLoop::setGameWorld(std::unique_ptr<GameWorld> gameWorld)
+{
+	gameWorld = std::move(gameWorld);
 }
 
 SceneManager* EngineLoop::getSceneManager()

@@ -16,8 +16,6 @@
 
 void NavigationTest::onAwake()
 {
-    input = InputManager::getInstance();
-
     if (gameObject->hasComponent<PathRenderer>())
     {
 

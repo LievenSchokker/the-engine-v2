@@ -10,7 +10,7 @@
 #include <utility>
 
 SceneManager::SceneManager(GameWorld& gameWorld)
-    : world(gameWorld), scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>())
+    : gameWorld(&gameWorld), scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>())
 {}
 
 
@@ -322,11 +322,11 @@ bool SceneManager::setActiveScene(const std::string& name)
         processedScenes.insert(name);
     }
 
-    activeScene->onStart();
+    activeScene->onStart(*gameWorld);
     return true;
 	activeScene = nextScene;
 	paused = false;
-	activeScene->onStart(world);
+	activeScene->onStart(*gameWorld);
 	return true;
 }
 
@@ -367,7 +367,7 @@ Scene* SceneManager::getOrCreatePersistentScene()
     if (persistentScene == nullptr)
     {
         persistentScene = std::make_unique<Scene>("__PersistentScene__");
-        persistentScene->onStart();
+        persistentScene->onStart(*gameWorld);
     }
     return persistentScene.get();
 }

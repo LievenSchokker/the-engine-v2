@@ -137,8 +137,9 @@ public:
 	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
 	 * Does not enable the behaviours on their own only calls the callback.
 	 * @param behaviours the behaviours that need to be initialised.
+	 * @param world
          */
-        void initialiseBehaviours(const std::vector<Behaviour *> &behaviours);
+        void initialiseBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world);
 
 	/**
 	 * @brief Adds the provided GameObject to the @c destroyQueue vector, in order to delete and destroy the object when @c processDestroyQueue is called.

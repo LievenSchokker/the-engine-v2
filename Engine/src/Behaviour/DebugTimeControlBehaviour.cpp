@@ -30,7 +30,6 @@ DebugTimeControlBehaviour::DebugTimeControlBehaviour(
 
 void DebugTimeControlBehaviour::onAwake()
 {
-	inputManager = InputManager::getInstance();
 }
 
 bool DebugTimeControlBehaviour::shouldRunWhenPaused() const

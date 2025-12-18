@@ -8,13 +8,10 @@
 void SimpleMoveBehaviour::onAwake()
 {
 	canMove = true;
-	inputManager = InputManager::getInstance();
-	std::cout << "SimpleMoveBehaviour is now awake" << std::endl;
 }
 
 void SimpleMoveBehaviour::onEnable()
 {
-	std::cout << "SimpleMoveBehaviour is now enabled" << std::endl;
 	currentSpeed = maxSpeed;
 }
 

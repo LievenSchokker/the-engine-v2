@@ -17,7 +17,6 @@ PlayerControllerBehaviour::PlayerControllerBehaviour()
 
 void PlayerControllerBehaviour::onAwake()
 {
-	inputManager = InputManager::getInstance();
 	animator = gameObject->getComponent<Animator>();
 }
 

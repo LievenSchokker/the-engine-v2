@@ -16,7 +16,7 @@
 
 NuklearSDLRenderHook::NuklearSDLRenderHook(SDL_Window* window,
                                            SDL_Renderer* renderer)
-	: inputManager(InputManager::getInstance())
+	: inputManager()
 	  , sdlWindow(window)
 	  , sdlRenderer(renderer)
 	  , nuklearContext(nullptr),

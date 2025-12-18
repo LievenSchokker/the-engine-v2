@@ -171,7 +171,7 @@ void Scene::onStart(GameWorld& world)
 
 	/// Initialise all the behaviours by calling their lifetime functions in the
 	/// correct order.
-	initialiseBehaviours(allBehaviours);
+	initialiseBehaviours(allBehaviours, world);
 }
 
 void Scene::onStop()

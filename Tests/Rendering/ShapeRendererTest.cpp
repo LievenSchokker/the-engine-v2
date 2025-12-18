@@ -135,19 +135,34 @@ TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
 {
     // Arrange
     auto gameworld = std::make_unique<GameWorld>();
-	auto fakeRenderer = std::make_unique<FakeRenderer>();
-	FakeRenderer* rendererPtr = fakeRenderer.get();
-	RenderSystem renderSystem{std::move(fakeRenderer)};
+    auto fakeRenderer = std::make_unique<FakeRenderer>();
+    FakeRenderer* rendererPtr = fakeRenderer.get();
+    RenderSystem renderSystem{std::move(fakeRenderer)};
 
-
-	std::unique_ptr<Scene> scene = std::make_unique<Scene>("TestScene");
+    std::unique_ptr<Scene> scene = std::make_unique<Scene>("TestScene");
     scene->onStart(*gameworld);
 
-    auto circle = std::make_unique<GameObject>();
-    circle->getTransform()->setPosition({42.0, 24.0});
-    circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(Color::blue());
-    scene->addRunTimeGameObject(std::move(circle), *gameworld);
-    auto sceneManager = std::make_unique<SceneManager>(*gameworld);
+    auto circle1 = std::make_unique<GameObject>();
+    circle1->getTransform()->setPosition({42.0, 24.0});
+    auto* shape1 = circle1->addComponent<ShapeRenderer>();
+    shape1->setCircle(25.0).setColor(Color::blue());
+    shape1->setLayer(2);  // Layer 2
+    scene->addRunTimeGameObject(std::move(circle1), *gameworld);
+
+    auto circle2 = std::make_unique<GameObject>();
+    circle2->getTransform()->setPosition({10.0, 10.0});
+    auto* shape2 = circle2->addComponent<ShapeRenderer>();
+    shape2->setCircle(15.0).setColor(Color::red());
+    shape2->setLayer(1);  // Layer 1
+    scene->addRunTimeGameObject(std::move(circle2), *gameworld);
+
+    auto sceneManager = std::make_unique<SceneManager>();
+    gameworld->sceneManager = sceneManager.get();
+    sceneManager->addScene(std::move(scene));
+    sceneManager->setActiveScene("TestScene");
+
+    // Act
+    renderSystem.update(0.016, *gameworld);
 
     // Assert - Layer 1 should render before Layer 2
     ASSERT_EQ(rendererPtr->executedCommands.size(), 2);
@@ -155,51 +170,35 @@ TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
     EXPECT_EQ(rendererPtr->executedCommands[1].layer, 2);
 }
 
-
 // Test inactive GameObjects are not rendered
 TEST(RenderSystemTest, SkipsInactiveGameObjects)
 {
-	auto fakeRenderer = std::make_unique<FakeRenderer>();
-	FakeRenderer* rendererPtr = fakeRenderer.get();
-	RenderSystem renderSystem{std::move(fakeRenderer)};
-    auto gameworld = std::make_unique<GameWorld>();
-    Scene scene("TestScene");
-    scene.onStart(*gameworld);
     // Arrange
+    auto gameworld = std::make_unique<GameWorld>();
     auto fakeRenderer = std::make_unique<FakeRenderer>();
     FakeRenderer* rendererPtr = fakeRenderer.get();
     RenderSystem renderSystem{std::move(fakeRenderer)};
 
     std::unique_ptr<Scene> scene = std::make_unique<Scene>("TestScene");
-    scene->onStart();
+    scene->onStart(*gameworld);
 
     auto activeObj = std::make_unique<GameObject>();
     activeObj->addComponent<ShapeRenderer>()->setCircle(10.0);
-    scene.addRunTimeGameObject(std::move(activeObj), *gameworld);
-    auto activeObj = std::make_unique<GameObject>();
-    activeObj->addComponent<ShapeRenderer>()->setCircle(10.0);
-    scene->addGameObject(std::move(activeObj));
+    scene->addRunTimeGameObject(std::move(activeObj), *gameworld);
 
     auto inactiveObj = std::make_unique<GameObject>();
     inactiveObj->addComponent<ShapeRenderer>()->setCircle(20.0);
     inactiveObj->setActive(false);
-    scene.addRunTimeGameObject(std::move(inactiveObj), *gameworld);
-    auto inactiveObj = std::make_unique<GameObject>();
-    inactiveObj->addComponent<ShapeRenderer>()->setCircle(20.0);
-    inactiveObj->setActive(false);
-    scene->addGameObject(std::move(inactiveObj));
+    scene->addRunTimeGameObject(std::move(inactiveObj), *gameworld);
 
-    GameWorld game{};
     auto sceneManager = std::make_unique<SceneManager>();
-    game.sceneManager = sceneManager.get();
+    gameworld->sceneManager = sceneManager.get();
     sceneManager->addScene(std::move(scene));
     sceneManager->setActiveScene("TestScene");
 
     // Act
-    renderSystem.update(0.016f, scene);
-    // Act
-    renderSystem.update(0.016f, game);
+    renderSystem.update(0.016, *gameworld);
 
-    // Assert
+    // Assert - only active object should be rendered
     EXPECT_EQ(rendererPtr->executedCommands.size(), 1);
 }
