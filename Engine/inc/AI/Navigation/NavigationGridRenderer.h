@@ -21,7 +21,7 @@ struct GridRenderOptions
 class NavigationGridRenderer : public Behaviour, public RenderComponent
 {
     public:
-        explicit NavigationGridRenderer() : grid(nullptr), gridRenderOptions(1.0f, Color::darkGreen(), Color::darkRed()){};
+        explicit NavigationGridRenderer() : grid(nullptr), gridRenderOptions{1.0f, Color::darkGreen(), Color::darkRed()}{};
         explicit NavigationGridRenderer(GridRenderOptions renderOptions) : grid(nullptr), gridRenderOptions(renderOptions){};
 
         /**

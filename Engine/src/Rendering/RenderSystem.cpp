@@ -17,7 +17,7 @@ RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
 
 void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
-	if ( !renderer || !renderer->isOpen() )
+	if (!renderer || !renderer->isOpen())
 	{
 		return;
 	}
@@ -30,8 +30,7 @@ void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 
 	processWorldCommands();
 
-	// renderer->submitUI(queue.ui().getCommands());
-
+	renderer->submitUI(queue.ui().getCommands());
 	renderer->endFrame();
 }
 
@@ -56,10 +55,6 @@ void RenderSystem::processWorldCommands()
 			}
 		}
 	}
-
-	// renderer->submitUI(queue.ui().getCommands());s
-
-	renderer->endFrame();
 }
 
 void RenderSystem::collectCommands(Scene& scene)
@@ -95,9 +90,10 @@ const std::string RenderSystem::getName() const
 {
 	return "RenderSystem";
 }
+
 const Color& RenderSystem::getClearColor() const
 {
-    return clearColor;
+	return clearColor;
 }
 
 void RenderSystem::updateCameras(const Scene& scene)

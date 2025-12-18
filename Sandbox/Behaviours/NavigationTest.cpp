@@ -29,7 +29,7 @@ void NavigationTest::onAwake()
     }
 }
 
-void NavigationTest::update(float deltaTime, GameWorld *world)
+void NavigationTest::update(double deltaTime, const GameWorld& world)
 {
     if (input == nullptr)
         return;
