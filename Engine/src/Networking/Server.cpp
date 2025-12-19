@@ -88,6 +88,7 @@ SystemStatus Server::start(GameWorld& gameWorld)
 void Server::update(double deltaTime, const GameWorld& gameWorld)
 {
 	transport->poll();
+    std::cout << gameWorld.clock->getCurrentTick() << std::endl;
 	stateSyncSystem->tick(gameWorld.clock->getCurrentTick());
 }
 

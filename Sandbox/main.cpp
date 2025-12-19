@@ -19,16 +19,44 @@
 int main(int argc, char** argv)
 {
     // Parse command line arguments
-	std::unique_ptr<Game> spel = std::make_unique<Game>();
-
     ApplicationSpecifications spec = {};
-	EngineMode mode = EngineMode::CLIENT;
+	std::unique_ptr<Game> spel = std::make_unique<Game>();
+    EngineMode mode = EngineMode::CLIENT;
+    spec.engineSystem = EngineSystem::Client;
+    if (argc > 1)
+    {
+        std::string arg = argv[1];
+        if (arg == "server")
+        {
+            mode = EngineMode::SERVER;
+            spec.engineSystem = EngineSystem::Server;
+            std::cout << "Starting as SERVER..." << std::endl;
+        }
+        else if (arg == "client")
+        {
+            mode = EngineMode::CLIENT;
+            spec.engineSystem = EngineSystem::Client;
+            std::cout << "Starting as CLIENT..." << std::endl;
+        }
+        else
+        {
+            std::cerr << "Unknown mode: " << arg << std::endl;
+            std::cerr << "Usage: " << argv[0] << " [server|client]" << std::endl;
+            return 1;
+        }
+    }
+    else
+    {
+        std::cout << "No mode specified, defaulting to CLIENT..." << std::endl;
+        std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
+    }
+
+
     spec.networkingOptions.mode = mode;
     spec.networkingOptions.port = 8080;
     spec.networkingOptions.serverIP = "127.0.0.1";
     spec.networkingOptions.tickRate = 60;
     spec.renderBackend = RenderBackend::SDL;
-	spec.engineSystem = EngineSystem::Client;
     spec.windowOptions = {
         "GameEngine",
         700,
