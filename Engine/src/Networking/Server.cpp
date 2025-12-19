@@ -85,11 +85,10 @@ SystemStatus Server::start(GameWorld& gameWorld)
 	return status;
 }
 
-void Server::update(double deltaTime, const GameWorld& gameWorld)
+void Server::fixedUpdate(double deltaTime, const GameWorld& gameWorld)
 {
 	transport->poll();
-    std::cout << gameWorld.clock->getCurrentTick() << std::endl;
-	stateSyncSystem->tick(gameWorld.clock->getCurrentTick());
+	stateSyncSystem->tick(gameWorld.clock->getTotalTicks());
 }
 
 void Server::shutdown(GameWorld& gameWorld)
@@ -100,7 +99,6 @@ void Server::shutdown(GameWorld& gameWorld)
 		connectedClients.clear();
 		status = SystemStatus::STOPPPED;
 		gameWorld.server = nullptr;
-		std::cout << "Server stopped" << std::endl;
 	}
 }
 

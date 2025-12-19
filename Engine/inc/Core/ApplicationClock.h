@@ -116,7 +116,6 @@ public:
 	 * @return Current time scale (default: 1.0)
 	 */
 	[[nodiscard]] double getTimeScale() const;
-	int getCurrentTick();
 
 	/**
 	 * @brief Pauses the simulation (fixed updates).

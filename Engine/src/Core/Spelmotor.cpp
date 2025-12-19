@@ -74,9 +74,8 @@ void SpelMotor::run()
 
 	while ( running )
 	{
-		coreClock->tick();
-
-		while ( coreClock->shouldFixedUpdate() )
+	    coreClock->tick();
+	    while ( coreClock->shouldFixedUpdate() )
 		{
 			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
 			coreClock->consumeFixedUpdate();

@@ -93,7 +93,6 @@ void EngineLoop::initNetwork() const
 			[spawnMgr](int clientId)
 			{
 				spawnMgr->syncExistingObjects(clientId);
-				spawnMgr->CheckNewClientSpawnObject(clientId);
 			}
 			);
 	}

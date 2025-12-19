@@ -42,6 +42,7 @@ void ApplicationClock::tick()
 	{
 		frameTime = maxAccumulatedTime;
 	}
+
 	currentTime = newTime;
 
 	// Don't accumulate time when paused to prevent teleport on resume
@@ -97,11 +98,6 @@ void ApplicationClock::setTimeScale(double scale)
 double ApplicationClock::getTimeScale() const
 {
 	return timeScale;
-}
-
-int ApplicationClock::getCurrentTick()
-{
-	return totalTicks;
 }
 
 void ApplicationClock::pause()

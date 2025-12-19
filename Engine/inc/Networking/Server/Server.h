@@ -67,7 +67,7 @@ public:
      * @param deltaTime Time since last update.
      * @param gameWorld Reference to the game world.
      */
-    void update(double deltaTime, const GameWorld& gameWorld) override;
+    void fixedUpdate(double deltaTime, const GameWorld& gameWorld) override;
 
     /**
      * @brief Cleanly shuts down networking and clears connection state

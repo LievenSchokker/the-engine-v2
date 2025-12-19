@@ -22,6 +22,11 @@ void PlayerMovement::onStart()
 
 void PlayerMovement::onNetworkSpawn()
 {
+    if (hasAuthority())
+    {
+        auto camera = getGameObject()->addComponent<Camera>();
+        camera->setZoom(0.2);
+    }
 }
 
 void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
@@ -72,11 +77,8 @@ void PlayerMovement::handleInput()
 
 
     auto* input = gameWorld->input;
-
-	std::cout << input << std::endl;
     if (input->isKeyDown(KeyCode::W) || input->isKeyDown(KeyCode::UP_ARROW))
     {
-    	std::cout << "W/UP pressed! Applying velocity..." << std::endl;
         callCommand("MoveUp");
         applyMovement(0, -1);
     }

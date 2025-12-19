@@ -35,6 +35,11 @@ std::unique_ptr<Scene> MultiplayerZandbak::getScene()
     followAgent->addAgentModule<FollowTargetModule>(100, *player->getTransform(), 300.0f);
     followAgent->addAgentModule<WanderModule>(50, 25.0f, 150.0f, 5.0f);
 
+    auto shape = std::make_unique<GameObject>();
+    auto coolShape = shape->addComponent<ShapeRenderer>();
+    coolShape->setColor(Color::darkRed());
+    coolShape->setRectangle({1500, 400});
+
 
     /// Avoid enemy:
     auto avoidEnemy = std::make_unique<GameObject>();
@@ -53,6 +58,7 @@ std::unique_ptr<Scene> MultiplayerZandbak::getScene()
     /// Construct and return scne
     auto scene = std::make_unique<Scene>("AgentsZandbak");
 
+    scene->addGameObject(std::move(shape));
     scene->addGameObject(std::move(avoidEnemy));
     scene->addGameObject(std::move(player));
     scene->addGameObject(std::move(followEnemy));

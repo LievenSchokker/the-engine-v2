@@ -1,4 +1,4 @@
-#include "Behaviour/NetworkBehaviour.h"
+    #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkBuilder.h"
 #include "Networking/NetworkSpawnManager.h"
 
@@ -21,7 +21,6 @@ bool NetworkIdentity::hasAuthority() const
 	{
 		return true;
 	}
-	std::cout << gameWorld->localClientId << "gameWorld->localClientId" << std::endl;
 	return ownerId == gameWorld->localClientId;
 }
 

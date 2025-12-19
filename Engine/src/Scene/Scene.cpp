@@ -64,24 +64,10 @@ bool Scene::addRunTimeGameObject(std::unique_ptr<GameObject> gameObject)
 	if (active)
 	{
 		auto behaviours = addedObject->getAllBehaviours();
-		std::cout << "[addRunTimeGameObject] Calling initialiseBehaviours with "
-				  << behaviours.size() << " behaviours" << std::endl;
 		for (auto* b : behaviours) {
 			std::cout << "  - " << b->getName() << " enabled=" << b->getIsEnabled() << std::endl;
 		}
 		initialiseBehaviours(addedObject->getAllBehaviours(), *gameWorld);
-
-		std::cout << "[addRunTimeGameObject] After init:" << std::endl;
-		for (auto* b : addedObject->getAllBehaviours()) {
-			std::cout << "  - " << b->getName()
-					  << " awakened=" << b->getHasAwakened()
-					  << " started=" << b->getHasStarted()
-					  << " enabled=" << b->getIsEnabled() << std::endl;
-		}
-	}
-	else
-	{
-		std::cout << "[addRunTimeGameObject] Scene not active, skipping init" << std::endl;
 	}
 
 	return true;

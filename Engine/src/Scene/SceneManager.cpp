@@ -103,12 +103,14 @@ void SceneManager::processForServer(Scene& scene)
 
     for (GameObject* obj : networkObjects)
     {
+        auto behaviour = obj->getComponent<NetworkBehaviour>();
+        
         Vector2 spawnPosition = obj->getTransform()->getPosition();
 
         std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
         if (!extracted) continue;
 
-        extracted->getTransform()->setPosition({0, 0});
+        extracted->getTransform()->setPosition(spawnPosition);
 
         if (!extracted->getComponent<NetworkIdentity>())
         {
@@ -396,6 +398,7 @@ void SceneManager::applyNetworkSnapshot(
         if (!received) continue;
 
         auto* identity = received->getComponent<NetworkIdentity>();
+
         if (!identity) continue;
 
         uint32_t netId = identity->getNetId();

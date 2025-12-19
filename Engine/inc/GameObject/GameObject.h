@@ -61,8 +61,6 @@ public:
      */
     std::unique_ptr<GameObject> clone() const;
 
-    Component* getComponentByType(ComponentType type) const;
-
 
     /**
     * @brief Adds a component of type T to this object's @c componentManager.

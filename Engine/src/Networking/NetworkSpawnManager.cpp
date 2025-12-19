@@ -74,7 +74,7 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
 
     if (gameWorld->isServer())
     {
-        identity->onNetworkInstantiate(nextNetworkId++);
+        identity->onNetworkInstantiate(nextNetworkId);
     }
 
     identity->onNetworkSpawn();
@@ -200,6 +200,18 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
     }
 
 	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
+
+
+    if (spawnedObjects.contains(message.netId))
+    {
+        if (GameObject* existing = spawnedObjects[message.netId])
+        {
+            existing->copyStateFrom(*message.gameObject);
+        }
+
+        return;
+    }
+
 	if (!identity)
 	{
 		identity = message.gameObject->addComponent<NetworkIdentity>();
