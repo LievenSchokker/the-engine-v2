@@ -104,7 +104,21 @@ void SceneManager::processForServer(Scene& scene)
     for (GameObject* obj : networkObjects)
     {
         auto behaviour = obj->getComponent<NetworkBehaviour>();
-        
+
+        if (behaviour != nullptr && behaviour->getAuthorityType() == AuthorityType::ClientAuthority)
+        {
+            std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+            if (!extracted) continue;
+
+            scene.removeGameObject(obj);
+
+            if (spawnManager)
+            {
+                uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
+            }
+            continue;
+        }
+
         Vector2 spawnPosition = obj->getTransform()->getPosition();
 
         std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
