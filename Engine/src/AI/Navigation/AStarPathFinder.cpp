@@ -6,6 +6,7 @@
 #include "../../../inc/AI/Navigation/Pathfinding/AStarPathFinder.h"
 #include "../../../inc/AI/Navigation/Pathfinding/PathResult.h"
 
+#include <algorithm>
 #include <queue>
 #include <unordered_set>
 #include <unordered_map>
