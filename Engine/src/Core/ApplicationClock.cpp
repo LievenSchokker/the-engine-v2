@@ -99,6 +99,11 @@ double ApplicationClock::getTimeScale() const
 	return timeScale;
 }
 
+int ApplicationClock::getCurrentTick()
+{
+	return totalTicks;
+}
+
 void ApplicationClock::pause()
 {
 	paused = true;

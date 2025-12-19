@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "ServerInformation.h"
+#include "StateSyncSystem.h"
 #include "Core/IEngineSystems.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
@@ -214,4 +215,5 @@ private:
     std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
     ClientConnectedCallback onClientConnected;
     ClientDisconnectedCallback onClientDisconnected;
+	std::unique_ptr<StateSyncSystem> stateSyncSystem;
 };

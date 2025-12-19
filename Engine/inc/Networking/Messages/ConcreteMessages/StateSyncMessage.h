@@ -3,12 +3,11 @@
 
 #include "Networking/Messages/IMessage.h"
 #include "Networking/Messages/ConcreteMessages/MessageTypes.h"
+#include "GameObject/GameObject.h"
 
 #include <vector>
 #include <cstdint>
 #include <memory>
-
-class GameObject;
 
 /**
  * @brief Synchronizes full GameObject state for networked objects.

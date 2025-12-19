@@ -22,14 +22,6 @@ void PlayerMovement::onStart()
 
 void PlayerMovement::onNetworkSpawn()
 {
-    if (hasAuthority())
-    {
-        if (auto* camera = getGameObject()->getComponent<Camera>(); !camera)
-        {
-            camera = getGameObject()->addComponent<Camera>(1.0f, Vector2{0, 0}, 700, 700);
-            camera->setZoom(1);
-        }
-    }
 }
 
 void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
@@ -107,8 +99,13 @@ void PlayerMovement::handleInput()
 
 void PlayerMovement::applyMovement(const float dirX, const float dirY) const
 {
-	Transform* transform = getGameObject()->getTransform();
 
+	if (!isServer())
+	{
+		return;
+	}
+
+	Transform* transform = getGameObject()->getTransform();
     float dt = 1.0f / 60.0f;
     Vector2 pos = transform->getPosition();
     pos.x += dirX * moveSpeed * dt;

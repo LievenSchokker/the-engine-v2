@@ -1,5 +1,6 @@
 #include "Networking/Server/Server.h"
 
+#include "Core/ApplicationClock.h"
 #include "Core/Options/ApplicationSpecifications.h"
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
@@ -23,6 +24,7 @@ Server::Server(const ServerConnectionInformation& serverConnectionInformation,
 	: transport(std::move(injectedTransport))
 	  , status(SystemStatus::STOPPPED)
 	  , messageDispatcher(nullptr)
+	  , stateSyncSystem(nullptr)
 {
 	if (serverConnectionInformation.port == 0)
 	{
@@ -68,19 +70,25 @@ SystemStatus Server::start(GameWorld& gameWorld)
 				gameWorld, *gameWorld.spawnManager,
 				gameWorld.spawnManager->getNetworkIdentityRegistry());
 		status = SystemStatus::RUNNING;
+
+		stateSyncSystem = std::make_unique<StateSyncSystem>(
+			this, &gameWorld.spawnManager->getNetworkIdentityRegistry());
 	}
 	else
 	{
 		status = SystemStatus::ERROR;
-		std::cerr << "Server failed to start: SpawnManager is null" << std::endl;
+		std::cerr << "Server failed to start: SpawnManager is null" <<
+			std::endl;
 		return status;
 	}
+
 	return status;
 }
 
 void Server::update(double deltaTime, const GameWorld& gameWorld)
 {
 	transport->poll();
+	stateSyncSystem->tick(gameWorld.clock->getCurrentTick());
 }
 
 void Server::shutdown(GameWorld& gameWorld)

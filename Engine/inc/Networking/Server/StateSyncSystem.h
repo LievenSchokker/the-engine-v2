@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "Core/IEngineSystems.h"
 #include "Networking/Messages/ConcreteMessages/StateSyncMessage.h"
 #include "Networking/NetworkingIdentityRegistry.h"
 
