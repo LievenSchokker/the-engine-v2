@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include <memory>
+
 #include "Events/EventDispatcher/EventDispatcher.h"
 
 class ApplicationClock;
