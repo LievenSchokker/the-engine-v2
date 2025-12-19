@@ -16,7 +16,7 @@ void InputManager::initialize(EventDispatcher& dispatcher)
     {
         return;
     }
-	std::cout << "[InputManager::initialize] Subscribing to events" << std::endl;
+
     cachedDispatcher = &dispatcher;
 
     keyPressedHandle = dispatcher.subscribe<KeyPressedEvent>(

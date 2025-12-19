@@ -22,11 +22,6 @@ void PlayerMovement::onStart()
 
 void PlayerMovement::onNetworkSpawn()
 {
-    if (hasAuthority())
-    {
-        auto camera = getGameObject()->addComponent<Camera>();
-        camera->setZoom(0.2);
-    }
 }
 
 void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
