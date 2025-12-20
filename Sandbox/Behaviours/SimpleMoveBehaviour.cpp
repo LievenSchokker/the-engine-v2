@@ -31,7 +31,6 @@ void SimpleMoveBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 
 void SimpleMoveBehaviour::onDisable()
 {
-	std::cout << "SimpleMoveBehaviour is now disabled" << std::endl;
 	currentSpeed = 0;
 }
 
@@ -49,13 +48,11 @@ void SimpleMoveBehaviour::pollInput()
 	currentDirection = {0.0f, 0.0f};
 
 	if (inputManager->isKeyDown(KeyCode::W))
-	    currentDirection.y -= 1.0f;
+	    currentDirection.y -= 0.1f;
 	if (inputManager->isKeyDown(KeyCode::S))
-	    currentDirection.y += 1.0f;
+	    currentDirection.y += 0.1f;
 	if (inputManager->isKeyDown(KeyCode::A))
-	    currentDirection.x -= 1.0f;
+	    currentDirection.x -= 0.1f;
 	if (inputManager->isKeyDown(KeyCode::D))
-	    currentDirection.x += 1.0f;
-
-    currentDirection = currentDirection.normalised();
+	    currentDirection.x += 0.1f;
 }
