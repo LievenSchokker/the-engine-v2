@@ -126,3 +126,20 @@ auto GameObject::getComponentIterator() const -> std::vector<
                             return dynamic_cast<T*>(comp.get()) != nullptr;
                         });
 }
+
+template <typename T>
+std::vector<T*> GameObject::getComponents() const
+{
+	std::vector<T*> result;
+
+	for (const auto& component : components)
+	{
+		T* casted = dynamic_cast<T*>(component.get());
+		if (casted != nullptr)
+		{
+			result.push_back(casted);
+		}
+	}
+
+	return result;
+}
