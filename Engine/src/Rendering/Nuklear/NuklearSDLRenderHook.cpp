@@ -532,6 +532,7 @@ void NuklearSDLRenderHook::close()
 	if (nuklearContext)
 	{
 		nk_sdl_shutdown();
+		nk_free(nuklearContext);
 		nuklearContext = nullptr;
 	}
 }
