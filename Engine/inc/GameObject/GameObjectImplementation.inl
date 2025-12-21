@@ -1,5 +1,9 @@
 #pragma once
 
+
+#include <algorithm>
+
+
 template <typename T, typename... Args>
 T* GameObject::addComponent(Args&&... args)
 {
