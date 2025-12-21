@@ -97,7 +97,6 @@ void Transform::rotateTowards(const Vector2& targetDirection, float maxRotationS
 	Vector2 direction = targetDirection - position;
 
     // Target angle in degrees
-    float targetAngle = std::atan2(targetDirection.y, targetDirection.x) * 180.0f / 3.14159265f;
 	float targetAngle = std::atan2(-direction.x, direction.y)
 						* 180.0f / 3.14159265f;
 
