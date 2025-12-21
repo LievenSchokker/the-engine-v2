@@ -97,7 +97,7 @@ void Transform::rotateTowards(const Vector2& targetDirection, float maxRotationS
 	Vector2 direction = targetDirection - position;
 
     // Target angle in degrees
-	float targetAngle = std::atan2(-direction.x, direction.y)
+	float targetAngle = std::atan2(direction.y, direction.x)
 						* 180.0f / 3.14159265f;
 
     // Compute delta and wrap to [-180, 180] for shortest rotation path
@@ -111,14 +111,15 @@ void Transform::rotateTowards(const Vector2& targetDirection, float maxRotationS
     setRotationAngle(rotationAngle + step);
 }
 
+
 void Transform::updateDirectionVectors()
 {
 	float radians = rotationAngle * 3.14159265f / 180.0f;
 	float c = cos(radians);
 	float s = sin(radians);
 
-	forwardVector = {-s, c};
-	rightVector = {c, s};
+	forwardVector = {c, s};
+	rightVector = {s, -c};
 }
 
 
