@@ -32,8 +32,8 @@ int main(int argc, char** argv)
 	spec.engineSystem = EngineSystem::Client;
     spec.windowOptions = {
         mode == EngineMode::SERVER ? "GameEngine - Server" : "GameEngine - Client",
-        700,
-        700
+        1200,
+        1200
     };
 
     /// Note: Change the unique_ptr to create the sandbox you want

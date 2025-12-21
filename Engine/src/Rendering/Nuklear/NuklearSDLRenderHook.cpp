@@ -60,6 +60,7 @@ void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 	subscriptions.push_back(dispatcher.subscribe<MouseButtonPressedEvent>(
 			[this](const MouseButtonPressedEvent& event)
 			{
+				std::cout << "mouse button pressed" << std::endl;
 				this->handleMouseClick(event);
 			}
 			)
@@ -68,6 +69,7 @@ void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 	subscriptions.push_back(dispatcher.subscribe<MouseButtonReleasedEvent>(
 			[this](const MouseButtonReleasedEvent& event)
 			{
+				std::cout << "mouse button released" << std::endl;
 				this->handleMouseReleased(event);
 			}
 			)
@@ -98,36 +100,15 @@ void NuklearSDLRenderHook::handleMouseClick(
 	int idx = -1;
 	switch (event.button)
 	{
-		case MouseButton::LEFT:
-			idx = 0;
-			break;
-		case MouseButton::MIDDLE:
-			idx = 1;
-			break;
-		case MouseButton::RIGHT:
-			idx = 2;
-			break;
+		case MouseButton::LEFT:   idx = 0; break;
+		case MouseButton::MIDDLE: idx = 1; break;
+		case MouseButton::RIGHT:  idx = 2; break;
 	}
 	if (idx >= 0)
 	{
 		pendingMouseDown[idx] = true;
 		clickX[idx] = event.x;
 		clickY[idx] = event.y;
-	}
-	switch (event.button)
-	{
-		case MouseButton::LEFT:
-			nk_input_button(nuklearContext, NK_BUTTON_LEFT, event.x, event.y,
-			                1);
-			break;
-		case MouseButton::MIDDLE:
-			nk_input_button(nuklearContext, NK_BUTTON_MIDDLE, event.x, event.y,
-			                1);
-			break;
-		case MouseButton::RIGHT:
-			nk_input_button(nuklearContext, NK_BUTTON_RIGHT, event.x, event.y,
-			                1);
-			break;
 	}
 }
 
@@ -137,37 +118,15 @@ void NuklearSDLRenderHook::handleMouseReleased(
 	int idx = -1;
 	switch (event.button)
 	{
-		case MouseButton::LEFT:
-			idx = 0;
-			break;
-		case MouseButton::MIDDLE:
-			idx = 1;
-			break;
-		case MouseButton::RIGHT:
-			idx = 2;
-			break;
+		case MouseButton::LEFT:   idx = 0; break;
+		case MouseButton::MIDDLE: idx = 1; break;
+		case MouseButton::RIGHT:  idx = 2; break;
 	}
 	if (idx >= 0)
 	{
-		pendingMouseDown[idx] = true;
+		pendingMouseUp[idx] = true;
 		clickX[idx] = event.x;
 		clickY[idx] = event.y;
-	}
-
-	switch (event.button)
-	{
-		case MouseButton::LEFT:
-			nk_input_button(nuklearContext, NK_BUTTON_LEFT, event.x, event.y,
-			                0);
-			break;
-		case MouseButton::MIDDLE:
-			nk_input_button(nuklearContext, NK_BUTTON_MIDDLE, event.x, event.y,
-			                0);
-			break;
-		case MouseButton::RIGHT:
-			nk_input_button(nuklearContext, NK_BUTTON_RIGHT, event.x, event.y,
-			                0);
-			break;
 	}
 }
 
@@ -206,7 +165,6 @@ void NuklearSDLRenderHook::presentFrame()
 	flushCommands();
 
 	nk_sdl_render(NK_ANTI_ALIASING_ON);
-	nk_clear(nuklearContext);
 }
 
 void NuklearSDLRenderHook::process(const std::vector<UIRenderCommand>& commands, InputManager& inputManager)
@@ -442,45 +400,124 @@ void NuklearSDLRenderHook::renderText(const UIRenderCommand& command)
 
 void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
 {
-	auto panelIterator = panelIndices.find(panelId);
-	if (panelIterator == panelIndices.end()) return;
+    auto panelIterator = panelIndices.find(panelId);
+    if (panelIterator == panelIndices.end()) return;
 
-	const auto& panel = commandQueue[panelIterator->second];
+    const auto& panel = commandQueue[panelIterator->second];
 
-	nk_flags flags = NK_WINDOW_NO_SCROLLBAR;
-	if (panel.hasBorder) flags |= NK_WINDOW_BORDER;
-	if (panel.hasTitle) flags |= NK_WINDOW_TITLE;
+    PanelState& state = panelStateCache[panelId];
+    if (!state.initialized) {
+        state.x = panel.x;
+        state.y = panel.y;
+        state.width = panel.width;
+        state.height = panel.height;
+        state.isClosed = false;
+        state.initialized = true;
+    }
 
-	char windowId[32];
+    if (state.isClosed) {
+        return;
+    }
 
-	/// Always generate a pannel Id snprintf is a cheap call
-	/// This is what this does btw:
-	/// Composes a string with the same text that would be printed
-	/// if format was used on printf, but instead of being printed,
-	/// the content is stored as a C string in the buffer pointed
-	/// by s (taking n as the maximum buffer capacity to fill).
-	snprintf(windowId, sizeof(windowId), "##%u", panelId);
+    nk_flags flags = 0;
+    if (panel.hasBorder) flags |= NK_WINDOW_BORDER;
+    if (panel.hasTitle) flags |= NK_WINDOW_TITLE;
+    if (!panel.scrollable) flags |= NK_WINDOW_NO_SCROLLBAR;
+    if (panel.resizable) flags |= NK_WINDOW_SCALABLE;
+    if (panel.minimizable) flags |= NK_WINDOW_MINIMIZABLE;
+    if (panel.closable) flags |= NK_WINDOW_CLOSABLE;
+    if (panel.movable) flags |= NK_WINDOW_MOVABLE;
 
-	/// Nuklear needs a pannel ID we use the title or if it's
-	/// empty the generated one based on ID
-	const char* name = panel.title.empty() ? windowId : panel.title.c_str();
+    char windowId[32];
+    snprintf(windowId, sizeof(windowId), "##%u", panelId);
 
-	if (nk_begin(nuklearContext, name,
-	             nk_rect(panel.x, panel.y, panel.width, panel.height), flags))
-	{
-		nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
+    struct nk_style_window originalStyle = nuklearContext->style.window;
 
-		//We render each element that belongs to panel!
-		auto elementIterator = panelElementIndices.find(panelId);
-		if (elementIterator != panelElementIndices.end())
-		{
-			for (size_t elementIndex : elementIterator->second)
-			{
-				renderElement(commandQueue[elementIndex]);
-			}
-		}
-	}
-	nk_end(nuklearContext);
+    // ... all your styling code stays the same ...
+    nuklearContext->style.window.fixed_background = nk_style_item_color(
+        nk_rgba(panel.backgroundColor.r, panel.backgroundColor.g,
+                panel.backgroundColor.b, panel.backgroundColor.a));
+    nuklearContext->style.window.border_color =
+        nk_rgba(panel.borderColor.r, panel.borderColor.g,
+                panel.borderColor.b, panel.borderColor.a);
+    nuklearContext->style.window.border = panel.borderThickness;
+    nuklearContext->style.window.rounding = panel.rounding;
+    nuklearContext->style.window.padding = nk_vec2(panel.padding, panel.padding);
+    nuklearContext->style.window.spacing = nk_vec2(panel.spacing, panel.spacing);
+
+    nuklearContext->style.window.header.normal = nk_style_item_color(
+        nk_rgba(panel.titleBackgroundColor.r, panel.titleBackgroundColor.g,
+                panel.titleBackgroundColor.b, panel.titleBackgroundColor.a));
+    nuklearContext->style.window.header.hover =
+        nuklearContext->style.window.header.normal;
+    nuklearContext->style.window.header.active =
+        nuklearContext->style.window.header.normal;
+
+    nuklearContext->style.window.header.label_normal =
+        nk_rgba(panel.titleTextColor.r, panel.titleTextColor.g,
+                panel.titleTextColor.b, panel.titleTextColor.a);
+    nuklearContext->style.window.header.label_hover =
+        nuklearContext->style.window.header.label_normal;
+    nuklearContext->style.window.header.label_active =
+        nuklearContext->style.window.header.label_normal;
+
+    nuklearContext->style.window.header.padding =
+        nk_vec2(panel.titlePadding, panel.titlePadding);
+    nuklearContext->style.window.header.label_padding =
+        nk_vec2(panel.titleLabelPadding, panel.titleLabelPadding);
+
+    const char* name = panel.title.empty() ? windowId : panel.title.c_str();
+
+    // DON'T set position/size every frame - only on first creation
+    // Use nk_begin_titled to separate display title from ID
+    struct nk_window* win = nk_window_find(nuklearContext, name);
+
+    if (win == nullptr) {
+        // First time - create with our initial bounds
+        if (nk_begin(nuklearContext, name,
+                     nk_rect(state.x, state.y, state.width, state.height), flags))
+        {
+            nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
+            renderPanelContents(panelId);
+        }
+    } else {
+        // Window exists - let Nuklear use its cached state
+        if (nk_begin(nuklearContext, name,
+                     nk_rect(win->bounds.x, win->bounds.y,
+                             win->bounds.w, win->bounds.h), flags))
+        {
+            nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
+            renderPanelContents(panelId);
+        }
+    }
+
+    // Update our cache from Nuklear's actual state
+    struct nk_rect bounds = nk_window_get_bounds(nuklearContext);
+    state.x = bounds.x;
+    state.y = bounds.y;
+    state.width = bounds.w;
+    state.height = bounds.h;
+
+    // Check if window was closed
+    if (panel.closable && nk_window_is_hidden(nuklearContext, name)) {
+        state.isClosed = true;
+    }
+
+    nk_end(nuklearContext);
+    nuklearContext->style.window = originalStyle;
+}
+
+// Helper to avoid code duplication
+void NuklearSDLRenderHook::renderPanelContents(uint32_t panelId)
+{
+    auto elementIterator = panelElementIndices.find(panelId);
+    if (elementIterator != panelElementIndices.end())
+    {
+        for (size_t elementIndex : elementIterator->second)
+        {
+            renderElement(commandQueue[elementIndex]);
+        }
+    }
 }
 
 void NuklearSDLRenderHook::renderButton(const UIRenderCommand& command)

@@ -76,6 +76,10 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
             auto system = std::make_unique<RenderSystem>(std::move(sdlRenderer));
             gameWorld->render = system.get();
 
+        	if (hasFlag(specs.engineSystem, EngineSystem::Events))
+        	{
+        		system->setupEvents(*gameWorld->getDispatcher());
+        	}
             loop->addSystem(std::move(system));
         }
     }
