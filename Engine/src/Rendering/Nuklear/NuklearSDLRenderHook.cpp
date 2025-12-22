@@ -483,14 +483,13 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
             renderPanelContents(panelId);
         }
     }
-
-    // Update our cache from Nuklear's actual state
+	
     struct nk_rect bounds = nk_window_get_bounds(nuklearContext);
     state.x = bounds.x;
     state.y = bounds.y;
     state.width = bounds.w;
     state.height = bounds.h;
-	
+
     if (panel.closable && nk_window_is_hidden(nuklearContext, name)) {
         state.isClosed = true;
     }
