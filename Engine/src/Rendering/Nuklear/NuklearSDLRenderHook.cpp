@@ -60,7 +60,6 @@ void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 	subscriptions.push_back(dispatcher.subscribe<MouseButtonPressedEvent>(
 			[this](const MouseButtonPressedEvent& event)
 			{
-				std::cout << "mouse button pressed" << std::endl;
 				this->handleMouseClick(event);
 			}
 			)
@@ -69,7 +68,6 @@ void NuklearSDLRenderHook::setupEvents(EventDispatcher& dispatcher)
 	subscriptions.push_back(dispatcher.subscribe<MouseButtonReleasedEvent>(
 			[this](const MouseButtonReleasedEvent& event)
 			{
-				std::cout << "mouse button released" << std::endl;
 				this->handleMouseReleased(event);
 			}
 			)
