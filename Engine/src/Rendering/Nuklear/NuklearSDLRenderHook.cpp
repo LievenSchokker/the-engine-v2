@@ -431,7 +431,6 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
 
     struct nk_style_window originalStyle = nuklearContext->style.window;
 
-    // ... all your styling code stays the same ...
     nuklearContext->style.window.fixed_background = nk_style_item_color(
         nk_rgba(panel.backgroundColor.r, panel.backgroundColor.g,
                 panel.backgroundColor.b, panel.backgroundColor.a));
@@ -466,12 +465,9 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
 
     const char* name = panel.title.empty() ? windowId : panel.title.c_str();
 
-    // DON'T set position/size every frame - only on first creation
-    // Use nk_begin_titled to separate display title from ID
     struct nk_window* win = nk_window_find(nuklearContext, name);
 
     if (win == nullptr) {
-        // First time - create with our initial bounds
         if (nk_begin(nuklearContext, name,
                      nk_rect(state.x, state.y, state.width, state.height), flags))
         {
@@ -479,7 +475,6 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
             renderPanelContents(panelId);
         }
     } else {
-        // Window exists - let Nuklear use its cached state
         if (nk_begin(nuklearContext, name,
                      nk_rect(win->bounds.x, win->bounds.y,
                              win->bounds.w, win->bounds.h), flags))
@@ -495,8 +490,7 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
     state.y = bounds.y;
     state.width = bounds.w;
     state.height = bounds.h;
-
-    // Check if window was closed
+	
     if (panel.closable && nk_window_is_hidden(nuklearContext, name)) {
         state.isClosed = true;
     }
@@ -505,7 +499,6 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
     nuklearContext->style.window = originalStyle;
 }
 
-// Helper to avoid code duplication
 void NuklearSDLRenderHook::renderPanelContents(uint32_t panelId)
 {
     auto elementIterator = panelElementIndices.find(panelId);
