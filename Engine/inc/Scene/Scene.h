@@ -111,13 +111,6 @@ public:
 	 */
 	void onStop();
 
-	/**
-	 * @brief Resume the scene if it is active.
-	 *
-	 * Resumes component execution for every stored object.
-	 */
-	void onResume();
-
     /**
      * @brief Update all game objects when the scene is active.
      *

@@ -150,19 +150,6 @@ void Scene::onStop()
 	active = false;
 }
 
-void Scene::onResume()
-{
-	if ( !active )
-	{
-		return;
-	}
-
-	for ( auto& gameObject : gameObjects )
-	{
-	    gameObject->setBehavioursEnabled(true);
-
-	}
-}
 
 void Scene::update(double deltaTime, const GameWorld& world)
 {

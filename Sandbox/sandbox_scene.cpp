@@ -60,7 +60,6 @@ class SandboxInputBehaviour final: public Behaviour
 		// Handle SPACE key to toggle clear color
 		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
 		{
-			auto w = world;
 			Color clearColor = world.render->getClearColor();
 			clearColor = (clearColor == Color::darkGreen())
 							 ? Color::darkPurple()

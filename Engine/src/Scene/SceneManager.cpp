@@ -356,7 +356,7 @@ void SceneManager::resume()
 	}
 
 	paused = false;
-	activeScene->onResume();
+	behaviourSystem->enableBehaviours(activeScene->getAllComponentsOfType<Behaviour>());
 }
 
 bool SceneManager::isPaused() const
