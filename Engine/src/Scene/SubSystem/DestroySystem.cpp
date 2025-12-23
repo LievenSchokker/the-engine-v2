@@ -1,0 +1,74 @@
+#include "Scene/SubSystems/DestroySystem.h"
+#include "Scene/Scene.h"
+#include "GameObject/GameObject.h"
+
+#include <algorithm>
+
+void DestructionSystem::queueDestroy(GameObject* obj)
+{
+	if (obj == nullptr)
+		return;
+
+	// Don't queue the same object twice
+	if (isQueued(obj))
+		return;
+
+	destroyQueue.push_back(obj);
+}
+
+void DestructionSystem::queueDestroy(const std::vector<GameObject*>& objects)
+{
+	for (GameObject* obj : objects)
+	{
+		queueDestroy(obj);
+	}
+}
+
+void DestructionSystem::processQueue(Scene& scene)
+{
+	if (destroyQueue.empty())
+		return;
+
+	// We iterate by index because the queue could grow
+	// if onSceneDestroy() queues more objects
+	for (size_t i = 0; i < destroyQueue.size(); ++i)
+	{
+		GameObject* obj = destroyQueue[i];
+
+		if (obj == nullptr)
+			continue;
+
+		// Invoke callback if set
+		if (preDestroyCallback)
+			preDestroyCallback(obj);
+
+		obj->onSceneDestroy();
+		scene.removeGameObject(obj);
+	}
+
+	destroyQueue.clear();
+}
+
+bool DestructionSystem::isQueued(const GameObject* obj) const
+{
+	if (obj == nullptr)
+		return false;
+
+	return std::ranges::find(destroyQueue, obj)
+		   != destroyQueue.end();
+}
+
+size_t DestructionSystem::queueSize() const
+{
+	return destroyQueue.size();
+}
+
+void DestructionSystem::clear()
+{
+	destroyQueue.clear();
+}
+
+void DestructionSystem::setPreDestroyCallback(std::function<void(GameObject*)> callback)
+{
+	preDestroyCallback = std::move(callback);
+}
