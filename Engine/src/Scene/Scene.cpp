@@ -137,6 +137,8 @@ void Scene::onStart(GameWorld& world)
 {
 	if (active) return;
     active = true;
+
+    //TODO REMOVE THIS FROM SCENE
     initialiseNavigationSystem({100, 100, Vector2{15, 15}});
 }
 
@@ -150,58 +152,6 @@ void Scene::onStop()
 	active = false;
 }
 
-
-void Scene::update(double deltaTime, const GameWorld& world)
-{
-	if ( !active )
-	{
-		return;
-	}
-
-	bool clockPaused = (world.clock != nullptr &&
-						world.clock->isPaused());
-
-    std::vector<GameObject*> objectsToUpdate;
-    objectsToUpdate.reserve(gameObjects.size());
-
-    for (auto& gameObject : gameObjects)
-    {
-        if (gameObject && gameObject->getIsActive())
-        {
-            objectsToUpdate.push_back(gameObject.get());
-        }
-    }
-
-    for (GameObject* gameObject : objectsToUpdate)
-    {
-        if (!gameObject || isInDestroyQueue(gameObject))
-        {
-            continue;
-        }
-
-        if (!gameObjectIds.contains(gameObject))
-        {
-            continue;
-        }
-
-        for (Behaviour* behaviour : gameObject->getEnabledBehaviours())
-        {
-            if (!behaviour || !behaviour->getHasAwakened() || !behaviour->getHasStarted())
-            {
-                continue;
-            }
-
-            if (clockPaused && !behaviour->shouldRunWhenPaused())
-            {
-                continue;
-            }
-
-            behaviour->update(deltaTime, world);
-        }
-    }
-
-	processDestroyQueue();
-}
 
 void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, GameWorld& world)
 {

@@ -110,15 +110,7 @@ public:
 	 * manager.
 	 */
 	void onStop();
-
-    /**
-     * @brief Update all game objects when the scene is active.
-     *
-     * @param deltaTime Seconds elapsed since the previous update.
-     * @param world
-     */
-    void update(double deltaTime, const GameWorld& world);
-
+    
     /**
 	* @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
 	* Does not enable the behaviours on their own only calls the callback.
