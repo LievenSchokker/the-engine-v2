@@ -10,6 +10,8 @@
 #include "Core/IEngineSystems.h"
 #include "Core/SystemStatus.h"
 #include "Networking/Connection/ConnectionMode.h"
+#include "SubSystems/BehaviourSystem.h"
+#include "SubSystems/DestroySystem.h"
 
 class NetworkSpawnManager;
 
@@ -27,6 +29,7 @@ public:
 
 	SystemStatus start(GameWorld& gameWorld) override;
 	void update(double deltaTime, const GameWorld& gameWorld) override;
+	void queueDestroy(GameObject* obj);
 	void shutdown(GameWorld& gameWorld) override;
 	[[nodiscard]] const std::string getName() const override;
 
@@ -242,4 +245,8 @@ public:
 
     /// @brief Whether the active scene is paused
     bool paused = false;
+
+	std::unique_ptr<BehaviourSystem> behaviourSystem;
+
+	std::unique_ptr<DestroySystem> destroySystem;
 };

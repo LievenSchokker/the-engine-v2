@@ -1,4 +1,6 @@
 #pragma once
+
+
 #include "Core/GameWorld.h"
 
 #include <vector>
@@ -21,7 +23,5 @@ public:
 	void enableBehaviours(const std::vector<Behaviour*>& behaviours);
 	void startBehaviours(const std::vector<Behaviour*>& behaviours);
 	void disableBehaviours(const std::vector<Behaviour*>& behaviours);
-
-	// Initialise behaviours for a single GameObject added at runtime
 	void initialiseRuntimeBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world);
 };
