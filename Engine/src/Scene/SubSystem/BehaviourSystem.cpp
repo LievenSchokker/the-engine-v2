@@ -7,16 +7,18 @@
 void BehaviourSystem::initialiseScene(Scene& scene, GameWorld& world)
 {
     std::vector<Behaviour*> allBehaviours;
-
+    scene.onStart(world);
     for (const auto& gameObject : scene.getGameObjects())
     {
         if (!gameObject)
             continue;
 
-        for (Behaviour* behaviour : gameObject->getAllBehaviours())
+        for (auto& behaviour  : gameObject->getAllBehaviours())
         {
             if (behaviour != nullptr)
+            {
                 allBehaviours.push_back(behaviour);
+            }
         }
     }
 

@@ -147,14 +147,14 @@ public:
 	 */
 	void queueDestroy(GameObject* gameObject);
 
-        /**
-         * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
-         * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
-         * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
-         *
-         * This function is called at the end of each scene::update() call.
-         */
-        void processDestroyQueue();
+    /**
+     * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
+     * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
+     * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
+     *
+     * This function is called at the end of each scene::update() call.
+     */
+    void processDestroyQueue();
 
 	/**
 	 * Checks whether the given object is in the @c destroyQueue vector in order to be destroyed.

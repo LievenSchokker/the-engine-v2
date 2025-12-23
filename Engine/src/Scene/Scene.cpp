@@ -136,38 +136,7 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 void Scene::onStart(GameWorld& world)
 {
 	if (active) return;
-
-    /// Note: Somehwere the settings should be configured?
     initialiseNavigationSystem({100, 100, Vector2{15, 15}});
-
-	active = true;
-
-	/// Store all behaviours from all gameobjects in this scene
-	std::vector<Behaviour*> allBehaviours;
-
-	/// Retrieve every behaviour on every GameObject in this scene object.
-	for ( auto& gameObject : gameObjects )
-	{
-		for ( auto& behaviour : gameObject->getAllBehaviours() )
-		{
-			if ( behaviour == nullptr )
-			    continue;
-
-			allBehaviours.emplace_back(behaviour);
-		}
-	}
-
-	// Reactivates behaviours
-	for ( auto& behaviour : beforeEnableBehaviours )
-	{
-		behaviour->setEnabled(true);
-	}
-
-	beforeEnableBehaviours.clear();
-
-	/// Initialise all the behaviours by calling their lifetime functions in the
-	/// correct order.
-	initialiseBehaviours(allBehaviours, world);
 }
 
 void Scene::onStop()

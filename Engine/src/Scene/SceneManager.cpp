@@ -327,8 +327,7 @@ bool SceneManager::setActiveScene(const std::string& name)
 	}
 
 	activeScene = nextScene;
-	paused = false;
-	activeScene->onStart(*gameWorld);
+    behaviourSystem->initialiseScene(*activeScene, *gameWorld);
 	return true;
 }
 
