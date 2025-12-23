@@ -108,6 +108,11 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 
     const std::string sceneName = scenePtr->getName();
     sceneManager->addScene(std::move(scenePtr));
+
+    for (auto& scene : gamePtr->getAllScenes())
+    {
+        sceneManager->addScene(std::move(scene));
+    }
     sceneManager->setActiveScene(sceneName);
     loop->addSystem(std::move(sceneManager));
 
