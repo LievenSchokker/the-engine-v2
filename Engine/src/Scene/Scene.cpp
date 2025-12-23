@@ -136,6 +136,7 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 void Scene::onStart(GameWorld& world)
 {
 	if (active) return;
+    active = true;
     initialiseNavigationSystem({100, 100, Vector2{15, 15}});
 }
 
@@ -147,14 +148,6 @@ void Scene::onStop()
 	}
 
 	active = false;
-	for ( auto& gameObject : gameObjects )
-	{
-		const auto& enabledBehaviours = gameObject->getEnabledBehaviours();
-		beforeEnableBehaviours.insert(beforeEnableBehaviours.end(),
-									  enabledBehaviours.begin(),
-									  enabledBehaviours.end());
-		gameObject->setBehavioursEnabled(false);
-	}
 }
 
 void Scene::onPause()
