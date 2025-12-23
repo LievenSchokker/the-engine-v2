@@ -110,14 +110,7 @@ public:
 	 * manager.
 	 */
 	void onStop();
-
-	/**
-	 * @brief Pause the scene if it is active.
-	 *
-	 * Temporarily suspends component execution for every stored object.
-	 */
-	void onPause();
-
+    
 	/**
 	 * @brief Resume the scene if it is active.
 	 *

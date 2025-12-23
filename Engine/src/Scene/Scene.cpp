@@ -150,19 +150,6 @@ void Scene::onStop()
 	active = false;
 }
 
-void Scene::onPause()
-{
-	if ( !active )
-	{
-		return;
-	}
-
-	for ( auto& gameObject : gameObjects )
-	{
-	    gameObject->setBehavioursEnabled(false);
-	}
-}
-
 void Scene::onResume()
 {
 	if ( !active )

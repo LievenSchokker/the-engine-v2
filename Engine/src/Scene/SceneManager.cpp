@@ -310,6 +310,7 @@ bool SceneManager::setActiveScene(const std::string& name)
 
 	if (activeScene != nullptr && activeScene != persistentScene.get())
 	{
+	    behaviourSystem->disableBehaviours(activeScene->getAllComponentsOfType<Behaviour>());
 		activeScene->onStop();
 	}
 
