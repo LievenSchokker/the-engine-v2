@@ -13,14 +13,14 @@ class Scene;
  * Objects are queued during gameplay and destroyed at a safe point
  * (end of frame) to avoid iterator invalidation and use-after-free bugs.
  */
-class DestructionSystem
+class DestroySystem
 {
 public:
-    DestructionSystem() = default;
-    ~DestructionSystem() = default;
+    DestroySystem() = default;
+    ~DestroySystem() = default;
 
-    DestructionSystem(const DestructionSystem&) = delete;
-    DestructionSystem& operator=(const DestructionSystem&) = delete;
+    DestroySystem(const DestroySystem&) = delete;
+    DestroySystem& operator=(const DestroySystem&) = delete;
 
     /**
      * @brief Queue a GameObject for destruction at end of frame.

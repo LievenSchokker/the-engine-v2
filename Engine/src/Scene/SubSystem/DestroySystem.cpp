@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-void DestructionSystem::queueDestroy(GameObject* obj)
+void DestroySystem::queueDestroy(GameObject* obj)
 {
 	if (obj == nullptr)
 		return;
@@ -16,7 +16,7 @@ void DestructionSystem::queueDestroy(GameObject* obj)
 	destroyQueue.push_back(obj);
 }
 
-void DestructionSystem::queueDestroy(const std::vector<GameObject*>& objects)
+void DestroySystem::queueDestroy(const std::vector<GameObject*>& objects)
 {
 	for (GameObject* obj : objects)
 	{
@@ -24,7 +24,7 @@ void DestructionSystem::queueDestroy(const std::vector<GameObject*>& objects)
 	}
 }
 
-void DestructionSystem::processQueue(Scene& scene)
+void DestroySystem::processQueue(Scene& scene)
 {
 	if (destroyQueue.empty())
 		return;
@@ -49,7 +49,7 @@ void DestructionSystem::processQueue(Scene& scene)
 	destroyQueue.clear();
 }
 
-bool DestructionSystem::isQueued(const GameObject* obj) const
+bool DestroySystem::isQueued(const GameObject* obj) const
 {
 	if (obj == nullptr)
 		return false;
@@ -58,17 +58,17 @@ bool DestructionSystem::isQueued(const GameObject* obj) const
 		   != destroyQueue.end();
 }
 
-size_t DestructionSystem::queueSize() const
+size_t DestroySystem::queueSize() const
 {
 	return destroyQueue.size();
 }
 
-void DestructionSystem::clear()
+void DestroySystem::clear()
 {
 	destroyQueue.clear();
 }
 
-void DestructionSystem::setPreDestroyCallback(std::function<void(GameObject*)> callback)
+void DestroySystem::setPreDestroyCallback(std::function<void(GameObject*)> callback)
 {
 	preDestroyCallback = std::move(callback);
 }
