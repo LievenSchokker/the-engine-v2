@@ -41,19 +41,6 @@ public:
 	const std::string& getName() const;
     bool addGameObject(std::unique_ptr<GameObject> gameObject);
 
-    /**
-	 * @brief Add a game object to the scene.
-	 *
-	 * If the scene is currently active the object's components are activated
-	 * via its @ref ComponentManager.
-	 *
-	 * @param gameObject Game object instance to own.
-	 * @param world
-	 * @return true if the object was successfully added, false if gameObject
-	 * was null.
-	 */
-	bool addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWorld& world);
-
 	/**
 	 * @brief Remove a game object by name.
 	 *
@@ -118,28 +105,6 @@ public:
 	* @param world
      */
     void initialiseBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world);
-
-	/**
-	 * @brief Adds the provided GameObject to the @c destroyQueue vector, in order to delete and destroy the object when @c processDestroyQueue is called.
-	 * @param gameObject the GameObject to destroy
-	 */
-	void queueDestroy(GameObject* gameObject);
-
-    /**
-     * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
-     * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
-     * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
-     *
-     * This function is called at the end of each scene::update() call.
-     */
-    void processDestroyQueue();
-
-	/**
-	 * Checks whether the given object is in the @c destroyQueue vector in order to be destroyed.
-	 * @param gameObject GameObject to check
-	 * @return true if the GameObject is in the vector, false otherwise.
-	 */
-	bool isInDestroyQueue(GameObject* gameObject);
 
 	/**
 	 * Destroys all GameObjects in this scene and clears the @c gameObjects vector.

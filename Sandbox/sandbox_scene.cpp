@@ -44,12 +44,30 @@ class SandboxInputBehaviour final: public Behaviour
 	void update(double deltaTime, const GameWorld& world) override
 	{
 	    inputManager = world.input;
-		(void)deltaTime;
+	    (void)deltaTime;
 
-		if ( inputManager == nullptr || scene == nullptr )
-		{
-			return;
-		}
+	    if ( inputManager == nullptr || scene == nullptr )
+	    {
+	        return;
+	    }
+
+	    if (inputManager->wasKeyPressed(KeyCode::L))
+	    {
+	        auto gameObject = std::make_unique<GameObject>();
+	        gameObject->setName("GameObjectTJEE");
+	        gameObject->addComponent<SandboxInputBehaviour>(scene);
+	        auto shape = gameObject->addComponent<ShapeRenderer>();
+	        shape->setCircle(500);
+	        scene->addGameObject(std::move(gameObject));
+	        std::cout << "Scene contains: " << scene->getGameObjects().size() << " GameObjects" << std::endl;
+	    }
+
+	    if (inputManager->wasKeyPressed(KeyCode::K))
+	    {
+	        scene->removeGameObject("GameObjectTJEE");
+	        std::cout << "Scene contains: " << scene->getGameObjects().size() << " GameObjects" << std::endl;
+	    }
+
 		if ( inputManager->wasKeyPressed(KeyCode::D) )
 		{
 			auto circle = scene->getGameObject("BlueCircle");

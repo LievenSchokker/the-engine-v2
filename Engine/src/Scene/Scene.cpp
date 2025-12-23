@@ -172,39 +172,6 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, Gam
     }
 }
 
-void Scene::queueDestroy(GameObject* obj)
-{
-	/// Check if the object is already in the destroyQueue.
-	for ( auto* queued : destroyQueue )
-	{
-		if ( queued == obj ) return;
-	}
-
-	destroyQueue.push_back(obj);
-}
-
-void Scene::processDestroyQueue()
-{
-    for (GameObject* gameObject : destroyQueue)
-    {
-        gameObject->onSceneDestroy();
-        removeGameObjectInternal(gameObject);
-    }
-
-	/// Clear the queue when all queued objects have been deleted.
-	destroyQueue.clear();
-}
-
-bool Scene::isInDestroyQueue(GameObject* obj)
-{
-    if (obj == nullptr)
-        return false;
-
-    return std::find(destroyQueue.begin(), destroyQueue.end(), obj)
-            != destroyQueue.end();
-}
-
-
 void Scene::destroyAllGameObjects()
 {
     for ( auto& gameObject : gameObjects )

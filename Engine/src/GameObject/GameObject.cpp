@@ -112,9 +112,6 @@ void GameObject::destroy()
     setActive(false);
 
     disableAllBehaviours();
-
-    if (scene != nullptr)
-        scene->queueDestroy(this);
 }
 
 
