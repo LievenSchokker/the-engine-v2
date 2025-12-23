@@ -431,24 +431,10 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
 
     const char* name = panel.title.empty() ? windowId : panel.title.c_str();
 
-    // Check if window is currently collapsed
     struct nk_window* win = nk_window_find(nuklearContext, name);
     bool isCollapsed = (win != nullptr && (win->flags & NK_WINDOW_MINIMIZED));
 
-    // Store original style
     struct nk_style_window originalStyle = nuklearContext->style.window;
-
-    // Calculate header height the same way Nuklear does
-    float headerHeight = nuklearContext->style.font->height
-                       + 2.0f * nuklearContext->style.window.header.padding.y
-                       + 2.0f * nuklearContext->style.window.header.label_padding.y;
-
-    // Calculate safe rounding for collapsed state
-    float effectiveRounding = panel.rounding;
-    if (isCollapsed && panel.rounding > 0.0f) {
-        float maxRounding = headerHeight * 0.5f;
-        effectiveRounding = (panel.rounding < maxRounding) ? panel.rounding : maxRounding;
-    }
 
     nuklearContext->style.window.fixed_background = nk_style_item_color(
         nk_rgba(panel.backgroundColor.r, panel.backgroundColor.g,
@@ -457,14 +443,16 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
         nk_rgba(panel.borderColor.r, panel.borderColor.g,
                 panel.borderColor.b, panel.borderColor.a);
     nuklearContext->style.window.border = panel.borderThickness;
-    nuklearContext->style.window.rounding = effectiveRounding;
     nuklearContext->style.window.padding = nk_vec2(panel.padding, panel.padding);
     nuklearContext->style.window.spacing = nk_vec2(panel.spacing, panel.spacing);
 
-    // Set header to transparent - we'll draw it ourselves
-    nuklearContext->style.window.header.normal = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-    nuklearContext->style.window.header.hover = nk_style_item_color(nk_rgba(0, 0, 0, 0));
-    nuklearContext->style.window.header.active = nk_style_item_color(nk_rgba(0, 0, 0, 0));
+    nuklearContext->style.window.header.normal = nk_style_item_color(
+        nk_rgba(panel.titleBackgroundColor.r, panel.titleBackgroundColor.g,
+                panel.titleBackgroundColor.b, panel.titleBackgroundColor.a));
+    nuklearContext->style.window.header.hover =
+        nuklearContext->style.window.header.normal;
+    nuklearContext->style.window.header.active =
+        nuklearContext->style.window.header.normal;
 
     nuklearContext->style.window.header.label_normal =
         nk_rgba(panel.titleTextColor.r, panel.titleTextColor.g,
@@ -501,38 +489,6 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
     state.y = bounds.y;
     state.width = bounds.w;
     state.height = bounds.h;
-
-    // Draw custom rounded header
-    if (panel.hasTitle && panel.rounding > 0.0f) {
-        struct nk_command_buffer* canvas = nk_window_get_canvas(nuklearContext);
-        nk_color headerColor = nk_rgba(
-            panel.titleBackgroundColor.r, panel.titleBackgroundColor.g,
-            panel.titleBackgroundColor.b, panel.titleBackgroundColor.a);
-
-        // Header bounds
-        struct nk_rect headerRect;
-        headerRect.x = bounds.x;
-        headerRect.y = bounds.y;
-        headerRect.w = bounds.w;
-        headerRect.h = headerHeight + 1.0f; // +1 matches Nuklear's header.h += 1.0f
-
-        if (isCollapsed) {
-            // Collapsed: full rounding on all corners
-            nk_fill_rect(canvas, headerRect, effectiveRounding, headerColor);
-        } else {
-            // Expanded: rounded top corners, square bottom corners
-            // Draw fully rounded rect
-            nk_fill_rect(canvas, headerRect, effectiveRounding, headerColor);
-
-            // Draw a square rect at the bottom to cover bottom rounded corners
-            struct nk_rect bottomRect;
-            bottomRect.x = headerRect.x;
-            bottomRect.y = headerRect.y + headerRect.h - effectiveRounding;
-            bottomRect.w = headerRect.w;
-            bottomRect.h = effectiveRounding;
-            nk_fill_rect(canvas, bottomRect, 0, headerColor);
-        }
-    }
 
     if (panel.closable && nk_window_is_hidden(nuklearContext, name)) {
         state.isClosed = true;
