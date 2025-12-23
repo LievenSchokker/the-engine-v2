@@ -20,9 +20,8 @@ std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
     panel1->setMinimizable(true);
     panel1->setBackgroundColor(Color(60, 20, 80, 250));
     panel1->setBorderColor(Color(255, 0, 255, 255));
-    panel1->setBorderThickness(8.0f);  // THICC border
-    panel1->setRounding(40.0f);        // Very round
-    panel1->setPadding(25.0f);         // Lots of padding
+    panel1->setBorderThickness(8.0f);
+    panel1->setPadding(25.0f);
     panel1->setSpacing(15.0f);
     panel1->setTitleBackgroundColor(Color(120, 0, 120, 255));
     panel1->setTitleTextColor(Color(255, 255, 0, 255));
@@ -56,7 +55,6 @@ std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
     panel2->setBackgroundColor(Color(5, 5, 5, 255));
     panel2->setBorderColor(Color(255, 0, 0, 255));
     panel2->setBorderThickness(1.0f);
-    panel2->setRounding(0.0f);
     panel2->setPadding(2.0f);
     panel2->setSpacing(1.0f);
     panel2->setTitleBackgroundColor(Color(80, 0, 0, 255));
@@ -99,7 +97,6 @@ std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
     panel3->setBackgroundColor(Color(100, 150, 200, 80));
     panel3->setBorderColor(Color(200, 220, 255, 100));
     panel3->setBorderThickness(4.0f);
-    panel3->setRounding(20.0f);
     panel3->setPadding(15.0f);
     panel3->setSpacing(10.0f);
     panel3->setTitleBackgroundColor(Color(50, 100, 150, 120));
@@ -127,37 +124,32 @@ std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
     panel4->setBackgroundColor(Color(20, 20, 30, 240));
     panel4->setBorderColor(Color(255, 255, 255, 255));
     panel4->setBorderThickness(3.0f);
-    panel4->setRounding(10.0f);
     panel4->setPadding(10.0f);
     panel4->setSpacing(8.0f);
     panel4->setTitleBackgroundColor(Color(40, 40, 50, 255));
     panel4->setTitleTextColor(Color(255, 255, 255, 255));
     panel4->setTitleHeight(28.0f);
     panel4->setRowHeight(35.0f);
-    panel4->setColumns(3);  // Three columns!
+    panel4->setColumns(3);
 
-    // Column 1 - Reds
     auto redBar1 = menu4->addComponent<UIProgressBar>(0, 0, 200, 25);
     redBar1->setPanelId(4);
     redBar1->setValue(1.0f);
     redBar1->setBarColor(Color(255, 0, 0, 255));
     redBar1->setBackgroundColor(Color(50, 0, 0, 255));
 
-    // Column 2 - Greens
     auto greenBar1 = menu4->addComponent<UIProgressBar>(0, 0, 200, 25);
     greenBar1->setPanelId(4);
     greenBar1->setValue(0.8f);
     greenBar1->setBarColor(Color(0, 255, 0, 255));
     greenBar1->setBackgroundColor(Color(0, 50, 0, 255));
 
-    // Column 3 - Blues
     auto blueBar1 = menu4->addComponent<UIProgressBar>(0, 0, 200, 25);
     blueBar1->setPanelId(4);
     blueBar1->setValue(0.6f);
     blueBar1->setBarColor(Color(0, 0, 255, 255));
     blueBar1->setBackgroundColor(Color(0, 0, 50, 255));
 
-    // Row 2
     auto redBar2 = menu4->addComponent<UIProgressBar>(0, 0, 200, 25);
     redBar2->setPanelId(4);
     redBar2->setValue(0.7f);

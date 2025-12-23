@@ -46,7 +46,6 @@ public:
 	void setBackgroundColor(Color color);
 	Color getBorderColor() const;
 	float getBorderThickness() const;
-	float getRounding() const;
 	float getPadding() const;
 	float getSpacing() const;
 	void setRowHeight(float height);
@@ -54,7 +53,6 @@ public:
 
 	void setBorderColor(Color color);
 	void setBorderThickness(float thickness);
-	void setRounding(float radius);
 	void setPadding(float pad);
 	void setSpacing(float space);
 
@@ -84,7 +82,6 @@ private:
 	std::string title;
 
 	float borderThickness = 1.0f;
-	float rounding = 0.0f;
 	float padding = 4.0f;
 	float spacing = 4.0f;
 	float opacity = 1.0f;
@@ -104,7 +101,6 @@ private:
 	float titlePadding = 4.0f;
 	float titleLabelPadding = 4.0f;
 
-	bool movable = false;
 	bool resizable = false;
 	bool minimizable = false;
 	bool closable = false;

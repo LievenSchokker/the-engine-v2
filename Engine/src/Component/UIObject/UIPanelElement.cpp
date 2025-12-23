@@ -41,7 +41,6 @@ void UIPanelElement::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWrite
 	// Visual styling
 	command.borderColor = borderColor;
 	command.borderThickness = borderThickness;
-	command.rounding = rounding;
 	command.padding = padding;
 	command.spacing = spacing;
 
@@ -78,13 +77,11 @@ void UIPanelElement::setBackgroundColor(Color color) { backgroundColor = color; 
 // Visual Styling
 Color UIPanelElement::getBorderColor() const { return borderColor; }
 float UIPanelElement::getBorderThickness() const { return borderThickness; }
-float UIPanelElement::getRounding() const { return rounding; }
 float UIPanelElement::getPadding() const { return padding; }
 float UIPanelElement::getSpacing() const { return spacing; }
 
 void UIPanelElement::setBorderColor(Color color) { borderColor = color; }
 void UIPanelElement::setBorderThickness(float thickness) { borderThickness = thickness; }
-void UIPanelElement::setRounding(float radius) { rounding = radius; }
 void UIPanelElement::setPadding(float pad) { padding = pad; }
 void UIPanelElement::setSpacing(float space) { spacing = space; }
 

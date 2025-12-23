@@ -107,7 +107,8 @@ private:
 	SDL_Renderer* sdlRenderer;
 	nk_context* nuklearContext;
 	EventDispatcher* eventDispatcher;
-	bool pendingMouseDown[3] = {false, false, false};  // LEFT, MIDDLE, RIGHT
+	
+	bool pendingMouseDown[3] = {false, false, false};
 	bool pendingMouseUp[3] = {false, false, false};
 	int clickX[3] = {0, 0, 0};
 	int clickY[3] = {0, 0, 0};
@@ -120,6 +121,7 @@ private:
 		bool isMinimized = false;
 		bool isClosed = false;
 	};
+
 	std::unordered_map<uint32_t, PanelState> panelStateCache;
 
 	std::vector<UIRenderCommand> commandQueue;
