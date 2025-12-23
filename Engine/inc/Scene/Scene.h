@@ -70,10 +70,10 @@ public:
 	 */
 	bool removeGameObject(const std::string& name);
 
-        /**
-         * @brief Removes a GameObject from the scene (destroys it).
-         */
-        void removeGameObject(GameObject* obj);
+    /**
+     * @brief Removes a GameObject from the scene (destroys it).
+     */
+    void removeGameObject(GameObject* obj);
 
         /**
          * @brief Look up a game object by name.
@@ -110,7 +110,7 @@ public:
 	 * manager.
 	 */
 	void onStop();
-    
+
     /**
 	* @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
 	* Does not enable the behaviours on their own only calls the callback.

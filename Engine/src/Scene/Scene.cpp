@@ -47,24 +47,6 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
     return true;
 }
 
-bool Scene::addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWorld& world)
-{
-	if (gameObject == nullptr) {
-		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-		return false;
-	}
-
-	GameObject* addedObject = gameObject.get();
-	addGameObjectInternal(std::move(gameObject));
-	addedObject->setScene(*this);
-
-	if (active) {
-		initialiseBehaviours(addedObject->getAllBehaviours(), world);
-	}
-
-	return true;
-}
-
 bool Scene::removeGameObject(const std::string& name)
 {
 	const auto it =
