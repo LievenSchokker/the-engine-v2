@@ -44,7 +44,6 @@ bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 	GameObject* addedObject = gameObject.get();
 	addGameObjectInternal(std::move(gameObject));
 	addedObject->setScene(*this);
-	
     return true;
 }
 
@@ -411,12 +410,11 @@ bool Scene::removeGameObjectInternal(GameObject* gameObject)
     if (gameObject == nullptr)
         return false;
 
-    auto it = std::find_if(
-        gameObjects.begin(),
-        gameObjects.end(),
-        [gameObject](const std::unique_ptr<GameObject>& ptr) {
-            return ptr.get() == gameObject;
-        }
+    auto it = std::ranges::find_if(gameObjects
+                                   ,
+                                   [gameObject](const std::unique_ptr<GameObject>& ptr) {
+                                       return ptr.get() == gameObject;
+                                   }
     );
 
     if (it == gameObjects.end())

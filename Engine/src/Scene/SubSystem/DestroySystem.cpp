@@ -9,7 +9,6 @@ void DestroySystem::queueDestroy(GameObject* obj)
 	if (obj == nullptr)
 		return;
 
-	// Don't queue the same object twice
 	if (isQueued(obj))
 		return;
 
@@ -31,6 +30,7 @@ void DestroySystem::processQueue(Scene& scene)
 
 	// We iterate by index because the queue could grow
 	// if onSceneDestroy() queues more objects
+    // DON'T MAKE THIS A NESTED LOOP
 	for (size_t i = 0; i < destroyQueue.size(); ++i)
 	{
 		GameObject* obj = destroyQueue[i];
