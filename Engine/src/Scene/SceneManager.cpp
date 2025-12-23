@@ -345,7 +345,7 @@ void SceneManager::pause()
 	}
 
 	paused = true;
-	activeScene->onPause();
+	activeScene->onStop();
 }
 
 void SceneManager::resume()

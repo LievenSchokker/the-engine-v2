@@ -110,7 +110,7 @@ public:
 	 * manager.
 	 */
 	void onStop();
-    
+
 	/**
 	 * @brief Resume the scene if it is active.
 	 *

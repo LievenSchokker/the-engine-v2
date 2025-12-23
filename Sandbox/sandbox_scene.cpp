@@ -39,11 +39,11 @@ class SandboxInputBehaviour final: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
 	}
 
 	void update(double deltaTime, const GameWorld& world) override
 	{
+	    inputManager = world.input;
 		(void)deltaTime;
 
 		if ( inputManager == nullptr || scene == nullptr )
