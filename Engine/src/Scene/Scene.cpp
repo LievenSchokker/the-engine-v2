@@ -133,43 +133,6 @@ void Scene::onStop()
 }
 
 
-void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, GameWorld& world)
-{
-    for ( auto& behaviour : behaviours )
-    {
-        if ( behaviour == nullptr )
-            continue;
-        if (!behaviour->getHasAwakened())
-            behaviour->awake(world);
-    }
-
-    /// Then call onEnable on all enabled behaviours on active GameObjects:
-    for (auto& behaviour : behaviours)
-    {
-        if (behaviour == nullptr)
-            continue;
-
-        if (behaviour->getGameObject()->getIsActive() && behaviour->getIsEnabled())
-        {
-            behaviour->onEnable();
-        }
-    }
-
-    /// Lastly call start on all enabled behaviours on Active GameObjects:
-    for (auto& behaviour : behaviours)
-    {
-        if (behaviour == nullptr)
-            continue;
-
-        if (!behaviour->getIsActiveAndEnabled())
-            continue;
-
-        /// Start may only be called once per behaviour
-        if (!behaviour->getHasStarted())
-            behaviour->start();
-    }
-}
-
 void Scene::destroyAllGameObjects()
 {
     for (const auto& gameObject : gameObjects )

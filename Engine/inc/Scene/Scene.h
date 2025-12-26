@@ -97,15 +97,7 @@ public:
 	 * manager.
 	 */
 	void onStop();
-
-    /**
-	* @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
-	* Does not enable the behaviours on their own only calls the callback.
-	* @param behaviours the behaviours that need to be initialised.
-	* @param world
-     */
-    void initialiseBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world);
-
+    
 	/**
 	 * Destroys all GameObjects in this scene and clears the @c gameObjects vector.
 	 *
