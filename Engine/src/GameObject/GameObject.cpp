@@ -216,7 +216,6 @@ void GameObject::setIsStatic(const bool value)
 void GameObject::setScene(Scene& newScene)
 {
     scene = &newScene;
-    sceneId = scene->getSceneId(*this);
 }
 
 Scene* GameObject::getScene() const

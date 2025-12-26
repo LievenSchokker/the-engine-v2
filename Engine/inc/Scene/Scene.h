@@ -39,7 +39,7 @@ public:
 	 * @return Reference to the stored scene name.
 	 */
 	const std::string& getName() const;
-    bool addGameObject(std::unique_ptr<GameObject> gameObject);
+    int addGameObject(std::unique_ptr<GameObject> gameObject);
 
 	/**
 	 * @brief Remove a game object by name.
@@ -62,13 +62,13 @@ public:
      */
     void removeGameObject(GameObject* obj);
 
-        /**
-         * @brief Look up a game object by name.
-         *
-         * @param name Name of the game object to retrieve.
-         * @return Pointer to the object, or nullptr when not found.
-         */
-        GameObject *getGameObject(const std::string &name) const;
+    /**
+     * @brief Look up a game object by name.
+     *
+     * @param name Name of the game object to retrieve.
+     * @return Pointer to the object, or nullptr when not found.
+     */
+    GameObject *getGameObject(const std::string &name) const;
 
 	/**
 	 * @brief Extract a game object from the scene without destroying it.
@@ -116,23 +116,6 @@ public:
 	template <class T>
 	std::vector<T*> getAllComponentsOfType() const;
 
-	/**
- * @brief Retrieves the id stored by this scene for a given GameObject.
- * @param gameObject the gameObject to look with for its id
- * @return the id that is assigned to the GameObject if found, -1 if the GameObject does not belong to this scene
- */
-	int getSceneId(const GameObject& gameObject) const;
-
-	/**
-	 * @brief Returns a GameObject from  this scene by providing its scene id.
-	 *
-	 * Returns
-	 * @param id
-	 * @return the GameObject whose id matches the argument, nullptr if the id is not found on any of this scene's GameObjects.
-	 */
-	GameObject* getGameObjectById(int id) const;
-
-
 	NavigationSystem* getNavigationSystem() const;
 
 	/**
@@ -144,26 +127,17 @@ public:
      * @brief Gets mutable access to all GameObjects.
      */
     std::vector<std::unique_ptr<GameObject>>& getGameObjects();
+
     const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
 
 
 
 private:
-	/// @brief Method that removes the @c gameObject from the containers storing it
-	bool removeGameObjectInternal(GameObject* gameObject);
-
-	/// @brief Method that adds the @c gameObject to the internal containers storing it
-	bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
-
-
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 	std::vector<GameObject*> destroyQueue;
 	bool active = false;
 
-	/// Map stores the GameObject and their scene id.
-	std::map<const GameObject*, int> gameObjectIds;
-	int currentGameObjectId = 0;
 	void initialiseNavigationSystem(NavigationGridOptions options);
 	std::unique_ptr<NavigationSystem> navigationSystem;
 

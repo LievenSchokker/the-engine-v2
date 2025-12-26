@@ -46,8 +46,6 @@ class TilemapInputBehaviour: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
-
 		// Get grid component from scene
 		if ( scene != nullptr )
 		{
@@ -61,6 +59,7 @@ class TilemapInputBehaviour: public Behaviour
 
 	void update(double deltaTime, const GameWorld& world) override
 	{
+	    inputManager = world.input;
 		(void)deltaTime;
 		(void)world;
 

@@ -34,17 +34,17 @@ const std::string& Scene::getName() const
 	return name;
 }
 
-bool Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
+int Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
     if ( gameObject == nullptr ) {
         std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-        return false;
+        return -1;
     }
 
 	GameObject* addedObject = gameObject.get();
-	addGameObjectInternal(std::move(gameObject));
+    gameObjects.emplace_back(std::move(gameObject));
 	addedObject->setScene(*this);
-    return true;
+    return 0;
 }
 
 bool Scene::removeGameObject(const std::string& name)
@@ -68,7 +68,6 @@ bool Scene::removeGameObject(const std::string& name)
 	if ( it != gameObjects.end() )
 	{
         GameObject* gameObject = it->get();
-	    removeGameObjectInternal(gameObject);
 		return true;
 	}
 
@@ -109,7 +108,6 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 
 	// Move ownership and remove from vector
 	auto result = std::move(*it);
-	gameObjectIds.erase(gameObject);
 	gameObjects.erase(it);
 
 	return result;
@@ -174,7 +172,7 @@ void Scene::initialiseBehaviours(const std::vector<Behaviour *> &behaviours, Gam
 
 void Scene::destroyAllGameObjects()
 {
-    for ( auto& gameObject : gameObjects )
+    for (const auto& gameObject : gameObjects )
     {
         gameObject->onSceneDestroy();
     }
@@ -217,66 +215,7 @@ const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const
     return gameObjects;
 }
 
-int Scene::getSceneId(const GameObject& gameObject) const
-{
-    auto it = gameObjectIds.find(&gameObject);
-
-    if (it == gameObjectIds.end())
-        return -1;
-
-    return it->second;
-}
-
-
-GameObject* Scene::getGameObjectById(int id) const
-{
-    for (const auto& obj : gameObjects)
-    {
-        if (getSceneId(*obj) == id)
-            return obj.get();
-    }
-
-    return nullptr;
-}
-
-
-bool Scene::removeGameObjectInternal(GameObject* gameObject)
-{
-    if (gameObject == nullptr)
-        return false;
-
-    auto it = std::ranges::find_if(gameObjects
-                                   ,
-                                   [gameObject](const std::unique_ptr<GameObject>& ptr) {
-                                       return ptr.get() == gameObject;
-                                   }
-    );
-
-    if (it == gameObjects.end())
-        return false;
-
-    gameObjectIds.erase(gameObject);
-    gameObjects.erase(it);
-
-    return true;
-}
-
-bool Scene::addGameObjectInternal(std::unique_ptr<GameObject> gameObject)
-{
-    if (!gameObject)
-        return false;
-
-    GameObject* goRaw = gameObject.get();
-
-    gameObjects.emplace_back(std::move(gameObject));
-
-    gameObjectIds[goRaw] = currentGameObjectId;
-    currentGameObjectId++;
-
-    return true;
-}
-
- void Scene::initialiseNavigationSystem(NavigationGridOptions options)
+void Scene::initialiseNavigationSystem(NavigationGridOptions options)
 {
     std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(options.gridWidth, options.gridHeight, options.cellSize);
     std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<NavigationObstacle>();
