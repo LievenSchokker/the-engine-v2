@@ -97,7 +97,7 @@ public:
 	 * manager.
 	 */
 	void onStop();
-    
+
 	/**
 	 * Destroys all GameObjects in this scene and clears the @c gameObjects vector.
 	 *
@@ -123,15 +123,16 @@ public:
     const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
 
 
-
+    NavigationSystem* getNavigationSystem();
 private:
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 	std::vector<GameObject*> destroyQueue;
 	bool active = false;
 
+
 	void initialiseNavigationSystem(NavigationGridOptions options);
-	std::unique_ptr<NavigationSystem> navigationSystem;
+    std::unique_ptr<NavigationSystem> navigationSystem;
 
     /// Incremented everytime a GameObject is added to this scene.
 	std::vector<Behaviour*> beforeEnableBehaviours;

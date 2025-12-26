@@ -117,9 +117,6 @@ void Scene::onStart(GameWorld& world)
 {
 	if (active) return;
     active = true;
-
-    //TODO REMOVE THIS FROM SCENE
-    initialiseNavigationSystem({100, 100, Vector2{15, 15}});
 }
 
 void Scene::onStop()
@@ -195,7 +192,11 @@ void Scene::initialiseNavigationSystem(NavigationGridOptions options)
 }
 
 
-NavigationSystem* Scene::getNavigationSystem() const
+NavigationSystem* Scene::getNavigationSystem()
 {
+    if (!navigationSystem)
+    {
+        initialiseNavigationSystem({100, 100, Vector2{15, 15}});
+    }
     return navigationSystem.get();
 }
