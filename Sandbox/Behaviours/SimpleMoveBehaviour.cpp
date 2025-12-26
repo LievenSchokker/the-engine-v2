@@ -5,6 +5,7 @@
 
 #include "Component/Transform.h"
 #include "Core/GameWorld.h"
+#include "Scene/SceneManager.h"
 
 void SimpleMoveBehaviour::onAwake()
 {
@@ -47,6 +48,29 @@ void SimpleMoveBehaviour::pollInput()
 	    return;
 
 	currentDirection = {0.0f, 0.0f};
+
+    if (inputManager->isKeyDown(KeyCode::H))
+    {
+        if (gameObject != nullptr)
+        {
+            if (clone != nullptr)
+            {
+                clone->destroy();
+                clone = nullptr;
+            }
+            std::unique_ptr<GameObject> clone = gameObject->clone();
+        }
+    }
+
+    if (inputManager->isKeyDown(KeyCode::L))
+    {
+        if (clone != nullptr)
+        {
+            getWorld()->sceneManager->getActiveScene()->addGameObject(std::move(clone));
+            clone = nullptr;
+            gameObject->destroy();
+        }
+    }
 
 	if (inputManager->isKeyDown(KeyCode::W))
 	    currentDirection.y -= 1.0f;

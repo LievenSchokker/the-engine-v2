@@ -35,6 +35,6 @@ class SimpleMoveBehaviour: public Behaviour
 	float currentSpeed = 0.0f;
 	float maxSpeed = 0.0f;
 	Vector2 currentDirection;
-
+    std::unique_ptr<GameObject> clone;
 	InputManager* inputManager;
 };
