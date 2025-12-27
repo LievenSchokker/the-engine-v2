@@ -47,13 +47,14 @@ class PhysicsInputBehaviour: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
 	}
 
 	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
+
+		inputManager = world.input;
 
 		if ( inputManager == nullptr || physicsWorld == nullptr ||
 			 rectangleGO == nullptr )
