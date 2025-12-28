@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(engineSandbox)
 
 # Glob the Behaviour sources
-file(GLOB BEHAVIOUR_SOURCES
+file(GLOB_RECURSE BEHAVIOUR_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Behaviours/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Behaviours/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/Examples/*.cpp"

@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 class IEngineSystems;
@@ -27,7 +28,7 @@ struct ApplicationSpecifications;
  * @see IEngineLoop
  * @see IEngineSystem
  */
-class EngineLoop: public IEngineLoop
+class  EngineLoop: public IEngineLoop
 {
 public:
 	/**
@@ -66,6 +67,7 @@ public:
 	 * order they were added.
 	 */
 	void start() override;
+	void initNetwork() const;
 	void initializeCloseEvent(EventDispatcher& dispatcher);
 
 	/**
@@ -183,12 +185,15 @@ public:
 	 * The shutdown will occur at the end of the current frame.
 	 */
 	void requestShutdown();
+	void setPendingSceneName(const std::string& name) { pendingSceneName = name; }
 
 private:
+	std::string pendingSceneName;
 	std::unique_ptr<IBackendContext> backendContext;
 	std::unique_ptr<Game> game;
 	std::unique_ptr<GameWorld> gameWorld;
 	std::vector<std::unique_ptr<IEngineSystems>> systems;
+	std::unique_ptr<NetworkSpawnManager> spawnManager;
 	SceneManager* sceneManagerPtr;
 	ClockFunction clockFunction;
 	bool shutdownRequested = false;

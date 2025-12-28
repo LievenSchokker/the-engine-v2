@@ -6,6 +6,7 @@
 #include <functional>
 
 #include "ServerInformation.h"
+#include "StateSyncSystem.h"
 #include "Core/IEngineSystems.h"
 #include "Networking/SendMode.h"
 #include "Networking/ITransport.h"
@@ -66,7 +67,7 @@ public:
      * @param deltaTime Time since last update.
      * @param gameWorld Reference to the game world.
      */
-    void update(double deltaTime, const GameWorld& gameWorld) override;
+    void fixedUpdate(double deltaTime, const GameWorld& gameWorld) override;
 
     /**
      * @brief Cleanly shuts down networking and clears connection state
@@ -214,4 +215,5 @@ private:
     std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
     ClientConnectedCallback onClientConnected;
     ClientDisconnectedCallback onClientDisconnected;
+	std::unique_ptr<StateSyncSystem> stateSyncSystem;
 };

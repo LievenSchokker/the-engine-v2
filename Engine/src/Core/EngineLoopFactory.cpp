@@ -98,36 +98,37 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
         loop->addSystem(std::move(physicsSystem));
     }
 
-    auto sceneManager = std::make_unique<SceneManager>(*gameWorld);
-    std::unique_ptr<Scene> scenePtr = gamePtr->getFirstScene();
+	// NETWORKING
+	if (hasFlag(specs.engineSystem, EngineSystem::NetClient))
+	{
+		auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
+		loop->addSystem(std::move(client));
+	}
 
-    if (!scenePtr)
-    {
-        throw std::runtime_error("Game must have at least one scene");
-    }
+	if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
+	{
+		auto server = std::make_unique<Server>(
+			ServerConnectionInformation{
+				specs.networkingOptions.port,
+				specs.networkingOptions.serverIP
+			},
+			std::make_unique<TransportGNS>());
+		loop->addSystem(std::move(server));
+	}
+
+	auto sceneManager = std::make_unique<SceneManager>(*gameWorld);
+	std::unique_ptr<Scene> scenePtr = gamePtr->getFirstScene();
+
+	if (!scenePtr)
+	{
+		throw std::runtime_error("Game must have at least one scene");
+	}
+
 
     const std::string sceneName = scenePtr->getName();
     sceneManager->addScene(std::move(scenePtr));
-    sceneManager->setActiveScene(sceneName);
+	loop->setPendingSceneName(sceneName);
     loop->addSystem(std::move(sceneManager));
-
-    // NETWORKING
-    if (hasFlag(specs.engineSystem, EngineSystem::NetClient))
-    {
-        auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
-        loop->addSystem(std::move(client));
-    }
-
-    if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
-    {
-        auto server = std::make_unique<Server>(
-            ServerConnectionInformation{
-                specs.networkingOptions.port,
-                specs.networkingOptions.serverIP
-            },
-            std::make_unique<TransportGNS>());
-        loop->addSystem(std::move(server));
-    }
 
     return loop;
 }

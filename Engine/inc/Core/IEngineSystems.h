@@ -25,9 +25,7 @@ public:
 	{
 	}
 
-	virtual void shutdown(GameWorld& gameWorld)
-	{
-	}
+	virtual void shutdown(GameWorld& gameWorld) {}
 
 	virtual const std::string getName() const = 0;
 };

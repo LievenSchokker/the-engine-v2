@@ -20,7 +20,6 @@ namespace spelmotorNetworking
         NetworkSpawnManager& spawnManager,
         NetworkIdentityRegistry& registry)
     {
-        std::cout << "[MessageDispatcherFactory] Creating server dispatcher" << std::endl;
         auto dispatcher = std::make_unique<MessageDispatcher>();
 
         dispatcher->registerMessageHandler(

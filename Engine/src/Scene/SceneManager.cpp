@@ -103,12 +103,28 @@ void SceneManager::processForServer(Scene& scene)
 
     for (GameObject* obj : networkObjects)
     {
+        auto behaviour = obj->getComponent<NetworkBehaviour>();
+
+        if (behaviour != nullptr && behaviour->getAuthorityType() == AuthorityType::ClientAuthority)
+        {
+            std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+            if (!extracted) continue;
+
+            scene.removeGameObject(obj);
+
+            if (spawnManager)
+            {
+                uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
+            }
+            continue;
+        }
+
         Vector2 spawnPosition = obj->getTransform()->getPosition();
 
         std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
         if (!extracted) continue;
 
-        extracted->getTransform()->setPosition({0, 0});
+        extracted->getTransform()->setPosition(spawnPosition);
 
         if (!extracted->getComponent<NetworkIdentity>())
         {
@@ -317,7 +333,7 @@ bool SceneManager::setActiveScene(const std::string& name)
 
     if (networkConfigured && !processedScenes.contains(name))
     {
-        processSceneForNetwork(*activeScene);
+        processSceneForNetwork(*nextScene);
         processedScenes.insert(name);
     }
 
@@ -396,6 +412,7 @@ void SceneManager::applyNetworkSnapshot(
         if (!received) continue;
 
         auto* identity = received->getComponent<NetworkIdentity>();
+
         if (!identity) continue;
 
         uint32_t netId = identity->getNetId();

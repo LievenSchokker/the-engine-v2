@@ -58,6 +58,17 @@ class SpelMotor
 	 */
 	ApplicationClock* getClock();
 
+	/**
+	 * @brief Initializes systems without entering the game loop.
+	 * Useful for testing where manual frame stepping is needed.
+	 */
+		void initialize();
+
+	/**
+	 * @brief Executes a single frame update.
+	 * Must call initialize() first.
+	 */
+	void tick();
    private:
 	/** @brief Immutable configuration set at construction.
 	 * Const ensures runtime modifications don't destabilize systems.

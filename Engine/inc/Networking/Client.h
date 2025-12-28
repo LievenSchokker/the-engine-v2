@@ -43,14 +43,13 @@ public:
      * @return True if the connection attempt was initiated successfully,
      *         false otherwise.
      */
-    bool connectToServer(
-        const ServerConnectionInformation& serverInformartion) const;
-
+    bool connectToServer(const ServerConnectionInformation& serverInformartion) const;
     /**
      * @brief Disconnects from the server.
      */
     void disconnect();
 
+	SystemStatus start(GameWorld& gameWorld) override;
     /**
      * @brief Sends a message to the connected server.
      * @param message The message to send.

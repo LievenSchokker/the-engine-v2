@@ -241,11 +241,13 @@ void GameObject::setBehavioursEnabled(const bool value) const
     }
 }
 
+
 void GameObject::serialize(WriteArchive& archive) const
 {
     std::string n = name;
     archive.process(n);
 
+    // Transform
     Transform* t = getTransform();
     float posX = t->getPosition().x;
     float posY = t->getPosition().y;
@@ -259,30 +261,31 @@ void GameObject::serialize(WriteArchive& archive) const
     archive.process(scaleX);
     archive.process(scaleY);
 
+    // Count
     uint32_t count = 0;
     for (const auto& comp : getComponents())
     {
         if (dynamic_cast<Transform*>(comp.get())) continue;
-
-        if (ComponentType type = comp->getComponentType(); ComponentFactory::instance().isRegistered(type))
+        const char* typeName = comp->getName();
+        if (typeName && ComponentFactory::instance().isRegistered(typeName))
         {
             count++;
         }
     }
     archive.process(count);
 
+    // Components
     for (const auto& comp : getComponents())
     {
         if (dynamic_cast<Transform*>(comp.get())) continue;
-
-        ComponentType type = comp->getComponentType();
-        if (!ComponentFactory::instance().isRegistered(type))
+        const char* typeName = comp->getName();
+        if (!typeName || !ComponentFactory::instance().isRegistered(typeName))
         {
             continue;
         }
 
-        auto typeId = static_cast<uint32_t>(type);
-        archive.process(typeId);
+        std::string typeNameStr(typeName);
+        archive.process(typeNameStr);
         comp->serialize(archive);
     }
 }
@@ -310,58 +313,68 @@ void GameObject::deserialize(ReadArchive& archive)
 
     for (uint32_t i = 0; i < count; ++i)
     {
-        uint32_t typeId;
-        archive.process(typeId);
-        const auto type = static_cast<ComponentType>(typeId);
+        std::string typeName;
+        archive.process(typeName);
 
-        // Try to find existing component first
-
-        if (Component* existing = getComponentByType(type))
+        if (Component* existing = getComponentByTypeName(typeName))
         {
-            // Update existing component
             existing->deserialize(archive);
         }
         else
         {
-            // Create new component only if it doesn't exist
-            auto comp = ComponentFactory::instance().create(type);
+            auto comp = ComponentFactory::instance().create(typeName);
             if (!comp)
             {
+                std::cerr << "[GameObject] Unknown component: " << typeName << std::endl;
                 break;
             }
-
             comp->deserialize(archive);
             internalAddComponent(std::move(comp));
         }
     }
+    fixupPointersAfterClone();
 }
+
+void GameObject::fixupPointersAfterClone()
+{
+    for (auto& component : components)
+    {
+        if (component)
+        {
+            component->setGameObject(this);
+        }
+    }
+}
+
 
 std::unique_ptr<GameObject> GameObject::clone() const
 {
-    // Serialize to bytes
     WriteArchive writer;
     serialize(writer);
 
-    // Deserialize into new object
     std::vector<std::byte> bytes = writer.getBytes();
     CerealReadArchive reader(bytes.data(), bytes.size());
 
     auto cloned = std::make_unique<GameObject>();
     cloned->deserialize(reader);
 
-    return cloned;
-}
-
-Component* GameObject::getComponentByType(ComponentType type) const
-{
-    for (const auto& comp : getComponents())
+    for (auto& component : cloned->components)
     {
-        if (comp->getComponentType() == type)
+        if (component)
         {
-            return comp.get();
+            component->setGameObject(cloned.get());
         }
     }
-    return nullptr;
+
+    for (auto& behaviour : cloned->behaviours)
+    {
+        if (behaviour)
+        {
+            behaviour->setGameObject(cloned.get());
+        }
+    }
+
+    return cloned;
 }
 
 void GameObject::copyStateFrom(const GameObject& source)
@@ -399,6 +412,19 @@ void GameObject::destroyAllComponents()
     }
 }
 
+Component* GameObject::getComponentByTypeName(const std::string& typeName) const
+{
+    for (const auto& comp : getComponents())
+    {
+        const char* compTypeName = comp->getName();
+        if (compTypeName && typeName == compTypeName)
+        {
+            return comp.get();
+        }
+    }
+    return nullptr;
+}
+
 const std::vector<std::unique_ptr<Component>>& GameObject::getComponents() const
 {
     return components;
@@ -408,6 +434,13 @@ void GameObject::internalAddComponent(std::unique_ptr<Component> component)
 {
     if (component != nullptr)
     {
+        component->setGameObject(this);
+
+        if (auto* behaviour = dynamic_cast<Behaviour*>(component.get()))
+        {
+            behaviours.push_back(behaviour);
+        }
+
         components.push_back(std::move(component));
     }
 }

@@ -70,11 +70,11 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
         return nullptr;
     }
 
-    getScene()->addGameObject(std::move(gameObject));
+    getScene()->addRunTimeGameObject(std::move(gameObject));
 
     if (gameWorld->isServer())
     {
-        identity->onNetworkInstantiate(nextNetworkId++);
+        identity->onNetworkInstantiate(nextNetworkId);
     }
 
     identity->onNetworkSpawn();
@@ -189,17 +189,29 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 
 void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 {
-	if (!message.gameObject)
-	{
-		return;
-	}
+    if (!message.gameObject)
+    {
+        return;
+    }
 
-	if (!getScene())
-	{
-		return;
-	}
+    if (!getScene())
+    {
+        return;
+    }
 
 	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
+
+
+    if (spawnedObjects.contains(message.netId))
+    {
+        if (GameObject* existing = spawnedObjects[message.netId])
+        {
+            existing->copyStateFrom(*message.gameObject);
+        }
+
+        return;
+    }
+
 	if (!identity)
 	{
 		identity = message.gameObject->addComponent<NetworkIdentity>();
@@ -218,7 +230,8 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
-	getScene()->addGameObject(std::move(message.gameObject));
+
+	getScene()->addRunTimeGameObject(std::move(message.gameObject));
 	identity->onNetworkSpawn();
 }
 

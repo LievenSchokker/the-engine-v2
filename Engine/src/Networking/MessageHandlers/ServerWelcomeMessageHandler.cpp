@@ -13,5 +13,6 @@ void ServerWelcomeMessageHandler::handleMessageInternal()
 {
     const WelcomeMessage* message = getMessage();
     if (!message) return;
+	//gameWorld->localClientId = message->getClientId();
     spawnManager.CheckNewClientSpawnObject(message->getClientId());
 }

@@ -41,10 +41,6 @@ class Collider: public Component
 		radius = radiusNew;
 	}
 
-    ComponentType getComponentType() const override {
-	    return ComponentType::Unknown;
-	}
-
 	void setRectangle(const Vector2& fullSize)
 	{
 		shape = PhysicsShapeType::Rectangle;

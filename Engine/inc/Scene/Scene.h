@@ -48,11 +48,10 @@ public:
 	 * via its @ref ComponentManager.
 	 *
 	 * @param gameObject Game object instance to own.
-	 * @param world
 	 * @return true if the object was successfully added, false if gameObject
 	 * was null.
 	 */
-	bool addRunTimeGameObject(std::unique_ptr<GameObject> gameObject, GameWorld& world);
+	bool addRunTimeGameObject(std::unique_ptr<GameObject> gameObject);
 
 	/**
 	 * @brief Remove a game object by name.
