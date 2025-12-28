@@ -145,7 +145,6 @@ public:
 private:
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
-	std::vector<GameObject*> destroyQueue;
 	bool active = false;
 
 

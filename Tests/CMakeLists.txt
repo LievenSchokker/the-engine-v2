@@ -40,7 +40,8 @@ add_executable(engine_tests
         Animation/AnimationTrackTest.cpp
         Animation/AnimationClipTest.cpp
         Animation/AnimatorTest.cpp
-        Scene/SceneBehavioursTests.cpp
+        Scene/SubSystem/BehaviourSystemTest.cpp
+        Scene/SubSystem/DestroySystemTest.cpp
         Events/EventTest.cpp
         Audio/TestAudioManager.cpp
         Audio/TestMusicSource.cpp
