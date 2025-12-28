@@ -28,7 +28,7 @@ struct ApplicationSpecifications;
  * @see IEngineLoop
  * @see IEngineSystem
  */
-class EngineLoop: public IEngineLoop
+class  EngineLoop: public IEngineLoop
 {
 public:
 	/**
