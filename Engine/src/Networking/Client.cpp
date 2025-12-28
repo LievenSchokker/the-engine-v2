@@ -16,7 +16,9 @@
 
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
-	: transport(std::move(injectedTransport))
+	: transport(std::move(injectedTransport)),
+	  currentConnection{ConnectionMode::Client, -1,
+	                    ConnectionStatus::Disconnected}
 {
 	messageDispatcher = nullptr;
 }

@@ -1,7 +1,6 @@
 #include <gtest/gtest.h>
 #include "Core/Options/ApplicationSpecifications.h"
-#include "Core/EngineLoop.h"
-#include "Core/EngineLoopFactory.h"
+#include "Core/SpelMotor.h"
 #include "Game.h"
 #include "Scene/Scene.h"
 
@@ -15,6 +14,8 @@ protected:
         specs.windowOptions = {"Test", 100, 100};
         specs.networkingOptions.port = 7777;
         specs.networkingOptions.serverIP = "127.0.0.1";
+        specs.networkingOptions.tickRate = 60;
+        specs.maxFrameTime = 0.25;
     }
 
     void testCombination(EngineSystem system)
@@ -25,20 +26,16 @@ protected:
         game->setApplicationSpecifications(specs);
         game->addScene(std::make_unique<Scene>("TestScene"));
 
-        auto loop = EngineLoopFactory::createEngineLoop(std::move(game));
-        ASSERT_NE(loop, nullptr);
+        SpelMotor engine(std::move(game));
+        engine.initialize();
 
-        loop->start();
-        constexpr double deltaTime = 1.0 / 60.0;
         constexpr int frameCount = 5;
-
         for (int i = 0; i < frameCount; ++i)
         {
-            loop->update(deltaTime);
-            loop->fixedUpdate(deltaTime);
+            engine.tick();
         }
 
-        loop->shutdown();
+        engine.shutdown();
     }
 
     ApplicationSpecifications specs;
@@ -240,48 +237,4 @@ TEST_F(EngineSystemCombinationsTest, All_Flags_With_Both_Network)
         EngineSystem::Audio | EngineSystem::Input |
         EngineSystem::NetClient | EngineSystem::NetServer
     );
-}
-
-TEST_F(EngineSystemCombinationsTest, Lifecycle_Physics_Only)
-{
-    specs.engineSystem = EngineSystem::Physics;
-
-    auto game = std::make_unique<Game>();
-    game->setApplicationSpecifications(specs);
-    game->addScene(std::make_unique<Scene>("TestScene"));
-
-    auto loop = EngineLoopFactory::createEngineLoop(std::move(game));
-    ASSERT_NE(loop, nullptr);
-
-    loop->start();
-
-    for (int i = 0; i < 5; ++i)
-    {
-        loop->update(0.016);
-        loop->fixedUpdate(0.016);
-    }
-
-    loop->shutdown();
-}
-
-TEST_F(EngineSystemCombinationsTest, Lifecycle_Renderer_Physics)
-{
-    specs.engineSystem = EngineSystem::Renderer | EngineSystem::Physics;
-
-    auto game = std::make_unique<Game>();
-    game->setApplicationSpecifications(specs);
-    game->addScene(std::make_unique<Scene>("TestScene"));
-
-    auto loop = EngineLoopFactory::createEngineLoop(std::move(game));
-    ASSERT_NE(loop, nullptr);
-
-    loop->start();
-
-    for (int i = 0; i < 5; ++i)
-    {
-        loop->update(0.016);
-        loop->fixedUpdate(0.016);
-    }
-
-    loop->shutdown();
 }

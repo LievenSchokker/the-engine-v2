@@ -74,19 +74,7 @@ void SpelMotor::run()
 
 	while ( running )
 	{
-	    coreClock->tick();
-	    while ( coreClock->shouldFixedUpdate() )
-		{
-			coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
-			coreClock->consumeFixedUpdate();
-
-			if ( coreSystemLoop->isShutdownRequested() )
-			{
-				running = false;
-				break;
-			}
-		}
-		coreSystemLoop->update(coreClock->getDeltaTime());
+		tick();
 	}
 	shutdown();
 }
@@ -100,4 +88,30 @@ void SpelMotor::shutdown()
 ApplicationClock* SpelMotor::getClock()
 {
 	return coreClock.get();
+}
+
+void SpelMotor::initialize()
+{
+	coreClock->start();
+	coreSystemLoop->start();
+	running = true;
+}
+
+void SpelMotor::tick()
+{
+	if (!running) return;
+
+	coreClock->tick();
+	while (coreClock->shouldFixedUpdate())
+	{
+		coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
+		coreClock->consumeFixedUpdate();
+
+		if (coreSystemLoop->isShutdownRequested())
+		{
+			running = false;
+			break;
+		}
+	}
+	coreSystemLoop->update(coreClock->getDeltaTime());
 }
