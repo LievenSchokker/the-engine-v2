@@ -1,9 +1,6 @@
-//
-// Created by Lieven Schokker on 20/12/2025.
-//
+#pragma once
 
-#ifndef PROGRAM_TRANSFORMSHOOTER_H
-#define PROGRAM_TRANSFORMSHOOTER_H
+
 #include "Behaviour/Behaviour.h"
 #include "Input/InputManager.h"
 #include "Math/Vector2.h"
