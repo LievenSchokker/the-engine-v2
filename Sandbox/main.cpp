@@ -10,6 +10,7 @@
 #include "Sandboxes//AgentsZandbak.h"
 #include "Sandboxes/PathFindingZandbak.h"
 #include "Sandboxes/Multiplayer/MultiplayerZandbak.h"
+#include "Sandboxes/Multiplayer/MultiplayerZandbak.h"
 
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's

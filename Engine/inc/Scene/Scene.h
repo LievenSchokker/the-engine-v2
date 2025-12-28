@@ -203,7 +203,6 @@ public:
     const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
 
 
-
 private:
 	/// @brief Method that removes the @c gameObject from the containers storing it
 	bool removeGameObjectInternal(GameObject* gameObject);

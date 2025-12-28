@@ -4,6 +4,7 @@
 #include "Component/BaseComponentTypes/Component.h"
 #include "Events/Subscriptions/SubscriptionScope.h"
 
+class Collider;
 class GameWorld;
 
 /**
@@ -143,6 +144,13 @@ class Behaviour: virtual public Component
 	*/
 	bool getHasStarted() const;
 
+	// Called when this GameObject's collider enters a sensor
+	virtual void onSensorEnter(Collider* other) {}
+
+	// Called when this GameObject's collider exits a sensor
+	virtual void onSensorExit(Collider* other) {}
+
+   private:
 	/**
 	* #brief check's if this behaviour has any subscriptions.
 	*

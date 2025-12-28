@@ -5,6 +5,8 @@
 
 #include "Events/EventDispatcher/EventDispatcher.h"
 
+#include <memory>
+
 class ApplicationClock;
 class AudioManager;
 class Server;
