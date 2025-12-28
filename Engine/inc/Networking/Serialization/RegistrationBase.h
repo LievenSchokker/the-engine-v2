@@ -9,7 +9,7 @@
  * This class solves the problem of needing to manually register every component type
  * with the factory. Manual registration is error-prone: forgetting to register a new
  * component results in silent failures during deserialization, which are difficult to debug.
- * 
+ *
  * @tparam Derived The component class inheriting from this base (CRTP pattern)
  */
 template <typename Derived>
