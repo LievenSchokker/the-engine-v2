@@ -31,6 +31,3 @@ private:
 	std::vector<Transform*> listOfTransforms;
 	Scene* activeScene;
 };
-
-
-#endif //PROGRAM_TRANSFORMSHOOTER_H
