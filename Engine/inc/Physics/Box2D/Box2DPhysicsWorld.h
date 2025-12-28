@@ -76,6 +76,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 * rotation.
 	 */
 	void syncTransforms() override;
+	void applyNetworkSnapshot() override;
 private:
 	/**
 	 * @brief Box2D world identifier.
