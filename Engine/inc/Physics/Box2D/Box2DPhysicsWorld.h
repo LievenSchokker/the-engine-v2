@@ -67,7 +67,15 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	void initialize() override;
 	void step(float deltaTime) override;
 	void shutdown() override;
-
+	/**
+	 * @brief Synchronizes all registered RigidBody transforms with the physics
+	 * world.
+	 *
+	 * After stepping the simulation, this function updates each RigidBody's
+	 * Transform component to match the corresponding Box2D body's position and
+	 * rotation.
+	 */
+	void syncTransforms() override;
 private:
 	/**
 	 * @brief Box2D world identifier.
@@ -89,14 +97,4 @@ private:
 	 * @brief The amount of ticks to calculate
 	 */
 	float tickRate;
-
-	/**
-	 * @brief Synchronizes all registered RigidBody transforms with the physics
-	 * world.
-	 *
-	 * After stepping the simulation, this function updates each RigidBody's
-	 * Transform component to match the corresponding Box2D body's position and
-	 * rotation.
-	 */
-	void syncTransforms() override;
 };
