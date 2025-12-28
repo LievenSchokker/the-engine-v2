@@ -18,21 +18,80 @@ Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
 
 void Box2DPhysicsWorld::initialize()
 {
-	std::cout << "Box2DPhysicsWorld::initialize() called" << std::endl;
-
 	b2WorldDef worldDef = b2DefaultWorldDef();
-	worldDef.gravity = {0.0f, 30.0f};
+	worldDef.gravity = {0.0f, 10.0f};
 	worldId = b2CreateWorld(&worldDef);
-
-	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
 }
 
 void Box2DPhysicsWorld::step(float deltaTime)
 {
-	float timeStep = 1.0f / tickRate;
-	int subStepCount = 4;
+	const float timeStep = 1.0f / tickRate;
+	const int subStepCount = 4;
 
 	b2World_Step(worldId, timeStep, subStepCount);
+	handleEvents();
+	syncTransforms();
+}
+
+void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
+{
+    if (!rigidBody) {
+        return;
+    }
+
+    GameObject* gameObject = rigidBody->getGameObject();
+    if (!gameObject) {
+        return;
+    }
+    auto* transform = gameObject->getTransform();
+    auto* collider = gameObject->getComponent<Collider>();
+
+    if (!collider || !transform) {
+        return;
+    }
+
+    b2BodyDef def = b2DefaultBodyDef();
+    def.type = rigidBody->isDynamic ? b2_dynamicBody : b2_staticBody;
+
+    Vector2 pos = transform->getPosition();
+    def.position = {pos.x, pos.y};
+
+    def.rotation = b2MakeRot(transform->getRotationAngle());
+
+    b2BodyId body = b2CreateBody(worldId, &def);
+
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.density = collider->getDensity();
+    shapeDef.isSensor = collider->isSensor();
+    shapeDef.enableSensorEvents = true;
+
+    b2ShapeId shapeId = b2_nullShapeId;
+
+    if (collider->getShape() == PhysicsShapeType::Circle)
+    {
+        b2Circle circle;
+        circle.center = {0.0f, 0.0f};
+        circle.radius = collider->radius;
+        shapeId = b2CreateCircleShape(body, &shapeDef, &circle);
+    }
+    else if (collider->getShape() == PhysicsShapeType::Rectangle)
+    {
+        b2Polygon poly = b2MakeBox(collider->size.x * 0.5f, collider->size.y * 0.5f);
+        shapeId = b2CreatePolygonShape(body, &shapeDef, &poly);
+    }
+
+
+    if (b2Shape_IsValid(shapeId))
+    {
+        b2Shape_SetUserData(shapeId, gameObject);
+    }
+
+    b2Body_SetUserData(body, gameObject);
+    bodies[rigidBody] = body;
+}
+
+void Box2DPhysicsWorld::handleEvents()
+{
 	b2SensorEvents sensorEvents = b2World_GetSensorEvents(worldId);
 
 	// Look at the sensor touches
@@ -84,99 +143,7 @@ void Box2DPhysicsWorld::step(float deltaTime)
 		if ( sensorCol && visitorCol ) sensorCol->onSensorExit(visitorCol);
 	}
 
-	// Sync transforms to gameobjects
-
-	for (auto body : bodies)
-	{
-		RigidBody* rigid_body = const_cast<RigidBody*>(body.first);
-		rigid_body->fixedUpdate();
-	}
-
-	syncTransforms();
 }
-
-void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
-{
-    std::cout << "[createBody] Called" << std::endl;
-
-    if (!rigidBody) {
-        std::cout << "[createBody] FAIL: rigidBody is null" << std::endl;
-        return;
-    }
-
-    GameObject* gameObject = rigidBody->getGameObject();
-    if (!gameObject) {
-        std::cout << "[createBody] FAIL: gameObject is null" << std::endl;
-        return;
-    }
-    std::cout << "[createBody] gameObject: " << gameObject->getName() << std::endl;
-
-    auto* transform = gameObject->getTransform();
-    auto* collider = gameObject->getComponent<Collider>();
-
-    if (!collider || !transform) {
-        std::cout << "[createBody] FAIL: missing collider or transform" << std::endl;
-        return;
-    }
-
-    // THIS IS THE KEY LINE - check what shape is set
-    std::cout << "[createBody] Collider shape: " << (int)collider->getShape() << std::endl;
-    std::cout << "[createBody] isDynamic: " << rigidBody->isDynamic << std::endl;
-
-    b2BodyDef def = b2DefaultBodyDef();
-    def.type = rigidBody->isDynamic ? b2_dynamicBody : b2_staticBody;
-
-    Vector2 pos = transform->getPosition();
-    def.position = {pos.x, pos.y};
-    std::cout << "[createBody] Position: " << pos.x << ", " << pos.y << std::endl;
-
-    def.rotation = b2MakeRot(transform->getRotationAngle());
-
-    b2BodyId body = b2CreateBody(worldId, &def);
-    std::cout << "[createBody] Body created with b2 id" << std::endl;
-
-    b2ShapeDef shapeDef = b2DefaultShapeDef();
-    shapeDef.density = collider->getDensity();
-    shapeDef.isSensor = collider->isSensor();
-    shapeDef.enableSensorEvents = true;
-
-    b2ShapeId shapeId = b2_nullShapeId;
-
-    if (collider->getShape() == PhysicsShapeType::Circle)
-    {
-        std::cout << "[createBody] Creating circle shape, radius: " << collider->radius << std::endl;
-        b2Circle circle;
-        circle.center = {0.0f, 0.0f};
-        circle.radius = collider->radius;
-        shapeId = b2CreateCircleShape(body, &shapeDef, &circle);
-    }
-    else if (collider->getShape() == PhysicsShapeType::Rectangle)
-    {
-        std::cout << "[createBody] Creating rectangle shape, size: " << collider->size.x << ", " << collider->size.y << std::endl;
-        b2Polygon poly = b2MakeBox(collider->size.x * 0.5f, collider->size.y * 0.5f);
-        shapeId = b2CreatePolygonShape(body, &shapeDef, &poly);
-    }
-    else
-    {
-        std::cout << "[createBody] WARNING: Unknown shape type!" << std::endl;
-    }
-
-    if (b2Shape_IsValid(shapeId))
-    {
-        b2Shape_SetUserData(shapeId, gameObject);
-        std::cout << "[createBody] Shape created successfully" << std::endl;
-    }
-    else
-    {
-        std::cout << "[createBody] WARNING: Shape creation failed!" << std::endl;
-    }
-
-    b2Body_SetUserData(body, gameObject);
-    bodies[rigidBody] = body;
-
-    std::cout << "[createBody] SUCCESS! Total bodies: " << bodies.size() << std::endl;
-}
-
 void Box2DPhysicsWorld::destroyBody(const RigidBody* rigidBody)
 {
 	if ( !rigidBody ) return;
@@ -215,14 +182,13 @@ void Box2DPhysicsWorld::syncTransforms()
 {
 	for ( auto& [rigidBody, box2DID] : bodies )
 	{
-		GameObject* gameObject = rigidBody->getGameObject();
+		const GameObject* gameObject = rigidBody->getGameObject();
 
-		// component knows its owner
-		b2Vec2 pos = b2Body_GetPosition(box2DID);
-		b2Rot rot = b2Body_GetRotation(box2DID);
+		b2Vec2 position = b2Body_GetPosition(box2DID);
+		b2Rot rotation = b2Body_GetRotation(box2DID);
 
-		gameObject->getTransform()->setPosition(Vector2(pos.x, pos.y));
-		gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rot));
+		gameObject->getTransform()->setPosition(Vector2(position.x, position.y));
+		gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rotation));
 	}
 }
 
@@ -230,15 +196,15 @@ void Box2DPhysicsWorld::applyNetworkSnapshot()
 {
 	for (auto& [rigidBody, bodyId] : bodies)
 	{
-		GameObject* gameObject = rigidBody->getGameObject();
+		const GameObject* gameObject = rigidBody->getGameObject();
 		if (!gameObject) continue;
 
-		Transform* transform = gameObject->getTransform();
+		const Transform* transform = gameObject->getTransform();
 		if (!transform) continue;
 
-		Vector2 pos = transform->getPosition();
-		float angle = transform->getRotationAngle();
-		b2Body_SetTransform(bodyId, {pos.x, pos.y}, b2MakeRot(angle));
+		const Vector2 position = transform->getPosition();
+		const float angle = transform->getRotationAngle();
+		b2Body_SetTransform(bodyId, {position.x, position.y}, b2MakeRot(angle));
 		b2Body_SetAwake(bodyId, true);
 	}
 }

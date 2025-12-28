@@ -45,6 +45,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 * @param rigidBody Pointer to the RigidBody containing physics components.
 	 */
 	void createBody(const RigidBody* rigidBody) override;
+	void handleEvents();
 
 	/**
 	 * @brief Destroys a previously created physics body.
