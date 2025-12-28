@@ -11,7 +11,7 @@ class GameWorld;
  * @brief This class serves as an abstract component that custom behaviour can
  * derive from.
  *
- * Implements lifetime functions that get called by the Engine internally
+ * Implements lifetime functions that get called by the Engine internallya
  *
  * Behaviour differs from Component because they can be enabled and disabled,
  * and implement lifetime functions.
@@ -23,10 +23,6 @@ class Behaviour: virtual public Component
 	{
 	}
 
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::Unknown;
-	}
 	/**
 	 * @brief Pure virtual destructor makes this class Abstract.
 	 */
@@ -186,9 +182,9 @@ protected:
 	template <class EventType, class T>
 	void subscribe(void (T::*method)(const EventType&));
 
-private:
+protected:
 	GameWorld* gameWorld = nullptr;
-
+private:
 	/// A RAII Wrapper for subscription handles. (This automatically manages subscription's)
 	SubscriptionScope subscriptions;
 	/// Enabled components are Updated, disabled Beahviours are not.

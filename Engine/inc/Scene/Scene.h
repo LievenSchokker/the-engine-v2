@@ -108,6 +108,23 @@ public:
 	template <class T>
 	std::vector<T*> getAllComponentsOfType() const;
 
+	/**
+ * @brief Retrieves the id stored by this scene for a given GameObject.
+ * @param gameObject the gameObject to look with for its id
+ * @return the id that is assigned to the GameObject if found, -1 if the GameObject does not belong to this scene
+ */
+	int getSceneId(const GameObject& gameObject) const;
+
+	/**
+	 * @brief Returns a GameObject from  this scene by providing its scene id.
+	 *
+	 * Returns
+	 * @param id
+	 * @return the GameObject whose id matches the argument, nullptr if the id is not found on any of this scene's GameObjects.
+	 */
+	GameObject* getGameObjectById(int id) const;
+
+
 	NavigationSystem* getNavigationSystem() const;
 
 	/**

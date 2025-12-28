@@ -12,25 +12,29 @@ class GameWorld;
  * Client: Reads input, sends movement commands to server
  * Server: Validates and applies movement, broadcasts to clients
  */
-class PlayerMovement final : public NetworkBehaviour
+class PlayerMovement final: public NetworkBehaviour,
+                            RegistrationBase<PlayerMovement>
 {
 public:
-    PlayerMovement();
-    void onStart() override;
-    void onNetworkSpawn() override;
-    void registerNetworkMethods(NetworkBuilder& builder) override;
-    void update(double deltaTime,const GameWorld& world) override;
+	PlayerMovement();
 
-	[[nodiscard]] ComponentType getComponentType() const override
+	static constexpr const char* name()
 	{
-		return ComponentType::PlayerMovement;
+		return "PlayerMovement";
 	}
+	const char* getName() const override { return name(); }
 
+	void onStart() override;
+
+	void onNetworkSpawn() override;
+	void registerNetworkMethods(NetworkBuilder& builder) override;
+    void update(double deltaTime,const GameWorld& world) override;
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
-private:
-    void handleInput();
-    void applyMovement(float dirX, float dirY) const;
 
-    float moveSpeed = 200.0f;
+private:
+	void handleInput();
+	void applyMovement(float dirX, float dirY) const;
+
+	float moveSpeed = 200.0f;
 };

@@ -206,11 +206,15 @@ TEST_F(ClientTest, IsConnectedReturnsFalseInitially)
 
 TEST_F(ClientTest, IsConnectedReturnsTrueAfterConnection)
 {
-    auto client = createClientWithMock();
+	auto client = createClientWithMock();
 
-    mockTransportPtr->simulateClientConnected(1);
+	auto world = std::make_unique<GameWorld>();
+	world->spawnManager = std::make_unique<NetworkSpawnManager>(world.get()).get();
+	client->start(*world);
 
-    EXPECT_TRUE(client->isConnected());
+	mockTransportPtr->simulateClientConnected(1);
+
+	EXPECT_TRUE(client->isConnected());
 }
 
 TEST_F(ClientTest, DisconnectClosesSocket)

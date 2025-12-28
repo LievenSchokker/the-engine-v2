@@ -122,17 +122,23 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
         auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
         loop->addSystem(std::move(client));
     }
+	// NETWORKING
+	if (hasFlag(specs.engineSystem, EngineSystem::NetClient))
+	{
+		auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
+		loop->addSystem(std::move(client));
+	}
 
-    if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
-    {
-        auto server = std::make_unique<Server>(
-            ServerConnectionInformation{
-                specs.networkingOptions.port,
-                specs.networkingOptions.serverIP
-            },
-            std::make_unique<TransportGNS>());
-        loop->addSystem(std::move(server));
-    }
+	if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
+	{
+		auto server = std::make_unique<Server>(
+			ServerConnectionInformation{
+				specs.networkingOptions.port,
+				specs.networkingOptions.serverIP
+			},
+			std::make_unique<TransportGNS>());
+		loop->addSystem(std::move(server));
+	}
 
     return loop;
 }

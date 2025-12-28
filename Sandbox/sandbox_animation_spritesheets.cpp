@@ -196,10 +196,10 @@ int main(int argc, char** argv)
 		rat->getTransform()->setPosition({200.0f, SCREEN_HEIGHT / 2.0f});
 		rat->getTransform()->setScale({2.0f, 2.0f});
 
-		// Load rat spritesheet (rat.png - 128x32, 4 frames horizontally)
-		auto* ratSprite = rat->addComponent<SpriteComponent>();
-		bool ratLoaded = SpritesheetLoader::loadSpritesheet(
-			assetManager.get(), ratSprite, "Assets/rat.png", 1, 4, 32, 32);
+	// Load rat spritesheet (rat.png - 128x32, 4 frames horizontally)
+	auto* ratSprite = rat->addComponent<SpriteComponent>();
+	bool ratLoaded = SpritesheetLoader::loadSpritesheet(
+		assetManager.get(), ratSprite, "Assets/rat.png", 1, 4, 32, 32);
 
 		if ( ratLoaded )
 		{
