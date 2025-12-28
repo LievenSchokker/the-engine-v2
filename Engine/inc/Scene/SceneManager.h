@@ -55,6 +55,7 @@ public:
      */
     bool addScene(std::unique_ptr<Scene> scene);
 
+	void addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject);
     /**
      * @brief Remove a stored scene.
      *
@@ -187,8 +188,10 @@ public:
      * @return Name of the first scene, or empty string if no scenes.
      */
     [[nodiscard]] std::string getFirstSceneName() const;
+	void applyNetworkSnapshot(
+		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
 
-   private:
+private:
     /**
      * @brief Processes a scene for networking based on configured mode.
      * @param scene The scene to process.
@@ -200,7 +203,7 @@ public:
      */
     void processForServer(Scene& scene);
 
-    /**
+	/**
      * @brief Client: Remove NetworkBehaviour objects.
      */
     void processForClient(Scene& scene);

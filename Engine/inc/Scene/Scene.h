@@ -97,6 +97,7 @@ public:
 	 * manager.
 	 */
 	void onStop();
+	void onPause();
 
 	/**
 	 * Destroys all GameObjects in this scene and clears the @c gameObjects vector.

@@ -147,9 +147,9 @@ GameWorld* EngineLoop::getGameWorld()
 	return gameWorld.get();
 }
 
-void EngineLoop::setGameWorld(std::unique_ptr<GameWorld> gameWorld)
+void EngineLoop::setGameWorld(std::unique_ptr<GameWorld> newGameWorld)
 {
-	gameWorld = std::move(gameWorld);
+	this->gameWorld = std::move(newGameWorld);
 }
 
 SceneManager* EngineLoop::getSceneManager()
