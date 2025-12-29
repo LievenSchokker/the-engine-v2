@@ -25,14 +25,19 @@
  * @brief Behavior class that handles physics demo input.
  *
  * Handles:
- * - W: Destroy circle body
- * - SPACE: Apply force to circle
+ * - W: Apply upward force to all circles
+ * - A: Apply leftward force to all circles
+ * - S: Apply downward force to all circles
+ * - D: Apply rightward force to all circles
  * - ESC: Exit
  */
 class PhysicsInputBehaviour: public Behaviour
 {
    public:
-	PhysicsInputBehaviour(GameObject* circleGO) : circleGO(circleGO)
+	explicit PhysicsInputBehaviour(std::vector<GameObject*> circleGOs)
+		: circleGOs(std::move(circleGOs)),
+		  inputManager(nullptr),
+		  physicsWorld(nullptr)
 	{
 	}
 
@@ -43,23 +48,51 @@ class PhysicsInputBehaviour: public Behaviour
 		inputManager = world.input;
 		physicsWorld = world.physics;
 
-		// Handle W key to destroy rectangle body
+		const float forceMagnitude = 30000000.0f;
+		Vector2 force = {0, 0};
+		bool forceApplied = false;
+
+		// Handle W key to apply upward force
 		if ( inputManager->wasKeyPressed(KeyCode::W) )
 		{
-			physicsWorld->destroyBody(circleGO->getComponent<RigidBody>());
-			std::cout << "Body destroyed for " << circleGO->getName()
-					  << std::endl;
+			force = {0, -forceMagnitude};
+			forceApplied = true;
+		}
+		// Handle S key to apply downward force
+		else if ( inputManager->wasKeyPressed(KeyCode::S) )
+		{
+			force = {0, forceMagnitude};
+			forceApplied = true;
+		}
+		// Handle A key to apply leftward force
+		else if ( inputManager->wasKeyPressed(KeyCode::A) )
+		{
+			force = {-forceMagnitude, 0};
+			forceApplied = true;
+		}
+		// Handle D key to apply rightward force
+		else if ( inputManager->wasKeyPressed(KeyCode::D) )
+		{
+			force = {forceMagnitude, 0};
+			forceApplied = true;
 		}
 
-		// Handle SPACE key to apply force
-		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
+		// Apply force to all circles
+		if ( forceApplied )
 		{
-			const Vector2 force = {0, -30000000};
-			physicsWorld->applyForce(circleGO->getComponent<RigidBody>(),
-									 force);
-			std::cout << "Force applied to " << circleGO->getName()
-					  << " with force: " << force.x << ", " << force.y
-					  << std::endl;
+			for ( auto* circleGO : circleGOs )
+			{
+				if ( circleGO != nullptr )
+				{
+					auto* rigidBody = circleGO->getComponent<RigidBody>();
+					if ( rigidBody != nullptr )
+					{
+						physicsWorld->applyForce(rigidBody, force);
+					}
+				}
+			}
+			std::cout << "Force applied to all circles: " << force.x << ", "
+					  << force.y << std::endl;
 		}
 
 		// Handle ESC key for exit
@@ -73,7 +106,7 @@ class PhysicsInputBehaviour: public Behaviour
    private:
 	InputManager* inputManager;
 	IPhysicsWorld* physicsWorld;
-	GameObject* circleGO;
+	std::vector<GameObject*> circleGOs;
 };
 
 void createCircle(std::unique_ptr<GameObject>& circle, float x, float y,
@@ -138,19 +171,44 @@ int main(int argc, char** argv)
 
 	// Create multiple bouncing balls with different properties
 	std::vector<std::unique_ptr<GameObject>> circles;
+	std::vector<GameObject*> circlePtrs;
 
 	// Create balls at different positions with different bounciness
 	auto& circle1 = circles.emplace_back();
 	createCircle(circle1, 240.0f, 100.0f, 30.0f, Color::lightBlue(), 0.9f,
 				 0.9f);	 // Very bouncy blue ball
-	// Store pointer to first circle IMMEDIATELY after creation, before any
-	// vector reallocations
-	GameObject* circle1Ptr = circle1.get();
+	circlePtrs.push_back(circle1.get());
 
-	createCircle(circles.emplace_back(), 250.0f, 20.0f, 25.0f, Color::red(),
-				 0.7f, 0.7f);  // Moderately bouncy red ball
-	createCircle(circles.emplace_back(), 260.0f, 200.0f, 35.0f, Color::green(),
-				 0.85f, 0.85f);	 // Bouncy green ball
+	auto& circle2 = circles.emplace_back();
+	createCircle(circle2, 250.0f, 20.0f, 25.0f, Color::red(), 0.7f,
+				 0.7f);	 // Moderately bouncy red ball
+	circlePtrs.push_back(circle2.get());
+
+	auto& circle3 = circles.emplace_back();
+	createCircle(circle3, 260.0f, 200.0f, 35.0f, Color::green(), 0.85f,
+				 0.85f);  // Bouncy green ball
+	circlePtrs.push_back(circle3.get());
+
+	// Create 10 very small circles for wow effect
+	std::vector<std::pair<float, float>> smallCirclePositions = {
+		{100.0f, 150.0f}, {150.0f, 80.0f}, {200.0f, 120.0f}, {300.0f, 60.0f},
+		{350.0f, 140.0f}, {400.0f, 90.0f}, {120.0f, 250.0f}, {180.0f, 300.0f},
+		{320.0f, 280.0f}, {380.0f, 320.0f}};
+
+	std::vector<Color> smallCircleColors = {
+		Color::yellow(),	  Color::pink(),		Color::purple(),
+		Color::lightBlue(),	  Color::red(),			Color::green(),
+		Color::lightYellow(), Color::lightPurple(), Color::orange(),
+		Color::lightGreen()};
+
+	for ( size_t i = 0; i < 10; ++i )
+	{
+		auto& smallCircle = circles.emplace_back();
+		createCircle(smallCircle, smallCirclePositions[i].first,
+					 smallCirclePositions[i].second, 8.0f, smallCircleColors[i],
+					 0.8f, 0.9f);  // Small, bouncy circles
+		circlePtrs.push_back(smallCircle.get());
+	}
 
 	for ( auto& circle : circles )
 	{
@@ -180,10 +238,10 @@ int main(int argc, char** argv)
 	// Create a GameObject for input handling
 	auto inputHandler = std::make_unique<GameObject>();
 	inputHandler->setName("InputHandler");
-	// Use first circle for input controls (W to destroy, SPACE to apply force)
+	// Pass all circle pointers for WASD controls
 	// Note: PhysicsInputBehaviour will get physics world from GameWorld in
 	// update()
-	inputHandler->addComponent<PhysicsInputBehaviour>(circle1Ptr);
+	inputHandler->addComponent<PhysicsInputBehaviour>(circlePtrs);
 
 	scene->addGameObject(std::move(inputHandler));
 
@@ -193,8 +251,10 @@ int main(int argc, char** argv)
 	std::cout << "Physics Demo - Bouncing Balls\n";
 	std::cout << "Watch the colorful balls bounce around!\n";
 	std::cout << "Controls:\n";
-	std::cout << "  W - Destroy first ball\n";
-	std::cout << "  SPACE - Apply upward force to first ball\n";
+	std::cout << "  W - Apply upward force to all balls\n";
+	std::cout << "  A - Apply leftward force to all balls\n";
+	std::cout << "  S - Apply downward force to all balls\n";
+	std::cout << "  D - Apply rightward force to all balls\n";
 	std::cout << "  ESC - Exit\n\n";
 
 	return SpelMotorEntry::main(std::move(game));
