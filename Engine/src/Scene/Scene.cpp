@@ -2,10 +2,7 @@
 
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
-#include "Component/BaseComponentTypes/RenderComponent.h"
-#include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Core/ApplicationClock.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
@@ -15,7 +12,6 @@
 #include <iostream>
 #include <utility>
 
-#include "Game.h"
 #include "Behaviour/Behaviour.h"
 
 #include "AI/Navigation/NavigationGridOptions.h"
@@ -139,9 +135,11 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 		gameObject->setBehavioursEnabled(false);
 	}
 
+	// Remove from gameObjectIds before moving
+	gameObjectIds.erase(gameObject);
+
 	// Move ownership and remove from vector
 	auto result = std::move(*it);
-	gameObjectIds.erase(gameObject);
 	gameObjects.erase(it);
 
 	return result;
