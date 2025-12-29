@@ -139,13 +139,14 @@ int main(int argc, char** argv)
 	auto& circle1 = circles.emplace_back();
 	createCircle(circle1, 240.0f, 100.0f, 30.0f, Color::lightBlue(),
 				 0.9f);	 // Very bouncy blue ball
+	// Store pointer to first circle IMMEDIATELY after creation, before any
+	// vector reallocations
+	GameObject* circle1Ptr = circle1.get();
+
 	createCircle(circles.emplace_back(), 250.0f, 20.0f, 25.0f, Color::red(),
 				 0.7f);	 // Moderately bouncy red ball
 	createCircle(circles.emplace_back(), 260.0f, 200.0f, 35.0f, Color::green(),
 				 0.85f);  // Bouncy green ball
-
-	// Store pointer to first circle before moving ownership
-	GameObject* circle1Ptr = circle1.get();
 
 	for ( auto& circle : circles )
 	{
