@@ -8,11 +8,8 @@
 
 #include <iostream>
 
-#include <iostream>
-
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
-	: worldId{}
-	  , tickRate(newTickRate)
+	: worldId{}, tickRate(newTickRate)
 {
 }
 
@@ -21,12 +18,11 @@ void Box2DPhysicsWorld::initialize()
 	std::cout << "Box2DPhysicsWorld::initialize() called" << std::endl;
 
 	b2WorldDef worldDef = b2DefaultWorldDef();
-	worldDef.gravity = {0.0f, 30.0f};
+	worldDef.gravity = {0.0f, 150.0f};
 	worldId = b2CreateWorld(&worldDef);
 
-	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
-
-
+	std::cout << "Box2D world created, id.index1 = " << worldId.index1
+			  << std::endl;
 }
 
 void Box2DPhysicsWorld::step(float deltaTime)
@@ -87,7 +83,7 @@ void Box2DPhysicsWorld::step(float deltaTime)
 
 	// Sync transforms to gameobjects
 
-	for (auto body : bodies)
+	for ( auto body : bodies )
 	{
 		RigidBody* rigid_body = const_cast<RigidBody*>(body.first);
 		rigid_body->fixedUpdate();
@@ -98,17 +94,17 @@ void Box2DPhysicsWorld::step(float deltaTime)
 
 void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
 {
-	if (!rigidBody) return;
+	if ( !rigidBody ) return;
 
 	// RigidBody always knows its owning GameObject
 	GameObject* gameObject = rigidBody->getGameObject();
-	if (!gameObject) return;
+	if ( !gameObject ) return;
 
 	auto* transform = gameObject->getTransform();
 	auto* collider = gameObject->getComponent<Collider>();
 
 	// Cannot create a physics body without a collider
-	if (!collider || !transform) return;
+	if ( !collider || !transform ) return;
 
 	//  Body definition
 	b2BodyDef def = b2DefaultBodyDef();
@@ -148,6 +144,7 @@ void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
 	if ( b2Shape_IsValid(shapeId) )
 	{
 		b2Shape_SetUserData(shapeId, gameObject);
+		b2Shape_SetRestitution(shapeId, collider->getRestitution());
 	}
 
 	// Assign user data to the body (optional)
@@ -179,10 +176,9 @@ void Box2DPhysicsWorld::applyForce(const RigidBody* rigidBody, Vector2 force)
 	b2Body_ApplyForceToCenter(it->second, b2Force, true);
 }
 
-
 void Box2DPhysicsWorld::shutdown()
 {
-	for (auto& [gameObject, box2DID] : bodies)
+	for ( auto& [gameObject, box2DID] : bodies )
 	{
 		b2DestroyBody(box2DID);
 	}

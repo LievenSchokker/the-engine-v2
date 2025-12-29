@@ -10,6 +10,7 @@ class Collider: public Component
 	PhysicsShapeType shape = PhysicsShapeType::None;
 	bool sensor = false;
 	float density = 1.0f;
+	float restitution = 0.0f;
 
    public:
 	float radius = 0.0f;			 // circle
@@ -23,6 +24,16 @@ class Collider: public Component
 	float getDensity() const
 	{
 		return this->density;
+	}
+
+	void setRestitution(float _restitution)
+	{
+		this->restitution = _restitution;
+	}
+
+	float getRestitution() const
+	{
+		return this->restitution;
 	}
 
 	void setSensor(bool _sensor)

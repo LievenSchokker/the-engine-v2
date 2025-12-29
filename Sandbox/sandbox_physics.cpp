@@ -77,7 +77,8 @@ class PhysicsInputBehaviour: public Behaviour
 };
 
 void createCircle(std::unique_ptr<GameObject>& circle, float x, float y,
-				  float radius, const Color& color, float density = 1.0f)
+				  float radius, const Color& color, float density = 1.0f,
+				  float restitution = 0.8f)
 {
 	circle = std::make_unique<GameObject>();
 	circle->setName("Circle");
@@ -89,11 +90,13 @@ void createCircle(std::unique_ptr<GameObject>& circle, float x, float y,
 	auto* collider = circle->addComponent<Collider>();
 	collider->setCircle(radius);
 	collider->setDensity(density);
+	collider->setRestitution(restitution);
 }
 
 void createRectangle(std::unique_ptr<GameObject>& rectangle, float x, float y,
 					 const Vector2& size, const Color& color,
-					 bool isStatic = true, float density = 1.0f)
+					 bool isStatic = true, float density = 1.0f,
+					 float restitution = 0.6f)
 {
 	rectangle = std::make_unique<GameObject>();
 	rectangle->setName("Rectangle");
@@ -109,6 +112,7 @@ void createRectangle(std::unique_ptr<GameObject>& rectangle, float x, float y,
 	auto* collider = rectangle->addComponent<Collider>();
 	collider->setRectangle(size);
 	collider->setDensity(density);
+	collider->setRestitution(restitution);
 }
 
 #undef main
@@ -137,16 +141,16 @@ int main(int argc, char** argv)
 
 	// Create balls at different positions with different bounciness
 	auto& circle1 = circles.emplace_back();
-	createCircle(circle1, 240.0f, 100.0f, 30.0f, Color::lightBlue(),
+	createCircle(circle1, 240.0f, 100.0f, 30.0f, Color::lightBlue(), 0.9f,
 				 0.9f);	 // Very bouncy blue ball
 	// Store pointer to first circle IMMEDIATELY after creation, before any
 	// vector reallocations
 	GameObject* circle1Ptr = circle1.get();
 
 	createCircle(circles.emplace_back(), 250.0f, 20.0f, 25.0f, Color::red(),
-				 0.7f);	 // Moderately bouncy red ball
+				 0.7f, 0.7f);  // Moderately bouncy red ball
 	createCircle(circles.emplace_back(), 260.0f, 200.0f, 35.0f, Color::green(),
-				 0.85f);  // Bouncy green ball
+				 0.85f, 0.85f);	 // Bouncy green ball
 
 	for ( auto& circle : circles )
 	{
@@ -156,20 +160,20 @@ int main(int argc, char** argv)
 	// Create ground platform (static, bouncy)
 	std::unique_ptr<GameObject> ground;
 	createRectangle(ground, 250.0f, 450.0f, {500.0f, 50.0f}, Color::orange(),
-					true, 0.6f);
+					true, 0.6f, 0.6f);
 	GameObject* groundGO = ground.get();
 	scene->addGameObject(std::move(ground));
 
 	// Create side walls for more interesting bouncing
 	std::unique_ptr<GameObject> leftWall;
 	createRectangle(leftWall, 25.0f, 250.0f, {50.0f, 400.0f}, Color::darkGray(),
-					true, 0.5f);
+					true, 0.5f, 0.5f);
 	GameObject* leftWallGO = leftWall.get();
 	scene->addGameObject(std::move(leftWall));
 
 	std::unique_ptr<GameObject> rightWall;
 	createRectangle(rightWall, 475.0f, 250.0f, {50.0f, 400.0f},
-					Color::darkGray(), true, 0.5f);
+					Color::darkGray(), true, 0.5f, 0.5f);
 	GameObject* rightWallGO = rightWall.get();
 	scene->addGameObject(std::move(rightWall));
 

@@ -6,8 +6,6 @@
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
-#include "Physics/Components/RigidBody.h"
-#include "Physics/IPhysicsWorld.h"
 
 
 #include <algorithm>
@@ -66,16 +64,6 @@ bool Scene::addRunTimeGameObject(std::unique_ptr<GameObject> gameObject)
 			std::cout << "  - " << b->getName() << " enabled=" << b->getIsEnabled() << std::endl;
 		}
 		initialiseBehaviours(addedObject->getAllBehaviours(), *gameWorld);
-
-		/// Automatically register RigidBody component if present
-		if (gameWorld != nullptr && gameWorld->physics != nullptr)
-		{
-			RigidBody* rigidBody = addedObject->getComponent<RigidBody>();
-			if (rigidBody != nullptr)
-			{
-				gameWorld->physics->createBody(rigidBody);
-			}
-		}
 	}
 
 	return true;
@@ -193,19 +181,6 @@ void Scene::onStart(GameWorld& world)
 	/// Initialise all the behaviours by calling their lifetime functions in the
 	/// correct order.
 	initialiseBehaviours(allBehaviours, world);
-
-	/// Automatically register all RigidBody components with the physics world
-	if (world.physics != nullptr)
-	{
-		std::vector<RigidBody*> rigidBodies = getAllComponentsOfType<RigidBody>();
-		for (RigidBody* rigidBody : rigidBodies)
-		{
-			if (rigidBody != nullptr)
-			{
-				world.physics->createBody(rigidBody);
-			}
-		}
-	}
 }
 
 void Scene::onStop()
@@ -354,16 +329,6 @@ void Scene::processDestroyQueue()
 {
 	for (GameObject* gameObject : destroyQueue)
 	{
-		/// Destroy physics body if RigidBody component exists
-		if (gameWorld != nullptr && gameWorld->physics != nullptr)
-		{
-			RigidBody* rigidBody = gameObject->getComponent<RigidBody>();
-			if (rigidBody != nullptr)
-			{
-				gameWorld->physics->destroyBody(rigidBody);
-			}
-		}
-
 		gameObject->onSceneDestroy();
 		removeGameObjectInternal(gameObject);
 	}
@@ -383,19 +348,6 @@ bool Scene::isInDestroyQueue(GameObject* obj)
 
 void Scene::destroyAllGameObjects()
 {
-	/// Destroy all physics bodies before destroying GameObjects
-	if (gameWorld != nullptr && gameWorld->physics != nullptr)
-	{
-		for (auto& gameObject : gameObjects)
-		{
-			RigidBody* rigidBody = gameObject->getComponent<RigidBody>();
-			if (rigidBody != nullptr)
-			{
-				gameWorld->physics->destroyBody(rigidBody);
-			}
-		}
-	}
-
 	for (auto& gameObject : gameObjects)
 	{
 		gameObject->onSceneDestroy();
@@ -464,16 +416,6 @@ GameObject* Scene::getGameObjectById(int id) const
 bool Scene::removeGameObjectInternal(GameObject* gameObject)
 {
 	if (gameObject == nullptr) return false;
-
-	/// Destroy physics body if RigidBody component exists
-	if (gameWorld != nullptr && gameWorld->physics != nullptr)
-	{
-		RigidBody* rigidBody = gameObject->getComponent<RigidBody>();
-		if (rigidBody != nullptr)
-		{
-			gameWorld->physics->destroyBody(rigidBody);
-		}
-	}
 
 	auto it = std::find_if(
 		gameObjects.begin(),
