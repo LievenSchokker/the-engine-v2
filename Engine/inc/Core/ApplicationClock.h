@@ -20,6 +20,8 @@ public:
 	 * @brief Constructs a timer with fixed simulation timestep.
 	 * @param fixedDeltaTime Time step for simulation updates
 	 * @param clockFunc Platform-specific clock function providing monotonic time
+	 * @param tickrate
+	 * @param maxAccumulatedTime
 	 *
 	 * @note Fixed timestep ensures reproducible simulation behavior across different
 	 *       hardware and prevents the "spiral of death" where slow frames cause more
@@ -48,10 +50,11 @@ public:
 
 	/**
 	 * @brief Checks if enough time has accumulated for another fixed update.
-	 * @return true when accumulator contains at least one full timestep
+	 * @return true when accumulator contains at least one full timestep and not paused
 	 *
+	 * @note Returns false when paused, preventing simulation updates.
 	 */
-	bool shouldFixedUpdate() const;
+	[[nodiscard]] bool shouldFixedUpdate() const;
 
 	/**
 	 * @brief Consumes one fixed timestep from the accumulator.
@@ -67,35 +70,76 @@ public:
 	 * @return Alpha value [0,1] representing progress toward next physics step
 	 *
 	 */
-	double getAlpha() const;
+	[[nodiscard]] double getAlpha() const;
 
 	/**
 	 * @brief Gets total elapsed simulation time.
 	 * @return Accumulated time in fixed timestep increments
 	 *
 	 */
-	double getTime() const;
+	[[nodiscard]] double getTime() const;
 
 	/**
-	 * @brief Gets the fixed timestep duration.
-	 * @return Constant delta time for each simulation step
+	 * @brief Gets the fixed timestep duration, scaled by time scale.
+	 * @return Scaled delta time for each simulation step (fixedDeltaTime * timeScale)
 	 *
+	 * @note This returns the scaled delta time, which affects simulation speed.
+	 *       Use this for all game logic and physics updates to respect debug time controls.
 	 */
-	double getDeltaTime() const;
+	[[nodiscard]] double getDeltaTime() const;
 
 	/**
 	 * @brief Gets remaining time in accumulator after fixed updates.
 	 * @return Leftover frame time not yet simulated (always < fixedDeltaTime)
 	 *
 	 */
-	double getAccumulatedTime() const;
+	[[nodiscard]] double getAccumulatedTime() const;
 
 	/**
 	 * @brief Gets total number of fixed updates executed.
 	 * @return Monotonically increasing tick counter
 	 *
 	 */
-	int getTotalTicks() const;
+	[[nodiscard]] int getTotalTicks() const;
+
+	/**
+	 * @brief Sets the time scale multiplier for simulation speed.
+	 * @param scale Time scale multiplier (1.0 = normal, 0.5 = slow, 2.0 = fast)
+	 *
+	 * @note Time scale affects getDeltaTime(), effectively speeding up or slowing down
+	 *       the entire simulation. Rendering continues at normal speed.
+	 */
+	void setTimeScale(double scale);
+
+	/**
+	 * @brief Gets the current time scale multiplier.
+	 * @return Current time scale (default: 1.0)
+	 */
+	[[nodiscard]] double getTimeScale() const;
+
+	/**
+	 * @brief Pauses the simulation (fixed updates).
+	 *
+	 * @note When paused, shouldFixedUpdate() returns false, preventing simulation
+	 *       updates. Rendering and input continue to function normally.
+	 */
+	void pause();
+
+	/**
+	 * @brief Resumes a paused simulation.
+	 */
+	void resume();
+
+	/**
+	 * @brief Toggles pause state.
+	 */
+	void togglePause();
+
+	/**
+	 * @brief Checks if the simulation is currently paused.
+	 * @return true when paused, false otherwise
+	 */
+	bool isPaused() const;
 
 private:
 	/** @brief A functions that retusn, the time the applicationhas beenrunning in second */
@@ -108,4 +152,8 @@ private:
 
 	int tickRate;
 	double maxAccumulatedTime;
+
+	// Debug controls
+	double timeScale;  // Multiplier for simulation speed (1.0 = normal)
+	bool paused;       // Whether simulation is paused
 };

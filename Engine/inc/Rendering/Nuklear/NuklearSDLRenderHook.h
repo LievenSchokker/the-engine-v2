@@ -27,20 +27,7 @@ public:
 	 * needs direct access to them for texture creation and rendering.
 	 */
 	NuklearSDLRenderHook(SDL_Window* window, SDL_Renderer* renderer);
-
-	/**
-	 * @brief Translates engine input state into Nuklear input events.
-	 *
-	 * This is a workaround for the fact that SDL events can only be polled once,
-	 * but both InputManager and Nuklear need them. Rather than fighting over
-	 * SDL_PollEvent, we let InputManager own event polling and then convert
-	 * its processed state into Nuklear's expected format.
-	 *
-	 * @note This approach loses text input (SDL_TEXTINPUT events) since InputManager
-	 *       only tracks key states, not character input. Text fields won't work
-	 *       until InputManager gains text input support.
-	 */
-	void updateInput() override;
+	~NuklearSDLRenderHook() override;
 
 	/**
 	 * @brief Sets up Nuklear context and fonts.
@@ -50,6 +37,10 @@ public:
 	 * always succeed so the object can be safely destroyed.
 	 */
 	void initialize() override;
+	void setupEvents(EventDispatcher& dispatcher) override;
+	void unSubscribeEvent(EventDispatcher& dispatcher);
+	void handleMouseClick(const MouseButtonPressedEvent& event);
+	void handleMouseReleased(const MouseButtonReleasedEvent& event);
 
 	/**
 	 * @brief Processes input and builds UI for this frame.
@@ -95,12 +86,13 @@ public:
 	* reserved size of 250 elements.
 	*
 	*/
-	void process(const std::vector<UIRenderCommand>& commands) override;
+	void process(const std::vector<UIRenderCommand>& commands, InputManager& inputManager) override;
 
 private:
 	void flushCommands();
 	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
+	void renderButton(const UIRenderCommand& command);
 	void renderElement(const UIRenderCommand& command);
 	void renderChart(const UIRenderCommand& command);
 	void renderProgressBar(const UIRenderCommand& command);
@@ -113,6 +105,13 @@ private:
 	SDL_Window* sdlWindow;
 	SDL_Renderer* sdlRenderer;
 	nk_context* nuklearContext;
+	EventDispatcher* eventDispatcher;
+	bool pendingMouseDown[3] = {false, false, false};  // LEFT, MIDDLE, RIGHT
+	bool pendingMouseUp[3] = {false, false, false};
+	int clickX[3] = {0, 0, 0};
+	int clickY[3] = {0, 0, 0};
+	int mouseX;
+	int mouseY;
 
 	std::vector<UIRenderCommand> commandQueue;
 
@@ -124,4 +123,6 @@ private:
 
 	/// @brief list of index's that have no panel
 	std::vector<uint32_t> rootPanels;
+
+	std::vector<SubscriptionHandle> subscriptions;
 };

@@ -1,7 +1,8 @@
 #pragma once
 
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager.h"
 #include <memory>
 
 /**
@@ -14,33 +15,36 @@
  */
 class Game
 {
-public:
-    Game();
-    ~Game();
+   public:
+	Game();
+	~Game();
 
-    /**
-     * @brief Retrieves a copy of the current application specifications.
-     *
-     * @return Copy of the application specifications.
-     */
-    [[nodiscard]] ApplicationSpecifications getApplicationSpecifications() const;
+	/**
+	 * @brief Retrieves a copy of the current application specifications.
+	 *
+	 * @return Copy of the application specifications.
+	 */
+	[[nodiscard]] ApplicationSpecifications getApplicationSpecifications()
+		const;
 
-    /**
-     * @brief Configures how the engine should initialize the application.
-     *
-     * @param specifications Desired application configuration.
-     */
-    void setApplicationSpecifications(const ApplicationSpecifications& specifications);
+	/**
+	 * @brief Configures how the engine should initialize the application.
+	 *
+	 * @param specifications Desired application configuration.
+	 */
+	void setApplicationSpecifications(
+		const ApplicationSpecifications& specifications);
 
-    /**
-     * @brief Registers a scene with the engine.
-     *
-     * @param scene Scene to transfer ownership of.
-     */
-    void addScene(std::unique_ptr<Scene> scene);
+	/**
+	 * @brief Registers a scene with the engine.
+	 * If no active scene is registered the set as active scene.
+	 *
+	 * @param scene Scene to transfer ownership of.
+	 */
+	void addScene(std::unique_ptr<Scene> scene);
 
-
-	std::unique_ptr<Scene> getFirstScene();
+    std::unique_ptr<Scene> getFirstScene();
+	std::vector<std::unique_ptr<Scene>> getAllScenes();
 private:
     ApplicationSpecifications specifications;
 

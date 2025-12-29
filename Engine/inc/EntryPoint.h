@@ -9,10 +9,10 @@
 
 namespace SpelMotorEntry
 {
-inline int main(std::unique_ptr<Game> game)
-{
-	SpelMotor engine(std::move(game));
-	engine.start();
-	return 0;
-}
+    inline int main(std::unique_ptr<Game> game)
+    {
+        SpelMotor engine(std::move(game));
+        engine.start();
+        return 0;
+    }
 }

@@ -9,16 +9,17 @@
  * @interface IEngineLoop
  * @brief Abstract interface for engine loop implementations
  *
- * This interface exists to support different runtime configurations (client, server,
- * or hybrid) without coupling the core engine to any specific implementation. By
- * programming against this interface, SpelMotor can drive any loop type uniformly,
- * enabling the same timing and update logic to work across all configurations.
+ * This interface exists to support different runtime configurations (client,
+ * server, or hybrid) without coupling the core engine to any specific
+ * implementation. By programming against this interface, SpelMotor can drive
+ * any loop type uniformly, enabling the same timing and update logic to work
+ * across all configurations.
  *
- * The split between client and server loops allows each to initialize only the
- * subsystems they need (e.g., servers skip rendering, clients skip authoritative
- * game state) while sharing the same update contract.
+ * The unified EngineLoop implementation allows different configurations to
+ * initialize only the subsystems they need (e.g., servers skip rendering,
+ * clients skip authoritative game state) while sharing the same update contract.
  *
- * @see ClientLoop, ServerLoop, SpelMotor
+ * @see EngineLoop, SpelMotor
  */
 class IEngineLoop
 {
@@ -35,6 +36,8 @@ public:
 	 * update cycle when needed.
 	 */
 	virtual GameWorld* getGameWorld() = 0;
+
+	virtual void setGameWorld(std::unique_ptr<GameWorld> gameWorld) = 0;
 
 	/**
 	 * @brief Provides access to the scene management system
@@ -55,6 +58,16 @@ public:
 	 * and remain decoupled from the specific clock implementation.
 	 */
 	virtual ApplicationClock::ClockFunction getClock() = 0;
+
+	/**
+	 * @brief Sets the application clock reference for debug time controls.
+	 *
+	 * This allows GameWorld to access the clock for debug functionality.
+	 * Called by SpelMotor after clock creation.
+	 *
+	 * @param clock Pointer to the ApplicationClock instance
+	 */
+	virtual void setApplicationClock(ApplicationClock* clock) = 0;
 
 	/**
 	 * @brief Performs one-time initialization after construction

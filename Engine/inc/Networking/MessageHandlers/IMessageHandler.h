@@ -14,7 +14,7 @@ class IMessage;
  * */
 class IMessageHandler
 {
-   public:
-	virtual ~IMessageHandler() = default;
-	virtual void handleMessage(std::unique_ptr<IMessage> message) = 0;
+public:
+    virtual ~IMessageHandler() = default;
+    virtual void handleMessage(std::unique_ptr<IMessage> message) = 0;
 };

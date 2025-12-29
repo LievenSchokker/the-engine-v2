@@ -88,7 +88,7 @@ class IRenderer
 	 * in rendering
 	 * @param commands The list of UIRenderCommands to be send for rendering
 	 */
-	virtual void submitUI(const std::vector<UIRenderCommand>& commands) = 0;
+	virtual void submitUI(const std::vector<UIRenderCommand>& commands, InputManager& input) = 0;
 	/**
 	 * @brief Checks if the rendering window is currently open
 	 *
@@ -107,6 +107,8 @@ class IRenderer
 	 * @see open()
 	 */
 	virtual void setTitle(const std::string& title) = 0;
+
+	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 
 	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
 };

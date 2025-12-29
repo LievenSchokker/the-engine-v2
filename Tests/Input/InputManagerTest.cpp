@@ -1,138 +1,190 @@
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
-#include <SDL.h>
+#include "Core/GameWorld.h"
+#include "Events/EventDispatcher/EventDispatcher.h"
+#include "Events/EventImplementations/ApplicationEvents.h"
 #include <gtest/gtest.h>
+#include <memory>
 
 class InputManagerTest : public ::testing::Test
 {
 protected:
-  InputManager *input;
+    std::unique_ptr<InputManager> input;
+    std::unique_ptr<EventDispatcher> dispatcher;
+    GameWorld gameWorld;
 
-  void
-  SetUp() override
-  {
-    // Initialize SDL for testing
-    if (SDL_Init(SDL_INIT_VIDEO) != 0)
+    void SetUp() override
     {
-      FAIL() << "SDL_Init failed: " << SDL_GetError();
+        input = std::make_unique<InputManager>();
+        dispatcher = std::make_unique<EventDispatcher>();
+        input->initialize(*dispatcher);
     }
 
-    // Get singleton instance
-    input = InputManager::getInstance();
-  }
+    void TearDown() override
+    {
+        input.reset();
+        dispatcher.reset();
+    }
 
-  void
-  TearDown() override
-  {
-    // Clean up singleton
-    InputManager::shutdown();
-    SDL_Quit();
-  }
+    void pressKey(KeyCode key)
+    {
+        KeyPressedEvent event(0, static_cast<int>(key), false);
+        dispatcher->dispatch(event);
+    }
+
+    void releaseKey(KeyCode key)
+    {
+        KeyReleasedEvent event(0, static_cast<int>(key));
+        dispatcher->dispatch(event);
+    }
+
+    void pressMouseButton(MouseButton button)
+    {
+        MouseButtonPressedEvent event(button, 0, 0, 1);
+        dispatcher->dispatch(event);
+    }
+
+    void releaseMouseButton(MouseButton button)
+    {
+        MouseButtonReleasedEvent event(button, 0, 0);
+        dispatcher->dispatch(event);
+    }
+
+    void moveMouse(int x, int y)
+    {
+        MouseMovedEvent event(x, y, 0, 0);
+        dispatcher->dispatch(event);
+    }
+
+    void scrollMouse(float dx, float dy)
+    {
+        MouseScrollEvent event(dx, dy);
+        dispatcher->dispatch(event);
+    }
+
+    void closeWindow()
+    {
+        WindowCloseEvent event;
+        dispatcher->dispatch(event);
+    }
+
+    void nextFrame()
+    {
+        input->update(0.016, gameWorld);
+    }
 };
 
-// Check input transition detection (pressed/released for keys and mouse)
-TEST_F(InputManagerTest, InputTransitions)
+TEST_F(InputManagerTest, KeyPressAndRelease)
 {
-  // Arrange
-  input->update();
+    pressKey(KeyCode::W);
+    nextFrame();
 
-  // Act & Assert - Key press transition
-  input->setKeyDown(KeyCode::W, true);
-  input->update();
-  EXPECT_TRUE(input->wasKeyPressed(KeyCode::W));
-  EXPECT_TRUE(input->isKeyDown(KeyCode::W));
+    EXPECT_TRUE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::W));
+    EXPECT_FALSE(input->wasKeyReleased(KeyCode::W));
 
-  // Act & Assert - Key release transition
-  input->setKeyDown(KeyCode::W, false);
-  input->update();
-  EXPECT_TRUE(input->wasKeyReleased(KeyCode::W));
-  EXPECT_FALSE(input->isKeyDown(KeyCode::W));
+    nextFrame();
 
-  // Act & Assert - Mouse button press transition
-  input->setMouseDown(MouseButton::LEFT, true);
-  input->update();
-  EXPECT_TRUE(input->wasMousePressed(MouseButton::LEFT));
-  EXPECT_TRUE(input->isMouseDown(MouseButton::LEFT));
+    EXPECT_FALSE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::W));
+    EXPECT_FALSE(input->wasKeyReleased(KeyCode::W));
 
-  // Act & Assert - Mouse button release transition
-  input->setMouseDown(MouseButton::LEFT, false);
-  input->update();
-  EXPECT_TRUE(input->wasMouseReleased(MouseButton::LEFT));
-  EXPECT_FALSE(input->isMouseDown(MouseButton::LEFT));
+    releaseKey(KeyCode::W);
+    nextFrame();
+
+    EXPECT_FALSE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_FALSE(input->isKeyDown(KeyCode::W));
+    EXPECT_TRUE(input->wasKeyReleased(KeyCode::W));
+
+    nextFrame();
+
+    EXPECT_FALSE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_FALSE(input->isKeyDown(KeyCode::W));
+    EXPECT_FALSE(input->wasKeyReleased(KeyCode::W));
 }
 
-// Check mouse delta (movement since previous frame)
-TEST_F(InputManagerTest, MouseDelta)
+TEST_F(InputManagerTest, MouseButtonPressAndRelease)
 {
-  // Arrange
-  input->setMousePosition(10, 10);
-  input->update();
+    pressMouseButton(MouseButton::LEFT);
+    nextFrame();
 
-  // Act
-  input->setMousePosition(30, 40);
+    EXPECT_TRUE(input->wasMousePressed(MouseButton::LEFT));
+    EXPECT_TRUE(input->isMouseDown(MouseButton::LEFT));
+    EXPECT_FALSE(input->wasMouseReleased(MouseButton::LEFT));
 
-  // Assert
-  EXPECT_EQ(input->mouseDeltaX(), 20);
-  EXPECT_EQ(input->mouseDeltaY(), 30);
-  EXPECT_EQ(input->mouseX(), 30);
-  EXPECT_EQ(input->mouseY(), 40);
+    nextFrame();
 
-  // Act & Assert - Delta resets after update
-  input->update();
-  EXPECT_EQ(input->mouseDeltaX(), 0);
-  EXPECT_EQ(input->mouseDeltaY(), 0);
+    EXPECT_FALSE(input->wasMousePressed(MouseButton::LEFT));
+    EXPECT_TRUE(input->isMouseDown(MouseButton::LEFT));
+
+    releaseMouseButton(MouseButton::LEFT);
+    nextFrame();
+
+    EXPECT_TRUE(input->wasMouseReleased(MouseButton::LEFT));
+    EXPECT_FALSE(input->isMouseDown(MouseButton::LEFT));
 }
 
-// Check mouse wheel delta (including accumulation and reset)
-TEST_F(InputManagerTest, MouseWheelDelta)
+TEST_F(InputManagerTest, MultipleSimultaneousInputs)
 {
-  // Act & Assert - Single wheel event
-  input->addMouseWheelDelta(5, 10);
-  EXPECT_EQ(input->wheelDeltaX(), 5);
-  EXPECT_EQ(input->wheelDeltaY(), 10);
+    pressKey(KeyCode::W);
+    pressKey(KeyCode::A);
+    pressMouseButton(MouseButton::LEFT);
+    moveMouse(100, 200);
+    nextFrame();
 
-  // Act & Assert - Multiple events accumulate
-  input->addMouseWheelDelta(2, 3);
-  input->addMouseWheelDelta(3, 4);
-  EXPECT_EQ(input->wheelDeltaX(), 10);
-  EXPECT_EQ(input->wheelDeltaY(), 17);
+    EXPECT_TRUE(input->isKeyDown(KeyCode::W));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::A));
+    EXPECT_TRUE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_TRUE(input->wasKeyPressed(KeyCode::A));
+    EXPECT_TRUE(input->isMouseDown(MouseButton::LEFT));
+    EXPECT_EQ(input->mouseX(), 100);
+    EXPECT_EQ(input->mouseY(), 200);
 
-  // Act & Assert - Reset after update
-  input->update();
-  EXPECT_EQ(input->wheelDeltaX(), 0);
-  EXPECT_EQ(input->wheelDeltaY(), 0);
+    pressKey(KeyCode::D);
+    pressMouseButton(MouseButton::RIGHT);
+    nextFrame();
+
+    EXPECT_TRUE(input->isKeyDown(KeyCode::W));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::A));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::D));
+    EXPECT_TRUE(input->wasKeyPressed(KeyCode::D));
+    EXPECT_FALSE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_TRUE(input->wasMousePressed(MouseButton::RIGHT));
+
+    releaseKey(KeyCode::W);
+    releaseMouseButton(MouseButton::LEFT);
+    nextFrame();
+
+    EXPECT_FALSE(input->isKeyDown(KeyCode::W));
+    EXPECT_TRUE(input->wasKeyReleased(KeyCode::W));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::A));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::D));
+    EXPECT_FALSE(input->isMouseDown(MouseButton::LEFT));
+    EXPECT_TRUE(input->wasMouseReleased(MouseButton::LEFT));
 }
 
-// Multiple inputs, transitions, frame reset, and quit
-TEST_F(InputManagerTest, MultipleInputsAndFrameReset)
+TEST_F(InputManagerTest, WindowCloseSignalsQuit)
 {
-  // Arrange - Multiple keys and mouse buttons
-  input->setKeyDown(KeyCode::W, true);
-  input->setKeyDown(KeyCode::A, true);
-  input->setMouseDown(MouseButton::LEFT, true);
-  input->update();
+    EXPECT_FALSE(input->quitRequested());
 
-  // Assert - Verify held states
-  EXPECT_TRUE(input->isKeyDown(KeyCode::W));
-  EXPECT_TRUE(input->isKeyDown(KeyCode::A));
-  EXPECT_TRUE(input->isMouseDown(MouseButton::LEFT));
+    closeWindow();
 
-  // Act - Add new input (should detect transition)
-  input->setMouseDown(MouseButton::RIGHT, true);
-  input->update();
+    EXPECT_TRUE(input->quitRequested());
+}
 
-  // Assert - Transition detected
-  EXPECT_TRUE(input->wasMousePressed(MouseButton::RIGHT));
-  EXPECT_TRUE(input->isMouseDown(MouseButton::RIGHT));
+TEST_F(InputManagerTest, KeyRepeatIsIgnored)
+{
+    pressKey(KeyCode::W);
+    nextFrame();
 
-  // Act & Assert - Transition states reset after update
-  input->update();
-  EXPECT_FALSE(input->wasMousePressed(MouseButton::RIGHT));
-  EXPECT_FALSE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_TRUE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::W));
 
-  // Act & Assert - Quit request
-  EXPECT_FALSE(input->quitRequested());
-  input->signalQuit();
-  EXPECT_TRUE(input->quitRequested());
+    KeyPressedEvent repeatEvent(0, static_cast<int>(KeyCode::W), true);
+    dispatcher->dispatch(repeatEvent);
+    nextFrame();
+
+    EXPECT_FALSE(input->wasKeyPressed(KeyCode::W));
+    EXPECT_TRUE(input->isKeyDown(KeyCode::W));
 }

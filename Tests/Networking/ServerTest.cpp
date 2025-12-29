@@ -13,10 +13,16 @@
 #include "Networking/Messages/IncomingRawMessage.h"
 #include "Networking/TransportResult.h"
 #include "Networking/SendMode.h"
+#include <vector>
+#include "Networking/ITransport.h"
+#include "Networking/Connection/Connection.h"
+#include "Networking/Connection/ConnectionStatus.h"
+#include "Networking/Connection/ConnectionMode.h"
+#include "Networking/Messages/OutgoingRawMessage.h"
+#include "Networking/Messages/IncomingRawMessage.h"
+#include "Networking/TransportResult.h"
+#include "Networking/SendMode.h"
 
-/**
- * @brief Record of a sent message for test verification.
- */
 struct SentMessageRecord
 {
     int connectionID;
@@ -24,9 +30,6 @@ struct SentMessageRecord
     SendMode sendMode;
 };
 
-/**
- * @brief Mock transport for testing Server and Client logic in isolation.
- */
 class MockTransport : public ITransport
 {
 public:
@@ -127,7 +130,8 @@ TEST_F(ServerTest, ConstructorThrowsOnZeroPort)
 TEST_F(ServerTest, SendMessageFailsForUnknownClient)
 {
     auto server = createServerWithMock(7777);
-    server->start();
+    auto world = std::make_unique<GameWorld>();
+    server->start(*world);
 
     ConnectionMessage message;
     message.setStatus(ConnectionStatus::Connected);
@@ -140,7 +144,8 @@ TEST_F(ServerTest, SendMessageFailsForUnknownClient)
 TEST_F(ServerTest, BroadcastMessageSucceedsWithNoClients)
 {
     auto server = createServerWithMock(7777);
-    server->start();
+    auto world = std::make_unique<GameWorld>();
+    server->start(*world);
 
     ConnectionMessage message;
     message.setStatus(ConnectionStatus::Connected);
@@ -153,13 +158,12 @@ TEST_F(ServerTest, BroadcastMessageSucceedsWithNoClients)
 TEST_F(ServerTest, KickClientSendsDisconnectAndRemovesClient)
 {
     auto server = createServerWithMock(7777);
-    server->start();
+    auto world = std::make_unique<GameWorld>();
+    server->start(*world);
 
     mockTransportPtr->simulateClientConnected(42);
-
     server->kickClient(42);
-
-    ASSERT_EQ(mockTransportPtr->sentMessages.size(), 1);
+    ASSERT_EQ(mockTransportPtr->sentMessages.size(), 2);
     EXPECT_EQ(mockTransportPtr->sentMessages[0].connectionID, 42);
 
     ASSERT_EQ(mockTransportPtr->disconnectedClients.size(), 1);
@@ -202,11 +206,15 @@ TEST_F(ClientTest, IsConnectedReturnsFalseInitially)
 
 TEST_F(ClientTest, IsConnectedReturnsTrueAfterConnection)
 {
-    auto client = createClientWithMock();
+	auto client = createClientWithMock();
 
-    mockTransportPtr->simulateClientConnected(1);
+	auto world = std::make_unique<GameWorld>();
+	world->spawnManager = std::make_unique<NetworkSpawnManager>(world.get()).get();
+	client->start(*world);
 
-    EXPECT_TRUE(client->isConnected());
+	mockTransportPtr->simulateClientConnected(1);
+
+	EXPECT_TRUE(client->isConnected());
 }
 
 TEST_F(ClientTest, DisconnectClosesSocket)

@@ -1,19 +1,16 @@
 #pragma once
 
+
 #include <cmath>
+#include <functional>
+
 
 /**
  * @brief A struct for storing 2D vector points.
  */
 struct Vector2
 {
-	Vector2() : x(0), y(0)
-	{
-	}
-
-	Vector2(const float x_, const float y_) : x(x_), y(y_)
-	{
-	}
+    Vector2(const float x_, const float y_) : x(x_), y(y_) {}
 
     /// Shorthand for writing Vector2{1.0, 1.0}
     static Vector2 one();
@@ -99,7 +96,7 @@ struct Vector2
     /// Divides this vector's component by a scalar value (v1.x / scalar, v1.y / scalar)
     Vector2 &operator/=(float scalar);
 
-    /// Flips the components of this vector (1 -> -1, -2 -> 2)
+    /// Flips the components of this vector (1 -> -1, -2 -> 2)s
     Vector2 operator-() const;
 
     /// Returns wheter this and the other are equal (using float epsilon)
@@ -110,4 +107,13 @@ struct Vector2
 
     float x = 0;
     float y = 0;
+};
+
+
+struct Vector2Hash
+{
+    std::size_t operator()(const Vector2& v) const
+    {
+        return std::hash<float>()(v.x) ^ (std::hash<float>()(v.y) << 1);
+    }
 };
