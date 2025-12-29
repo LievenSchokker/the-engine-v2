@@ -1,7 +1,7 @@
 #include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "Rendering/Color.h"
@@ -21,10 +21,8 @@ class MovingObjectBehaviour: public Behaviour
 	{
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& gameWorld) override
 	{
-		(void)world;
-
 		Transform* transform = getGameObject()->getTransform();
 		if ( transform == nullptr )
 		{
@@ -65,6 +63,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
+    spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Debug Time Controls Demo", SCREEN_WIDTH,
 						  SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;

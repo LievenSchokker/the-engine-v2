@@ -63,6 +63,10 @@ public:
        archive(value);
     }
 
+    size_t getBytesRead()
+    {
+        return static_cast<size_t>(stream.tellg());
+    }
 private:
     std::istringstream stream;          ///< Wraps raw bytes for Cereal consumption; constructed from input data
     cereal::BinaryInputArchive archive; ///< Performs actual deserialization; reads sequentially from stream

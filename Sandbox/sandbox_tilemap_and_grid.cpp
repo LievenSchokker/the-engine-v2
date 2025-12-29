@@ -5,7 +5,7 @@
 #include "Component/ShapeRenderer.h"
 #include "Component/TilemapComponent.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -59,7 +59,7 @@ class TilemapInputBehaviour: public Behaviour
 		}
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
@@ -134,6 +134,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
+    spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 

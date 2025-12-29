@@ -29,7 +29,7 @@ concept CerealSerializable = requires(cereal::BinaryOutputArchive& archive,
 
 /**
  * @class CerealWriteArchive
- * @brief Accumulates serialized data into a byte buffer for network transmission.
+ * @brief Accum ulates serialized data into a byte buffer for network transmission.
  *
  * This wrapper exists to isolate the rest of the codebase from Cereal's API specifics.
  * If we later switch serialization libraries (for performance, licensing, or feature reasons),

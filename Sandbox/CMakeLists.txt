@@ -2,13 +2,14 @@ cmake_minimum_required(VERSION 3.22)
 project(engineSandbox)
 
 # Glob the Behaviour sources
-file(GLOB BEHAVIOUR_SOURCES
+file(GLOB_RECURSE BEHAVIOUR_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Behaviours/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Behaviours/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/Examples/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Examples/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/Sandboxes/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Sandboxes/*.h"
+
 )
 
 # Helper function to create a sandbox executable
@@ -46,3 +47,4 @@ add_sandbox_executable(engineSandbox_input sandbox_input.cpp)
 add_sandbox_executable(engineSandbox_scene sandbox_scene.cpp)
 add_sandbox_executable(engineSandbox_tilemap_and_grid sandbox_tilemap_and_grid.cpp)
 add_sandbox_executable(engineSandbox_debug_time_controls sandbox_debug_time_controls.cpp)
+add_sandbox_executable(engineSandbox_audio sandbox_audio.cpp)

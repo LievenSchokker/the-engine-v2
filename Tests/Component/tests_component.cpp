@@ -1,8 +1,6 @@
 #include "GameObject/GameObject.h"
 #include "Component/BaseComponentTypes/Component.h"
-#include "Component/ComponentManager.h"
-#include "GameObject/ScenePlaceholder.h"
-#include "../Component/TestComponents.h"
+#include "TestComponents.h"
 
 #include <gtest/gtest.h>
 
@@ -10,18 +8,17 @@ namespace engine_tests
 {
     TEST(ComponentTests, AddComponentAddsToComponentManager)
     {
-        GameObject go;
-        ComponentManager* componentManager = go.getComponentManager();
+        GameObject go{};
 
-        TestComponentOne* first = componentManager->addComponent<TestComponentOne>();
+        TestComponentOne* first = go.addComponent<TestComponentOne>();
         EXPECT_NE(first, nullptr);
-        EXPECT_TRUE(componentManager->hasComponent(first));
+        EXPECT_TRUE(go.hasComponent(first));
 
         TestComponentTwo* addedViaComponent = first->addComponent<TestComponentTwo>();
         EXPECT_NE(addedViaComponent, nullptr);
-        EXPECT_TRUE(componentManager->hasComponent(addedViaComponent));
+        EXPECT_TRUE(go.hasComponent(addedViaComponent));
 
-        TestComponentTwo* retrieved =  componentManager->getComponent<TestComponentTwo>();
+        TestComponentTwo* retrieved =  go.getComponent<TestComponentTwo>();
         EXPECT_NE(retrieved, nullptr);
         EXPECT_EQ(addedViaComponent, retrieved);
     }
@@ -29,12 +26,11 @@ namespace engine_tests
 
     TEST(ComponentTests, GetComponentReturnsFromComponentManager)
     {
-        GameObject go;
-        ComponentManager* componentManager = go.getComponentManager();
-        TestComponentOne* added = componentManager->addComponent<TestComponentOne>();
+        GameObject go{};
+        TestComponentOne* added = go.addComponent<TestComponentOne>();
 
         TestComponentOne* retrievedFromComponent = added->getComponent<TestComponentOne>();
-        TestComponentOne* retrievedFromComponentManager = componentManager->getComponent<TestComponentOne>();
+        TestComponentOne* retrievedFromComponentManager = go.getComponent<TestComponentOne>();
 
         EXPECT_NE(retrievedFromComponent, nullptr);
         EXPECT_EQ(retrievedFromComponent, retrievedFromComponentManager);
@@ -43,10 +39,8 @@ namespace engine_tests
 
     TEST(ComponentsTest, GameObjectSetsOnComponentManagerAdd)
     {
-        GameObject go;
-        ComponentManager* componentManager = go.getComponentManager();
-
-        TestComponentOne* added = componentManager->addComponent<TestComponentOne>();
+        GameObject go{};
+        TestComponentOne* added = go.addComponent<TestComponentOne>();
 
         EXPECT_EQ(added->getGameObject(), &go);
     }
@@ -54,10 +48,8 @@ namespace engine_tests
 
     TEST(ComponentsTest, TransformReturnsGameObjectTransform)
     {
-        GameObject go;
-        ComponentManager* componentManager = go.getComponentManager();
-
-        TestComponentOne* added = componentManager->addComponent<TestComponentOne>();
+        GameObject go{};
+        TestComponentOne* added = go.addComponent<TestComponentOne>();
 
         EXPECT_EQ(added->getTransform(), go.getTransform());
     }
@@ -65,17 +57,15 @@ namespace engine_tests
 
     TEST(ComponentTests, TryGetReturnsComponentManagerTryGet)
     {
-        GameObject go;
-        ComponentManager* componentManager = go.getComponentManager();
-
-        TestComponentOne* added_1 = componentManager->addComponent<TestComponentOne>();
-        TestComponentTwo* added_2 = componentManager->addComponent<TestComponentTwo>();
+        GameObject go{};
+        TestComponentOne* added_1 = go.addComponent<TestComponentOne>();
+        TestComponentTwo* added_2 = go.addComponent<TestComponentTwo>();
 
         TestComponentTwo* componentOut = nullptr;
         TestComponentTwo* managerOut = nullptr;
 
         bool fromAdded_1 = added_1->tryGetComponent<TestComponentTwo>(componentOut);
-        bool fromManager = componentManager->tryGetComponent<TestComponentTwo>(managerOut);
+        bool fromManager = go.tryGetComponent<TestComponentTwo>(managerOut);
 
         EXPECT_EQ(fromAdded_1, fromManager);
         EXPECT_EQ(componentOut, managerOut);

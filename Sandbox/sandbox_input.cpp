@@ -1,5 +1,5 @@
 #include "Behaviour/Behaviour.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -50,7 +50,7 @@ class InputTestBehaviour: public Behaviour
 		std::cout << "- Press the escape key to quit" << std::endl;
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
@@ -119,6 +119,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.serverIP = "127.0.0.1";
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
+    spec.engineSystem = EngineSystem::Client;
 	spec.renderBackend = RenderBackend::SDL;
 	spec.windowOptions = {"Basic C++ SDL project", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time

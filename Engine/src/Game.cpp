@@ -1,8 +1,6 @@
 #include "Game.h"
 
-#include "GameObject/GameObject.h"
-
-Game::Game() : sceneManager(std::make_unique<SceneManager>()) {};
+Game::Game() {};
 Game::~Game() = default;
 
 void Game::setApplicationSpecifications(
@@ -18,38 +16,21 @@ ApplicationSpecifications Game::getApplicationSpecifications() const
 
 void Game::addScene(std::unique_ptr<Scene> scene)
 {
-	std::string name = scene->getName();
-	sceneManager->addScene(std::move(scene));
-
-	if ( sceneManager->getActiveScene() == nullptr )
-	{
-		sceneManager->setActiveScene(name);
-	}
+    std::string name = scene->getName();
+    scenes.push_back(std::move(scene));
 }
 
-bool Game::setActiveScene(const std::string& name) const
+std::unique_ptr<Scene> Game::getFirstScene()
 {
-	if ( sceneManager == nullptr )
-	{
-		return false;
-	}
-	return sceneManager->setActiveScene(name);
+    if (scenes.empty())
+    {
+        return nullptr;
+    }
+
+    return std::move(scenes.front());
 }
 
-void Game::addToPersistentScene(std::unique_ptr<GameObject> gameObject)
+std::vector<std::unique_ptr<Scene>> Game::getAllScenes()
 {
-	if ( sceneManager == nullptr )
-	{
-		return;
-	}
-	Scene* persistentScene = sceneManager->getOrCreatePersistentScene();
-	if ( persistentScene != nullptr )
-	{
-		persistentScene->addGameObject(std::move(gameObject));
-	}
-}
-
-std::unique_ptr<SceneManager> Game::getSceneManager()
-{
-	return std::move(sceneManager);
+	return std::move(scenes);
 }

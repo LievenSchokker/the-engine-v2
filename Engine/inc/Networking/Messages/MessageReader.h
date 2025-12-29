@@ -30,7 +30,7 @@ public:
      * @return A unique_ptr to the deserialized message, or nullptr if parsing fails
      *         or the message type is unknown.
      */
-    static std::unique_ptr<IMessage> readMessage(IncomingRawMessage rawMessage);
+    static std::unique_ptr<IMessage> readMessage(const IncomingRawMessage& rawMessage);
 
 private:
     /**

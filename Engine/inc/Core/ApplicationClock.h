@@ -20,6 +20,8 @@ public:
 	 * @brief Constructs a timer with fixed simulation timestep.
 	 * @param fixedDeltaTime Time step for simulation updates
 	 * @param clockFunc Platform-specific clock function providing monotonic time
+	 * @param tickrate
+	 * @param maxAccumulatedTime
 	 *
 	 * @note Fixed timestep ensures reproducible simulation behavior across different
 	 *       hardware and prevents the "spiral of death" where slow frames cause more
@@ -52,7 +54,7 @@ public:
 	 *
 	 * @note Returns false when paused, preventing simulation updates.
 	 */
-	bool shouldFixedUpdate() const;
+	[[nodiscard]] bool shouldFixedUpdate() const;
 
 	/**
 	 * @brief Consumes one fixed timestep from the accumulator.
@@ -68,14 +70,14 @@ public:
 	 * @return Alpha value [0,1] representing progress toward next physics step
 	 *
 	 */
-	double getAlpha() const;
+	[[nodiscard]] double getAlpha() const;
 
 	/**
 	 * @brief Gets total elapsed simulation time.
 	 * @return Accumulated time in fixed timestep increments
 	 *
 	 */
-	double getTime() const;
+	[[nodiscard]] double getTime() const;
 
 	/**
 	 * @brief Gets the fixed timestep duration, scaled by time scale.
@@ -84,21 +86,21 @@ public:
 	 * @note This returns the scaled delta time, which affects simulation speed.
 	 *       Use this for all game logic and physics updates to respect debug time controls.
 	 */
-	double getDeltaTime() const;
+	[[nodiscard]] double getDeltaTime() const;
 
 	/**
 	 * @brief Gets remaining time in accumulator after fixed updates.
 	 * @return Leftover frame time not yet simulated (always < fixedDeltaTime)
 	 *
 	 */
-	double getAccumulatedTime() const;
+	[[nodiscard]] double getAccumulatedTime() const;
 
 	/**
 	 * @brief Gets total number of fixed updates executed.
 	 * @return Monotonically increasing tick counter
 	 *
 	 */
-	int getTotalTicks() const;
+	[[nodiscard]] int getTotalTicks() const;
 
 	/**
 	 * @brief Sets the time scale multiplier for simulation speed.
@@ -113,7 +115,7 @@ public:
 	 * @brief Gets the current time scale multiplier.
 	 * @return Current time scale (default: 1.0)
 	 */
-	double getTimeScale() const;
+	[[nodiscard]] double getTimeScale() const;
 
 	/**
 	 * @brief Pauses the simulation (fixed updates).

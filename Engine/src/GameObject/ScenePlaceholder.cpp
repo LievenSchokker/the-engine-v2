@@ -1,6 +1,9 @@
 
 
 #include "GameObject/ScenePlaceholder.h"
+
+#include <algorithm>
+
 #include "GameObject/GameObject.h"
 #include "../../inc/Component/BaseComponentTypes/Component.h"
 
@@ -36,7 +39,7 @@ void ScenePlaceholder::processDestroyQueue()
     for (auto* obj : destroyQueue)
     {
         objects.erase(
-            std::remove(objects.begin(), objects.end(), obj),
+            std::ranges::remove(objects, obj).begin(),
             objects.end()
         );
 

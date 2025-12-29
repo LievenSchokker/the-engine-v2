@@ -1,7 +1,7 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -15,12 +15,15 @@
 #include "Physics/IPhysicsWorld.h"
 #include "Rendering/Color.h"
 #include "Scene/Scene.h"
+#include "Behaviours/SensorListener.h"
 
 #include <iostream>
 #include <memory>
 
 #define SCREEN_WIDTH 500
 #define SCREEN_HEIGHT 500
+
+class SensorListener;
 
 /**
  * @brief Behavior class that handles physics demo input.
@@ -44,13 +47,14 @@ class PhysicsInputBehaviour: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 		(void)world;
+
+		inputManager = world.input;
 
 		if ( inputManager == nullptr || physicsWorld == nullptr ||
 			 rectangleGO == nullptr )
@@ -89,13 +93,17 @@ void createCircle(std::unique_ptr<GameObject>& circle)
 {
 	circle = std::make_unique<GameObject>();
 	circle->setName("BlueCircle");
-	circle->getTransform()->setPosition({150.0, 140.0});
+	circle->getTransform()->setPosition({150.0, 200.0});
 	circle->getTransform()->setScale({1.0, 1.0});
 	circle->addComponent<ShapeRenderer>()->setCircle(50).setColor(
 		Color::lightBlue());
 
 	circle->addComponent<RigidBody>();
-	circle->addComponent<Collider>()->setCircle(50);
+
+	auto collider = circle->addComponent<Collider>();
+	collider->setCircle(50);
+	collider->setSensor(true);
+	circle->addComponent<SensorListener>();
 }
 
 void createRectangle(std::unique_ptr<GameObject>& rectangle)
@@ -108,7 +116,8 @@ void createRectangle(std::unique_ptr<GameObject>& rectangle)
 
 	auto rb = rectangle->addComponent<RigidBody>();
 	rb->makeStatic();
-	rectangle->addComponent<Collider>()->setRectangle({400, 50});
+	auto collider = rectangle->addComponent<Collider>();
+	collider->setRectangle({400, 50});
 }
 
 #undef main
@@ -147,7 +156,7 @@ int main(int argc, char** argv)
 	// --- Physics World ---
 	std::unique_ptr<IPhysicsWorld> physicsWorld =
 		std::make_unique<Box2DPhysicsWorld>();
-	physicsWorld->start();
+	physicsWorld->initialize();
 
 	// Register GameObjects with physics world
 	physicsWorld->createBody(circleGO->getComponent<RigidBody>());

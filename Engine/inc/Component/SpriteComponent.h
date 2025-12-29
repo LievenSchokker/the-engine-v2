@@ -4,6 +4,7 @@
 #include "Assets/IImage.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Math/Vector2.h"
+#include "Networking/Serialization/RegistrationBase.h"
 #include "Rendering/Color.h"
 #include "Rendering/Rect.h"
 
@@ -15,11 +16,12 @@
  * a grid layout definition. The frame index can be animated using the
  * animation system.
  */
-class SpriteComponent: public RenderComponent
+class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 {
    public:
 	SpriteComponent() = default;
-
+	static constexpr const char* name() { return "Sprite"; }
+	const char* getName() const override { return name(); }
 	/**
 	 * @brief Sets the spritesheet image and grid definition.
 	 *

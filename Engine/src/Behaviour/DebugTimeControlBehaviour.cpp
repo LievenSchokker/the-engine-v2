@@ -4,6 +4,7 @@
 #include "Core/GameWorld.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
+#include "Scene/SceneManager.h"
 
 #include <iostream>
 #include <optional>
@@ -28,27 +29,44 @@ DebugTimeControlBehaviour::DebugTimeControlBehaviour(
 
 void DebugTimeControlBehaviour::onAwake()
 {
-	inputManager = InputManager::getInstance();
 }
 
-bool DebugTimeControlBehaviour::shouldRunWhenPaused() const
+void DebugTimeControlBehaviour::onStart()
 {
-	return true;
-}
-
-void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
-{
-	(void)deltaTime;
-
-	if ( inputManager == nullptr )
+	// Move to persistent scene on start
+	// This ensures debug controls persist across scene transitions
+	if ( gameWorld != nullptr && gameWorld->sceneManager != nullptr )
 	{
-		return;
+		SceneManager* sceneManager = gameWorld->sceneManager;
+		Scene* persistentScene = sceneManager->getOrCreatePersistentScene();
+		GameObject* thisObject = getGameObject();
+
+		if ( thisObject != nullptr && persistentScene != nullptr )
+		{
+			const std::string objectName = thisObject->getName();
+
+			// Check if object already exists in persistent scene
+			if ( persistentScene->getGameObject(objectName) == nullptr )
+			{
+				// Try to transfer from active scene if object is there
+				Scene* activeScene = sceneManager->getActiveScene();
+				if ( activeScene != nullptr && activeScene != persistentScene &&
+					 activeScene->getGameObject(objectName) != nullptr )
+				{
+					// Transfer from active scene to persistent scene
+					[[maybe_unused]] bool transferred =
+						sceneManager->transferGameObject(
+							activeScene->getName(), persistentScene->getName(),
+							objectName);
+				}
+			}
+		}
 	}
 
 	// Get clock from GameWorld
-	if ( world != nullptr && world->clock != nullptr )
+	if ( gameWorld != nullptr && gameWorld->clock != nullptr )
 	{
-		clock = world->clock;
+		clock = gameWorld->clock;
 	}
 
 	// Print menu once when clock is available (if enabled)
@@ -71,6 +89,23 @@ void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 		std::cout << "==========================\n" << std::endl;
 		std::cout.flush();
 		menuPrinted = true;
+	}
+}
+
+bool DebugTimeControlBehaviour::shouldRunWhenPaused() const
+{
+	return true;
+}
+
+void DebugTimeControlBehaviour::update(double deltaTime,
+									   const GameWorld& gameWorld)
+{
+	(void)deltaTime;
+
+	inputManager = gameWorld.input;
+	if ( inputManager == nullptr )
+	{
+		return;
 	}
 
 	if ( clock == nullptr )

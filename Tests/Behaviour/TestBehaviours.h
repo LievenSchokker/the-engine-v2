@@ -16,7 +16,7 @@ namespace engine_tests
             void onAwake() override;
             void onEnable() override;
             void onStart() override;
-    		void update(float deltaTime, GameWorld* world) override;
+    		void update(double deltaTime, const GameWorld& world) override;
             void onDisable() override;
             void onDestroy() override;
 

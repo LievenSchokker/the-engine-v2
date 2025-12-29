@@ -15,5 +15,5 @@ public:
     ~AgentsZandbak() override = default;
 
     std::unique_ptr<Scene> getScene() override;
-
+    std::vector<std::unique_ptr<GameObject>> createObstacles();
 };

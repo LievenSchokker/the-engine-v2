@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/ApplicationSpecifications.h"
+#include "Options/ApplicationSpecifications.h"
 
 class Game;
 class IEngineLoop;
@@ -20,6 +20,7 @@ class SpelMotor
 {
    public:
 	explicit SpelMotor(std::unique_ptr<Game> game);
+    SpelMotor(std::unique_ptr<Game> game, std::unique_ptr<IEngineLoop> engineLoop);
 	~SpelMotor();
 	/**
 	 * @brief Starts the engine and enters the main game loop.
@@ -57,6 +58,17 @@ class SpelMotor
 	 */
 	ApplicationClock* getClock();
 
+	/**
+	 * @brief Initializes systems without entering the game loop.
+	 * Useful for testing where manual frame stepping is needed.
+	 */
+		void initialize();
+
+	/**
+	 * @brief Executes a single frame update.
+	 * Must call initialize() first.
+	 */
+	void tick();
    private:
 	/** @brief Immutable configuration set at construction.
 	 * Const ensures runtime modifications don't destabilize systems.
@@ -66,6 +78,6 @@ class SpelMotor
 	/** @brief Tracks whether the game loop is active. */
 	mutable bool running;
 
-	std::unique_ptr<IEngineLoop> coreSystemLoop;
-	std::unique_ptr<ApplicationClock> coreClock;
+    std::unique_ptr<IEngineLoop> coreSystemLoop;
+    std::unique_ptr<ApplicationClock> coreClock;
 };

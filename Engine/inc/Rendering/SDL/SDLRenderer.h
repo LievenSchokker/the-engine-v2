@@ -19,6 +19,7 @@
  * @see IRenderer, SdlContext
  */
 
+
 #pragma once
 
 #include "External/IBackendContext.h"
@@ -117,7 +118,7 @@ class SDLRenderer: public IRenderer
 
 	void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) override;
 
-	void submitUI(const std::vector<UIRenderCommand>& commands) override;
+	void submitUI(const std::vector<UIRenderCommand>& commands, InputManager& input) override;
 
    private:
 	/**
@@ -141,14 +142,14 @@ class SDLRenderer: public IRenderer
 					const Vector2& scale, const Color& tint, bool flipX = false,
 					bool flipY = false);
 
+
    private:
 	std::unique_ptr<IUIRenderHook> userInterfaceHook;
-
-	bool ensureSolidQuadTexture();
-	void destroySolidQuadTexture();
+	void setupEvents(EventDispatcher& dispatcher) override;
 	SDL_Texture* getOrCreateTexture(IImage* image);
 	void clearTextureCache();
-
+	bool ensureSolidQuadTexture();
+	void destroySolidQuadTexture();
 	SDL_Window* window =
 		nullptr;  ///< Null indicates closed state; must outlive renderer
 	SDL_Renderer* renderer =

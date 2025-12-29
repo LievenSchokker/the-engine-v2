@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Core/ApplicationSpecifications.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
@@ -46,28 +46,12 @@ class Game
 	 */
 	void addScene(std::unique_ptr<Scene> scene);
 
-	/**
-	 * @brief Activate a new scene.
-	 *
-	 * @param name Name of the scene to activate.
-	 * @return true when the scene exists and becomes active, false otherwise.
-	 */
-	bool setActiveScene(const std::string& name) const;
+    std::unique_ptr<Scene> getFirstScene();
+	std::vector<std::unique_ptr<Scene>> getAllScenes();
+private:
+    ApplicationSpecifications specifications;
 
-	/**
-	 * @brief Add a game object directly to the persistent scene.
-	 *
-	 * The persistent scene is always active and never stopped, making it ideal
-	 * for debug controls and other cross-scene utilities. Objects added to the
-	 * persistent scene persist across all scene transitions.
-	 *
-	 * @param gameObject Game object instance to transfer ownership of.
-	 */
-	void addToPersistentScene(std::unique_ptr<GameObject> gameObject);
-
-	std::unique_ptr<SceneManager> getSceneManager();
-
-   private:
-	ApplicationSpecifications specifications;
-	std::unique_ptr<SceneManager> sceneManager;
+    /// Owning container for all registered scenes. Using unique_ptr ensures
+    /// deterministic destruction order during engine shutdown.
+    std::vector<std::unique_ptr<Scene>> scenes;
 };
