@@ -1,5 +1,7 @@
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
 
+#include <corecrt_math_defines.h>
+
 #include "Component/Transform.h"
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"
@@ -180,31 +182,71 @@ void Box2DPhysicsWorld::shutdown()
 
 void Box2DPhysicsWorld::syncTransforms()
 {
-	for ( auto& [rigidBody, box2DID] : bodies )
-	{
-		const GameObject* gameObject = rigidBody->getGameObject();
+    for (auto& [rigidBody, box2DID] : bodies)
+    {
+        GameObject* gameObject = rigidBody->getGameObject();
 
-		b2Vec2 position = b2Body_GetPosition(box2DID);
-		b2Rot rotation = b2Body_GetRotation(box2DID);
+        b2Vec2 position = b2Body_GetPosition(box2DID);
+        b2Rot rotation = b2Body_GetRotation(box2DID);
+        b2Vec2 linearVel = b2Body_GetLinearVelocity(box2DID);
+        float angularVel = b2Body_GetAngularVelocity(box2DID);
 
-		gameObject->getTransform()->setPosition(Vector2(position.x, position.y));
-		gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rotation));
-	}
+        gameObject->getTransform()->setPosition(Vector2(position.x, position.y));
+        gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rotation));
+
+        auto* rb = const_cast<RigidBody*>(rigidBody);
+        rb->linearVelocity = {linearVel.x, linearVel.y};
+        rb->angularVelocity = angularVel;
+    }
 }
 
 void Box2DPhysicsWorld::applyNetworkSnapshot()
 {
-	for (auto& [rigidBody, bodyId] : bodies)
-	{
-		const GameObject* gameObject = rigidBody->getGameObject();
-		if (!gameObject) continue;
+    constexpr float positionLerpFactor = 0.3f;
+    constexpr float rotationLerpFactor = 0.3f;
+    constexpr float snapThresholdSquared = 25.0f;
 
-		const Transform* transform = gameObject->getTransform();
-		if (!transform) continue;
+    for (auto& [rigidBody, bodyId] : bodies)
+    {
+        const GameObject* gameObject = rigidBody->getGameObject();
+        if (!gameObject) continue;
 
-		const Vector2 position = transform->getPosition();
-		const float angle = transform->getRotationAngle();
-		b2Body_SetTransform(bodyId, {position.x, position.y}, b2MakeRot(angle));
-		b2Body_SetAwake(bodyId, true);
-	}
+        const Transform* transform = gameObject->getTransform();
+        if (!transform) continue;
+
+        const Vector2 targetPos = transform->getPosition();
+        const float targetAngle = transform->getRotationAngle();
+
+        b2Vec2 currentPos = b2Body_GetPosition(bodyId);
+        b2Rot currentRot = b2Body_GetRotation(bodyId);
+        float currentAngle = b2Rot_GetAngle(currentRot);
+
+        float dx = targetPos.x - currentPos.x;
+        float dy = targetPos.y - currentPos.y;
+        float distanceSquared = dx * dx + dy * dy;
+
+        Vector2 newPosition {0.0f, 0.0f};
+        float newAngle;
+
+        if (distanceSquared > snapThresholdSquared)
+        {
+            newPosition = targetPos;
+            newAngle = targetAngle;
+        }
+        else
+        {
+            newPosition.x = currentPos.x + dx * positionLerpFactor;
+            newPosition.y = currentPos.y + dy * positionLerpFactor;
+            float angleDiff = targetAngle - currentAngle;
+            while (angleDiff > M_PI) angleDiff -= 2.0f * M_PI;
+            while (angleDiff < -M_PI) angleDiff += 2.0f * M_PI;
+            newAngle = currentAngle + angleDiff * rotationLerpFactor;
+        }
+
+        b2Body_SetTransform(bodyId, {newPosition.x, newPosition.y}, b2MakeRot(newAngle));
+        b2Body_SetLinearVelocity(bodyId, {rigidBody->linearVelocity.x, rigidBody->linearVelocity.y});
+        b2Body_SetAngularVelocity(bodyId, rigidBody->angularVelocity);
+
+        b2Body_SetAwake(bodyId, true);
+    }
 }
