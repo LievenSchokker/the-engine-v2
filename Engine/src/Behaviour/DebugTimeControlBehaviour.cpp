@@ -17,7 +17,6 @@ DebugTimeControlBehaviour::DebugTimeControlBehaviour(
 	: inputManager(nullptr),
 	  clock(nullptr),
 	  menuPrinted(false),
-	  movedToPersistentScene(false),
 	  pauseKey(pauseKey),
 	  normalSpeedKey(normalSpeedKey),
 	  slowKey(slowKey),
@@ -30,29 +29,15 @@ DebugTimeControlBehaviour::DebugTimeControlBehaviour(
 
 void DebugTimeControlBehaviour::onAwake()
 {
-	inputManager = InputManager::getInstance();
 }
 
-bool DebugTimeControlBehaviour::shouldRunWhenPaused() const
+void DebugTimeControlBehaviour::onStart()
 {
-	return true;
-}
-
-void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
-{
-	(void)deltaTime;
-
-	if ( inputManager == nullptr )
-	{
-		return;
-	}
-
-	// Move to persistent scene on first update (if not already there)
+	// Move to persistent scene on start
 	// This ensures debug controls persist across scene transitions
-	if ( !movedToPersistentScene && world != nullptr &&
-		 world->sceneManager != nullptr )
+	if ( gameWorld != nullptr && gameWorld->sceneManager != nullptr )
 	{
-		SceneManager* sceneManager = world->sceneManager;
+		SceneManager* sceneManager = gameWorld->sceneManager;
 		Scene* persistentScene = sceneManager->getOrCreatePersistentScene();
 		GameObject* thisObject = getGameObject();
 
@@ -69,23 +54,19 @@ void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 					 activeScene->getGameObject(objectName) != nullptr )
 				{
 					// Transfer from active scene to persistent scene
-					sceneManager->transferGameObject(activeScene->getName(),
-													 persistentScene->getName(),
-													 objectName);
+					[[maybe_unused]] bool transferred =
+						sceneManager->transferGameObject(
+							activeScene->getName(), persistentScene->getName(),
+							objectName);
 				}
-				// Note: If object is in a non-active scene, it won't be
-				// transferred automatically. Add debug controller directly to
-				// persistent scene for best results.
 			}
 		}
-		movedToPersistentScene =
-			true;  // Mark as attempted to avoid repeated checks
 	}
 
 	// Get clock from GameWorld
-	if ( world != nullptr && world->clock != nullptr )
+	if ( gameWorld != nullptr && gameWorld->clock != nullptr )
 	{
-		clock = world->clock;
+		clock = gameWorld->clock;
 	}
 
 	// Print menu once when clock is available (if enabled)
@@ -108,6 +89,23 @@ void DebugTimeControlBehaviour::update(float deltaTime, GameWorld* world)
 		std::cout << "==========================\n" << std::endl;
 		std::cout.flush();
 		menuPrinted = true;
+	}
+}
+
+bool DebugTimeControlBehaviour::shouldRunWhenPaused() const
+{
+	return true;
+}
+
+void DebugTimeControlBehaviour::update(double deltaTime,
+									   const GameWorld& gameWorld)
+{
+	(void)deltaTime;
+
+	inputManager = gameWorld.input;
+	if ( inputManager == nullptr )
+	{
+		return;
 	}
 
 	if ( clock == nullptr )

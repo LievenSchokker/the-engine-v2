@@ -1,8 +1,3 @@
-//
-// Created by thijs on 25-11-2025.
-//
-
-
 #include <gtest/gtest.h>
 #include "Physics/IPhysicsWorld.h"
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
@@ -11,6 +6,10 @@
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 
+namespace
+{
+constexpr float FIXED_TIMESTEP = 1.0f / 60.0f;
+}
 
 /**
  * @brief Tests that applying a force updates the GameObject's transform.
@@ -18,7 +17,7 @@
 TEST(Box2DPhysicsWorldTest, PhysicsSimulationUpdatesTransform)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject obj;
     obj.addComponent<Transform>();
@@ -30,22 +29,20 @@ TEST(Box2DPhysicsWorldTest, PhysicsSimulationUpdatesTransform)
     Vector2 initialPos = obj.getTransform()->getPosition();
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
-    world.fixedUpdate();
+    world.step(FIXED_TIMESTEP);
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_NE(initialPos.y, newPos.y);
 }
 
-
 /**
  * @brief Objects fall under gravity over multiple frames.
  */
-
 TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject obj;
     obj.addComponent<Transform>();
@@ -56,8 +53,9 @@ TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    for (int i = 0; i < 60; ++i) {
-        world.fixedUpdate();
+    for (int i = 0; i < 60; ++i)
+    {
+        world.step(FIXED_TIMESTEP);
         world.syncTransforms();
     }
 
@@ -67,14 +65,13 @@ TEST(Box2DPhysicsWorldTest, ObjectFallsUnderGravity)
     EXPECT_GT(newPos.y, initialPos.y);
 }
 
-
 /**
  * @brief Static objects should not move under forces.
  */
 TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject obj;
     obj.addComponent<Transform>();
@@ -87,13 +84,12 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
     Vector2 initialPos = obj.getTransform()->getPosition();
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
-    world.fixedUpdate();
+    world.step(FIXED_TIMESTEP);
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
     EXPECT_EQ(initialPos.y, newPos.y);
 }
-
 
 /**
  * @brief Applying horizontal force moves object in X axis.
@@ -101,7 +97,7 @@ TEST(Box2DPhysicsWorldTest, StaticObjectDoesNotMove)
 TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject obj;
     obj.addComponent<Transform>();
@@ -113,13 +109,12 @@ TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
     Vector2 initialPos = obj.getTransform()->getPosition();
 
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
-    world.fixedUpdate();
+    world.step(FIXED_TIMESTEP);
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_GT(newPos.x, initialPos.x); // Object moved horizontally
+    EXPECT_GT(newPos.x, initialPos.x);
 }
-
 
 /**
  * @brief Tests collision between two objects (ball falls on floor).
@@ -127,7 +122,7 @@ TEST(Box2DPhysicsWorldTest, ApplyHorizontalForceMovesObject)
 TEST(Box2DPhysicsWorldTest, ObjectsCollide)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject floor;
     floor.addComponent<Transform>();
@@ -142,15 +137,15 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
     world.createBody(floor.getComponent<RigidBody>());
     world.createBody(ball.getComponent<RigidBody>());
 
-    for (int i = 0; i < 120; ++i) {
-        world.fixedUpdate();
+    for (int i = 0; i < 120; ++i)
+    {
+        world.step(FIXED_TIMESTEP);
         world.syncTransforms();
     }
 
     Vector2 ballPos = ball.getTransform()->getPosition();
-    EXPECT_LE(ballPos.y, 100 - 10); // Ball rests on floor (radius 10)
+    EXPECT_LE(ballPos.y, 100 - 10);
 }
-
 
 /**
  * @brief Tests multiple forces applied in one frame.
@@ -158,7 +153,7 @@ TEST(Box2DPhysicsWorldTest, ObjectsCollide)
 TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject obj;
     obj.addComponent<Transform>();
@@ -170,7 +165,7 @@ TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(50, 0));
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
 
-    world.fixedUpdate();
+    world.step(FIXED_TIMESTEP);
     world.syncTransforms();
 
     Vector2 pos = obj.getTransform()->getPosition();
@@ -178,14 +173,13 @@ TEST(Box2DPhysicsWorldTest, ApplyMultipleForces)
     EXPECT_GT(pos.y, 0);
 }
 
-
 /**
  * @brief Tests that destroying a static object removes it from simulation.
  */
 TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject obj;
     obj.addComponent<Transform>();
@@ -196,18 +190,15 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    // Destroy the body
     world.destroyBody(obj.getComponent<RigidBody>());
 
-    // Apply a force and update world
     world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
-    world.fixedUpdate();
+    world.step(FIXED_TIMESTEP);
     world.syncTransforms();
 
     Vector2 newPos = obj.getTransform()->getPosition();
-    EXPECT_EQ(newPos.y, initialPos.y); // Object no longer simulated
+    EXPECT_EQ(newPos.y, initialPos.y);
 }
-
 
 /**
  * @brief Tests that destroying a dynamic object stops it from moving.
@@ -215,7 +206,7 @@ TEST(Box2DPhysicsWorldTest, DestroyStaticObject)
 TEST(Box2DPhysicsWorldTest, DestroyDynamicObject)
 {
     Box2DPhysicsWorld world;
-    world.start();
+    world.initialize();
 
     GameObject obj;
     obj.addComponent<Transform>();
@@ -226,17 +217,16 @@ TEST(Box2DPhysicsWorldTest, DestroyDynamicObject)
 
     Vector2 initialPos = obj.getTransform()->getPosition();
 
-    // Destroy the body immediately
     world.destroyBody(obj.getComponent<RigidBody>());
 
-    // Apply a force and simulate multiple frames
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < 10; ++i)
+    {
         world.applyForce(obj.getComponent<RigidBody>(), Vector2(0, 100));
-        world.fixedUpdate();
+        world.step(FIXED_TIMESTEP);
         world.syncTransforms();
     }
 
-	Vector2 newPos = obj.getTransform()->getPosition();
-	EXPECT_EQ(newPos.x, initialPos.x);
-	EXPECT_EQ(newPos.y, initialPos.y); // No movement after destruction
+    Vector2 newPos = obj.getTransform()->getPosition();
+    EXPECT_EQ(newPos.x, initialPos.x);
+    EXPECT_EQ(newPos.y, initialPos.y);
 }

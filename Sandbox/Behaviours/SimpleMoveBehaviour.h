@@ -23,7 +23,7 @@ class SimpleMoveBehaviour: public Behaviour
 	void onAwake() override;
 	void onEnable() override;
 	void onStart() override;
-	void update(float deltaTime, GameWorld* world) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 	void onDisable() override;
 	void setMaxSpeed(float speed) { maxSpeed = speed; }
 
@@ -33,8 +33,7 @@ class SimpleMoveBehaviour: public Behaviour
    private:
 	bool canMove = false;
 	float currentSpeed = 0.0f;
-	float maxSpeed = 10.0f;
-	float speedMultiplier = 1.5f;
+	float maxSpeed = 0.0f;
 	Vector2 currentDirection;
 
 	InputManager* inputManager;

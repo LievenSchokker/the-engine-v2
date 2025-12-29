@@ -1,7 +1,12 @@
 #pragma once
 
+#include "Component/Camera.h"
+#include "Core/IEngineSystems.h"
 #include "Rendering/Color.h"
+#include "Events/EventDispatcher/EventDispatcher.h"
+#include "External/SDLBackendContext.h"
 #include "Rendering/RenderQueue/RenderQueue.h"
+#include "Rendering/Color.h"
 #include "Scene/Scene.h"
 
 class IRenderer;
@@ -15,9 +20,9 @@ class IRenderer;
  * entities are organized in the scene.
  *
  */
-class RenderSystem
+class RenderSystem: public IEngineSystems
 {
-   public:
+public:
 	/**
 	 * @brief Takes ownership of a renderer implementation.
 	 * @param renderer The backend-specific renderer to delegate drawing to.
@@ -28,6 +33,8 @@ class RenderSystem
 	 */
 	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
 
+
+	void setupEvents(EventDispatcher& dispatcher) const;
 	/**
 	 * @brief Executes a full render frame: collect, sort, draw, present.
 	 *
@@ -36,14 +43,17 @@ class RenderSystem
 	 * boilerplate out of core loop code.
 	 *
 	 */
-	void update(float deltaTime, Scene& scene);
-
+	void update(double deltaTime, const GameWorld& gameWorld) override;
+	void processWorldCommands();
 	void setClearColor(const Color& color);
+	void updateCameras(const Scene& scene);
 
 	const Color& getClearColor() const;
 
    private:
+	const std::string getName() const override;
 	std::unique_ptr<IRenderer> renderer;
+	std::vector<Camera*> cameras;
 	RenderQueue queue;
 	Color clearColor = Color::black();
 	void collectCommands(Scene& scene);

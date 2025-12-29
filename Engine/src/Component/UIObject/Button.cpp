@@ -1,25 +1,48 @@
 #include "Component/UIElement/Button.h"
+#include "Rendering/RenderQueue/IUserInterfaceRenderQueueWriter.h"
+#include "Rendering/UIRenderCommand.h"
 
 #include <iostream>
 
+uint32_t Button::nextButtonId = 1;
 
-Button::Button(const int width, const int height, const bool interactable)
-	: UIElement(0, 0, width, height), interactable(interactable)
+Button::Button(
+	float x,
+	float y,
+	float width,
+	float height,
+	std::string text
+)
+	: UIElement(x, y, width, height)
+	, buttonId(nextButtonId++)
+	, text(std::move(text))
+{}
+
+void Button::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWriter& queue) const
 {
+	if (!visible)
+	{
+		return;
+	}
+
+	UIRenderCommand command;
+	command.type = UICommandType::Button;
+	command.panelId = panelId;
+	command.parentId = parentId;
+	command.x = x;
+	command.y = y;
+	command.width = width;
+	command.height = height;
+	command.buttonId = buttonId;
+	command.text = text;
+	command.interactable = interactable;
+
+	queue.push(command);
 }
 
-void Button::setInteractable(const bool newInteractable)
-{
-	interactable = newInteractable;
-}
+std::string Button::getText() const { return text; }
+bool Button::isInteractable() const { return interactable; }
+uint32_t Button::getButtonId() const { return buttonId; }
 
-bool Button::getInteractable() const
-{
-	return interactable;
-}
-
-void Button::onClick()
-{
-	//  QQToDo: Implementation of this function depends on the GUI choice
-	std::cout << "Button has been clicked!" << std::endl;
-}
+void Button::setText(const std::string& newText) { text = newText; }
+void Button::setInteractable(bool enabled) { interactable = enabled; }

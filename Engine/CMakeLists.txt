@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(engine)
 
 file(GLOB_RECURSE ENGINE_SOURCES
-        "${CMAKE_SOURCE_DIR}/Engine/src/*.cpp"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
 )
 
 include(FetchContent)
@@ -20,13 +20,17 @@ add_library(engine STATIC
         ${ENGINE_SOURCES})
 
 target_include_directories(engine PUBLIC
-        ${CMAKE_SOURCE_DIR}/Engine/inc
-        ${CMAKE_SOURCE_DIR}/Engine/third-party
-        ${CMAKE_SOURCE_DIR}/Engine/third-party/cereal/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/inc
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party
+        ${CMAKE_CURRENT_SOURCE_DIR}/third-party/cereal/include
         ${SDL2_INCLUDE_DIRS}
         ${SDL2_IMAGE_INCLUDE_DIRS}
-        ${GAMENETWORKINGSOCKETS_INCLUDE_DIRS}
 )
+
+find_package(SDL2 CONFIG REQUIRED)
+find_package(SDL2_image CONFIG REQUIRED)
+find_package(SDL2_mixer CONFIG REQUIRED)
+find_package(GameNetworkingSockets CONFIG REQUIRED)
 
 target_link_libraries(engine PUBLIC
         $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>

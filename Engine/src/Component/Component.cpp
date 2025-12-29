@@ -32,10 +32,6 @@ const Transform* Component::getTransform() const
     return transform;
 }
 
-ComponentType Component::getComponentType() const
-{
-	return ComponentType::Unknown;
-}
 void Component::deserialize(ReadArchive& archive){}
 void Component::serialize(WriteArchive& archive) const{}
 

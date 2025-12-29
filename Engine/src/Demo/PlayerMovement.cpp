@@ -9,9 +9,11 @@
 
 #include <iostream>
 
+#include "Component/Camera.h"
+
 PlayerMovement::PlayerMovement()
 {
-    authorityType = AuthorityType::ClientAuthority;
+    authorityType = AuthorityType::ServerAuthority;
 }
 
 void PlayerMovement::onStart()
@@ -24,28 +26,32 @@ void PlayerMovement::onNetworkSpawn()
 
 void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
 {
-    builder.command("MoveUp", [this](ReadArchive&) {
+    builder.command("MoveUp", [this](ReadArchive&)
+    {
         applyMovement(0, -1);
     });
-    builder.command("MoveDown", [this](ReadArchive&) {
+    builder.command("MoveDown", [this](ReadArchive&)
+    {
         applyMovement(0, 1);
     });
-    builder.command("MoveLeft", [this](ReadArchive&) {
+    builder.command("MoveLeft", [this](ReadArchive&)
+    {
         applyMovement(-1, 0);
     });
-    builder.command("MoveRight", [this](ReadArchive&) {
+    builder.command("MoveRight", [this](ReadArchive&)
+    {
         applyMovement(1, 0);
     });
 }
 
-void PlayerMovement::update(float deltaTime, GameWorld* world)
+void PlayerMovement::update(double deltaTime,const GameWorld& world)
 {
-    if (!hasAuthority())
-    {
-        return;
-    }
+	if (!hasAuthority())
+	{
+		return;
+	}
 
-    handleInput();
+	handleInput();
 }
 
 void PlayerMovement::serialize(WriteArchive& archive) const
@@ -60,11 +66,12 @@ void PlayerMovement::deserialize(ReadArchive& archive)
 
 void PlayerMovement::handleInput()
 {
-    auto* world = getWorld();
-    if (!world || !world->input) return;
+	if (!gameWorld || !gameWorld->input) {
+		return;
+	}
 
-    auto* input = world->input;
 
+    auto* input = gameWorld->input;
     if (input->isKeyDown(KeyCode::W) || input->isKeyDown(KeyCode::UP_ARROW))
     {
         callCommand("MoveUp");
@@ -89,28 +96,28 @@ void PlayerMovement::handleInput()
 
 void PlayerMovement::applyMovement(const float dirX, const float dirY) const
 {
+
 	if (!isServer())
 	{
 		return;
 	}
 
 	Transform* transform = getGameObject()->getTransform();
+    float dt = 1.0f / 60.0f;
+    Vector2 pos = transform->getPosition();
+    pos.x += dirX * moveSpeed * dt;
+    pos.y += dirY * moveSpeed * dt;
+    transform->setPosition(pos);
 
-	float dt = 1.0f / 60.0f;
-	Vector2 pos = transform->getPosition();
-	pos.x += dirX * moveSpeed * dt;
-	pos.y += dirY * moveSpeed * dt;
-	transform->setPosition(pos);
-
-	ShapeRenderer* shapeRenderer = nullptr;
-	if (getGameObject()->tryGetComponent(shapeRenderer))
-	{
-		float currentRadius = shapeRenderer->getRadius();
-		currentRadius += 0.5f;
-		if (currentRadius > 50.0f)
-		{
-			currentRadius = 10.0f;
-		}
-		shapeRenderer->setCircle(currentRadius);
-	}
+    ShapeRenderer* shapeRenderer = nullptr;
+    if (getGameObject()->tryGetComponent(shapeRenderer))
+    {
+        float currentRadius = shapeRenderer->getRadius();
+        currentRadius += 0.5f;
+        if (currentRadius > 50.0f)
+        {
+            currentRadius = 10.0f;
+        }
+        shapeRenderer->setCircle(currentRadius);
+    }
 }

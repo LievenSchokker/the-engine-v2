@@ -1,8 +1,4 @@
-#pragma once
-
-
 #include <gtest/gtest.h>
-
 
 #include "Networking/Messages/MessageWriter.h"
 #include "Networking/Messages/ConcreteMessages/ConnectionMessage.h"

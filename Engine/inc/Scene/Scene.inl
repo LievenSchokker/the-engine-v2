@@ -13,7 +13,7 @@ std::vector<T*> Scene::getAllComponentsOfType() const
 	{
 		if (!gameObject->getIsActive()) continue;
 
-		auto components = gameObject->getComponentManager()->getAllComponentsOfType<T>();
+		auto components = gameObject->getAllComponentsOfType<T>();
 		result.insert(result.end(), components.begin(), components.end());
 	}
 

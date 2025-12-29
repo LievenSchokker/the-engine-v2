@@ -1,6 +1,6 @@
 #include "Game.h"
 
-Game::Game() : sceneManager(std::make_unique<SceneManager>()) {};
+Game::Game() {};
 Game::~Game() = default;
 
 void Game::setApplicationSpecifications(
@@ -17,10 +17,20 @@ ApplicationSpecifications Game::getApplicationSpecifications() const
 void Game::addScene(std::unique_ptr<Scene> scene)
 {
     std::string name = scene->getName();
-    sceneManager->addScene(std::move(scene));
+    scenes.push_back(std::move(scene));
 }
 
-std::unique_ptr<SceneManager> Game::getSceneManager()
+std::unique_ptr<Scene> Game::getFirstScene()
 {
-	return std::move(sceneManager);
+    if (scenes.empty())
+    {
+        return nullptr;
+    }
+
+    return std::move(scenes.front());
+}
+
+std::vector<std::unique_ptr<Scene>> Game::getAllScenes()
+{
+	return std::move(scenes);
 }

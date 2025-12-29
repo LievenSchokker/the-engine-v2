@@ -83,18 +83,15 @@ void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 
 void ShapeRenderer::serialize(WriteArchive& archive) const
 {
-	// Shape type
 	uint8_t shapeType = static_cast<uint8_t>(type);
 	archive.process(shapeType);
 
-	// Color (RGBA)
 	uint8_t r = color.r, g = color.g, b = color.b, a = color.a;
 	archive.process(r);
 	archive.process(g);
 	archive.process(b);
 	archive.process(a);
 
-	// Dimensions
 	float rad = radius;
 	float sizeX = size.x;
 	float sizeY = size.y;
@@ -102,17 +99,12 @@ void ShapeRenderer::serialize(WriteArchive& archive) const
 	archive.process(sizeX);
 	archive.process(sizeY);
 
-	// Layer info
 	uint8_t lay = layer;
 	int8_t order = orderInLayer;
 	archive.process(lay);
 	archive.process(order);
 }
 
-ComponentType ShapeRenderer::getComponentType() const
-{
-	return ComponentType::ShapeRenderer;
-}
 void ShapeRenderer::deserialize(ReadArchive& archive)
 {
 	// Shape type

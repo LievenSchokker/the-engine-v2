@@ -6,23 +6,18 @@ NetworkBehaviour::NetworkBehaviour() = default;
 
 bool NetworkBehaviour::isServer() const
 {
-    return world && world->isServer();
+    return gameWorld && gameWorld->isServer();
 }
 
 bool NetworkBehaviour::isClient() const
 {
-    return world && world->isClient();
+    return gameWorld && gameWorld->isClient();
 }
 
 bool NetworkBehaviour::hasAuthority() const
 {
     if (!identity) return false;
     return identity->hasAuthority();
-}
-
-GameWorld* NetworkBehaviour::getWorld() const
-{
-	return world;
 }
 
 void NetworkBehaviour::executeAction(const std::string& actionKey)
@@ -34,11 +29,6 @@ void NetworkBehaviour::executeAction(const std::string& actionKey)
 		ReadArchive emptyArchive(nullptr, 0);
 		commandEntry->second(emptyArchive);
 	}
-}
-
-void NetworkBehaviour::setWorldRefrence(GameWorld* gameWorld)
-{
-	world = gameWorld;
 }
 
 void NetworkBehaviour::setComponentNetworkId(uint32_t id)

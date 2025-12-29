@@ -1,9 +1,10 @@
 #include "Behaviour/Behaviour.h"
+#include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
@@ -27,76 +28,66 @@
  * - Mouse wheel Y: Rotates the YellowRectangle
  * - Mouse wheel X: Moves and scales the BlueCircle
  */
-class SandboxInputBehaviour: public Behaviour
+class SandboxInputBehaviour final: public Behaviour
 {
    public:
-	explicit SandboxInputBehaviour(Scene* scene)
-		: scene(scene), inputManager(nullptr)
+	explicit SandboxInputBehaviour(Scene* scene) : scene(scene)
 	{
 	}
 
 	~SandboxInputBehaviour() override = default;
 
-	void onAwake() override
-	{
-		inputManager = InputManager::getInstance();
-	}
-
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 
-		if ( inputManager == nullptr || scene == nullptr )
+		if ( scene == nullptr )
 		{
 			return;
 		}
-		if ( inputManager->wasKeyPressed(KeyCode::D) )
+		if ( world.input->wasKeyPressed(KeyCode::E) )
 		{
 			auto circle = scene->getGameObject("BlueCircle");
-			auto component = circle->getComponent<SimpleMoveBehaviour>();
-			component->setEnabled(!component->getIsEnabled());
-		}
-
-		// Handle SPACE key to toggle clear color
-		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
-		{
-			Color clearColor = world->render->getClearColor();
-			clearColor = (clearColor == Color::darkGreen())
-							 ? Color::darkPurple()
-							 : Color::darkGreen();
-			// Try to set clear color through RenderSystem if available
-			if ( world != nullptr && world->render != nullptr )
+			if ( circle != nullptr )
 			{
-				world->render->setClearColor(clearColor);
+				auto component = circle->getComponent<SimpleMoveBehaviour>();
+				if ( component != nullptr )
+				{
+					component->setEnabled(!component->getIsEnabled());
+				}
 			}
 		}
 
-		if ( inputManager->wasKeyPressed(KeyCode::ENTER) )
+		// Handle SPACE key to toggle clear color
+		if ( world.input->wasKeyPressed(KeyCode::SPACE) )
 		{
-			SceneManager* sm = world->sceneManager;
+			Color clearColor = world.render->getClearColor();
+			clearColor = (clearColor == Color::darkGreen())
+							 ? Color::darkPurple()
+							 : Color::darkGreen();
+
+			// Try to set clear color through RenderSystem if available
+			if ( world.render != nullptr )
+			{
+				world.render->setClearColor(clearColor);
+			}
+		}
+
+		if ( world.input->wasKeyPressed(KeyCode::ENTER) )
+		{
+			SceneManager* sm = world.sceneManager;
 			Scene* active = sm->getActiveScene();
 
 			if ( active->getName() == "PrototypeScene" )
 				sm->setActiveScene("SecondScene");
 			else
 			{
-				bool hardReset = false;
-				if ( hardReset )
-				{
-					sm->removeScene("PrototypeScene");
-					auto newScene = createPrototypeScene();
-					sm->addScene(std::move(newScene));
-					sm->setActiveScene("PrototypeScene");
-				}
-				else
-				{
-					sm->setActiveScene("PrototypeScene");
-				}
+				sm->loadScene("PrototypeScene");
 			}
 		}
 
 		// Handle mouse wheel Y to rotate rectangle
-		if ( inputManager->wheelDeltaY() != 0 )
+		if ( world.input->wheelDeltaY() != 0 )
 		{
 			GameObject* rectangle = scene->getGameObject("YellowRectangle");
 			if ( rectangle != nullptr )
@@ -104,12 +95,12 @@ class SandboxInputBehaviour: public Behaviour
 				double currentRotation =
 					rectangle->getTransform()->getRotationAngle();
 				rectangle->getTransform()->setRotationAngle(
-					currentRotation + inputManager->wheelDeltaY());
+					currentRotation + world.input->wheelDeltaY());
 			}
 		}
 
 		// Handle mouse wheel X to move and scale circle
-		if ( inputManager->wheelDeltaX() != 0 )
+		if ( world.input->wheelDeltaX() != 0 )
 		{
 			GameObject* circle = scene->getGameObject("BlueCircle");
 			if ( circle != nullptr )
@@ -117,50 +108,22 @@ class SandboxInputBehaviour: public Behaviour
 				Vector2 currentPosition = circle->getTransform()->getPosition();
 				circle->getTransform()->setPosition(
 					{currentPosition.x +
-						 static_cast<float>(inputManager->wheelDeltaX()) *
+						 static_cast<float>(world.input->wheelDeltaX()) *
 							 10.0f,
 					 currentPosition.y});
 				Vector2 currentScale = circle->getTransform()->getScale();
 				circle->getTransform()->setScale(
 					{currentScale.x +
-						 static_cast<float>(inputManager->wheelDeltaX()) * 0.1f,
+						 static_cast<float>(world.input->wheelDeltaX()) * 0.1f,
 					 currentScale.y +
-						 static_cast<float>(inputManager->wheelDeltaX()) *
+						 static_cast<float>(world.input->wheelDeltaX()) *
 							 0.1f});
 			}
 		}
 	}
 
-	std::unique_ptr<Scene> createPrototypeScene()
-	{
-		auto scene = std::make_unique<Scene>("PrototypeScene");
-
-		auto circle = std::make_unique<GameObject>();
-		circle->setName("BlueCircle");
-		circle->getTransform()->setPosition({150.0, 140.0});
-		circle->getTransform()->setScale({1.0, 1.0});
-		circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(
-			Color::lightBlue());
-		circle->addComponent<SimpleMoveBehaviour>();
-
-		auto rectangle = std::make_unique<GameObject>();
-		rectangle->setName("YellowRectangle");
-		rectangle->getTransform()->setPosition({320.0, 240.0});
-		rectangle->getTransform()->setRotationAngle(25.0);
-		rectangle->getTransform()->setScale({1.0, 1.0});
-		rectangle->addComponent<ShapeRenderer>()
-			->setRectangle({140.0, 80.0})
-			.setColor(Color::lightRed());
-
-		scene->addGameObject(std::move(circle));
-		scene->addGameObject(std::move(rectangle));
-
-		return scene;
-	}
-
    private:
 	Scene* scene;
-	InputManager* inputManager;
 };
 
 //////////////////////////////
@@ -235,6 +198,7 @@ int main(int argc, char** argv)
 	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
+	spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Shape Sandbox", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 
@@ -242,6 +206,22 @@ int main(int argc, char** argv)
 
 	auto prototypeScene = createPrototypeScene();
 	auto secondScene = createSecondScene();
+
+	// Create a debug controller and add it directly to the persistent scene
+	// This ensures debug controls work across all scene transitions
+	auto debugController = std::make_unique<GameObject>();
+	debugController->setName("DebugController");
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::NUMBER_1_AND_EXCLAMATION,	// Pause key
+		std::nullopt,						// Normal speed (disabled)
+		KeyCode::NUMBER_2_AND_AT,			// Slow (enabled)
+		KeyCode::NUMBER_3_AND_HASHMARK,		// Very slow (enabled)
+		KeyCode::NUMBER_4_AND_DOLLAR,		// Fast (enabled)
+		std::nullopt,						// Very fast (disabled)
+		true								// Print menu
+	);
+
+	prototypeScene->addGameObject(std::move(debugController));
 
 	// Attach behavior
 	auto goInputHandler = std::make_unique<GameObject>();

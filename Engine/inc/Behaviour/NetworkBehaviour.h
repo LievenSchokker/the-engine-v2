@@ -65,8 +65,6 @@ public:
 	 */
 	bool hasAuthority() const;
 
-	GameWorld* getWorld() const;
-
 	/**
 	 * @brief Override to register Commands and RPCs using the NetworkBuilder.
 	 *
@@ -123,8 +121,6 @@ public:
 	 */
 	void executeAction(const std::string& actionKey);
 
-	void setWorldRefrence(GameWorld* world);
-
 	void setComponentNetworkId(uint32_t id);
 
 	void addCommand(const std::string& name, ActionCallback callback);
@@ -168,7 +164,6 @@ protected:
 
     AuthorityType authorityType = AuthorityType::ServerAuthority;
 private:
-	GameWorld* world = nullptr;
 	/// Commands are client→server calls
 	std::unordered_map<std::string, ActionCallback> commands;
 };
