@@ -117,17 +117,25 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 	}
 
 	auto sceneManager = std::make_unique<SceneManager>(*gameWorld);
-	std::unique_ptr<Scene> scenePtr = gamePtr->getFirstScene();
+	auto allScenes = gamePtr->getAllScenes();
 
-	if (!scenePtr)
+	if (allScenes.empty())
 	{
 		throw std::runtime_error("Game must have at least one scene");
 	}
 
+	// Add all scenes to SceneManager
+	std::string firstSceneName;
+	for (auto& scene : allScenes)
+	{
+		if (firstSceneName.empty())
+		{
+			firstSceneName = scene->getName();
+		}
+		sceneManager->addScene(std::move(scene));
+	}
 
-    const std::string sceneName = scenePtr->getName();
-    sceneManager->addScene(std::move(scenePtr));
-	loop->setPendingSceneName(sceneName);
+	loop->setPendingSceneName(firstSceneName);
     loop->addSystem(std::move(sceneManager));
 
     return loop;

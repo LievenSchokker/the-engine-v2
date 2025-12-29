@@ -85,6 +85,7 @@ class DebugTimeControlBehaviour: public Behaviour
 	~DebugTimeControlBehaviour() override = default;
 
 	void onAwake() override;
+	void onStart() override;
 	void update(double deltaTime, const GameWorld& gameWorld) override;
 	bool shouldRunWhenPaused() const override;
 
@@ -92,7 +93,6 @@ class DebugTimeControlBehaviour: public Behaviour
 	InputManager* inputManager;
 	ApplicationClock* clock;
 	bool menuPrinted;
-	bool movedToPersistentScene;
 
 	// Configurable key bindings
 	std::optional<KeyCode> pauseKey;
