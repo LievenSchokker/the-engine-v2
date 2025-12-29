@@ -40,7 +40,7 @@ endfunction()
 # Create separate executables for each sandbox
 # (You can comment out the executables you don't want to build.)
 add_sandbox_executable(engineSandbox_main main.cpp)
-add_sandbox_executable(engineSandbox_physics Physics.cpp)
+add_sandbox_executable(engineSandbox_physics sandbox_physics.cpp)
 add_sandbox_executable(engineSandbox_animation_spritesheets sandbox_animation_spritesheets.cpp)
 add_sandbox_executable(engineSandbox_animation_transforms sandbox_animation_transforms.cpp)
 add_sandbox_executable(engineSandbox_input sandbox_input.cpp)
