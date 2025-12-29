@@ -3,7 +3,14 @@
 #include "Animation/AnimationClip.h"
 #include "Behaviour/Behaviour.h"
 
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+
 class GameObject;
+struct SpritesheetAnimationClip;
 
 /**
  * @class Animator
@@ -104,11 +111,112 @@ class Animator: public Behaviour
 	 *
 	 * @param deltaTime Time elapsed since last update in seconds
 	 */
-	void update(float deltaTime, GameWorld* world) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
+
+	/**
+	 * @brief Adds a spritesheet animation clip that can be played by name.
+	 *
+	 * Converts the SpritesheetAnimationClip to an AnimationClip internally
+	 * and stores it for later playback. This provides a convenient API for
+	 * spritesheet animations without requiring manual AnimationTrack creation.
+	 *
+	 * @param name Name to identify this animation (used with playSpritesheet())
+	 * @param clip SpritesheetAnimationClip definition
+	 */
+	void addSpritesheetClip(const std::string& name,
+							const SpritesheetAnimationClip& clip);
+
+	/**
+	 * @brief Plays a spritesheet animation by name.
+	 *
+	 * Stops any currently playing animation and starts the named spritesheet
+	 * animation. Does nothing if the animation name doesn't exist.
+	 *
+	 * @param clipName Name of the spritesheet animation to play
+	 */
+	void playSpritesheet(const std::string& clipName);
+
+	/**
+	 * @brief Gets the name of the currently playing spritesheet animation.
+	 * @return Animation name, or empty string if none playing or current clip
+	 * is not a spritesheet clip
+	 */
+	std::string getCurrentSpritesheetClipName() const;
+
+	/**
+	 * @brief Checks if a spritesheet clip exists.
+	 * @param name Name of the clip to check
+	 * @return true if clip exists, false otherwise
+	 */
+	bool hasSpritesheetClip(const std::string& name) const;
+
+	/**
+	 * @brief Adds sprite frame tracks from a SpritesheetAnimationClip to an
+	 * AnimationClip and takes ownership of it.
+	 *
+	 * This allows combining sprite frame animation with other property
+	 * animations (like transform position) in a single clip. The frame tracks
+	 * will loop continuously throughout the clip's duration.
+	 *
+	 * The Animator takes ownership of the clip via std::move. The caller should
+	 * not use the clip after calling this method.
+	 *
+	 * @param targetClip Unique pointer to the AnimationClip to add tracks to
+	 * @param spritesheetClip The SpritesheetAnimationClip containing frame data
+	 * @return Raw pointer to the clip for use with play() (valid as long as
+	 *         Animator exists)
+	 */
+	AnimationClip* addSpritesheetTracksToClip(
+		std::unique_ptr<AnimationClip> targetClip,
+		const SpritesheetAnimationClip& spritesheetClip);
 
    private:
 	AnimationClip* currentClip;
 	bool isPlaying;
 	float timeScale;
 	float currentTime;
+
+	/// Storage for spritesheet clips converted from SpritesheetAnimationClip
+	std::unordered_map<std::string, std::unique_ptr<AnimationClip>>
+		spritesheetClips;
+
+	/// Storage for clips added via addSpritesheetTracksToClip (no name)
+	std::vector<std::unique_ptr<AnimationClip>> ownedClips;
+
+	/// Reverse mapping from AnimationClip pointer to spritesheet clip name for
+	/// O(1) lookup
+	std::unordered_map<AnimationClip*, std::string> clipToNameMap;
+
+	/// Clips that should loop their Frame tracks automatically
+	std::unordered_set<AnimationClip*> clipsWithLoopingFrames;
+
+	/**
+	 * @brief Converts a SpritesheetAnimationClip to an AnimationClip.
+	 *
+	 * Creates sequential AnimationTracks for each frame transition in the
+	 * frame sequence. Each track animates from one frame to the next over
+	 * the specified frame duration.
+	 *
+	 * @param clip The SpritesheetAnimationClip to convert
+	 * @return Unique pointer to the converted AnimationClip
+	 */
+	std::unique_ptr<AnimationClip> convertSpritesheetClip(
+		const SpritesheetAnimationClip& clip);
+
+	/**
+	 * @brief Adds frame tracks from a SpritesheetAnimationClip to an
+	 * AnimationClip.
+	 *
+	 * Static helper method that creates and adds frame animation tracks. Can
+	 * repeat the frame sequence multiple times. Does not require an Animator
+	 * instance to use.
+	 *
+	 * @param clip The AnimationClip to add tracks to
+	 * @param spritesheetClip The SpritesheetAnimationClip containing frame data
+	 * @param repeatCount Number of times to repeat the frame sequence (default:
+	 * 1)
+	 */
+	static void addFrameTracksToClip(
+		AnimationClip* clip, const SpritesheetAnimationClip& spritesheetClip,
+		int repeatCount = 1);
 };

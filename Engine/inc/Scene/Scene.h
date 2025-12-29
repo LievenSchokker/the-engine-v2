@@ -2,14 +2,19 @@
 
 
 #include "Core/GameWorld.h"
+#include "AI/Navigation/NavigationGridOptions.h"
 
+class NavigationSystem;
 class GameObject;
 class Behaviour;
+struct RenderQueue;
 struct ShapeRenderCommand;
 
+#include <map>
 #include <memory>
 #include <string>
 #include <vector>
+#include "Core/GameWorld.h"
 
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.
@@ -34,8 +39,9 @@ public:
 	 * @return Reference to the stored scene name.
 	 */
 	const std::string& getName() const;
+    bool addGameObject(std::unique_ptr<GameObject> gameObject);
 
-	/**
+    /**
 	 * @brief Add a game object to the scene.
 	 *
 	 * If the scene is currently active the object's components are activated
@@ -45,7 +51,7 @@ public:
 	 * @return true if the object was successfully added, false if gameObject
 	 * was null.
 	 */
-	bool addGameObject(std::unique_ptr<GameObject> gameObject);
+	bool addRunTimeGameObject(std::unique_ptr<GameObject> gameObject);
 
 	/**
 	 * @brief Remove a game object by name.
@@ -63,13 +69,18 @@ public:
 	 */
 	bool removeGameObject(const std::string& name);
 
-	/**
-	 * @brief Look up a game object by name.
-	 *
-	 * @param name Name of the game object to retrieve.
-	 * @return Pointer to the object, or nullptr when not found.
-	 */
-	GameObject* getGameObject(const std::string& name) const;
+        /**
+         * @brief Removes a GameObject from the scene (destroys it).
+         */
+        void removeGameObject(GameObject* obj);
+
+        /**
+         * @brief Look up a game object by name.
+         *
+         * @param name Name of the game object to retrieve.
+         * @return Pointer to the object, or nullptr when not found.
+         */
+        GameObject *getGameObject(const std::string &name) const;
 
 	/**
 	 * @brief Extract a game object from the scene without destroying it.
@@ -89,7 +100,7 @@ public:
 	 * Activates every stored object's components through their component
 	 * manager.
 	 */
-	void onStart();
+	void onStart(GameWorld& world);
 
 	/**
 	 * @brief Stop the scene if it is active.
@@ -113,27 +124,21 @@ public:
 	 */
 	void onResume();
 
-	/**
-	 * @brief Update all game objects when the scene is active.
-	 *
-	 * @param deltaTime Seconds elapsed since the previous update.
-	 * @param world
-	 */
-	void update(double deltaTime, GameWorld* world);
+    /**
+     * @brief Update all game objects when the scene is active.
+     *
+     * @param deltaTime Seconds elapsed since the previous update.
+     * @param world
+     */
+    void update(double deltaTime, const GameWorld& world);
 
-	/**
-	 * @brief Collect render commands for active objects in this scene.
-	 *
-	 * Appends commands to the provided collection; does nothing when inactive.
-	 */
-	void collectRenderCommands(std::vector<ShapeRenderCommand>& out) const;
-
-	/**
-	 * @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
-	 *
-	 * @param behaviours the behaviours that need to be initialised.
-	 */
-	void initialiseBehaviours(const std::vector<Behaviour*>& behaviours);
+    /**
+	* @brief initialises the @c behaviours by calling their awake(), onEnable() and start() methods in the correct order.
+	* Does not enable the behaviours on their own only calls the callback.
+	* @param behaviours the behaviours that need to be initialised.
+	* @param world
+     */
+    void initialiseBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world);
 
 	/**
 	 * @brief Adds the provided GameObject to the @c destroyQueue vector, in order to delete and destroy the object when @c processDestroyQueue is called.
@@ -141,14 +146,14 @@ public:
 	 */
 	void queueDestroy(GameObject* gameObject);
 
-	/**
-	 * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
-	 * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
-	 * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
-	 *
-	 * This function is called at the end of each scene::update() call.
-	 */
-	void processDestroyQueue();
+        /**
+         * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
+         * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
+         * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
+         *
+         * This function is called at the end of each scene::update() call.
+         */
+        void processDestroyQueue();
 
 	/**
 	 * Checks whether the given object is in the @c destroyQueue vector in order to be destroyed.
@@ -167,11 +172,60 @@ public:
 	template <class T>
 	std::vector<T*> getAllComponentsOfType() const;
 
+	/**
+ * @brief Retrieves the id stored by this scene for a given GameObject.
+ * @param gameObject the gameObject to look with for its id
+ * @return the id that is assigned to the GameObject if found, -1 if the GameObject does not belong to this scene
+ */
+	int getSceneId(const GameObject& gameObject) const;
+
+	/**
+	 * @brief Returns a GameObject from  this scene by providing its scene id.
+	 *
+	 * Returns
+	 * @param id
+	 * @return the GameObject whose id matches the argument, nullptr if the id is not found on any of this scene's GameObjects.
+	 */
+	GameObject* getGameObjectById(int id) const;
+
+
+	NavigationSystem* getNavigationSystem() const;
+
+	/**
+     ** @brief Removes a GameObject by pointer and returns it.
+	*/
+    std::unique_ptr<GameObject> extractGameObject(GameObject* obj);
+
+    /**
+     * @brief Gets mutable access to all GameObjects.
+     */
+    std::vector<std::unique_ptr<GameObject>>& getGameObjects();
+    const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
+
+
 private:
+	/// @brief Method that removes the @c gameObject from the containers storing it
+	bool removeGameObjectInternal(GameObject* gameObject);
+
+	/// @brief Method that adds the @c gameObject to the internal containers storing it
+	bool addGameObjectInternal(std::unique_ptr<GameObject> gameObject);
+
+
 	std::string name;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 	std::vector<GameObject*> destroyQueue;
 	bool active = false;
+
+	/// Map stores the GameObject and their scene id.
+	std::map<const GameObject*, int> gameObjectIds;
+	int currentGameObjectId = 0;
+	void initialiseNavigationSystem(NavigationGridOptions options);
+	std::unique_ptr<NavigationSystem> navigationSystem;
+
+    /// Incremented everytime a GameObject is added to this scene.
+	std::vector<Behaviour*> beforeEnableBehaviours;
+    GameWorld* gameWorld = nullptr;
+
 };
 
 #include "Scene.inl"

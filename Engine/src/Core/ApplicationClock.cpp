@@ -1,10 +1,6 @@
 #include "Core/ApplicationClock.h"
 
-#include <iostream>
-
-#include "Core/ApplicationClock.h"
 #include <chrono>
-#include <iostream>
 
 // Use a static start time
 static auto programStart = std::chrono::high_resolution_clock::now();
@@ -15,8 +11,8 @@ static double getTimeSeconds()
 	return std::chrono::duration<double>(now - programStart).count();
 }
 
-ApplicationClock::ApplicationClock(const ClockFunction& clockFunc,
-							int tickrate, double maxAccTime)
+ApplicationClock::ApplicationClock(const ClockFunction& clockFunc, int tickrate,
+								   double maxAccTime)
 	: getClock(getTimeSeconds),
 	  fixedDeltaTime(1.0 / tickrate),
 	  currentTime(0.0),
@@ -24,7 +20,9 @@ ApplicationClock::ApplicationClock(const ClockFunction& clockFunc,
 	  simulationTime(0.0),
 	  totalTicks(0),
 	  tickRate(tickrate),
-	  maxAccumulatedTime(maxAccTime > 0.0 ? maxAccTime : 0.25)
+	  maxAccumulatedTime(maxAccTime > 0.0 ? maxAccTime : 0.25),
+	  timeScale(1.0),
+	  paused(false)
 {
 }
 
@@ -40,17 +38,24 @@ void ApplicationClock::tick()
 
 	double oldAccum = accumulatedTime;
 
-	if (frameTime > maxAccumulatedTime)
+	if ( frameTime > maxAccumulatedTime )
 	{
 		frameTime = maxAccumulatedTime;
 	}
+
 	currentTime = newTime;
-	accumulatedTime += frameTime;
+
+	// Don't accumulate time when paused to prevent teleport on resume
+	// When paused, we want to freeze the simulation exactly where it is
+	if ( !paused )
+	{
+		accumulatedTime += frameTime;
+	}
 }
 
 bool ApplicationClock::shouldFixedUpdate() const
 {
-	return accumulatedTime >= fixedDeltaTime;
+	return !paused && accumulatedTime >= fixedDeltaTime;
 }
 
 void ApplicationClock::consumeFixedUpdate()
@@ -72,7 +77,7 @@ double ApplicationClock::getTime() const
 
 double ApplicationClock::getDeltaTime() const
 {
-	return fixedDeltaTime;
+	return fixedDeltaTime * timeScale;
 }
 
 double ApplicationClock::getAccumulatedTime() const
@@ -83,4 +88,34 @@ double ApplicationClock::getAccumulatedTime() const
 int ApplicationClock::getTotalTicks() const
 {
 	return totalTicks;
+}
+
+void ApplicationClock::setTimeScale(double scale)
+{
+	timeScale = scale;
+}
+
+double ApplicationClock::getTimeScale() const
+{
+	return timeScale;
+}
+
+void ApplicationClock::pause()
+{
+	paused = true;
+}
+
+void ApplicationClock::resume()
+{
+	paused = false;
+}
+
+void ApplicationClock::togglePause()
+{
+	paused = !paused;
+}
+
+bool ApplicationClock::isPaused() const
+{
+	return paused;
 }

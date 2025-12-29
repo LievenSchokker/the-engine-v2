@@ -365,7 +365,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 
 			// Calculate line length and angle
 			double lineLength = std::sqrt(lineVector.x * lineVector.x +
-			                              lineVector.y * lineVector.y);
+										  lineVector.y * lineVector.y);
 			double angle =
 				std::atan2(lineVector.y, lineVector.x) * 180.0 / M_PI;
 
@@ -402,7 +402,6 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		dot.color = debugWalkableDotColor;
 		dot.layer = layer;
 		dot.orderInLayer = orderInLayer;
-		queue.push(dot);
 		queue.push(dot);
 	}
 
@@ -445,4 +444,124 @@ void GridComponent::setLayer(uint8_t l)
 void GridComponent::setOrderInLayer(int8_t order)
 {
 	orderInLayer = order;
+}
+
+void GridComponent::serialize(WriteArchive& archive) const
+{
+    // Debug settings
+    bool debugEnabled = debugRenderEnabled;
+    archive.process(debugEnabled);
+
+    uint8_t walkR = debugWalkableDotColor.r;
+    uint8_t walkG = debugWalkableDotColor.g;
+    uint8_t walkB = debugWalkableDotColor.b;
+    uint8_t walkA = debugWalkableDotColor.a;
+    archive.process(walkR);
+    archive.process(walkG);
+    archive.process(walkB);
+    archive.process(walkA);
+
+    uint8_t blockR = debugBlockedDotColor.r;
+    uint8_t blockG = debugBlockedDotColor.g;
+    uint8_t blockB = debugBlockedDotColor.b;
+    uint8_t blockA = debugBlockedDotColor.a;
+    archive.process(blockR);
+    archive.process(blockG);
+    archive.process(blockB);
+    archive.process(blockA);
+
+    uint8_t lineR = debugGridLineColor.r;
+    uint8_t lineG = debugGridLineColor.g;
+    uint8_t lineB = debugGridLineColor.b;
+    uint8_t lineA = debugGridLineColor.a;
+    archive.process(lineR);
+    archive.process(lineG);
+    archive.process(lineB);
+    archive.process(lineA);
+
+    bool showDiag = debugShowDiagonalLinks;
+    archive.process(showDiag);
+
+    // Walkable tile IDs
+    uint32_t walkableCount = static_cast<uint32_t>(walkableTileIds.size());
+    archive.process(walkableCount);
+    for (int tileId : walkableTileIds)
+    {
+        int id = tileId;
+        archive.process(id);
+    }
+
+    // Tile weights
+    uint32_t weightCount = static_cast<uint32_t>(tileWeights.size());
+    archive.process(weightCount);
+    for (const auto& [tileId, weight] : tileWeights)
+    {
+        int id = tileId;
+        double w = weight;
+        archive.process(id);
+        archive.process(w);
+    }
+
+    // Layer info
+    uint8_t lay = layer;
+    int8_t order = orderInLayer;
+    archive.process(lay);
+    archive.process(order);
+}
+
+void GridComponent::deserialize(ReadArchive& archive)
+{
+    // Debug settings
+    archive.process(debugRenderEnabled);
+
+    uint8_t walkR, walkG, walkB, walkA;
+    archive.process(walkR);
+    archive.process(walkG);
+    archive.process(walkB);
+    archive.process(walkA);
+    debugWalkableDotColor = Color(walkR, walkG, walkB, walkA);
+
+    uint8_t blockR, blockG, blockB, blockA;
+    archive.process(blockR);
+    archive.process(blockG);
+    archive.process(blockB);
+    archive.process(blockA);
+    debugBlockedDotColor = Color(blockR, blockG, blockB, blockA);
+
+    uint8_t lineR, lineG, lineB, lineA;
+    archive.process(lineR);
+    archive.process(lineG);
+    archive.process(lineB);
+    archive.process(lineA);
+    debugGridLineColor = Color(lineR, lineG, lineB, lineA);
+
+    archive.process(debugShowDiagonalLinks);
+
+    // Walkable tile IDs
+    uint32_t walkableCount;
+    archive.process(walkableCount);
+    walkableTileIds.clear();
+    for (uint32_t i = 0; i < walkableCount; ++i)
+    {
+        int tileId;
+        archive.process(tileId);
+        walkableTileIds.insert(tileId);
+    }
+
+    // Tile weights
+    uint32_t weightCount;
+    archive.process(weightCount);
+    tileWeights.clear();
+    for (uint32_t i = 0; i < weightCount; ++i)
+    {
+        int tileId;
+        double weight;
+        archive.process(tileId);
+        archive.process(weight);
+        tileWeights[tileId] = weight;
+    }
+
+    // Layer info
+    archive.process(layer);
+    archive.process(orderInLayer);
 }

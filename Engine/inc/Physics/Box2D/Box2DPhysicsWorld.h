@@ -1,9 +1,10 @@
 #pragma once
 
-#include "box2d/id.h"
-#include "Physics/IPhysicsWorld.h"
 #include "Physics/Components/RigidBody.h"
+#include "Physics/IPhysicsWorld.h"
+#include "box2d/id.h"
 
+#include <box2d/types.h>
 #include <unordered_map>
 
 /**
@@ -12,20 +13,21 @@
  *
  * This class wraps the Box2D C API and provides concrete implementations for
  * the IPhysicsWorld interface. It handles world creation, stepping the physics
- * simulation, and creating/destroying physics bodies associated with GameObjects.
+ * simulation, and creating/destroying physics bodies associated with
+ * GameObjects.
  *
  * The PhysicsSystem owns a single instance of this class and delegates all
  * physics operations to it.
  */
 class Box2DPhysicsWorld: public IPhysicsWorld
 {
-public:
+   public:
 	/**
 	 * @brief Constructs an empty physics world.
 	 *
 	 * The actual Box2D world is not created until start() is called.
 	 */
-	Box2DPhysicsWorld(float newTickRate = 60);
+	explicit Box2DPhysicsWorld(float newTickRate = 60);
 
 	/**
 	 * @brief Destructor.
@@ -33,31 +35,6 @@ public:
 	 * Currently defaulted. All cleanup should be handled in shutdown().
 	 */
 	~Box2DPhysicsWorld() override = default;
-
-	/**
-	 * @brief Initializes the Box2D world.
-	 *
-	 * This creates the internal b2WorldId instance and applies default
-	 * world settings such as gravity. Must be called before update() or
-	 * body creation.
-	 */
-	void start() override;
-
-	/**
-	 * @brief Steps the Box2D simulation forward by one fixed timestep.
-	 *
-	 * The timestep and substep count are typically configured internally.
-	 * This method is called by PhysicsSystem::update().
-	 */
-	void fixedUpdate() override;
-
-	/**
-	 * @brief Shuts down the physics world.
-	 *
-	 * All Box2D bodies are destroyed and the world is cleared. After this call,
-	 * the world must be restarted with start() to simulate again.
-	 */
-	void shutdown() override;
 
 	/**
 	 * @brief Creates a physics body for the given GameObject.
@@ -81,19 +58,24 @@ public:
 	/**
 	 * @brief Applies a force to the center of mass of a physics body.
 	 *
-	 * @param rigitBody Pointer to the RigidBody whose body will receive the force.
+	 * @param rigitBody Pointer to the RigidBody whose body will receive the
+	 * force.
 	 * @param force Force vector in world units.
 	 */
-	void applyForce(const RigidBody* rigitBody, Vector2 force) override;
+	void applyForce(const RigidBody* rigidBody, Vector2 force) override;
 
+	void initialize() override;
+	void step(float deltaTime) override;
+	void shutdown() override;
 	/**
-	 * @brief Synchronizes all registered RigidBody transforms with the physics world.
+	 * @brief Synchronizes all registered RigidBody transforms with the physics
+	 * world.
 	 *
 	 * After stepping the simulation, this function updates each RigidBody's
-	 * Transform component to match the corresponding Box2D body's position and rotation.
+	 * Transform component to match the corresponding Box2D body's position and
+	 * rotation.
 	 */
 	void syncTransforms() override;
-
 private:
 	/**
 	 * @brief Box2D world identifier.
@@ -103,12 +85,13 @@ private:
 	b2WorldId worldId;
 
 	/**
-	 * @brief Mapping from RigidBody pointers to their corresponding Box2D bodies.
+	 * @brief Mapping from RigidBody pointers to their corresponding Box2D
+	 * bodies.
 	 *
-	 * This allows direct RigidBody-based operations without needing a separate body ID map.
+	 * This allows direct RigidBody-based operations without needing a separate
+	 * body ID map.
 	 */
 	std::unordered_map<const RigidBody*, b2BodyId> bodies;
-
 
 	/**
 	 * @brief The amount of ticks to calculate

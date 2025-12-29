@@ -3,8 +3,10 @@
 #include "Math/Vector2.h"
 #include "Rendering/Color.h"
 #include "BaseComponentTypes/RenderComponent.h"
+#include "Networking/Serialization/RegistrationBase.h"
 
 #include <unordered_map>
+#include <vector>
 
 class TilemapAsset;
 
@@ -19,11 +21,20 @@ class TilemapAsset;
  *
  * The tilemap is positioned based on the GameObject's Transform.
  */
-class TilemapComponent: public RenderComponent
+class TilemapComponent: public RenderComponent,
+                        RegistrationBase<TilemapComponent>
 {
 public:
-	TilemapComponent();
+	TilemapComponent() : tileSize{32.0, 32.0}
+	{
+	};
 	~TilemapComponent() override = default;
+
+	static constexpr const char* name()
+	{
+		return "Tilemap";
+	}
+	const char* getName() const override { return name(); }
 
 	/**
 	 * @brief Set the tilemap asset to use.
@@ -111,6 +122,8 @@ public:
 	bool isReady() const;
 	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 
 private:
 	TilemapAsset* tilemapAsset = nullptr;

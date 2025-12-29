@@ -1,18 +1,20 @@
 #include "Assets/AssetManager.h"
 #include "Assets/TilemapAsset.h"
+#include "Behaviour/Behaviour.h"
 #include "Component/GridComponent.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/TilemapComponent.h"
 #include "Component/Transform.h"
-#include "External/SdlContext.h"
+#include "Core/Options/ApplicationSpecifications.h"
+#include "Core/GameWorld.h"
+#include "EntryPoint.h"
+#include "Game.h"
 #include "GameObject/GameObject.h"
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
+#include "Math/Vector2.h"
 #include "Rendering/Color.h"
-#include "Rendering/RenderQueue.h"
-#include "Rendering/SDL/SDLRenderer.h"
-#include "Rendering/Window/WindowOptions.h"
-#include "Scene/SceneManager.h"
+#include "Scene/Scene.h"
 
 #include <iostream>
 #include <memory>
@@ -20,37 +22,133 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
-int main()
+/**
+ * @brief Behavior class that handles input for the tilemap/grid demo.
+ *
+ * Handles:
+ * - G: Toggle grid debug rendering
+ * - D: Toggle diagonal links display
+ * - B: Toggle sample blocked cell
+ * - ESC: Exit
+ */
+class TilemapInputBehaviour: public Behaviour
 {
-	SdlContext context(SDL_INIT_VIDEO);
-	SDLRenderer renderer(context);
-
-	WindowOptions options{"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
-	renderer.open(options);
-	if ( !renderer.isOpen() ) {
-		std::cout << "Failed to open SDL window\n";
-		return 1;
+   public:
+	explicit TilemapInputBehaviour(Scene* scene)
+		: scene(scene),
+		  sampleCellBlocked(true),
+		  sampleBlockedCell{10.0, 7.0}
+	{
 	}
 
-	SceneManager sceneManager;
-	sceneManager.setClearColor(Color::black());
+	~TilemapInputBehaviour() override = default;
+
+	void onAwake() override
+	{
+		// Get grid component from scene
+		if ( scene != nullptr )
+		{
+			GameObject* tilemapObj = scene->getGameObject("LevelTilemap");
+			if ( tilemapObj != nullptr )
+			{
+				gridComponent = tilemapObj->getComponent<GridComponent>();
+			}
+		}
+	}
+
+	void update(double deltaTime, const GameWorld& world) override
+	{
+		(void)deltaTime;
+		(void)world;
+
+		// Toggle debug rendering with 'G' key
+		if ( world.input->wasKeyPressed(KeyCode::G) &&
+			 gridComponent != nullptr )
+		{
+			bool currentState = gridComponent->isDebugRenderEnabled();
+			gridComponent->setDebugRenderEnabled(!currentState);
+			std::cout << "Grid debug rendering: "
+					  << (currentState ? "OFF" : "ON") << std::endl;
+		}
+
+		// Toggle diagonal links with 'D' key
+		if ( world.input->wasKeyPressed(KeyCode::D) &&
+			 gridComponent != nullptr )
+		{
+			bool currentState = gridComponent->isDebugShowDiagonalLinks();
+			gridComponent->setDebugShowDiagonalLinks(!currentState);
+			std::cout << "Grid diagonal links: "
+					  << (currentState ? "OFF" : "ON") << std::endl;
+		}
+
+		// Toggle sample blocked cell with 'B' key
+		if ( world.input->wasKeyPressed(KeyCode::B) &&
+			 gridComponent != nullptr )
+		{
+			if ( sampleCellBlocked )
+			{
+				gridComponent->unblockCell(sampleBlockedCell);
+				std::cout << "Sample blocked cell: UNBLOCKED\n";
+			}
+			else
+			{
+				gridComponent->blockCell(sampleBlockedCell);
+				std::cout << "Sample blocked cell: BLOCKED\n";
+			}
+			sampleCellBlocked = !sampleCellBlocked;
+		}
+
+		// Handle ESC key for exit
+		if ( world.input->wasKeyPressed(KeyCode::ESCAPE) )
+		{
+			world.input->signalQuit();
+		}
+	}
+
+   private:
+	Scene* scene;
+	GridComponent* gridComponent = nullptr;
+	bool sampleCellBlocked;
+	Vector2 sampleBlockedCell;
+};
+
+#undef main
+
+int main(int argc, char** argv)
+{
+	(void)argc;
+	(void)argv;
+
+	ApplicationSpecifications spec = {};
+	spec.networkingOptions.port = 8080;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.mode = EngineMode::CLIENT;
+	spec.networkingOptions.tickRate = 60;
+	spec.renderBackend = RenderBackend::SDL;
+    spec.engineSystem = EngineSystem::Client;
+	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.maxFrameTime = 0.1;  // 100ms max frame time
+
+	std::unique_ptr<Game> game = std::make_unique<Game>();
 
 	// Create a scene
 	auto tilemapScene = std::make_unique<Scene>("TilemapScene");
 
 	// Create AssetManager and load tilemap
 	AssetManager assetManager;
-	std::string tilemapPath = "Sandbox/Assets/level1_tilemap.csv";
+	std::string tilemapPath = "Assets/level1_tilemap.csv";
 
 	assetManager.add(tilemapPath, std::make_unique<TilemapAsset>());
-	if ( !assetManager.load(tilemapPath) ) {
+	if ( !assetManager.load(tilemapPath) )
+	{
 		std::cerr << "Failed to load tilemap: " << tilemapPath << std::endl;
 		return 1;
 	}
 
 	TilemapAsset* tilemap =
 		dynamic_cast<TilemapAsset*>(assetManager.get(tilemapPath));
-	if ( tilemap == nullptr ) {
+	if ( tilemap == nullptr )
+	{
 		std::cerr << "Failed to get tilemap asset" << std::endl;
 		return 1;
 	}
@@ -61,7 +159,8 @@ int main()
 
 	// Add TilemapComponent
 	auto* tilemapComponent = tilemapObject->addComponent<TilemapComponent>();
-	if ( tilemapComponent == nullptr ) {
+	if ( tilemapComponent == nullptr )
+	{
 		std::cerr << "Failed to add TilemapComponent" << std::endl;
 		return 1;
 	}
@@ -84,7 +183,8 @@ int main()
 	// Add GridComponent for AI pathfinding (future use)
 	auto* gridComponent = tilemapObject->addComponent<GridComponent>();
 	std::unique_ptr<GameObject> blockedBoulder;
-	if ( gridComponent != nullptr ) {
+	if ( gridComponent != nullptr )
+	{
 		gridComponent->setTilemapComponent(tilemapComponent);
 		gridComponent->setWalkableTileIds({0, 2});
 
@@ -107,18 +207,23 @@ int main()
 			tilemapComponent->cellToWorld(blockedCell));
 	}
 
+	// Create a GameObject for input handling
+	auto inputHandler = std::make_unique<GameObject>();
+	inputHandler->setName("InputHandler");
+	inputHandler->addComponent<TilemapInputBehaviour>(tilemapScene.get());
+
 	// Add to scene
 	tilemapScene->addGameObject(std::move(tilemapObject));
-	if ( blockedBoulder != nullptr ) {
+	if ( blockedBoulder != nullptr )
+	{
 		// Append after the tilemap so it renders on top
 		tilemapScene->addGameObject(std::move(blockedBoulder));
 	}
-
-	sceneManager.addScene(std::move(tilemapScene));
-	sceneManager.setActiveScene("TilemapScene");
+	tilemapScene->addGameObject(std::move(inputHandler));
 
 	// Example: Query grid information
-	if ( tilemapComponent->isReady() ) {
+	if ( tilemapComponent->isReady() )
+	{
 		std::cout << "Tilemap loaded: " << tilemapComponent->getGridWidth()
 				  << "x" << tilemapComponent->getGridHeight() << " tiles\n";
 
@@ -131,76 +236,28 @@ int main()
 				  << ") -> Tile ID: " << tileId << "\n";
 	}
 
-	bool running = true;
-	Uint32 lastTicks = SDL_GetTicks();
-	RenderQueue renderQueue;
-
-	InputManager* input = InputManager::getInstance();
-	Scene* activeScene = sceneManager.getActiveScene();
-	GameObject* tilemapObj = activeScene->getGameObject("LevelTilemap");
-	GridComponent* gridComp =
-		tilemapObj ? tilemapObj->getComponent<GridComponent>() : nullptr;
-
 	// Test weight queries after retrieving grid component from scene
-	if ( gridComp != nullptr ) {
+	if ( gridComponent != nullptr )
+	{
 		std::cout << "\nTile weights:\n";
-		std::cout << "  Tile 0 (grass): " << gridComp->getTileWeight(0) << "\n";
-		std::cout << "  Tile 2 (high grass): " << gridComp->getTileWeight(2)
+		std::cout << "  Tile 0 (grass): " << gridComponent->getTileWeight(0)
 				  << "\n";
-		std::cout << "  Tile 3 (water): " << gridComp->getTileWeight(3) << "\n";
+		std::cout << "  Tile 2 (high grass): "
+				  << gridComponent->getTileWeight(2) << "\n";
+		std::cout << "  Tile 3 (water): " << gridComponent->getTileWeight(3)
+				  << "\n";
 		std::cout << "  Cell (3,3) weight: "
-				  << gridComp->getCellWeight({3.0, 3.0}) << "\n";
-	}
-	Vector2 sampleBlockedCell{10.0, 7.0};
-	bool sampleCellBlocked = true;
-
-	while ( running && renderer.isOpen() ) {
-		input->update();
-
-		// Toggle debug rendering with 'G' key
-		if ( input->wasKeyPressed(KeyCode::G) && gridComp != nullptr ) {
-			bool currentState = gridComp->isDebugRenderEnabled();
-			gridComp->setDebugRenderEnabled(!currentState);
-			std::cout << "Grid debug rendering: "
-					  << (currentState ? "OFF" : "ON") << std::endl;
-		}
-
-		// Toggle diagonal links with 'D' key
-		if ( input->wasKeyPressed(KeyCode::D) && gridComp != nullptr ) {
-			bool currentState = gridComp->isDebugShowDiagonalLinks();
-			gridComp->setDebugShowDiagonalLinks(!currentState);
-			std::cout << "Grid diagonal links: "
-					  << (currentState ? "OFF" : "ON") << std::endl;
-		}
-
-		// Toggle sample blocked cell with 'B' key
-		if ( input->wasKeyPressed(KeyCode::B) && gridComp != nullptr ) {
-			if ( sampleCellBlocked ) {
-				gridComp->unblockCell(sampleBlockedCell);
-				std::cout << "Sample blocked cell: UNBLOCKED\n";
-			} else {
-				gridComp->blockCell(sampleBlockedCell);
-				std::cout << "Sample blocked cell: BLOCKED\n";
-			}
-			sampleCellBlocked = !sampleCellBlocked;
-		}
-
-		if ( input->quitRequested() || input->wasKeyPressed(KeyCode::ESCAPE) ) {
-			running = false;
-		}
-
-		Uint32 currentTicks = SDL_GetTicks();
-		float deltaTime =
-			static_cast<float>(currentTicks - lastTicks) / 1000.0f;
-		lastTicks = currentTicks;
-
-		sceneManager.update(deltaTime);
-		sceneManager.buildRenderQueue(renderQueue);
-		executeRenderQueue(renderer, renderQueue);
-
-		SDL_Delay(16);
+				  << gridComponent->getCellWeight({3.0, 3.0}) << "\n";
 	}
 
-	renderer.close();
-	return 0;
+	std::cout << "\nControls:\n";
+	std::cout << "  G - Toggle grid debug rendering\n";
+	std::cout << "  D - Toggle diagonal links\n";
+	std::cout << "  B - Toggle sample blocked cell\n";
+	std::cout << "  ESC - Exit\n\n";
+
+	game->addScene(std::move(tilemapScene));
+	game->setApplicationSpecifications(spec);
+
+	return SpelMotorEntry::main(std::move(game));
 }

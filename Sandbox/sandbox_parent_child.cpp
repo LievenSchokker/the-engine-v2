@@ -1,7 +1,6 @@
 #include "Behaviour/Behaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
-#include "Core/ApplicationSpecifications.h"
 #include "Core/GameWorld.h"
 #include "EntryPoint.h"
 #include "Game.h"
@@ -34,7 +33,6 @@ class ParentChildInputBehaviour: public Behaviour
    public:
 	explicit ParentChildInputBehaviour(Scene* scene)
 		: scene(scene),
-		  inputManager(nullptr),
 		  clearColor(Color::darkGray()),
 		  parentObj(nullptr),
 		  child1(nullptr),
@@ -47,8 +45,6 @@ class ParentChildInputBehaviour: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
-
 		if ( scene != nullptr )
 		{
 			parentObj = scene->getGameObject("ParentObject");
@@ -76,12 +72,11 @@ class ParentChildInputBehaviour: public Behaviour
 					 "world position\n\n";
 	}
 
-	void update(float deltaTime, GameWorld* world) override
+	void update(double deltaTime, const GameWorld& world) override
 	{
 		(void)deltaTime;
 
-		if ( inputManager == nullptr || scene == nullptr ||
-			 parentObj == nullptr )
+		if ( scene == nullptr || parentObj == nullptr )
 		{
 			return;
 		}
@@ -100,19 +95,19 @@ class ParentChildInputBehaviour: public Behaviour
 		Vector2 currentPos = parentTransform->getPosition();
 		Vector2 newPos = currentPos;
 
-		if ( inputManager->isKeyDown(KeyCode::A) )
+		if ( world.input->isKeyDown(KeyCode::A) )
 		{
 			newPos.x -= moveSpeed;
 		}
-		if ( inputManager->isKeyDown(KeyCode::D) )
+		if ( world.input->isKeyDown(KeyCode::D) )
 		{
 			newPos.x += moveSpeed;
 		}
-		if ( inputManager->isKeyDown(KeyCode::W) )
+		if ( world.input->isKeyDown(KeyCode::W) )
 		{
 			newPos.y -= moveSpeed;
 		}
-		if ( inputManager->isKeyDown(KeyCode::S) )
+		if ( world.input->isKeyDown(KeyCode::S) )
 		{
 			newPos.y += moveSpeed;
 		}
@@ -132,19 +127,19 @@ class ParentChildInputBehaviour: public Behaviour
 				Vector2 childCurrentPos = child1Transform->getPosition();
 				Vector2 childNewPos = childCurrentPos;
 
-				if ( inputManager->isKeyDown(KeyCode::LEFT_ARROW) )
+				if ( world.input->isKeyDown(KeyCode::LEFT_ARROW) )
 				{
 					childNewPos.x -= childMoveSpeed;
 				}
-				if ( inputManager->isKeyDown(KeyCode::RIGHT_ARROW) )
+				if ( world.input->isKeyDown(KeyCode::RIGHT_ARROW) )
 				{
 					childNewPos.x += childMoveSpeed;
 				}
-				if ( inputManager->isKeyDown(KeyCode::UP_ARROW) )
+				if ( world.input->isKeyDown(KeyCode::UP_ARROW) )
 				{
 					childNewPos.y -= childMoveSpeed;
 				}
-				if ( inputManager->isKeyDown(KeyCode::DOWN_ARROW) )
+				if ( world.input->isKeyDown(KeyCode::DOWN_ARROW) )
 				{
 					childNewPos.y += childMoveSpeed;
 				}
@@ -163,11 +158,11 @@ class ParentChildInputBehaviour: public Behaviour
 		const double rotationSpeed = 90.0 * deltaTime;	// degrees per second
 		double currentRotation = parentTransform->getRotationAngle();
 
-		if ( inputManager->isKeyDown(KeyCode::Q) )
+		if ( world.input->isKeyDown(KeyCode::Q) )
 		{
 			parentTransform->setRotationAngle(currentRotation - rotationSpeed);
 		}
-		if ( inputManager->isKeyDown(KeyCode::E) )
+		if ( world.input->isKeyDown(KeyCode::E) )
 		{
 			parentTransform->setRotationAngle(currentRotation + rotationSpeed);
 		}
@@ -176,13 +171,13 @@ class ParentChildInputBehaviour: public Behaviour
 		const float scaleSpeed = 0.5f * deltaTime;
 		Vector2 currentScale = parentTransform->getScale();
 
-		if ( inputManager->isKeyDown(KeyCode::Z) )
+		if ( world.input->isKeyDown(KeyCode::Z) )
 		{
 			float newScaleX = std::max(0.1f, currentScale.x - scaleSpeed);
 			float newScaleY = std::max(0.1f, currentScale.y - scaleSpeed);
 			parentTransform->setScale({newScaleX, newScaleY});
 		}
-		if ( inputManager->isKeyDown(KeyCode::X) )
+		if ( world.input->isKeyDown(KeyCode::X) )
 		{
 			float newScaleX = std::min(3.0f, currentScale.x + scaleSpeed);
 			float newScaleY = std::min(3.0f, currentScale.y + scaleSpeed);
@@ -190,7 +185,7 @@ class ParentChildInputBehaviour: public Behaviour
 		}
 
 		// Handle R to reset all transforms
-		if ( inputManager->wasKeyPressed(KeyCode::R) )
+		if ( world.input->wasKeyPressed(KeyCode::R) )
 		{
 			// Reset parent transform
 			parentTransform->setPosition(
@@ -238,7 +233,7 @@ class ParentChildInputBehaviour: public Behaviour
 		}
 
 		// Handle 1/2/3 to toggle child attachment
-		if ( inputManager->wasKeyPressed(KeyCode::NUMBER_1_AND_EXCLAMATION) &&
+		if ( world.input->wasKeyPressed(KeyCode::NUMBER_1_AND_EXCLAMATION) &&
 			 child1 != nullptr )
 		{
 			if ( child1->getParent() == parentObj )
@@ -253,7 +248,7 @@ class ParentChildInputBehaviour: public Behaviour
 			}
 		}
 
-		if ( inputManager->wasKeyPressed(KeyCode::NUMBER_2_AND_AT) &&
+		if ( world.input->wasKeyPressed(KeyCode::NUMBER_2_AND_AT) &&
 			 child2 != nullptr )
 		{
 			if ( child2->getParent() == parentObj )
@@ -268,7 +263,7 @@ class ParentChildInputBehaviour: public Behaviour
 			}
 		}
 
-		if ( inputManager->wasKeyPressed(KeyCode::NUMBER_3_AND_HASHMARK) &&
+		if ( world.input->wasKeyPressed(KeyCode::NUMBER_3_AND_HASHMARK) &&
 			 child3 != nullptr )
 		{
 			if ( child3->getParent() == parentObj )
@@ -286,7 +281,6 @@ class ParentChildInputBehaviour: public Behaviour
 
    private:
 	Scene* scene;
-	InputManager* inputManager;
 	Color clearColor;
 
 	GameObject* parentObj;
@@ -311,6 +305,7 @@ int main(int argc, char** argv)
 	spec.windowOptions = {"Parent-Child Hierarchy Demo", SCREEN_WIDTH,
 						  SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
+	spec.engineSystem = EngineSystem::Client;
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 

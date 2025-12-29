@@ -7,3 +7,4 @@ build
 .cache
 tests/test_main.cpp
 Tests/test_main.cpp
+.DS_Store

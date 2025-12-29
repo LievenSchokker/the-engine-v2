@@ -18,23 +18,17 @@
  */
 
 #pragma once
-#include "RenderCommand.h"
-#include "Scene/Scene.h"
-
-
-class string;
-struct WindowOptions;
-
-# include  "Rendering/IUIRenderHook.h"
-#include "Math/Vector2.h"
 #include "Color.h"
+#include "RenderCommand.h"
+#include "Rendering/IUIRenderHook.h"
+#include "Rendering/Window/WindowOptions.h"
 
-#include <string>
 #include <memory>
+#include <string>
 
 class IRenderer
 {
-public:
+   public:
 	virtual ~IRenderer() = default;
 
 	/**
@@ -94,7 +88,7 @@ public:
 	 * in rendering
 	 * @param commands The list of UIRenderCommands to be send for rendering
 	 */
-	virtual void submitUI(const std::vector<UIRenderCommand>& commands) = 0;
+	virtual void submitUI(const std::vector<UIRenderCommand>& commands, InputManager& input) = 0;
 	/**
 	 * @brief Checks if the rendering window is currently open
 	 *
@@ -114,6 +108,7 @@ public:
 	 */
 	virtual void setTitle(const std::string& title) = 0;
 
+	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 
 	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
 };

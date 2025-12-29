@@ -1,12 +1,17 @@
 #pragma once
 
+#include "Networking/Serialization/ISerializable.h"
+#include "Networking/Serialization/Serialization.h"
+
+enum class ComponentType : uint32_t;
+
 class Scene;
 class Transform;
 class Component;
 class Behaviour;
-class ComponentManager;
 class ScenePlaceholder;
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -18,19 +23,19 @@ class ScenePlaceholder;
  * GameObjects are the core entities in the game engine. They can have multiple
  * Components that define their behavior and functionality.
  *
- * Each GameObject has a @c componentManager to manage its components,
+ * Each GameObject has a @c components vector to manage its components,
  * and a @c transform to define its place in the game world.
  * A GameObject can further be organized using
  * tags, layers, and active/static state.
  *
  */
-class GameObject
+class GameObject: public ISerializable
 {
    public:
 	/**
 	 * @brief Constructs a new GameObject.
 	 *
-	 * Initializes the @c transform and @c componentManager.
+	 * Initializes the @c transform and @c components.
 	 */
 	GameObject();
 
@@ -40,7 +45,22 @@ class GameObject
 	~GameObject();
 
 	/**
-	 * @brief Adds a component of type T to this object's @c componentManager.
+	 * @brief Serializes this GameObject and all its components.
+	 */
+	void serialize(WriteArchive& archive) const;
+
+	/**
+	 * @brief Deserializes a GameObject from an archive.
+	 */
+	void deserialize(ReadArchive& archive);
+
+	/**
+	 * @brief Creates a deep copy of this GameObject via serialization.
+	 */
+	std::unique_ptr<GameObject> clone() const;
+
+	/**
+	 * @brief Adds a component of type T to this object's @c components.
 	 *
 	 * @tparam T Type of the component to add (must inherit from Component)
 	 * @return Pointer to the newly added component
@@ -49,7 +69,7 @@ class GameObject
 	T* addComponent(Args&&... args);
 	/**
 	 * @brief Retrieves a component of type T from this GameObject's @c
-	 * componentManager.
+	 * components.
 	 *
 	 * Returns nullptr if the component does not exist.
 	 *
@@ -59,9 +79,12 @@ class GameObject
 	template <typename T>
 	T* getComponent() const;
 
+	template <typename T>
+	std::vector<T*> getComponents() const;
+
 	/**
 	 * @brief Attempts to retrieve a component of type T from this GameObject's
-	 * @c componentManager.
+	 * @c components.
 	 *
 	 * Sets the output pointer to the component if it exists, otherwise sets it
 	 * to nullptr.
@@ -79,12 +102,11 @@ class GameObject
 	 * @tparam T Type of the component
 	 * @return Pointer to the existing or newly added component
 	 */
-	template <typename T>
-	T* getOrAddComponent();
+	template <class T, class... Args>
+	T* getOrAddComponent(Args&&... args);
 
 	/**
-	 * @brief Removes a component of type T from this GameObject's @c
-	 * componentManager
+	 * @brief Removes a component of type T from this GameObject's @c components
 	 *
 	 * @tparam T Type of the component to remove
 	 */
@@ -92,8 +114,7 @@ class GameObject
 	void removeComponent();
 
 	/**
-	 * @brief Removes the given component from this GameObject's @c
-	 * componentManager
+	 * @brief Removes the given component from this GameObject's @c components
 	 *
 	 * @tparam comp  @c Component to remove
 	 */
@@ -112,16 +133,20 @@ class GameObject
 	 * @param comp Pointer to the component to check
 	 * @return true if the component exists, false otherwise
 	 */
-	bool hasComponent(Component* comp) const;
+	bool hasComponent(const Component* comp) const;
 
 	/**
 	 * @brief Compares the GameObject's tag to another string.
 	 * @param other Tag to compare with
 	 * @return true if the tags match, false otherwise
 	 */
-	bool compareTag(const std::string& other);
+	bool compareTag(const std::string& other) const;
 
+	/**
+	 * @brief Retrieves a vector of all Behaviours attached to this GameObject
+	 */
 	const std::vector<Behaviour*>& getAllBehaviours() const;
+	const std::vector<Behaviour*>& getEnabledBehaviours();
 
 	/**
 	 * @brief Returns all active Behaviour components attached to this
@@ -205,20 +230,26 @@ class GameObject
 	/**
 	 * @brief sets the scene this GameObject is currently owned by.
 	 *
-	 * Used to queue up this object to be destroyed by the scene owner upon
-	 * calling @c destroy()
+	 * @c A GameObject requests its @c sceneId by requesting it after the scene
+	 * gets set. Used to queue up this object to be destroyed by the scene owner
+	 * upon calling @c destroy()
+	 *
 	 * @param newScene new owning scene of this GameObject
 	 */
 	void setScene(Scene& newScene);
 
-	void setBehavioursEnabled(bool value) const;
+	/**
+	 * @ Retrieves the scene this GameObject is currently owned by
+	 * @return
+	 */
+	Scene* getScene() const;
 
 	/**
-	 * @brief Helper function to get the @c componentManager directly,
-	 * used primarily for testing (unit tests)
-	 * @return the @c componentManager of this GameObject.
+	 * @brief Enables/Disables all behaviour components on this GameObject
+	 * @param value true if they should be enabled, false if they should be
+	 * disabled
 	 */
-	ComponentManager* getComponentManager() const;
+	void setBehavioursEnabled(bool value) const;
 
 	/**
 	 * @brief Marks this object and its components to be destroyed by the Scene.
@@ -243,6 +274,29 @@ class GameObject
 	 * @return the value of @c isDestroyed, set true in @c destroy() method.
 	 */
 	bool getIsDestroyed() const;
+
+	/**
+	 * @brief Returns the sceneId of this GameObject
+	 *
+	 *
+	 * @return the value of internally stored @c sceneId, which gets set when
+	 * the @c setScene() method is called
+	 */
+	int getSceneId() const;
+
+	void copyStateFrom(const GameObject& source);
+
+	void destroyAllComponents();
+	const std::vector<std::unique_ptr<Component>>& getComponents() const;
+
+	/**
+	 * @brief Retrieves all components of type T from @c components.
+	 *
+	 * @tparam T Type of the components to get (must inherit from Component)
+	 * @return Vector of pointers to all matching components
+	 */
+	template <typename T>
+	std::vector<T*> getAllComponentsOfType() const;
 
 	/**
 	 * @brief Sets the parent GameObject.
@@ -284,7 +338,32 @@ class GameObject
 	void markTransformDirty();
 
    private:
-	std::unique_ptr<ComponentManager> componentManager;
+	void fixupPointersAfterClone();
+	Component* getComponentByTypeName(const std::string& typeName) const;
+
+	void enableAllBehaviours() const;
+
+	void disableAllBehaviours() const;
+
+	void internalAddComponent(std::unique_ptr<Component> component);
+	/// Helper function to iterate through @c components
+	template <typename T>
+	std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
+	/// Helper function to iterate through @c components, const version.
+	template <typename T>
+	std::vector<std::unique_ptr<Component>>::const_iterator
+
+	getComponentIterator() const;
+
+	/// All components stored by this object
+	std::vector<std::unique_ptr<Component>> components;
+
+	/// All behaviours of this gameobject
+	std::vector<Behaviour*> behaviours;
+
+	/// All enabled behaviours of this gameobject.
+	std::vector<Behaviour*> enabledBehaviours;
+
 	std::unique_ptr<Transform> transform;
 	Scene* scene;
 	std::string name;
@@ -294,6 +373,7 @@ class GameObject
 	bool isActive;
 	bool isStatic;
 	bool isDestroyed;
+	int sceneId{};
 
 	GameObject* parent;
 	std::vector<GameObject*> children;

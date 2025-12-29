@@ -8,10 +8,6 @@
 #include <cmath>
 #include <iostream>
 
-TilemapComponent::TilemapComponent() : tileSize(0.0, 0.0)
-{
-	tileSize = {32.0, 32.0};  // Default tile size
-}
 
 void TilemapComponent::setTilemapAsset(TilemapAsset* asset)
 {
@@ -203,4 +199,66 @@ void TilemapComponent::setLayer(uint8_t l)
 void TilemapComponent::setOrderInLayer(int8_t order)
 {
 	orderInLayer = order;
+}
+
+void TilemapComponent::serialize(WriteArchive& archive) const
+{
+	// Tile size
+	float tileSizeX = tileSize.x;
+	float tileSizeY = tileSize.y;
+	archive.process(tileSizeX);
+	archive.process(tileSizeY);
+
+	// Tile colors
+	uint32_t colorCount = static_cast<uint32_t>(tileColors.size());
+	archive.process(colorCount);
+	for (const auto& [tileId, color] : tileColors)
+	{
+		int id = tileId;
+		uint8_t r = color.r;
+		uint8_t g = color.g;
+		uint8_t b = color.b;
+		uint8_t a = color.a;
+		archive.process(id);
+		archive.process(r);
+		archive.process(g);
+		archive.process(b);
+		archive.process(a);
+	}
+
+	// Layer info
+	uint8_t lay = layer;
+	int8_t order = orderInLayer;
+	archive.process(lay);
+	archive.process(order);
+}
+
+void TilemapComponent::deserialize(ReadArchive& archive)
+{
+	// Tile size
+	archive.process(tileSize.x);
+	archive.process(tileSize.y);
+
+	// Tile colors
+	uint32_t colorCount;
+	archive.process(colorCount);
+	tileColors.clear();
+	for (uint32_t i = 0; i < colorCount; ++i)
+	{
+		int tileId;
+		uint8_t r, g, b, a;
+		archive.process(tileId);
+		archive.process(r);
+		archive.process(g);
+		archive.process(b);
+		archive.process(a);
+		tileColors[tileId] = Color(r, g, b, a);
+	}
+
+	// Layer info
+	archive.process(layer);
+	archive.process(orderInLayer);
+
+	// Note: tilemapAsset is runtime reference
+	// Must be set via setTilemapAsset() after instantiation
 }

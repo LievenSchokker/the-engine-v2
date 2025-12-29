@@ -2,6 +2,14 @@
 
 #include "GameObject/GameObject.h"
 #include "Math/Matrix3.h"
+#include "Math/Vector2.h"
+#include "Networking/Serialization/Serialization.h"
+
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 Transform::Transform(const Vector2 position, const double rotationAngle,
 					 const Vector2 scale)
@@ -13,8 +21,11 @@ Transform::Transform(const Vector2 position, const double rotationAngle,
 	  cachedLocalMatrix(Matrix3()),
 	  cachedWorldMatrix(Matrix3()),
 	  isLocalMatrixDirty(true),
-	  isWorldMatrixDirty(true)
+	  isWorldMatrixDirty(true),
+	  forwardVector(Vector2(0, 1)),
+	  rightVector(Vector2(1, 0))
 {
+	updateDirectionVectors();
 }
 
 Transform::~Transform() = default;
@@ -24,7 +35,7 @@ Vector2 Transform::getPosition() const
 	return position;
 }
 
-double Transform::getRotationAngle() const
+float Transform::getRotationAngle() const
 {
 	return rotationAngle;
 }
@@ -45,6 +56,7 @@ void Transform::setRotationAngle(const double newRotationAngle)
 {
 	if ( rotationAngle == newRotationAngle ) return;
 	rotationAngle = newRotationAngle;
+	updateDirectionVectors();
 	markDirty();
 }
 
@@ -244,4 +256,115 @@ void Transform::updateWorldMatrix() const
 	}
 
 	isWorldMatrixDirty = false;
+}
+
+void Transform::moveTowards(Vector2 targetPosition, float maxDistance)
+{
+	Vector2 currentPos = getPosition();
+	Vector2 direction = targetPosition - currentPos;
+	float distance = direction.magnitude();
+
+	if ( distance <= maxDistance )
+	{
+		// Snap to target if within max distance
+		setPosition(targetPosition);
+	}
+	else
+	{
+		// Move towards target by maxDistance
+		Vector2 moveDirection = direction.normalised();
+		Vector2 newPosition = currentPos + moveDirection * maxDistance;
+		setPosition(newPosition);
+	}
+}
+
+void Transform::rotateTowards(const Vector2& targetDirection,
+							  float maxRotationSpeed, float deltaTime)
+{
+	if ( targetDirection.magnitude() < 0.001f )
+		return;	 // Avoid division by zero
+
+	Vector2 normalizedTarget = targetDirection.normalised();
+	Vector2 currentForward = forward();
+
+	// Calculate angle between current forward and target direction
+	float angleRad = Vector2::angle(currentForward, normalizedTarget);
+	float angleDeg = angleRad * 180.0f / static_cast<float>(M_PI);
+
+	// Determine rotation direction (clockwise or counter-clockwise)
+	// Use cross product to determine sign
+	float cross = currentForward.x * normalizedTarget.y -
+				  currentForward.y * normalizedTarget.x;
+	if ( cross < 0.0f )
+	{
+		angleDeg = -angleDeg;
+	}
+
+	// Clamp rotation to max speed
+	float maxRotationThisFrame = maxRotationSpeed * deltaTime;
+	float rotationAmount = std::min(std::abs(angleDeg), maxRotationThisFrame);
+	if ( angleDeg < 0.0f )
+	{
+		rotationAmount = -rotationAmount;
+	}
+
+	// Apply rotation
+	setRotationAngle(rotationAngle + rotationAmount);
+}
+
+const Vector2& Transform::forward() const
+{
+	return forwardVector;
+}
+
+const Vector2& Transform::right() const
+{
+	return rightVector;
+}
+
+void Transform::updateDirectionVectors()
+{
+	// Convert rotation angle from degrees to radians
+	float angleRad = rotationAngle * static_cast<float>(M_PI) / 180.0f;
+
+	// Calculate forward vector (pointing up initially, rotated by angle)
+	forwardVector = Vector2(std::sin(angleRad), std::cos(angleRad));
+
+	// Right vector is forward rotated 90 degrees clockwise
+	rightVector = Vector2(std::cos(angleRad), -std::sin(angleRad));
+}
+
+void Transform::serialize(WriteArchive& archive) const
+{
+	float posX = position.x;
+	float posY = position.y;
+	double rot = rotationAngle;
+	float scaleX = scale.x;
+	float scaleY = scale.y;
+
+	archive.process(posX);
+	archive.process(posY);
+	archive.process(rot);
+	archive.process(scaleX);
+	archive.process(scaleY);
+}
+
+void Transform::deserialize(ReadArchive& archive)
+{
+	float posX, posY;
+	double rot;
+	float scaleX, scaleY;
+
+	archive.process(posX);
+	archive.process(posY);
+	archive.process(rot);
+	archive.process(scaleX);
+	archive.process(scaleY);
+
+	position = Vector2(posX, posY);
+	rotationAngle = rot;
+	scale = Vector2(scaleX, scaleY);
+
+	updateDirectionVectors();
+	markDirty();
 }

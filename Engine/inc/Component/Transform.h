@@ -1,19 +1,31 @@
 #pragma once
 
 #include "Component/BaseComponentTypes/Component.h"
+#include "GameObject/GameObject.h"
 #include "Math/Matrix3.h"
 #include "Math/Vector2.h"
+#include "Networking/Serialization/RegistrationBase.h"
 
 /**
  * @brief Transform holds the position, rotation and scale.
  * Supports parent-child hierarchy through matrix multiplication.
  */
-class Transform: public Component
+class Transform: public Component, RegistrationBase<Transform>
 {
    public:
 	Transform(Vector2 position = {0.0, 0.0}, double rotationAngle = 0,
 			  Vector2 scale = {1.0, 1.0});
 	~Transform();
+
+	static constexpr const char* name()
+	{
+		return "Transform";
+	}
+
+	const char* getName() const override
+	{
+		return name();
+	}
 
 	/**
 	 * @brief Get the current local position.
@@ -24,9 +36,9 @@ class Transform: public Component
 	/**
 	 * @brief Get the current local rotation angle.
 	 *
-	 * @return A double of the current rotation angle.
+	 * @return A float of the current rotation angle.
 	 */
-	double getRotationAngle() const;
+	float getRotationAngle() const;
 	/**
 	 * @brief Get the current local scale.
 	 *
@@ -115,9 +127,36 @@ class Transform: public Component
 	 */
 	void markDirtyLocal();
 
+	/**
+	 * @brief  Moves the Transform towards a target position.
+	 *
+	 *
+	 * @param targetPosition the position to move towards
+	 * @param maxDistance Maximum allowed distance the Transform can move in
+	 * this call. If the targetPosition is closer than the maxDistance, the
+	 * transform will snap to it.
+	 */
+	void moveTowards(Vector2 targetPosition, float maxDistance);
+
+	/**
+	 * @brief Rotates the Transform towards a target direction.
+	 *
+	 * @param targetDirection The direction to rotate towards
+	 * @param maxRotationSpeed Maximum rotation speed in degrees per second
+	 * @param deltaTime Time elapsed since last frame
+	 */
+	void rotateTowards(const Vector2& targetDirection, float maxRotationSpeed,
+					   float deltaTime);
+
+	const Vector2& forward() const;
+	const Vector2& right() const;
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
+
    private:
+	void updateDirectionVectors();
 	Vector2 position;
-	double rotationAngle;
+	float rotationAngle;
 	Vector2 scale;
 
 	Transform* parent;
@@ -127,6 +166,9 @@ class Transform: public Component
 	mutable Matrix3 cachedWorldMatrix;
 	mutable bool isLocalMatrixDirty;
 	mutable bool isWorldMatrixDirty;
+
+	Vector2 forwardVector;
+	Vector2 rightVector;
 
 	void updateLocalMatrix() const;
 	void updateWorldMatrix() const;

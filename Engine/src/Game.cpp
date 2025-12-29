@@ -1,10 +1,10 @@
 #include "Game.h"
 
-Game::Game() = default;
+Game::Game() {};
 Game::~Game() = default;
 
-
-void Game::setApplicationSpecifications(const ApplicationSpecifications& specificationS)
+void Game::setApplicationSpecifications(
+	const ApplicationSpecifications& specificationS)
 {
 	specifications = specificationS;
 }
@@ -16,11 +16,21 @@ ApplicationSpecifications Game::getApplicationSpecifications() const
 
 void Game::addScene(std::unique_ptr<Scene> scene)
 {
-	scenes.push_back(std::move(scene));
+    std::string name = scene->getName();
+    scenes.push_back(std::move(scene));
 }
 
 std::unique_ptr<Scene> Game::getFirstScene()
 {
-	if (scenes.empty()) return nullptr;
-	return std::move(scenes[0]);
+    if (scenes.empty())
+    {
+        return nullptr;
+    }
+
+    return std::move(scenes.front());
+}
+
+std::vector<std::unique_ptr<Scene>> Game::getAllScenes()
+{
+	return std::move(scenes);
 }

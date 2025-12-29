@@ -2,12 +2,21 @@
 
 #include "KeyCode.h"
 #include "MouseButton.h"
+#include "../Events/EventDispatcher/EventDispatcher.h"
+#include "Core/IEngineSystems.h"
 
 #include <memory>
 #include <unordered_set>
 
 
-class IInputAdapter;
+struct KeyPressedEvent;
+struct KeyReleasedEvent;
+struct MouseMovedEvent;
+struct MouseButtonPressedEvent;
+struct MouseButtonReleasedEvent;
+struct MouseScrollEvent;
+struct WindowCloseEvent;
+
 
 /**
  * @brief Central coordinator for game input state.
@@ -16,16 +25,10 @@ class IInputAdapter;
  * It exposes high-level queries for keys, mouse buttons, position, wheel
  * deltas, and quit requests so gameplay code can react in the current frame.
  */
-class InputManager
+class InputManager: public IEngineSystems
 {
 public:
-	/**
-	 * @brief Retrieve the singleton instance.
-	 *
-	 * @return Pointer to the global `InputManager`.
-	 */
-	static InputManager* getInstance();
-
+	InputManager();
 	/**
 	 * @brief Destroy the singleton instance and release resources.
 	 *
@@ -33,56 +36,9 @@ public:
 	 * state.
 	 */
 	static void shutdown();
-
-	/**
-	 * @brief Configure the adapter that provides raw input events.
-	 *
-	 * @param newAdapter Ownership-transferred adapter implementation.
-	 */
-	void setAdapter(std::unique_ptr<IInputAdapter> newAdapter);
-
-	/**
-	 * @brief Poll for new input events and update cached state.
-	 *
-	 * Call once per frame; the adapter will feed fresh events into the manager.
-	 */
-	void update();
-
-	/**
-	 * @brief Record a key state change for the current frame.
-	 *
-	 * Typically used by an input adapter to push low-level events.
-	 *
-	 * @param key Logical key identifier.
-	 * @param isDown True if the key is currently pressed.
-	 */
-	void setKeyDown(KeyCode key, bool isDown);
-
-	/**
-	 * @brief Record a mouse button state change for the current frame.
-	 *
-	 * @param button Mouse button identifier.
-	 * @param isDown True if the button is currently pressed.
-	 */
-	void setMouseDown(MouseButton button, bool isDown);
-
-	/**
-	 * @brief Update the tracked mouse cursor position.
-	 *
-	 * @param x Horizontal screen coordinate.
-	 * @param y Vertical screen coordinate.
-	 */
-	void setMousePosition(int x, int y);
-
-	/**
-	 * @brief Accumulate mouse wheel delta for the current frame.
-	 *
-	 * Multiple calls within a frame are summed.
-	 *
-	 * @param dx Horizontal wheel delta.
-	 * @param dy Vertical wheel delta.
-	 */
-	void addMouseWheelDelta(int dx, int dy);
+	void initialize(EventDispatcher& dispatcher);
+	SystemStatus start(GameWorld& gameWorld) override;
+	void update(double deltaTime, const GameWorld& gameWorld) override;
 
 	/**
 	 * @brief Latch a quit request coming from the platform layer.
@@ -196,33 +152,36 @@ public:
 	 */
 	int wheelDeltaY() const;
 
+	const std::string getName() const override;
 private:
-	InputManager() = default;
-	InputManager(const InputManager&) = delete;
-	InputManager& operator=(const InputManager&) = delete;
-	InputManager(InputManager&&) = delete;
-	InputManager& operator=(InputManager&&) = delete;
-	~InputManager();
-	std::unique_ptr<IInputAdapter> adapter;
-	static InputManager* instance;
+	void disconnect(EventDispatcher& dispatcher);
+	void onKeyPressed(const KeyPressedEvent& e);
+	void onKeyReleased(const KeyReleasedEvent& e);
+	void onMouseMoved(const MouseMovedEvent& e);
+	void onMouseButtonPressed(const MouseButtonPressedEvent& e);
+	void onMouseButtonReleased(const MouseButtonReleasedEvent& e);
+	void onMouseScroll(const MouseScrollEvent& e);
+	void onWindowClose(const WindowCloseEvent& e);
 
-	/// Frame lifecycle internals
-	void resetPerFrameState();
-	void computeTransitions();
+	SubscriptionHandle keyPressedHandle{0, 0};
+	SubscriptionHandle keyReleasedHandle{0, 0};
+	SubscriptionHandle mouseMovedHandle{0, 0};
+	SubscriptionHandle mousePressedHandle{0, 0};
+	SubscriptionHandle mouseReleasedHandle{0, 0};
+	SubscriptionHandle mouseScrollHandle{0, 0};
+	SubscriptionHandle windowCloseHandle{0, 0};
+	bool initialized = false;
 
-	// Keyboard state
 	std::unordered_set<KeyCode> keysCurrent;
 	std::unordered_set<KeyCode> keysPrevious;
-	std::unordered_set<KeyCode> keysPressed; // computed in computeTransitions
-	std::unordered_set<KeyCode> keysReleased; // computed in computeTransitions
+	std::unordered_set<KeyCode> keysPressed;
+	std::unordered_set<KeyCode> keysReleased;
 
 	// Mouse button state
 	std::unordered_set<MouseButton> mouseCurrent;
 	std::unordered_set<MouseButton> mousePrevious;
-	std::unordered_set<MouseButton>
-	mousePressed; // computed in computeTransitions
-	std::unordered_set<MouseButton>
-	mouseReleased; // computed in computeTransitions
+	std::unordered_set<MouseButton> mousePressed;
+	std::unordered_set<MouseButton> mouseReleased;
 
 	// Mouse position
 	int currentMouseX = 0;
@@ -235,4 +194,6 @@ private:
 	int wheelX = 0;
 	int wheelY = 0;
 	bool quitSignaled = false;
+
+	EventDispatcher* cachedDispatcher = nullptr;
 };
