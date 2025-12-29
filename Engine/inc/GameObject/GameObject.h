@@ -297,6 +297,15 @@ public:
     void destroyAllComponents();
     const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
+    /**
+	 * @brief Retrieves all components of type T from @c components.
+	 *
+	 * @tparam T Type of the components to get (must inherit from Component)
+	 * @return Vector of pointers to all matching components
+	 */
+	template <typename T>
+	std::vector<T*> getAllComponentsOfType() const;
+
 private:
 	void fixupPointersAfterClone();
 	Component* getComponentByTypeName(const std::string& typeName) const;

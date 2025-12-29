@@ -36,7 +36,6 @@ class TilemapInputBehaviour: public Behaviour
    public:
 	explicit TilemapInputBehaviour(Scene* scene)
 		: scene(scene),
-		  inputManager(nullptr),
 		  sampleCellBlocked(true),
 		  sampleBlockedCell{10.0, 7.0}
 	{
@@ -46,8 +45,6 @@ class TilemapInputBehaviour: public Behaviour
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
-
 		// Get grid component from scene
 		if ( scene != nullptr )
 		{
@@ -64,13 +61,8 @@ class TilemapInputBehaviour: public Behaviour
 		(void)deltaTime;
 		(void)world;
 
-		if ( inputManager == nullptr )
-		{
-			return;
-		}
-
 		// Toggle debug rendering with 'G' key
-		if ( inputManager->wasKeyPressed(KeyCode::G) &&
+		if ( world.input->wasKeyPressed(KeyCode::G) &&
 			 gridComponent != nullptr )
 		{
 			bool currentState = gridComponent->isDebugRenderEnabled();
@@ -80,7 +72,7 @@ class TilemapInputBehaviour: public Behaviour
 		}
 
 		// Toggle diagonal links with 'D' key
-		if ( inputManager->wasKeyPressed(KeyCode::D) &&
+		if ( world.input->wasKeyPressed(KeyCode::D) &&
 			 gridComponent != nullptr )
 		{
 			bool currentState = gridComponent->isDebugShowDiagonalLinks();
@@ -90,7 +82,7 @@ class TilemapInputBehaviour: public Behaviour
 		}
 
 		// Toggle sample blocked cell with 'B' key
-		if ( inputManager->wasKeyPressed(KeyCode::B) &&
+		if ( world.input->wasKeyPressed(KeyCode::B) &&
 			 gridComponent != nullptr )
 		{
 			if ( sampleCellBlocked )
@@ -107,15 +99,14 @@ class TilemapInputBehaviour: public Behaviour
 		}
 
 		// Handle ESC key for exit
-		if ( inputManager->wasKeyPressed(KeyCode::ESCAPE) )
+		if ( world.input->wasKeyPressed(KeyCode::ESCAPE) )
 		{
-			inputManager->signalQuit();
+			world.input->signalQuit();
 		}
 	}
 
    private:
 	Scene* scene;
-	InputManager* inputManager;
 	GridComponent* gridComponent = nullptr;
 	bool sampleCellBlocked;
 	Vector2 sampleBlockedCell;
@@ -145,7 +136,7 @@ int main(int argc, char** argv)
 
 	// Create AssetManager and load tilemap
 	AssetManager assetManager;
-	std::string tilemapPath = "Sandbox/Assets/level1_tilemap.csv";
+	std::string tilemapPath = "Assets/level1_tilemap.csv";
 
 	assetManager.add(tilemapPath, std::make_unique<TilemapAsset>());
 	if ( !assetManager.load(tilemapPath) )
