@@ -25,6 +25,8 @@ void Box2DPhysicsWorld::initialize()
 	worldId = b2CreateWorld(&worldDef);
 
 	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
+
+
 }
 
 void Box2DPhysicsWorld::step(float deltaTime)
