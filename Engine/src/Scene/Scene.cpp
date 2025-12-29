@@ -140,7 +140,6 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 
 	// Move ownership and remove from vector
 	auto result = std::move(*it);
-	gameObjectIds.erase(gameObject);
 	gameObjects.erase(it);
 
 	return result;

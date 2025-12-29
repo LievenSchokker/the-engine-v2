@@ -185,16 +185,6 @@ public:
      */
     [[nodiscard]] std::string getFirstSceneName() const;
 
-	/**
-	 * @brief Fixed update the active scene when not paused.
-	 *
-	 * Calls fixedUpdate() on the active scene for deterministic physics
-	 * simulation.
-	 *
-	 * @param deltaTime Fixed time step for physics calculations.
-	 */
-	void fixedUpdate(double deltaTime);
-
    private:
     /**
      * @brief Processes a scene for networking based on configured mode.
