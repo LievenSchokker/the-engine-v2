@@ -13,7 +13,7 @@
 
 PlayerMovement::PlayerMovement()
 {
-    authorityType = AuthorityType::ServerAuthority;
+    authorityType = AuthorityType::ClientAuthority;
 }
 
 void PlayerMovement::onStart()

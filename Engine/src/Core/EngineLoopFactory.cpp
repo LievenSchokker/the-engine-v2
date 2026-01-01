@@ -119,12 +119,6 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
         auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
         loop->addSystem(std::move(client));
     }
-	// NETWORKING
-	if (hasFlag(specs.engineSystem, EngineSystem::NetClient))
-	{
-		auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
-		loop->addSystem(std::move(client));
-	}
 
 	if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
 	{
@@ -136,27 +130,6 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 			std::make_unique<TransportGNS>());
 		loop->addSystem(std::move(server));
 	}
-
-	auto allScenes = gamePtr->getAllScenes();
-
-	if (allScenes.empty())
-	{
-		throw std::runtime_error("Game must have at least one scene");
-	}
-
-	// Add all scenes to SceneManager
-	std::string firstSceneName;
-	for (auto& scene : allScenes)
-	{
-		if (firstSceneName.empty())
-		{
-			firstSceneName = scene->getName();
-		}
-		sceneManager->addScene(std::move(scene));
-	}
-
-	loop->setPendingSceneName(firstSceneName);
-    loop->addSystem(std::move(sceneManager));
 
     return loop;
 }

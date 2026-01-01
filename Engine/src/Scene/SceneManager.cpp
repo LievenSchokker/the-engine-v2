@@ -171,7 +171,7 @@ void SceneManager::processForClient(Scene& scene)
         return;
     }
 
-    for (GameObject* obj : toProcess)
+    for (const GameObject* obj : toProcess)
     {
         std::string name = obj->getName();
 
