@@ -107,24 +107,26 @@ void SceneManager::processForServer(Scene& scene) const
     for (const GameObject* obj : networkObjects)
     {
 	    auto behaviour = obj->getComponent<NetworkBehaviour>();
+		if (behaviour != nullptr && behaviour->getAuthorityType() == AuthorityType::ClientAuthority)
+		{
+			// ClientAuthority: just register as prefab (clients will spawn these)
+			std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+			if (!extracted) continue;
 
-    	if (behaviour != nullptr && behaviour->getAuthorityType() == AuthorityType::ClientAuthority)
-    	{
-    		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
-    		if (!extracted) continue;
-    		if (spawnManager)
-    		{
-    			uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
-    		}
-    		continue;
-    	}
+			if (spawnManager)
+			{
+				spawnManager->addToPrefabLibrary(std::move(extracted));
+			}
+			continue;
+		}
 
-        Vector2 spawnPosition = obj->getTransform()->getPosition();
+		// ServerAuthority: register as prefab AND spawn into scene
+		Vector2 spawnPosition = obj->getTransform()->getPosition();
 
-		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
+		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
 		if (!extracted) continue;
 
-		extracted->getTransform()->setPosition({0, 0});
+		extracted->getTransform()->setPosition(spawnPosition);
 
 		if (!extracted->getComponent<NetworkIdentity>())
 		{
@@ -133,8 +135,8 @@ void SceneManager::processForServer(Scene& scene) const
 
 		if (spawnManager)
 		{
-			uint32_t assetId = spawnManager->addToPrefabLibrary(
-				std::move(extracted));
+			uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
+			spawnManager->spawnObject(assetId, -1);
 		}
 	}
 }
@@ -153,9 +155,9 @@ void SceneManager::addGameObjectToActiveScene(std::unique_ptr<GameObject> gameOb
 	}
 }
 
-void SceneManager::processForClient(Scene& scene) const
+void SceneManager::processForClient(Scene& scene)
 {
-	std::vector<GameObject*> toProcess;
+    std::vector<GameObject*> toProcess;
 
     scene.forEachGameObject([&](GameObject& obj) {
         if (hasNetworkBehaviour(obj) && !hasNetworkIdentity(obj)) {
@@ -164,31 +166,30 @@ void SceneManager::processForClient(Scene& scene) const
     });
 
 
-	if (toProcess.empty())
-	{
-		return;
-	}
+    if (toProcess.empty())
+    {
+        return;
+    }
 
-	for (GameObject* obj : toProcess)
-	{
-		std::string name = obj->getName();
+    for (GameObject* obj : toProcess)
+    {
+        std::string name = obj->getName();
 
-		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
-		if (!extracted) continue;
+        std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+        if (!extracted) continue;
 
-		extracted->getTransform()->setPosition({0, 0});
+        extracted->getTransform()->setPosition({0, 0});
 
-		if (!extracted->getComponent<NetworkIdentity>())
-		{
-			extracted->addComponent<NetworkIdentity>();
-		}
+        if (!extracted->getComponent<NetworkIdentity>())
+        {
+            extracted->addComponent<NetworkIdentity>();
+        }
 
-		if (spawnManager != nullptr)
-		{
-			uint32_t assetId = spawnManager->addToPrefabLibrary(
-				std::move(extracted));
-		}
-	}
+        if (spawnManager != nullptr)
+        {
+            uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
+        }
+    }
 }
 
 bool SceneManager::hasNetworkBehaviour(const GameObject& obj) const
@@ -205,27 +206,27 @@ bool SceneManager::hasNetworkBehaviour(const GameObject& obj) const
 
 bool SceneManager::hasNetworkIdentity(const GameObject& obj) const
 {
-	return obj.getComponent<NetworkIdentity>() != nullptr;
+    return obj.getComponent<NetworkIdentity>() != nullptr;
 }
 
 bool SceneManager::addScene(std::unique_ptr<Scene> scene)
 {
-	if (scene == nullptr)
-	{
-		std::cerr << "[SceneManager] Error: Attempted to add a null scene\n";
-		return false;
-	}
+    if (scene == nullptr)
+    {
+        std::cerr << "[SceneManager] Error: Attempted to add a null scene\n";
+        return false;
+    }
 
-	const std::string name = scene->getName();
-	if (scenes.contains(name))
-	{
-		std::cerr << "[SceneManager] Error: Scene with name '" << name
-			<< "' already exists\n";
-		return false;
-	}
+    const std::string name = scene->getName();
+    if (scenes.contains(name))
+    {
+        std::cerr << "[SceneManager] Error: Scene with name '" << name
+                  << "' already exists\n";
+        return false;
+    }
 
-	scenes.emplace(name, std::move(scene));
-	return true;
+    scenes.emplace(name, std::move(scene));
+    return true;
 }
 
 bool SceneManager::removeScene(const std::string& name)
@@ -318,12 +319,12 @@ Scene* SceneManager::getActiveScene() const
 
 bool SceneManager::setActiveScene(const std::string& name)
 {
-	if (activeScene && activeScene->getName() == name)
-	{
-		std::cout << "[SceneManager] Warning: Scene with name '" << name
-			<< "' is already active\n";
-		return true;
-	}
+    if (activeScene && activeScene->getName() == name)
+    {
+        std::cout << "[SceneManager] Warning: Scene with name '" << name
+                  << "' is already active\n";
+        return true;
+    }
 
 	Scene* nextScene = getScene(name);
 	if (nextScene == nullptr)
@@ -346,6 +347,9 @@ bool SceneManager::setActiveScene(const std::string& name)
 		return false;
 	}
 
+	activeScene = nextScene;
+	paused = false;
+
     if (networkConfigured && !processedScenes.contains(name))
     {
         processSceneForNetwork(*nextScene);
@@ -354,6 +358,7 @@ bool SceneManager::setActiveScene(const std::string& name)
 
 	activeScene = nextScene;
     behaviourSystem->initialiseScene(*activeScene, *gameWorld);
+	activeScene->onStart(*gameWorld);
 	return true;
 }
 

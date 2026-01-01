@@ -1,12 +1,10 @@
 #pragma once
 
-
 #include "Behaviour/Behaviour.h"
-
 
 class RigidBody: public Behaviour
 {
-public:
+   public:
 	bool isDynamic = true;
 
 	void makeStatic()
@@ -18,4 +16,8 @@ public:
 	{
 		isDynamic = true;
 	}
+
+   protected:
+	void onStart() override;
+	void onDestroy() override;
 };

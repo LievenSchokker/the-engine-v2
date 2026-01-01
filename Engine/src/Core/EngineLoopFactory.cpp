@@ -1,8 +1,4 @@
 #include "Core/EngineLoopFactory.h"
-
-#include <iostream>
-#include <ostream>
-
 #include "Audio/AudioSystem.h"
 #include "Audio/SDL/AudioBackendSDL.h"
 #include "Core/Options/ApplicationSpecifications.h"
@@ -20,6 +16,7 @@
 #include "Scene/SceneManager.h"
 
 #include <iostream>
+#include <ostream>
 
 std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     std::unique_ptr<Game> game)
@@ -139,6 +136,27 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 			std::make_unique<TransportGNS>());
 		loop->addSystem(std::move(server));
 	}
+
+	auto allScenes = gamePtr->getAllScenes();
+
+	if (allScenes.empty())
+	{
+		throw std::runtime_error("Game must have at least one scene");
+	}
+
+	// Add all scenes to SceneManager
+	std::string firstSceneName;
+	for (auto& scene : allScenes)
+	{
+		if (firstSceneName.empty())
+		{
+			firstSceneName = scene->getName();
+		}
+		sceneManager->addScene(std::move(scene));
+	}
+
+	loop->setPendingSceneName(firstSceneName);
+    loop->addSystem(std::move(sceneManager));
 
     return loop;
 }

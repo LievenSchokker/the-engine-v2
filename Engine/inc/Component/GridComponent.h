@@ -247,5 +247,6 @@ private:
 
 	static std::pair<int, int> cellKey(Vector2 cell);
 	uint8_t layer = 0;
-	int8_t orderInLayer = 0;
+	int8_t orderInLayer =
+		1;	// Default to 1 so debug overlays render above base content
 };
