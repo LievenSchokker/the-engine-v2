@@ -110,7 +110,7 @@ void SceneManager::processForServer(Scene& scene) const
 		if (behaviour != nullptr && behaviour->getAuthorityType() == AuthorityType::ClientAuthority)
 		{
 			// ClientAuthority: just register as prefab (clients will spawn these)
-			std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+			std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
 			if (!extracted) continue;
 
 			if (spawnManager)
@@ -123,7 +123,7 @@ void SceneManager::processForServer(Scene& scene) const
 		// ServerAuthority: register as prefab AND spawn into scene
 		Vector2 spawnPosition = obj->getTransform()->getPosition();
 
-		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
 		if (!extracted) continue;
 
 		extracted->getTransform()->setPosition(spawnPosition);
@@ -175,7 +175,7 @@ void SceneManager::processForClient(Scene& scene)
     {
         std::string name = obj->getName();
 
-        std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+        std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
         if (!extracted) continue;
 
         extracted->getTransform()->setPosition({0, 0});

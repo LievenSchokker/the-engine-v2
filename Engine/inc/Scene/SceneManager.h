@@ -56,6 +56,7 @@ public:
     bool addScene(std::unique_ptr<Scene> scene);
 
 	void addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject) const;
+    void processForClient(Scene& scene);
     /**
      * @brief Remove a stored scene.
      *

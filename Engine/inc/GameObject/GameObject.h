@@ -293,7 +293,6 @@ class GameObject: public ISerializable
     GameObjectHandle getGameObjectHandle() const;
     void setGameObjectHandle(GameObjectHandle handle);
 
-private:
 	/**
 	 * @brief Retrieves all components of type T from @c components.
 	 *
@@ -342,7 +341,7 @@ private:
 	 */
 	void markTransformDirty();
 
-   private:
+private:
 	void fixupPointersAfterClone();
 	Component* getComponentByTypeName(const std::string& typeName) const;
 
