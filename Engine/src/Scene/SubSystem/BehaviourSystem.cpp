@@ -8,19 +8,16 @@ void BehaviourSystem::initialiseScene(Scene& scene, GameWorld& world)
 {
     std::vector<Behaviour*> allBehaviours;
     scene.onStart(world);
-    for (const auto& gameObject : scene.getGameObjects())
-    {
-        if (!gameObject)
-            continue;
 
-        for (auto& behaviour  : gameObject->getAllBehaviours())
+    scene.forEachGameObject([&](GameObject& gameObject) {
+        for (auto& behaviour  : gameObject.getAllBehaviours())
         {
             if (behaviour != nullptr)
             {
                 allBehaviours.push_back(behaviour);
             }
         }
-    }
+    });
 
     awakeBehaviours(allBehaviours, world);
     enableBehaviours(allBehaviours);
@@ -32,14 +29,14 @@ void BehaviourSystem::update(Scene& scene, double deltaTime, const GameWorld& wo
     const bool clockPaused = (world.clock != nullptr && world.clock->isPaused());
 
 
-    std::vector<GameObject*> activeObjects;
-    activeObjects.reserve(scene.getGameObjects().size());
 
-    for (const auto& gameObject : scene.getGameObjects())
-    {
-        if (gameObject && gameObject->getIsActive())
-            activeObjects.push_back(gameObject.get());
-    }
+    std::vector<GameObject*> activeObjects;
+
+    scene.forEachGameObject([&](GameObject& gameObject) {
+        if (gameObject.getIsActive()) {
+            activeObjects.push_back(&gameObject);
+        }
+    });
 
     for (GameObject* gameObject : activeObjects)
     {

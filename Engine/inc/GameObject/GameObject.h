@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameObjectHandle.h"
 #include "Networking/Serialization/ISerializable.h"
 #include "Networking/Serialization/Serialization.h"
 
@@ -44,22 +45,22 @@ public:
     /**
      * @brief Destructor. Cleans up all components and resources.
      */
-    ~GameObject();
+    ~GameObject() override;
 
     /**
      * @brief Serializes this GameObject and all its components.
      */
-    void serialize(WriteArchive& archive) const;
+    void serialize(WriteArchive& archive) const override;
 
     /**
      * @brief Deserializes a GameObject from an archive.
      */
-    void deserialize(ReadArchive& archive);
+    void deserialize(ReadArchive& archive) override;
 
     /**
      * @brief Creates a deep copy of this GameObject via serialization.
      */
-    std::unique_ptr<GameObject> clone() const;
+    [[nodiscard]] std::unique_ptr<GameObject> clone() const;
 
 
     /**
@@ -151,13 +152,6 @@ public:
      */
     const std::vector<Behaviour*>& getAllBehaviours() const;
     const std::vector<Behaviour*>& getEnabledBehaviours();
-
-    /**
-    * @brief Returns all active Behaviour components attached to this GameObject.
-    * @return Vector of pointers to active Behaviour components
-    */
-    const std::vector<Behaviour*>& getEnabledBehaviours() const;
-
 
     /**
     * @brief Returns the Transform of this GameObject.
@@ -297,6 +291,9 @@ public:
     void destroyAllComponents();
     const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
+    GameObjectHandle getGameObjectHandle() const;
+    void setGameObjectHandle(GameObjectHandle handle);
+
 private:
 	void fixupPointersAfterClone();
 	Component* getComponentByTypeName(const std::string& typeName) const;
@@ -334,6 +331,7 @@ private:
     bool isStatic;
     bool isDestroyed;
     int sceneId{};
+    GameObjectHandle gameObjectHandle;
 };
 
 #include "GameObjectImplementation.inl"

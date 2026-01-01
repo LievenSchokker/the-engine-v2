@@ -55,7 +55,7 @@ public:
      */
     bool addScene(std::unique_ptr<Scene> scene);
 
-	void addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject);
+	void addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject) const;
     /**
      * @brief Remove a stored scene.
      *
@@ -201,12 +201,12 @@ private:
     /**
      * @brief Server: Extract NetworkBehaviour objects as prefabs.
      */
-    void processForServer(Scene& scene);
+    void processForServer(Scene& scene) const;
 
 	/**
      * @brief Client: Remove NetworkBehaviour objects.
      */
-    void processForClient(Scene& scene);
+    void processForClient(Scene& scene) const;
 
     /**
      * @brief Checks if a GameObject has any NetworkBehaviour components.

@@ -1,24 +1,42 @@
 #pragma once
 
 
+#include "Slot.h"
 #include "GameObject/GameObject.h"
 
-template <typename T>
-std::vector<T*> Scene::getAllComponentsOfType() const
+
+template<typename Function>
+void Scene::forEachGameObject(Function&& func)
 {
-	std::vector<T*> result;
-	result.reserve(gameObjects.size());
+    for (auto& slot : slots) {
+        if (slot.object) {
+            func(*slot.object);
+        }
+    }
+}
 
-	for (const auto& gameObject : gameObjects)
-	{
-		if (!gameObject->getIsActive()) continue;
+template<typename Function>
+void Scene::forEachGameObject(Function&& func) const
+{
+    for (const auto& [object, generation] : slots) {
+        if (object) {
+            func(*object);
+        }
+    }
+}
 
-		T* component = gameObject->getComponent<T>();
-		if (component != nullptr)
-		{
-			result.push_back(component);
-		}
-	}
+template <typename Component>
+std::vector<Component*> Scene::getAllComponentsOfType() const
+{
+    std::vector<Component*> result;
 
-	return result;
+    forEachGameObject([&](const GameObject& obj) {
+        if (!obj.getIsActive()) return;
+
+        for (Component* component : obj.getComponents<Component>()) {
+            result.push_back(component);
+        }
+    });
+
+    return result;
 }

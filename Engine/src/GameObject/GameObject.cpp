@@ -426,6 +426,16 @@ const std::vector<std::unique_ptr<Component>>& GameObject::getComponents() const
     return components;
 }
 
+GameObjectHandle GameObject::getGameObjectHandle() const
+{
+    return gameObjectHandle;
+}
+
+void GameObject::setGameObjectHandle(const GameObjectHandle handle)
+{
+    gameObjectHandle = handle;
+}
+
 void GameObject::internalAddComponent(std::unique_ptr<Component> component)
 {
     if (component != nullptr)

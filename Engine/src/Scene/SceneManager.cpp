@@ -89,30 +89,28 @@ void SceneManager::processSceneForNetwork(Scene& scene)
 	}
 }
 
-void SceneManager::processForServer(Scene& scene)
+void SceneManager::processForServer(Scene& scene) const
 {
 	std::vector<GameObject*> networkObjects;
 
-	for (auto& obj : scene.getGameObjects())
-	{
-		if (hasNetworkBehaviour(*obj) && !hasNetworkIdentity(*obj))
-		{
-			networkObjects.push_back(obj.get());
-		}
-	}
+    scene.forEachGameObject([&](GameObject& obj) {
+        if (hasNetworkBehaviour(obj) && !hasNetworkIdentity(obj)) {
+            networkObjects.push_back(&obj);
+        }
+    });
 
 	if (networkObjects.empty())
 	{
 		return;
 	}
 
-    for (GameObject* obj : networkObjects)
+    for (const GameObject* obj : networkObjects)
     {
 	    auto behaviour = obj->getComponent<NetworkBehaviour>();
 
     	if (behaviour != nullptr && behaviour->getAuthorityType() == AuthorityType::ClientAuthority)
     	{
-    		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+    		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
     		if (!extracted) continue;
     		if (spawnManager)
     		{
@@ -123,7 +121,7 @@ void SceneManager::processForServer(Scene& scene)
 
         Vector2 spawnPosition = obj->getTransform()->getPosition();
 
-		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
 		if (!extracted) continue;
 
 		extracted->getTransform()->setPosition({0, 0});
@@ -141,7 +139,7 @@ void SceneManager::processForServer(Scene& scene)
 	}
 }
 
-void SceneManager::addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject)
+void SceneManager::addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject) const
 {
 	if (!activeScene || !gameObject) return;
 
@@ -155,19 +153,16 @@ void SceneManager::addGameObjectToActiveScene(std::unique_ptr<GameObject> gameOb
 	}
 }
 
-void SceneManager::processForClient(Scene& scene)
+void SceneManager::processForClient(Scene& scene) const
 {
 	std::vector<GameObject*> toProcess;
 
-	for (auto& obj : scene.getGameObjects())
-	{
-		bool hasNB = hasNetworkBehaviour(*obj);
-		bool hasNI = hasNetworkIdentity(*obj);
-		if (hasNB && !hasNI)
-		{
-			toProcess.push_back(obj.get());
-		}
-	}
+    scene.forEachGameObject([&](GameObject& obj) {
+        if (hasNetworkBehaviour(obj) && !hasNetworkIdentity(obj)) {
+            toProcess.push_back(&obj);
+        }
+    });
+
 
 	if (toProcess.empty())
 	{
@@ -178,7 +173,7 @@ void SceneManager::processForClient(Scene& scene)
 	{
 		std::string name = obj->getName();
 
-		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj);
+		std::unique_ptr<GameObject> extracted = scene.extractGameObject(obj->getGameObjectHandle());
 		if (!extracted) continue;
 
 		extracted->getTransform()->setPosition({0, 0});
@@ -506,7 +501,7 @@ void SceneManager::applyNetworkSnapshot(
 		}
 
 		spawnManager->untrackSpawnedObject(netId);
-		activeScene->removeGameObject(object);
+		activeScene->removeGameObject(object->getGameObjectHandle());
 	}
 }
 

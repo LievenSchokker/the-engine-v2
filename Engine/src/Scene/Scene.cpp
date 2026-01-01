@@ -2,23 +2,15 @@
 
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
-#include "Component/BaseComponentTypes/RenderComponent.h"
-#include "Component/BaseComponentTypes/UIRenderComponent.h"
-#include "Core/ApplicationClock.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
-
+#include "AI/Navigation/NavigationGridOptions.h"
+#include "Scene/Slot.h"
 
 #include <algorithm>
 #include <iostream>
 #include <utility>
-
-#include "Game.h"
-#include "Behaviour/Behaviour.h"
-
-#include "AI/Navigation/NavigationGridOptions.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -34,199 +26,167 @@ const std::string& Scene::getName() const
 	return name;
 }
 
-int Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
-{
-	if (gameObject == nullptr)
-	{
-		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-		return false;
-	}
-    if ( gameObject == nullptr ) {
-        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-        return -1;
-    }
 
-	GameObject* addedObject = gameObject.get();
-    gameObjects.emplace_back(std::move(gameObject));
-	addedObject->setScene(*this);
-    return 0;
-}
+///     [[[ SCENE LIFECYCLE FUNCTIONS ]]]
 
-
-bool Scene::removeGameObject(const std::string& name)
-{
-	const auto it =
-		std::ranges::remove_if(gameObjects,
-		                       [&](const std::unique_ptr<GameObject>&
-		                       gameObject)
-		                       {
-			                       if (gameObject->getName() == name)
-			                       {
-				                       if (active && gameObject->getIsActive())
-				                       {
-					                       gameObject->destroy();
-					                       gameObject->onSceneDestroy();
-				                       }
-				                       return true;
-			                       }
-			                       return false;
-		                       }).begin();
-
-	if (it != gameObjects.end())
-	{
-        GameObject* gameObject = it->get();
-		return true;
-	}
-
-	return false;
-}
-
-GameObject* Scene::getGameObject(const std::string& name) const
-{
-	for (const auto& gameObject : gameObjects)
-	{
-		if (gameObject->getName() == name)
-		{
-			return gameObject.get();
-		}
-	}
-
-	return nullptr;
-}
-
-std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
-{
-	const auto it = std::ranges::find_if(gameObjects,
-	                                     [&](const std::unique_ptr<GameObject>&
-	                                     gameObject)
-	                                     {
-		                                     return gameObject->getName() ==
-		                                            name;
-	                                     });
-
-	if (it == gameObjects.end())
-	{
-		return nullptr;
-	}
-
-	GameObject* gameObject = it->get();
-
-	// Call onStop if scene is active
-	if (active && gameObject != nullptr)
-	{
-		gameObject->setBehavioursEnabled(false);
-	}
-
-	// Move ownership and remove from vector
-	auto result = std::move(*it);
-	gameObjects.erase(it);
-
-	return result;
-}
 
 void Scene::onStart(GameWorld& world)
 {
-	gameWorld = &world;
-	if (active) return;
+    gameWorld = &world;
+    if (active) return;
 
-	/// Note: Somehwere the settings should be configured?
-	initialiseNavigationSystem({100, 100, Vector2{15, 15}});
-
-	active = true;
-
-	/// Store all behaviours from all gameobjects in this scene
-	std::vector<Behaviour*> allBehaviours;
-
-	/// Retrieve every behaviour on every GameObject in this scene object.
-	for (auto& gameObject : gameObjects)
-	{
-		for (auto& behaviour : gameObject->getAllBehaviours())
-		{
-			if (behaviour == nullptr) continue;
-
-			allBehaviours.emplace_back(behaviour);
-		}
-	}
-
-	// Reactivates behaviours
-	for (auto& behaviour : beforeEnableBehaviours)
-	{
-		behaviour->setEnabled(true);
-	}
-
-	beforeEnableBehaviours.clear();
+    initialiseNavigationSystem({100, 100, Vector2{15, 15}});
     active = true;
+
+    std::vector<Behaviour*> allBehaviours;
+
+    forEachGameObject([&](const GameObject& obj) {
+        for (auto& behaviour : obj.getAllBehaviours()) {
+            if (behaviour) allBehaviours.emplace_back(behaviour);
+        }
+    });
+
+    for (const auto& behaviour : beforeEnableBehaviours) {
+        behaviour->setEnabled(true);
+    }
+    beforeEnableBehaviours.clear();
 }
 
 void Scene::onStop()
 {
-	if (!active)
-	{
-		return;
-	}
+    if (!active) return;
+    active = false;
 
-	active = false;
-	for (auto& gameObject : gameObjects)
-	{
-		const auto& enabledBehaviours = gameObject->getEnabledBehaviours();
-		beforeEnableBehaviours.insert(beforeEnableBehaviours.end(),
-		                              enabledBehaviours.begin(),
-		                              enabledBehaviours.end());
-		gameObject->setBehavioursEnabled(false);
-	}
+    forEachGameObject([&](GameObject& obj) {
+        const auto& enabledBehaviours = obj.getEnabledBehaviours();
+        beforeEnableBehaviours.insert(
+            beforeEnableBehaviours.end(),
+            enabledBehaviours.begin(),
+            enabledBehaviours.end()
+        );
+        obj.setBehavioursEnabled(false);
+    });
 }
+
+
+
+///     [[[ GAME OBJECT HANDLING AND LIFETIME FUNCTIONS ]]]
+
+
+GameObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
+{
+    if (gameObject == nullptr) {
+        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
+        return GameObjectHandle::null();
+    }
+
+    uint32_t index;
+
+    if (!freeIndices.empty()) {
+        index = freeIndices.back();
+        freeIndices.pop_back();
+    } else {
+        index = static_cast<uint32_t>(slots.size());
+        slots.push_back({});
+    }
+
+    GameObject* obj = gameObject.get();
+    slots[index].object = std::move(gameObject);
+
+    GameObjectHandle handle{ index, slots[index].generation };
+    obj->setScene(*this);
+    return handle;
+}
+
+
+
+bool Scene::removeGameObject(const std::string& name)
+{
+    GameObjectHandle handle = findHandleByName(name);
+    if (handle.isNull()) return false;
+
+    removeGameObject(handle);
+    return true;
+}
+
+bool Scene::removeGameObject(GameObjectHandle handle)
+{
+    if (!isValid(handle)) return false;
+
+    auto& slot = slots[handle.index];
+
+    if (active && slot.object->getIsActive()) {
+        slot.object->destroy();
+        slot.object->onSceneDestroy();
+    }
+
+    slot.object.reset();
+
+    //This generation is super imporant, it makes sure that when an object get's removed and a new object get's
+    //assigned the same ID the can differentiate object with same id but different generation handles.
+    slot.generation++;
+    freeIndices.push_back(handle.index);
+    return true;
+}
+
+
+
+GameObject* Scene::getGameObject(const std::string& name) const
+{
+    return getGameObject(findHandleByName(name));
+}
+
+GameObject* Scene::getGameObject(GameObjectHandle handle) const
+{
+    if (!isValid(handle)) return nullptr;
+    return slots[handle.index].object.get();
+}
+
+std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
+{
+    return extractGameObject(findHandleByName(name));
+}
+
 
 void Scene::destroyAllGameObjects()
 {
-	for (auto& gameObject : gameObjects)
-	{
-		gameObject->onSceneDestroy();
-	}
-
-	gameObjects.clear();
+    for (auto& [object, generation] : slots) {
+        if (object) {
+            object->onSceneDestroy();
+            object.reset();
+        }
+    }
+    slots.clear();
+    freeIndices.clear();
 }
 
-std::unique_ptr<GameObject> Scene::extractGameObject(GameObject* obj)
+std::unique_ptr<GameObject> Scene::extractGameObject(GameObjectHandle handle)
 {
-	for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
-	{
-		if (it->get() == obj)
-		{
-			std::unique_ptr<GameObject> extracted = std::move(*it);
-			gameObjects.erase(it);
-			return extracted;
-		}
-	}
-	return nullptr;
+    if (!isValid(handle)) return nullptr;
+
+    auto& slot = slots[handle.index];
+
+    if (active && slot.object) {
+        slot.object->setBehavioursEnabled(false);
+    }
+
+    auto result = std::move(slot.object);
+    slot.generation++;
+    freeIndices.push_back(handle.index);
+
+    return result;
 }
 
-void Scene::removeGameObject(GameObject* obj)
-{
-	gameObjects.erase(
-		std::remove_if(gameObjects.begin(), gameObjects.end(),
-		               [obj](const std::unique_ptr<GameObject>& ptr)
-		               {
-			               return ptr.get() == obj;
-		               }),
-		gameObjects.end()
-		);
-}
 
-std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects()
-{
-	return gameObjects;
-}
+//TODO Move this out of scene class
+//      [[[ NAVIGATGION SYSTEM FUNCTIONS ]]]
 
-const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const
-{
-	return gameObjects;
-}
 
 void Scene::initialiseNavigationSystem(NavigationGridOptions options)
 {
 	std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(
 		options.gridWidth, options.gridHeight, options.cellSize);
-	std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<
+	const std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<
 		NavigationObstacle>();
 
 	std::vector<BoundingBox> obstacleBounds{};
@@ -248,4 +208,27 @@ NavigationSystem* Scene::getNavigationSystem()
         initialiseNavigationSystem({100, 100, Vector2{15, 15}});
     }
     return navigationSystem.get();
+}
+
+
+///      [[[ HELPER FUNCTIONS ]]]
+
+GameObjectHandle Scene::findHandleByName(const std::string& name) const
+{
+    for (uint32_t i = 0; i < slots.size(); i++) {
+        if (const auto& [object, generation] = slots[i]; object && object->getName() == name) {
+            return GameObjectHandle{ i, generation };
+        }
+    }
+    return GameObjectHandle::null();
+}
+
+bool Scene::isValid(const GameObjectHandle handle) const
+{
+    if (handle.isNull()) return false;
+    if (handle.index >= slots.size()) return false;
+
+    const auto& slot = slots[handle.index];
+    return slot.generation == handle.generation
+        && slot.object != nullptr;
 }

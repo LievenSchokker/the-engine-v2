@@ -43,7 +43,7 @@ void DestroySystem::processQueue(Scene& scene)
 			preDestroyCallback(obj);
 
 		obj->onSceneDestroy();
-		scene.removeGameObject(obj);
+		scene.removeGameObject(obj->getGameObjectHandle());
 	}
 
 	destroyQueue.clear();
