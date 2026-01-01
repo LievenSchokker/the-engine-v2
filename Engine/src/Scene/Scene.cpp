@@ -93,8 +93,9 @@ GameObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
     GameObject* obj = gameObject.get();
     slots[index].object = std::move(gameObject);
 
-    GameObjectHandle handle{ index, slots[index].generation };
+    const GameObjectHandle handle{ index, slots[index].generation };
     obj->setScene(*this);
+    obj->setGameObjectHandle(handle);
     return handle;
 }
 
