@@ -40,7 +40,6 @@ class SandboxInputBehaviour final: public Behaviour
 
 	void update(double deltaTime, const GameWorld& world) override
 	{
-	    inputManager = world.input;
 	    (void)deltaTime;
 
 		if ( scene == nullptr )
@@ -50,16 +49,17 @@ class SandboxInputBehaviour final: public Behaviour
 		if ( world.input->wasKeyPressed(KeyCode::E) )
 		{
 			auto circle = scene->getGameObject("BlueCircle");
-			if ( circle != nullptr )
+			GameObject* rectangle = scene->getGameObject("YellowRectangle");
+			if ( rectangle != nullptr )
 			{
-				auto component = circle->getComponent<SimpleMoveBehaviour>();
-				if ( component != nullptr )
-				{
-					component->setEnabled(!component->getIsEnabled());
-				}
+				rectangle->getTransform()->setRotationAngle(rectangle->getTransform()->getRotationAngle() + 5.0);
 			}
 		}
 
+		if (world.input->wasKeyPressed(KeyCode::W))
+		{
+
+		}
 		// Handle SPACE key to toggle clear color
 		if ( world.input->wasKeyPressed(KeyCode::SPACE) )
 		{
@@ -85,19 +85,6 @@ class SandboxInputBehaviour final: public Behaviour
 			else
 			{
 				sm->loadScene("PrototypeScene");
-			}
-		}
-
-		// Handle mouse wheel Y to rotate rectangle
-		if ( world.input->wheelDeltaY() != 0 )
-		{
-			GameObject* rectangle = scene->getGameObject("YellowRectangle");
-			if ( rectangle != nullptr )
-			{
-				double currentRotation =
-					rectangle->getTransform()->getRotationAngle();
-				rectangle->getTransform()->setRotationAngle(
-					currentRotation + world.input->wheelDeltaY());
 			}
 		}
 

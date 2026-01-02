@@ -89,6 +89,16 @@ bool Scene::removeGameObject(ObjectHandle handle)
 	return true;
 }
 
+GameObject* Scene::getGameObject(const std::string& name)
+{
+	return getGameObject(findHandleByName(name));
+}
+
+GameObject* Scene::getGameObject(ObjectHandle handle)
+{
+	return gameObjects.resolve(handle);
+}
+
 const GameObject* Scene::getGameObject(const std::string& name) const
 {
 	return getGameObject(findHandleByName(name));

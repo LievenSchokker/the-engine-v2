@@ -86,6 +86,8 @@ public:
      * @param name Name of the game object to retrieve.
      * @return Pointer to the object, or nullptr when not found.
      */
+	GameObject* getGameObject(const std::string& name);
+	GameObject* getGameObject(ObjectHandle handle);
     [[nodiscard]] const GameObject* getGameObject(const std::string& name) const;
     [[nodiscard]] const GameObject* getGameObject(ObjectHandle handle) const;
 
