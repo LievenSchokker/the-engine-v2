@@ -3,6 +3,7 @@
 
 #include "Core/GameWorld.h"
 #include "AI/Navigation/NavigationGridOptions.h"
+#include "SlotMap/SlotMap.h"
 
 class GameObject;
 struct Slot;
@@ -11,7 +12,7 @@ class NavigationSystem;
 class Behaviour;
 struct RenderQueue;
 struct ShapeRenderCommand;
-struct GameObjectHandle;
+struct ObjectHandle;
 
 #include "Core/GameWorld.h"
 
@@ -61,7 +62,7 @@ public:
      */
     void onStop();
 
-    GameObjectHandle  addGameObject(std::unique_ptr<GameObject> gameObject);
+    ObjectHandle  addGameObject(std::unique_ptr<GameObject> gameObject);
 
 	/**
 	 * @brief Remove a game object by name.
@@ -78,7 +79,7 @@ public:
 	 * @return true when an object was removed, false otherwise.
 	 */
 	bool removeGameObject(const std::string& name);
-    bool removeGameObject(GameObjectHandle handle);
+    bool removeGameObject(ObjectHandle handle);
 
     /**
      * @brief Look up a game object by name.
@@ -86,8 +87,8 @@ public:
      * @param name Name of the game object to retrieve.
      * @return Pointer to the object, or nullptr when not found.
      */
-    [[nodiscard]] GameObject* getGameObject(const std::string &name) const;
-    [[nodiscard]] GameObject* getGameObject(GameObjectHandle handle) const;
+    [[nodiscard]] const GameObject* getGameObject(const std::string& name) const;
+    [[nodiscard]] const GameObject* getGameObject(ObjectHandle handle) const;
 
 	/**
 	 * @brief Extract a game object from the scene without destroying it.
@@ -100,7 +101,7 @@ public:
 	 * @return unique_ptr to the extracted game object, or nullptr if not found.
 	 */
 	std::unique_ptr<GameObject> extractGameObject(const std::string& name);
-    std::unique_ptr<GameObject> extractGameObject(GameObjectHandle handle);
+    std::unique_ptr<GameObject> extractGameObject(ObjectHandle handle);
 
 	/**
 	 * Destroys all GameObjects in this scene and clears the @c gameObjects vector.
@@ -122,20 +123,17 @@ public:
 
 private:
 	std::string name;
-	std::vector<Slot> slots;
-    std::vector<uint32_t> freeIndices;
+	SlotMap<GameObject> gameObjects;
+
 	bool active = false;
-    std::unique_ptr<NavigationSystem> navigationSystem;
+	GameWorld* gameWorld = nullptr;
 
-    /// Incremented everytime a GameObject is added to this scene.
-    std::vector<Behaviour*> beforeEnableBehaviours;
-    GameWorld* gameWorld = nullptr;
-    uint32_t generationIndex = 0;
+	//TODO THESE SEEM SMELLY REMOVE
+	std::vector<Behaviour*> beforeEnableBehaviours;
+	std::unique_ptr<NavigationSystem> navigationSystem;
 
-    [[nodiscard]] GameObjectHandle findHandleByName(const std::string& name) const;
-
-    [[nodiscard]] bool isValid(GameObjectHandle handle) const;
-
+    [[nodiscard]] ObjectHandle findHandleByName(const std::string& name) const;
+    [[nodiscard]] bool isValid(ObjectHandle handle) const;
     void initialiseNavigationSystem(NavigationGridOptions options);
 };
 

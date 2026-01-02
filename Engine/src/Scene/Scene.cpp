@@ -6,7 +6,7 @@
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "AI/Navigation/NavigationGridOptions.h"
-#include "Scene/Slot.h"
+#include "../../inc/Scene/SlotMap/Slot.h"
 
 #include <algorithm>
 #include <iostream>
@@ -30,154 +30,112 @@ const std::string& Scene::getName() const
 ///     [[[ SCENE LIFECYCLE FUNCTIONS ]]]
 
 
-void Scene::onStart(GameWorld& world)
-{
-    gameWorld = &world;
-    if (active) return;
+void Scene::onStart(GameWorld& world) {
+	gameWorld = &world;
+	if (active) return;
 
-    initialiseNavigationSystem({100, 100, Vector2{15, 15}});
-    active = true;
+	initialiseNavigationSystem({100, 100, Vector2{15, 15}});
+	active = true;
 
-    std::vector<Behaviour*> allBehaviours;
+	std::vector<Behaviour*> allBehaviours;
 
-    forEachGameObject([&](const GameObject& obj) {
-        for (auto& behaviour : obj.getAllBehaviours()) {
-            if (behaviour) allBehaviours.emplace_back(behaviour);
-        }
-    });
+	forEachGameObject([&](const GameObject& obj) {
+		for (auto& behaviour : obj.getAllBehaviours()) {
+			if (behaviour) allBehaviours.emplace_back(behaviour);
+		}
+	});
 
-    for (const auto& behaviour : beforeEnableBehaviours) {
-        behaviour->setEnabled(true);
-    }
-    beforeEnableBehaviours.clear();
+	for (const auto& behaviour : beforeEnableBehaviours) {
+		behaviour->setEnabled(true);
+	}
+	beforeEnableBehaviours.clear();
 }
 
-void Scene::onStop()
-{
-    if (!active) return;
-    active = false;
 
-    forEachGameObject([&](GameObject& obj) {
-        const auto& enabledBehaviours = obj.getEnabledBehaviours();
-        beforeEnableBehaviours.insert(
-            beforeEnableBehaviours.end(),
-            enabledBehaviours.begin(),
-            enabledBehaviours.end()
-        );
-        obj.setBehavioursEnabled(false);
-    });
+void Scene::onStop() {
+	if (!active) return;
+	active = false;
+
+	forEachGameObject([&](GameObject& obj) {
+		const auto& enabledBehaviours = obj.getEnabledBehaviours();
+		beforeEnableBehaviours.insert(
+			beforeEnableBehaviours.end(),
+			enabledBehaviours.begin(),
+			enabledBehaviours.end()
+		);
+		obj.setBehavioursEnabled(false);
+	});
 }
 
 
 
 ///     [[[ GAME OBJECT HANDLING AND LIFETIME FUNCTIONS ]]]
 
+ObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject) {
+	if (gameObject == nullptr) {
+		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
+		return ObjectHandle::null();
+	}
 
-GameObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
-{
-    if (gameObject == nullptr) {
-        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-        return GameObjectHandle::null();
-    }
+	GameObject* obj = gameObject.get();
+	ObjectHandle handle = gameObjects.add(std::move(gameObject));
 
-    uint32_t index;
+	obj->setScene(*this);
+	obj->setGameObjectHandle(handle);
 
-    if (!freeIndices.empty()) {
-        index = freeIndices.back();
-        freeIndices.pop_back();
-    } else {
-        index = static_cast<uint32_t>(slots.size());
-        slots.push_back({});
-    }
-
-    GameObject* obj = gameObject.get();
-    slots[index].object = std::move(gameObject);
-
-    const GameObjectHandle handle{ index, slots[index].generation };
-    obj->setScene(*this);
-    obj->setGameObjectHandle(handle);
-    return handle;
+	return handle;
 }
 
-
-
-bool Scene::removeGameObject(const std::string& name)
-{
-    GameObjectHandle handle = findHandleByName(name);
-    if (handle.isNull()) return false;
-
-    removeGameObject(handle);
-    return true;
+bool Scene::removeGameObject(const std::string& name) {
+	ObjectHandle handle = findHandleByName(name);
+	if (handle.isNull()) return false;
+	return removeGameObject(handle);
 }
 
-bool Scene::removeGameObject(GameObjectHandle handle)
-{
-    if (!isValid(handle)) return false;
+bool Scene::removeGameObject(ObjectHandle handle) {
+	if (!gameObjects.isValid(handle)) return false;
 
-    auto& slot = slots[handle.index];
+	GameObject* obj = gameObjects.resolve(handle);
 
-    if (active && slot.object->getIsActive()) {
-        slot.object->destroy();
-        slot.object->onSceneDestroy();
-    }
+	if (active && obj->getIsActive()) {
+		obj->destroy();
+		obj->onSceneDestroy();
+	}
 
-    slot.object.reset();
-
-    //This generation is super imporant, it makes sure that when an object get's removed and a new object get's
-    //assigned the same ID the can differentiate object with same id but different generation handles.
-    slot.generation++;
-    freeIndices.push_back(handle.index);
-    return true;
+	gameObjects.destroy(handle);
+	return true;
 }
 
-
-
-GameObject* Scene::getGameObject(const std::string& name) const
-{
-    return getGameObject(findHandleByName(name));
+const GameObject* Scene::getGameObject(const std::string& name) const {
+	return getGameObject(findHandleByName(name));
 }
 
-GameObject* Scene::getGameObject(GameObjectHandle handle) const
-{
-    if (!isValid(handle)) return nullptr;
-    return slots[handle.index].object.get();
+const GameObject* Scene::getGameObject(ObjectHandle handle) const {
+	return gameObjects.resolve(handle);
 }
 
-std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
-{
-    return extractGameObject(findHandleByName(name));
+std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name) {
+	return extractGameObject(findHandleByName(name));
 }
 
+std::unique_ptr<GameObject> Scene::extractGameObject(ObjectHandle handle) {
+	if (!gameObjects.isValid(handle)) return nullptr;
 
-void Scene::destroyAllGameObjects()
-{
-    for (auto& [object, generation] : slots) {
-        if (object) {
-            object->onSceneDestroy();
-            object.reset();
-        }
-    }
-    slots.clear();
-    freeIndices.clear();
+	GameObject* obj = gameObjects.resolve(handle);
+
+	if (active && obj) {
+		obj->setBehavioursEnabled(false);
+	}
+
+	return gameObjects.extract(handle);
 }
 
-std::unique_ptr<GameObject> Scene::extractGameObject(GameObjectHandle handle)
-{
-    if (!isValid(handle)) return nullptr;
-
-    auto& slot = slots[handle.index];
-
-    if (active && slot.object) {
-        slot.object->setBehavioursEnabled(false);
-    }
-
-    auto result = std::move(slot.object);
-    slot.generation++;
-    freeIndices.push_back(handle.index);
-
-    return result;
+void Scene::destroyAllGameObjects() {
+	forEachGameObject([](GameObject& obj) {
+		obj.onSceneDestroy();
+	});
+	gameObjects.clear();
 }
-
 
 //TODO Move this out of scene class
 //      [[[ NAVIGATGION SYSTEM FUNCTIONS ]]]
@@ -214,22 +172,19 @@ NavigationSystem* Scene::getNavigationSystem()
 
 ///      [[[ HELPER FUNCTIONS ]]]
 
-GameObjectHandle Scene::findHandleByName(const std::string& name) const
-{
-    for (uint32_t i = 0; i < slots.size(); i++) {
-        if (const auto& [object, generation] = slots[i]; object && object->getName() == name) {
-            return GameObjectHandle{ i, generation };
-        }
-    }
-    return GameObjectHandle::null();
+
+ObjectHandle Scene::findHandleByName(const std::string& name) const {
+	const auto& slots = gameObjects.getSlots();
+
+	for (uint32_t i = 0; i < slots.size(); i++) {
+		const auto& slot = slots[i];
+		if (slot.object && slot.object->getName() == name) {
+			return ObjectHandle{i, slot.generation};
+		}
+	}
+	return ObjectHandle::null();
 }
 
-bool Scene::isValid(const GameObjectHandle handle) const
-{
-    if (handle.isNull()) return false;
-    if (handle.index >= slots.size()) return false;
-
-    const auto& slot = slots[handle.index];
-    return slot.generation == handle.generation
-        && slot.object != nullptr;
+bool Scene::isValid(ObjectHandle handle) const {
+	return gameObjects.isValid(handle);
 }

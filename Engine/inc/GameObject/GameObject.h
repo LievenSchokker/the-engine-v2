@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameObjectHandle.h"
+#include "ObjectHandle.h"
 #include "Networking/Serialization/ISerializable.h"
 #include "Networking/Serialization/Serialization.h"
 
@@ -290,8 +290,8 @@ class GameObject: public ISerializable
 	void destroyAllComponents();
 	const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
-    GameObjectHandle getGameObjectHandle() const;
-    void setGameObjectHandle(GameObjectHandle handle);
+    ObjectHandle getGameObjectHandle() const;
+    void setGameObjectHandle(ObjectHandle handle);
 
 	/**
 	 * @brief Retrieves all components of type T from @c components.
@@ -384,7 +384,7 @@ private:
 
 	void removeChild(GameObject* child);
 	void addChild(GameObject* child);
-    GameObjectHandle gameObjectHandle;
+    ObjectHandle gameObjectHandle;
 };
 
 #include "GameObjectImplementation.inl"

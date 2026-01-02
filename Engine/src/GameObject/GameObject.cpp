@@ -508,12 +508,12 @@ const std::vector<std::unique_ptr<Component>>& GameObject::getComponents() const
 	return components;
 }
 
-GameObjectHandle GameObject::getGameObjectHandle() const
+ObjectHandle GameObject::getGameObjectHandle() const
 {
     return gameObjectHandle;
 }
 
-void GameObject::setGameObjectHandle(const GameObjectHandle handle)
+void GameObject::setGameObjectHandle(const ObjectHandle handle)
 {
     gameObjectHandle = handle;
 }
