@@ -3,10 +3,9 @@
 
 #include <memory>
 
-
-class GameObject;
-
+template<typename T>
 struct Slot {
-    std::unique_ptr<GameObject> object;
-    uint32_t generation = 1;
+	std::unique_ptr<T> object;
+	uint32_t generation = 1;
 };
+
