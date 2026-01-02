@@ -6,7 +6,6 @@
 #include "SlotMap/SlotMap.h"
 
 class GameObject;
-struct Slot;
 class NavigationSystem;
 
 class Behaviour;
@@ -129,7 +128,6 @@ private:
 	GameWorld* gameWorld = nullptr;
 
 	//TODO THESE SEEM SMELLY REMOVE
-	std::vector<Behaviour*> beforeEnableBehaviours;
 	std::unique_ptr<NavigationSystem> navigationSystem;
 
     [[nodiscard]] ObjectHandle findHandleByName(const std::string& name) const;

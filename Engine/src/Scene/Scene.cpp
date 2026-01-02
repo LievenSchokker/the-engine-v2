@@ -36,35 +36,12 @@ void Scene::onStart(GameWorld& world) {
 
 	initialiseNavigationSystem({100, 100, Vector2{15, 15}});
 	active = true;
-
-	std::vector<Behaviour*> allBehaviours;
-
-	forEachGameObject([&](const GameObject& obj) {
-		for (auto& behaviour : obj.getAllBehaviours()) {
-			if (behaviour) allBehaviours.emplace_back(behaviour);
-		}
-	});
-
-	for (const auto& behaviour : beforeEnableBehaviours) {
-		behaviour->setEnabled(true);
-	}
-	beforeEnableBehaviours.clear();
 }
 
 
 void Scene::onStop() {
 	if (!active) return;
 	active = false;
-
-	forEachGameObject([&](GameObject& obj) {
-		const auto& enabledBehaviours = obj.getEnabledBehaviours();
-		beforeEnableBehaviours.insert(
-			beforeEnableBehaviours.end(),
-			enabledBehaviours.begin(),
-			enabledBehaviours.end()
-		);
-		obj.setBehavioursEnabled(false);
-	});
 }
 
 
@@ -120,13 +97,6 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name) {
 
 std::unique_ptr<GameObject> Scene::extractGameObject(ObjectHandle handle) {
 	if (!gameObjects.isValid(handle)) return nullptr;
-
-	GameObject* obj = gameObjects.resolve(handle);
-
-	if (active && obj) {
-		obj->setBehavioursEnabled(false);
-	}
-
 	return gameObjects.extract(handle);
 }
 
