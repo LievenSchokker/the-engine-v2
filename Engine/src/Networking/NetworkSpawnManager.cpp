@@ -123,6 +123,7 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 	spawnedObjects.erase(netId);
 	objectAssets.erase(netId);
     identityRegistry->unregisterIdentity(identity);
+
 	object->destroy();
 }
 

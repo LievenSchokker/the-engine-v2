@@ -147,14 +147,13 @@ class GameObject: public ISerializable
 	 * @brief Retrieves a vector of all Behaviours attached to this GameObject
 	 */
 	const std::vector<Behaviour*>& getAllBehaviours() const;
-	const std::vector<Behaviour*>& getEnabledBehaviours();
 
 	/**
 	 * @brief Returns all active Behaviour components attached to this
 	 * GameObject.
 	 * @return Vector of pointers to active Behaviour components
 	 */
-	const std::vector<Behaviour*>& getEnabledBehaviours() const;
+	const std::vector<Behaviour*>& getEnabledBehaviours();
 
 	/**
 	 * @brief Returns the Transform of this GameObject.
@@ -341,8 +340,26 @@ class GameObject: public ISerializable
 	 */
 	void markTransformDirty();
 
+	std::optional<uint32_t> consumePendingParentNetId()
+	{
+		if (!hasPendingParent) return std::nullopt;
+		hasPendingParent = false;
+		return pendingParentNetId;
+	}
+
+	std::vector<std::unique_ptr<GameObject>> consumeInlineChildren()
+	{
+		return std::move(deserializedInlineChildren);
+	}
+
+	void storeInlineChild(std::unique_ptr<GameObject> child)
+	{
+		deserializedInlineChildren.push_back(std::move(child));
+	}
+
 private:
 	void fixupPointersAfterClone();
+
 	Component* getComponentByTypeName(const std::string& typeName) const;
 
 	void enableAllBehaviours() const;
@@ -385,6 +402,10 @@ private:
 	void removeChild(GameObject* child);
 	void addChild(GameObject* child);
     ObjectHandle gameObjectHandle;
+
+	uint32_t pendingParentNetId = 0;
+	bool hasPendingParent = false;
+	std::vector<std::unique_ptr<GameObject>> deserializedInlineChildren;
 };
 
 #include "GameObjectImplementation.inl"

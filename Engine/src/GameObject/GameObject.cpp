@@ -1,5 +1,6 @@
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
+#include "Component/NetworkIdentity.h"
 #include "Component/Transform.h"
 #include "Networking/Component/ComponentFactory.h"
 #include "Networking/Serialization/Serialization.h"
@@ -367,6 +368,42 @@ void GameObject::serialize(WriteArchive& archive) const
 		archive.process(typeNameStr);
 		comp->serialize(archive);
 	}
+
+	bool hasNetworkedParent = false;
+	uint32_t parentNetId = 0;
+
+	if (parent != nullptr)
+	{
+		auto* parentIdentity = parent->getComponent<NetworkIdentity>();
+		if (parentIdentity)
+		{
+			hasNetworkedParent = true;
+			parentNetId = parentIdentity->getNetId();
+		}
+	}
+
+	archive.process(hasNetworkedParent);
+	if (hasNetworkedParent)
+	{
+		archive.process(parentNetId);
+	}
+
+	std::vector<GameObject*> inlineChildren;
+	for (GameObject* child : children)
+	{
+		if (child && !child->hasComponent<NetworkIdentity>())
+		{
+			inlineChildren.push_back(child);
+		}
+	}
+
+	uint32_t childCount = static_cast<uint32_t>(inlineChildren.size());
+	archive.process(childCount);
+
+	for (GameObject* child : inlineChildren)
+	{
+		child->serialize(archive);
+	}
 }
 
 void GameObject::deserialize(ReadArchive& archive)
@@ -413,7 +450,26 @@ void GameObject::deserialize(ReadArchive& archive)
 		}
 	}
 	fixupPointersAfterClone();
+
+	bool hasNetworkedParent;
+	archive.process(hasNetworkedParent);
+	hasPendingParent = hasNetworkedParent;
+	if (hasNetworkedParent)
+	{
+		archive.process(pendingParentNetId);
+	}
+
+	uint32_t childCount;
+	archive.process(childCount);
+	for (uint32_t i = 0; i < childCount; ++i)
+	{
+		auto child = std::make_unique<GameObject>();
+		child->deserialize(archive);
+		child->setParent(this);
+		deserializedInlineChildren.push_back(std::move(child));
+	}
 }
+
 
 void GameObject::fixupPointersAfterClone()
 {
@@ -437,21 +493,23 @@ std::unique_ptr<GameObject> GameObject::clone() const
 	auto cloned = std::make_unique<GameObject>();
 	cloned->deserialize(reader);
 
-	for ( auto& component : cloned->components )
+	std::function<void(GameObject*)> fixupRecursive = [&](GameObject* obj)
 	{
-		if ( component )
+		for (auto& component : obj->components)
 		{
-			component->setGameObject(cloned.get());
+			if (component) component->setGameObject(obj);
 		}
-	}
+		for (auto& behaviour : obj->behaviours)
+		{
+			if (behaviour) behaviour->setGameObject(obj);
+		}
+		for (auto& child : obj->deserializedInlineChildren)
+		{
+			if (child) fixupRecursive(child.get());
+		}
+	};
 
-	for ( auto& behaviour : cloned->behaviours )
-	{
-		if ( behaviour )
-		{
-			behaviour->setGameObject(cloned.get());
-		}
-	}
+	fixupRecursive(cloned.get());
 
 	return cloned;
 }
