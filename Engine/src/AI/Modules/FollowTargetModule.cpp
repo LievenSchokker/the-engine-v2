@@ -27,7 +27,7 @@ Vector2 FollowTargetModule::compute()
     if (followTarget == nullptr)
         return Vector2::zero();
 
-    GameObject* targetObject = agentScene->getGameObjectById(targetGameObjectId);
+    GameObject* targetObject = nullptr;
 
     if (targetObject == nullptr)
         return Vector2::zero();

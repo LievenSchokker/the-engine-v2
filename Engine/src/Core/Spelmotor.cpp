@@ -18,8 +18,8 @@
 #include <stdexcept>
 
 SpelMotor::SpelMotor(std::unique_ptr<Game> game)
-    : running(false),
-      specifications(game->getApplicationSpecifications()),
+    : specifications(game->getApplicationSpecifications()),
+      running(false),
       coreSystemLoop(EngineLoopFactory::createEngineLoop(std::move(game))),
       coreClock(std::make_unique<ApplicationClock>(
           coreSystemLoop->getClock(), specifications.networkingOptions.tickRate,

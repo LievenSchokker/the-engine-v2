@@ -1,5 +1,4 @@
 #include "GameObject/GameObject.h"
-
 #include "Behaviour/Behaviour.h"
 #include "Component/Transform.h"
 #include "Networking/Component/ComponentFactory.h"
@@ -22,7 +21,9 @@ GameObject::GameObject()
 	scene = nullptr;
 	parent = nullptr;
 	children = {};
+	gameObjectHandle = ObjectHandle{0, 0};
 }
+
 
 GameObject::~GameObject()
 {
@@ -135,9 +136,9 @@ void GameObject::destroy()
 			child->destroy();
 		}
 	}
-
-	if ( scene != nullptr ) scene->queueDestroy(this);
+    disableAllBehaviours();
 }
+
 
 void GameObject::onSceneDestroy()
 {
@@ -164,10 +165,12 @@ std::string GameObject::getTag() const
 	return tag;
 }
 
+
 bool GameObject::getIsActive() const
 {
 	return isActive;
 }
+
 
 bool GameObject::getIsStatic() const
 {
@@ -223,7 +226,6 @@ void GameObject::setIsStatic(const bool value)
 void GameObject::setScene(Scene& newScene)
 {
 	scene = &newScene;
-	sceneId = scene->getSceneId(*this);
 }
 
 Scene* GameObject::getScene() const
@@ -464,6 +466,7 @@ void GameObject::copyStateFrom(const GameObject& source)
 	deserialize(readArchive);
 }
 
+
 void GameObject::enableAllBehaviours() const
 {
 	for ( auto& behaviour : behaviours )
@@ -504,6 +507,16 @@ Component* GameObject::getComponentByTypeName(const std::string& typeName) const
 const std::vector<std::unique_ptr<Component>>& GameObject::getComponents() const
 {
 	return components;
+}
+
+ObjectHandle GameObject::getGameObjectHandle() const
+{
+    return gameObjectHandle;
+}
+
+void GameObject::setGameObjectHandle(const ObjectHandle handle)
+{
+    gameObjectHandle = handle;
 }
 
 void GameObject::internalAddComponent(std::unique_ptr<Component> component)

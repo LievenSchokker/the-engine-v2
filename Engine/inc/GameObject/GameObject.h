@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ObjectHandle.h"
 #include "Networking/Serialization/ISerializable.h"
 #include "Networking/Serialization/Serialization.h"
 
@@ -42,16 +43,22 @@ class GameObject: public ISerializable
 	/**
 	 * @brief Destructor. Cleans up all components and resources.
 	 */
-	~GameObject();
+	~GameObject() override;
 
-
+	/**
+	 * @brief Serializes this GameObject and all its components.
+	 */
 	void serialize(WriteArchive& archive) const override;
+
+	/**
+	 * @brief Deserializes a GameObject from an archive.
+	 */
 	void deserialize(ReadArchive& archive) override;
 
 	/**
 	 * @brief Creates a deep copy of this GameObject via serialization.
 	 */
-	std::unique_ptr<GameObject> clone() const;
+	[[nodiscard]] std::unique_ptr<GameObject> clone() const;
 
 	/**
 	 * @brief Adds a component of type T to this object's @c components.
@@ -283,6 +290,9 @@ class GameObject: public ISerializable
 	void destroyAllComponents();
 	const std::vector<std::unique_ptr<Component>>& getComponents() const;
 
+    ObjectHandle getGameObjectHandle() const;
+    void setGameObjectHandle(ObjectHandle handle);
+
 	/**
 	 * @brief Retrieves all components of type T from @c components.
 	 *
@@ -331,7 +341,7 @@ class GameObject: public ISerializable
 	 */
 	void markTransformDirty();
 
-   private:
+private:
 	void fixupPointersAfterClone();
 	Component* getComponentByTypeName(const std::string& typeName) const;
 
@@ -374,6 +384,7 @@ class GameObject: public ISerializable
 
 	void removeChild(GameObject* child);
 	void addChild(GameObject* child);
+    ObjectHandle gameObjectHandle;
 };
 
 #include "GameObjectImplementation.inl"

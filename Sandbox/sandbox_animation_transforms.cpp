@@ -44,12 +44,16 @@ class AnimationInputBehaviour: public Behaviour
 		// Get all animators from the scene
 		if ( scene != nullptr )
 		{
-			GameObject* movingCircleObj = scene->getGameObject("MovingCircle");
-			GameObject* rotatingSquareObj =
+			const GameObject* movingCircleObj = scene->getGameObject(
+				"MovingCircle");
+			const GameObject* rotatingSquareObj =
 				scene->getGameObject("RotatingSquare");
-			GameObject* pulsingRectObj = scene->getGameObject("PulsingRect");
-			GameObject* combinedObj = scene->getGameObject("CombinedAnimation");
-			GameObject* pingPongObj = scene->getGameObject("PingPongAnimation");
+			const GameObject* pulsingRectObj = scene->getGameObject(
+				"PulsingRect");
+			const GameObject* combinedObj = scene->getGameObject(
+				"CombinedAnimation");
+			const GameObject* pingPongObj = scene->getGameObject(
+				"PingPongAnimation");
 
 			if ( movingCircleObj )
 				movingCircleAnim = movingCircleObj->getComponent<Animator>();

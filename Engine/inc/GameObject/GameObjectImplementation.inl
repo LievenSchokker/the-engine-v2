@@ -50,6 +50,18 @@ T* GameObject::getComponent() const
 }
 
 template <typename T>
+std::vector<T*> GameObject::getComponents() const
+{
+    std::vector<T*> result;
+    for (const auto& component : components) {
+        if (T* casted = dynamic_cast<T*>(component.get())) {
+            result.push_back(casted);
+        }
+    }
+    return result;
+}
+
+template <typename T>
 bool GameObject::tryGetComponent(T*& out) const
 {
     T* component = getComponent<T>();
