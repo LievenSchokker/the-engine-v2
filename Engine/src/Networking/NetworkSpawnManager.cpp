@@ -70,7 +70,7 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
         return nullptr;
     }
 
-    getScene()->addRunTimeGameObject(std::move(gameObject));
+    gameWorld->sceneManager->addGameObjectToActiveScene(std::move(gameObject));
 
     if (gameWorld->isServer())
     {
@@ -230,8 +230,7 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 
-
-	getScene()->addRunTimeGameObject(std::move(message.gameObject));
+	gameWorld->sceneManager->addGameObjectToActiveScene(std::move(message.gameObject));
 	identity->onNetworkSpawn();
 }
 

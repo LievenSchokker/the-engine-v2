@@ -22,12 +22,14 @@ void Game::addScene(std::unique_ptr<Scene> scene)
 
 std::unique_ptr<Scene> Game::getFirstScene()
 {
-    if (scenes.empty())
-    {
-        return nullptr;
-    }
+	if (scenes.empty())
+	{
+		return nullptr;
+	}
 
-    return std::move(scenes.front());
+	std::unique_ptr<Scene> first = std::move(scenes.front());
+	scenes.erase(scenes.begin());
+	return first;
 }
 
 std::vector<std::unique_ptr<Scene>> Game::getAllScenes()

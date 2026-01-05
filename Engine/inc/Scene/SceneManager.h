@@ -10,6 +10,8 @@
 #include "Core/IEngineSystems.h"
 #include "Core/SystemStatus.h"
 #include "Networking/Connection/ConnectionMode.h"
+#include "SubSystems/BehaviourSystem.h"
+#include "SubSystems/DestroySystem.h"
 
 class NetworkSpawnManager;
 
@@ -27,6 +29,7 @@ public:
 
 	SystemStatus start(GameWorld& gameWorld) override;
 	void update(double deltaTime, const GameWorld& gameWorld) override;
+	void queueDestroy(GameObject* obj);
 	void shutdown(GameWorld& gameWorld) override;
 	[[nodiscard]] const std::string getName() const override;
 
@@ -52,6 +55,8 @@ public:
      */
     bool addScene(std::unique_ptr<Scene> scene);
 
+	void addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject) const;
+    void processForClient(Scene& scene);
     /**
      * @brief Remove a stored scene.
      *
@@ -161,12 +166,6 @@ public:
     [[nodiscard]] Scene* getPersistentScene() const;
 
     /**
-     * @brief Apply a network snapshot to synchronize game objects.
-     * @param receivedObjects Objects received from the network.
-     */
-    void applyNetworkSnapshot(const std::vector<std::unique_ptr<GameObject>>& receivedObjects) const;
-
-    /**
      * @brief Check if a network identity is locally owned.
      * @param identity The network identity to check.
      * @return True if locally owned.
@@ -184,8 +183,10 @@ public:
      * @return Name of the first scene, or empty string if no scenes.
      */
     [[nodiscard]] std::string getFirstSceneName() const;
+	void applyNetworkSnapshot(
+		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
 
-   private:
+private:
     /**
      * @brief Processes a scene for networking based on configured mode.
      * @param scene The scene to process.
@@ -195,12 +196,7 @@ public:
     /**
      * @brief Server: Extract NetworkBehaviour objects as prefabs.
      */
-    void processForServer(Scene& scene);
-
-    /**
-     * @brief Client: Remove NetworkBehaviour objects.
-     */
-    void processForClient(Scene& scene);
+    void processForServer(Scene& scene) const;
 
     /**
      * @brief Checks if a GameObject has any NetworkBehaviour components.
@@ -242,4 +238,8 @@ public:
 
     /// @brief Whether the active scene is paused
     bool paused = false;
+
+	std::unique_ptr<BehaviourSystem> behaviourSystem;
+
+	std::unique_ptr<DestroySystem> destroySystem;
 };
