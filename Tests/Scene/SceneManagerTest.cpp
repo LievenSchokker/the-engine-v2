@@ -178,7 +178,7 @@ TEST(SceneManagerTest, AddGameObjectToActiveScene)
 
 	// Act - Add object to active scene (use addGameObjectToActiveScene)
 	auto obj3 = std::make_unique<MockGameObject>("Object3");
-	sceneManager.addGameObjectToActiveScene(std::move(obj3));  // NOW scene is active
+	sceneManager.getActiveScene()->addGameObject(std::move(obj3));
 
 	// Assert - Object added to active scene should exist
 	EXPECT_NE(scenePtr->getGameObject("Object3"), nullptr);

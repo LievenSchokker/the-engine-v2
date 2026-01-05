@@ -54,8 +54,6 @@ public:
      * or a scene with the same name already exists.
      */
     bool addScene(std::unique_ptr<Scene> scene);
-
-	void addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject) const;
     void processForClient(Scene& scene);
     /**
      * @brief Remove a stored scene.
@@ -186,6 +184,7 @@ public:
 	void applyNetworkSnapshot(
 		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
 
+	BehaviourSystem& getBehaviourSystem();
 private:
     /**
      * @brief Processes a scene for networking based on configured mode.
