@@ -281,34 +281,29 @@ void Transform::moveTowards(Vector2 targetPosition, float maxDistance)
 void Transform::rotateTowards(const Vector2& targetDirection,
 							  float maxRotationSpeed, float deltaTime)
 {
-	if ( targetDirection.magnitude() < 0.001f )
-		return;	 // Avoid division by zero
+	if (targetDirection.magnitude() < 0.001f)
+		return;
 
-	Vector2 normalizedTarget = targetDirection.normalised();
-	Vector2 currentForward = forward();
+	float targetAngle = std::atan2(targetDirection.y, targetDirection.x)
+						* 180.0f / static_cast<float>(M_PI);
 
-	// Calculate angle between current forward and target direction
-	float angleRad = Vector2::angle(currentForward, normalizedTarget);
-	float angleDeg = angleRad * 180.0f / static_cast<float>(M_PI);
+	float angleDiff = targetAngle - rotationAngle;
 
-	// Determine rotation direction (clockwise or counter-clockwise)
-	// Use cross product to determine sign
-	float cross = currentForward.x * normalizedTarget.y -
-				  currentForward.y * normalizedTarget.x;
-	if ( cross < 0.0f )
-	{
-		angleDeg = -angleDeg;
-	}
+	while (angleDiff > 180.0f) angleDiff -= 360.0f;
+	while (angleDiff < -180.0f) angleDiff += 360.0f;
 
-	// Clamp rotation to max speed
 	float maxRotationThisFrame = maxRotationSpeed * deltaTime;
-	float rotationAmount = std::min(std::abs(angleDeg), maxRotationThisFrame);
-	if ( angleDeg < 0.0f )
+	float rotationAmount;
+
+	if (std::abs(angleDiff) <= maxRotationThisFrame)
 	{
-		rotationAmount = -rotationAmount;
+		rotationAmount = angleDiff;
+	}
+	else
+	{
+		rotationAmount = (angleDiff > 0) ? maxRotationThisFrame : -maxRotationThisFrame;
 	}
 
-	// Apply rotation
 	setRotationAngle(rotationAngle + rotationAmount);
 }
 
