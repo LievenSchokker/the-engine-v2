@@ -166,12 +166,6 @@ public:
     [[nodiscard]] Scene* getPersistentScene() const;
 
     /**
-     * @brief Apply a network snapshot to synchronize game objects.
-     * @param receivedObjects Objects received from the network.
-     */
-    void applyNetworkSnapshot(const std::vector<std::unique_ptr<GameObject>>& receivedObjects) const;
-
-    /**
      * @brief Check if a network identity is locally owned.
      * @param identity The network identity to check.
      * @return True if locally owned.
@@ -203,11 +197,6 @@ private:
      * @brief Server: Extract NetworkBehaviour objects as prefabs.
      */
     void processForServer(Scene& scene) const;
-
-	/**
-     * @brief Client: Remove NetworkBehaviour objects.
-     */
-    void processForClient(Scene& scene) const;
 
     /**
      * @brief Checks if a GameObject has any NetworkBehaviour components.

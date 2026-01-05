@@ -401,7 +401,7 @@ Scene* SceneManager::getOrCreatePersistentScene()
 	if (persistentScene == nullptr)
 	{
 		persistentScene = std::make_unique<Scene>("__PersistentScene__");
-		persistentScene->onStart(*gameWorld);
+		behaviourSystem->initialiseScene(*persistentScene, *gameWorld);
 	}
 
 	return persistentScene.get();
@@ -492,7 +492,7 @@ void SceneManager::applyNetworkSnapshot(
 		}
 	}
 
-	for (uint32_t netId : toRemove)
+	for (const uint32_t netId : toRemove)
 	{
 		GameObject* object = spawnManager->getObjectByNetId(netId);
 		if (!object) continue;

@@ -42,7 +42,6 @@ void DestroySystem::processQueue(Scene& scene)
 		if (preDestroyCallback)
 			preDestroyCallback(obj);
 
-		obj->onSceneDestroy();
 		scene.removeGameObject(obj->getGameObjectHandle());
 	}
 

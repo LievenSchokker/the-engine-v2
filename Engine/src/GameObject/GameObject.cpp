@@ -21,6 +21,7 @@ GameObject::GameObject()
 	scene = nullptr;
 	parent = nullptr;
 	children = {};
+	gameObjectHandle = ObjectHandle{0, 0};
 }
 
 
