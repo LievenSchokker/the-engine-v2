@@ -7,6 +7,7 @@
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "AI/Navigation/NavigationGridOptions.h"
+#include "Scene/SceneManager.h"
 
 #include <algorithm>
 #include <iostream>
@@ -193,4 +194,84 @@ ObjectHandle Scene::findHandleByName(const std::string& name) const
 bool Scene::isValid(const ObjectHandle handle) const
 {
 	return gameObjects.isValid(handle);
+}
+
+void Scene::serialize(WriteArchive& archive) const
+{
+    std::string sceneName = name;
+    archive.process(sceneName);
+
+    std::map<const GameObject*, uint32_t> goToIndex;
+    uint32_t goCount = 0;
+
+    const auto& slots = gameObjects.getSlots();
+    for (uint32_t i = 0; i < slots.size(); ++i)
+    {
+        const auto& [object, generation] = slots[i];
+        if (object)
+        {
+            goToIndex[object.get()] = goCount;
+            ++goCount;
+        }
+    }
+
+    archive.process(goCount);
+
+    for (const auto& [object, generation] : slots)
+    {
+        if (object)
+        {
+            object->serialize(archive);
+        }
+    }
+
+    for (const auto& [object, generation] : slots)
+    {
+        if (object)
+        {
+            int32_t parentIndex = -1;
+            if (object->getParent())
+            {
+                auto it = goToIndex.find(object->getParent());
+                if (it != goToIndex.end())
+                {
+                    parentIndex = static_cast<int32_t>(it->second);
+                }
+            }
+            archive.process(parentIndex);
+        }
+    }
+}
+
+void Scene::deserialize(ReadArchive& archive)
+{
+    destroyAllGameObjects();
+    archive.process(name);
+
+    uint32_t goCount;
+    archive.process(goCount);
+
+    std::vector<GameObject*> loadedObjects;
+    loadedObjects.reserve(goCount);
+
+    for (uint32_t i = 0; i < goCount; ++i)
+    {
+        auto go = std::make_unique<GameObject>();
+        go->deserialize(archive);
+
+        GameObject* rawPtr = go.get();
+        addGameObject(std::move(go));
+        loadedObjects.push_back(rawPtr);
+    }
+
+    for (uint32_t i = 0; i < goCount; ++i)
+    {
+        int32_t parentIndex;
+        archive.process(parentIndex);
+
+        if (parentIndex >= 0 && parentIndex < static_cast<int32_t>(loadedObjects.size()))
+        {
+            loadedObjects[i]->setParent(loadedObjects[static_cast<size_t>(parentIndex)]);
+        }
+    }
 }

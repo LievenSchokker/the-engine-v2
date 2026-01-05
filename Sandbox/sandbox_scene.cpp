@@ -37,19 +37,23 @@ static const std::string SAVE_FILENAME = "quicksave.scene";
  * - Mouse wheel Y: Rotates the YellowRectangle
  * - Mouse wheel X: Moves and scales the BlueCircle
  */
-class SandboxInputBehaviour final: public Behaviour
+class SandboxInputBehaviour final: public Behaviour, RegistrationBase<SandboxInputBehaviour>
 {
    public:
-	explicit SandboxInputBehaviour(Scene* scene) : scene(scene)
-	{
-	}
-
+	SandboxInputBehaviour() = default;
 	~SandboxInputBehaviour() override = default;
 
 	void onAwake() override
 	{
 		std::cout << "Sandbox Awake" << std::endl;
 	}
+
+	static constexpr const char* name()
+	{
+		return "SandboxInputBehaviour";
+	}
+
+	const char* getName() const override { return name(); }
 
 	void onEnable() override
 	{
@@ -61,10 +65,18 @@ class SandboxInputBehaviour final: public Behaviour
 		std::cout << "ENTER - Switch scenes" << std::endl;
 	}
 
+	void serialize(WriteArchive& archive) const override
+	{
+		std::cout << "Sandbox Serialize" << std::endl;
+	}
+	void deserialize(ReadArchive& archive) override
+	{
+		std::cout << "Sandbox Deserialize" << std::endl;
+	}
 	void update(double deltaTime, const GameWorld& world) override
 	{
 	    (void)deltaTime;
-
+		Scene* scene = world.sceneManager->getActiveScene();
 		if ( scene == nullptr )
 		{
 			return;
@@ -112,7 +124,6 @@ class SandboxInputBehaviour final: public Behaviour
 				sm->removeScene(sceneName);
 				sm->addScene(std::move(loadedScene));
 				sm->setActiveScene(sceneName);
-
 				std::cout << "[Load] Scene loaded successfully from: " << savePath << std::endl;
 			}
 			else
@@ -157,9 +168,6 @@ class SandboxInputBehaviour final: public Behaviour
 			}
 		}
 	}
-
-   private:
-	Scene* scene;
 };
 
 //////////////////////////////
@@ -257,14 +265,14 @@ int main(int argc, char** argv)
 	// Attach behavior
 	auto goInputHandler = std::make_unique<GameObject>();
 	goInputHandler->setName("InputHandler");
-	goInputHandler->addComponent<SandboxInputBehaviour>(prototypeScene.get());
+	goInputHandler->addComponent<SandboxInputBehaviour>();
 	prototypeScene->addGameObject(std::move(goInputHandler));
 	game->addScene(std::move(prototypeScene));
 
 	// Attach behavior
 	auto goInputHandler2 = std::make_unique<GameObject>();
 	goInputHandler2->setName("InputHandler");
-	goInputHandler2->addComponent<SandboxInputBehaviour>(secondScene.get());
+	goInputHandler2->addComponent<SandboxInputBehaviour>();
 	secondScene->addGameObject(std::move(goInputHandler2));
 	game->addScene(std::move(secondScene));
 
