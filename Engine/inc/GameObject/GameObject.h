@@ -44,15 +44,9 @@ class GameObject: public ISerializable
 	 */
 	~GameObject();
 
-	/**
-	 * @brief Serializes this GameObject and all its components.
-	 */
-	void serialize(WriteArchive& archive) const;
 
-	/**
-	 * @brief Deserializes a GameObject from an archive.
-	 */
-	void deserialize(ReadArchive& archive);
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 
 	/**
 	 * @brief Creates a deep copy of this GameObject via serialization.

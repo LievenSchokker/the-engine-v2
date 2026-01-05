@@ -3,6 +3,7 @@
 
 #include "Core/GameWorld.h"
 #include "AI/Navigation/NavigationGridOptions.h"
+#include "Networking/Serialization/ISerializable.h"
 
 class NavigationSystem;
 class GameObject;
@@ -22,7 +23,7 @@ struct ShapeRenderCommand;
  * Maintains lifecycle state and propagates core calls to its game objects when
  * active.
  */
-class Scene
+class Scene : public ISerializable
 {
 public:
 	/**
@@ -69,18 +70,18 @@ public:
 	 */
 	bool removeGameObject(const std::string& name);
 
-        /**
-         * @brief Removes a GameObject from the scene (destroys it).
-         */
-        void removeGameObject(GameObject* obj);
+    /**
+     * @brief Removes a GameObject from the scene (destroys it).
+     */
+    void removeGameObject(GameObject* obj);
 
-        /**
-         * @brief Look up a game object by name.
-         *
-         * @param name Name of the game object to retrieve.
-         * @return Pointer to the object, or nullptr when not found.
-         */
-        GameObject *getGameObject(const std::string &name) const;
+    /**
+     * @brief Look up a game object by name.
+     *
+     * @param name Name of the game object to retrieve.
+     * @return Pointer to the object, or nullptr when not found.
+     */
+    GameObject *getGameObject(const std::string &name) const;
 
 	/**
 	 * @brief Extract a game object from the scene without destroying it.
@@ -146,14 +147,14 @@ public:
 	 */
 	void queueDestroy(GameObject* gameObject);
 
-        /**
-         * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
-         * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
-         * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
-         *
-         * This function is called at the end of each scene::update() call.
-         */
-        void processDestroyQueue();
+    /**
+     * @brief processes the destroy queue by destroying and deleting all GameObjects inside it,
+     * This function calls @c GameObject::onSceneDestroy() for each GameObject inside the @c destroyQueue,
+     * then attempts to remove the GameObject from the stored @c gameObjects vector to delete it, then clears the @c destroyQueue vector to begin the next frame clean.
+     *
+     * This function is called at the end of each scene::update() call.
+     */
+    void processDestroyQueue();
 
 	/**
 	 * Checks whether the given object is in the @c destroyQueue vector in order to be destroyed.
@@ -201,6 +202,10 @@ public:
      */
     std::vector<std::unique_ptr<GameObject>>& getGameObjects();
     const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
+
 
 
 private:

@@ -391,6 +391,82 @@ const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const
 	return gameObjects;
 }
 
+
+void Scene::serialize(WriteArchive& archive) const
+{
+    std::string sceneName = name;
+    archive.process(sceneName);
+
+    std::map<const GameObject*, uint32_t> goToIndex;
+    uint32_t index = 0;
+    for (const auto& go : gameObjects)
+    {
+        if (go)
+        {
+            goToIndex[go.get()] = index;
+        }
+        ++index;
+    }
+
+    uint32_t goCount = static_cast<uint32_t>(gameObjects.size());
+    archive.process(goCount);
+
+    for (const auto& go : gameObjects)
+    {
+        if (go)
+        {
+            go->serialize(archive);
+        }
+    }
+
+    for (const auto& go : gameObjects)
+    {
+        int32_t parentIndex = -1;
+        if (go && go->getParent())
+        {
+            auto it = goToIndex.find(go->getParent());
+            if (it != goToIndex.end())
+            {
+                parentIndex = static_cast<int32_t>(it->second);
+            }
+        }
+        archive.process(parentIndex);
+    }
+}
+
+void Scene::deserialize(ReadArchive& archive)
+{
+    destroyAllGameObjects();
+    archive.process(name);
+    uint32_t goCount;
+    archive.process(goCount);
+    std::vector<GameObject*> loadedObjects;
+    loadedObjects.reserve(goCount);
+
+    for (uint32_t i = 0; i < goCount; ++i)
+    {
+        auto go = std::make_unique<GameObject>();
+        go->deserialize(archive);
+
+        GameObject* rawPtr = go.get();
+        addGameObject(std::move(go));
+        loadedObjects.push_back(rawPtr);
+    }
+
+    for (uint32_t i = 0; i < goCount; ++i)
+    {
+        int32_t parentIndex;
+        archive.process(parentIndex);
+
+        if (parentIndex >= 0 && parentIndex < static_cast<int32_t>(loadedObjects.size()))
+        {
+            loadedObjects[i]->setParent(loadedObjects[static_cast<size_t>(parentIndex)]);
+        }
+    }
+}
+
+
+
 int Scene::getSceneId(const GameObject& gameObject) const
 {
 	auto it = gameObjectIds.find(&gameObject);
