@@ -61,7 +61,7 @@ public:
      */
     void onStop();
 
-    ObjectHandle  addGameObject(std::unique_ptr<GameObject> gameObject);
+    ObjectHandle addGameObject(std::unique_ptr<GameObject> gameObject);
 
 	/**
 	 * @brief Remove a game object by name.

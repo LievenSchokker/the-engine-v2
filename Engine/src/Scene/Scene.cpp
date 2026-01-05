@@ -7,6 +7,7 @@
 #include "AI/Navigation/NavigationSystem.h"
 #include "AI/Navigation/NavigationGridOptions.h"
 #include "../../inc/Scene/SlotMap/Slot.h"
+#include "Scene/SceneManager.h"
 
 #include <algorithm>
 #include <iostream>
@@ -58,13 +59,21 @@ ObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 	}
 
 	GameObject* obj = gameObject.get();
+
 	ObjectHandle handle = gameObjects.add(std::move(gameObject));
 
 	obj->setScene(*this);
 	obj->setGameObjectHandle(handle);
+	if (active && gameWorld && gameWorld->sceneManager)
+	{
+		std::vector<Behaviour*> behaviours = obj->getAllBehaviours();
+		gameWorld->sceneManager->getBehaviourSystem().
+				   initialiseRuntimeBehaviours(behaviours, *gameWorld);
+	}
 
 	return handle;
 }
+
 
 bool Scene::removeGameObject(const std::string& name)
 {

@@ -141,20 +141,6 @@ void SceneManager::processForServer(Scene& scene) const
 	}
 }
 
-void SceneManager::addGameObjectToActiveScene(std::unique_ptr<GameObject> gameObject) const
-{
-	if (!activeScene || !gameObject) return;
-
-	std::vector<Behaviour*> behaviours = gameObject->getAllBehaviours();
-
-	activeScene->addGameObject(std::move(gameObject));
-
-	if (gameWorld)
-	{
-		behaviourSystem->initialiseRuntimeBehaviours(behaviours, *gameWorld);
-	}
-}
-
 void SceneManager::processForClient(Scene& scene)
 {
     std::vector<GameObject*> toProcess;
@@ -508,6 +494,11 @@ void SceneManager::applyNetworkSnapshot(
 		spawnManager->untrackSpawnedObject(netId);
 		activeScene->removeGameObject(object->getGameObjectHandle());
 	}
+}
+
+BehaviourSystem& SceneManager::getBehaviourSystem()
+{
+	return *behaviourSystem;
 }
 
 
