@@ -54,7 +54,7 @@ TEST_F(BehaviourSystemTest, UpdateCallsBehaviourUpdate)
     behaviourSystem->initialiseScene(scene, *gameWorld);
     behaviour->updateCalled = false;  // Reset after initialisation
 
-    behaviourSystem->update(scene, 0.016, *gameWorld);
+    behaviourSystem->update(scene, 0.016, *gameWorld, false);
 
     EXPECT_TRUE(behaviour->updateCalled);
 }
@@ -72,7 +72,7 @@ TEST_F(BehaviourSystemTest, UpdateSkipsInactiveGameObjects)
     // Deactivate GameObject
     behaviour->getGameObject()->setActive(false);
 
-    behaviourSystem->update(scene, 0.016, *gameWorld);
+    behaviourSystem->update(scene, 0.016, *gameWorld, false);
 
     EXPECT_FALSE(behaviour->updateCalled);
 }
@@ -90,7 +90,7 @@ TEST_F(BehaviourSystemTest, UpdateSkipsDisabledBehaviours)
     // Disable behaviour
     behaviour->setEnabled(false);
 
-    behaviourSystem->update(scene, 0.016, *gameWorld);
+    behaviourSystem->update(scene, 0.016, *gameWorld, false);
 
     EXPECT_FALSE(behaviour->updateCalled);
 }
@@ -213,7 +213,7 @@ TEST_F(BehaviourSystemTest, UpdateMultipleGameObjects)
     behaviour1->updateCalled = false;
     behaviour2->updateCalled = false;
 
-    behaviourSystem->update(scene, 0.016, *gameWorld);
+    behaviourSystem->update(scene, 0.016, *gameWorld, false);
 
     EXPECT_TRUE(behaviour1->updateCalled);
     EXPECT_TRUE(behaviour2->updateCalled);

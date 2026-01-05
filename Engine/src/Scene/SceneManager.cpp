@@ -29,11 +29,12 @@ void SceneManager::fixedUpdate(double deltaTime, const GameWorld& gameWorld)
 {
 	if (!activeScene || paused) return;
 
-	behaviourSystem->fixedUpdate(*activeScene, deltaTime, gameWorld);
+	behaviourSystem->update(*activeScene, deltaTime, gameWorld, true);
 
 	if (persistentScene)
 	{
-		behaviourSystem->fixedUpdate(*persistentScene, deltaTime, gameWorld);
+		//wanted to reuse this method fixed true == fixedUpdate is being called
+		behaviourSystem->update(*persistentScene, deltaTime, gameWorld, true);
 	}
 }
 
@@ -42,12 +43,12 @@ void SceneManager::update(double deltaTime, const GameWorld& gameWorld)
 {
 	if (!activeScene || paused) return;
 
-	behaviourSystem->update(*activeScene, deltaTime, gameWorld);
+	behaviourSystem->update(*activeScene, deltaTime, gameWorld, false);
 	destroySystem->processQueue(*activeScene);
 
 	if (persistentScene)
 	{
-		behaviourSystem->update(*persistentScene, deltaTime, gameWorld);
+		behaviourSystem->update(*persistentScene, deltaTime, gameWorld, false);
 		destroySystem->processQueue(*persistentScene);
 	}
 }
