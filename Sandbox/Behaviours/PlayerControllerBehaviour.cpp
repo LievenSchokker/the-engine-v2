@@ -30,6 +30,11 @@ void PlayerControllerBehaviour::onStart()
 	}
 }
 
+void PlayerControllerBehaviour::fixedUpdate()
+{
+	std::cout << "Yeet" << std::endl;
+}
+
 void PlayerControllerBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
 	inputManager = gameWorld.input;

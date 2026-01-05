@@ -4,6 +4,7 @@
 #include "AI/Modules/AvoidTargetModule.h"
 #include "AI/Modules/FollowTargetModule.h"
 #include "AI/Modules/WanderModule.h"
+#include "Behaviours/PlayerControllerBehaviour.h"
 #include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/Camera.h"
 #include "Component/ShapeRenderer.h"
@@ -19,7 +20,7 @@ std::unique_ptr<Scene> MultiplayerZandbak::getScene()
     auto renderer = player->addComponent<ShapeRenderer>();
     renderer->setCircle(50);
     renderer->setColor(Color(0,255,0));
-    auto movement = player->addComponent<PlayerMovement>();
+    auto movement = player->addComponent<PlayerControllerBehaviour>();
     player->getTransform()->setPosition((Vector2{500, 500}));
 
 	auto child = std::make_unique<GameObject>();

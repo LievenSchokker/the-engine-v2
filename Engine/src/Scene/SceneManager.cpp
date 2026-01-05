@@ -25,6 +25,19 @@ SystemStatus SceneManager::start(GameWorld& gameWorld)
 	return SystemStatus::RUNNING;
 }
 
+void SceneManager::fixedUpdate(double deltaTime, const GameWorld& gameWorld)
+{
+	if (!activeScene || paused) return;
+
+	behaviourSystem->fixedUpdate(*activeScene, deltaTime, gameWorld);
+
+	if (persistentScene)
+	{
+		behaviourSystem->fixedUpdate(*persistentScene, deltaTime, gameWorld);
+	}
+}
+
+
 void SceneManager::update(double deltaTime, const GameWorld& gameWorld)
 {
 	if (!activeScene || paused) return;

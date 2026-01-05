@@ -59,6 +59,40 @@ void BehaviourSystem::update(Scene& scene, double deltaTime, const GameWorld& wo
     }
 }
 
+void BehaviourSystem::fixedUpdate(Scene& scene, double deltaTime, const GameWorld& world)
+{
+	const bool clockPaused = (world.clock != nullptr && world.clock->isPaused());
+
+
+
+	std::vector<GameObject*> activeObjects;
+
+	scene.forEachGameObject([&](GameObject& gameObject) {
+		if (gameObject.getIsActive()) {
+			activeObjects.push_back(&gameObject);
+		}
+	});
+
+	for (GameObject* gameObject : activeObjects)
+	{
+		if (!gameObject)
+			continue;
+
+		for (Behaviour* behaviour : gameObject->getEnabledBehaviours())
+		{
+			if (!behaviour)
+				continue;
+
+			if (!behaviour->getHasAwakened() || !behaviour->getHasStarted())
+				continue;
+
+			if (clockPaused && !behaviour->shouldRunWhenPaused())
+				continue;
+
+			behaviour->fixedUpdate();
+		}
+	}
+}
 void BehaviourSystem::awakeBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world)
 {
     for (Behaviour* behaviour : behaviours)

@@ -33,6 +33,7 @@ public:
      */
     void update(Scene& scene, double deltaTime, const GameWorld& world);
 
+	void fixedUpdate(Scene& scene, double deltaTime, const GameWorld& world);
     /**
      * @brief Calls awake() on behaviours that haven't yet awoken.
      * Runs before enable/start to allow one-time setup without dependencies on other behaviours.

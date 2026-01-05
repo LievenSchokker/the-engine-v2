@@ -82,13 +82,6 @@ void Box2DPhysicsWorld::step(float deltaTime)
 	}
 
 	// Sync transforms to gameobjects
-
-	for ( auto body : bodies )
-	{
-		RigidBody* rigid_body = const_cast<RigidBody*>(body.first);
-		rigid_body->fixedUpdate();
-	}
-
 	syncTransforms();
 }
 

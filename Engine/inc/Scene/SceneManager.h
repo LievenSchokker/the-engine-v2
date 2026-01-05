@@ -28,6 +28,7 @@ public:
     ~SceneManager() override = default;
 
 	SystemStatus start(GameWorld& gameWorld) override;
+	void fixedUpdate(double deltaTime, const GameWorld& gameWorld) override;
 	void update(double deltaTime, const GameWorld& gameWorld) override;
 	void queueDestroy(GameObject* obj);
 	void shutdown(GameWorld& gameWorld) override;
