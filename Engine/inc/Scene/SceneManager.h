@@ -38,10 +38,9 @@ public:
      * @brief Configures the SceneManager for networking.
      * Must be called before setActiveScene() for network processing to work.
      *
-     * @param mode Server or Client mode
      * @param spawnMgr Required for server to auto-spawn objects (can be nullptr for client)
      */
-    void configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnMgr = nullptr);
+    void configureNetworking(NetworkSpawnManager* spawnMgr = nullptr);
 
     /**
      * @brief Checks if network processing has been configured.
@@ -210,7 +209,7 @@ private:
      * @return True if has NetworkIdentity.
      */
     [[nodiscard]] bool hasNetworkIdentity(const GameObject& obj) const;
-	
+
 	void addInlineChildrenRecursive(GameObject* obj);
     /// @brief Whether networking has been configured
     bool networkConfigured = false;

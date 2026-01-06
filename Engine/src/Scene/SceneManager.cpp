@@ -77,10 +77,8 @@ const std::string SceneManager::getName() const
 	return "SceneManager";
 }
 
-void SceneManager::configureNetworking(ConnectionMode mode,
-                                       NetworkSpawnManager* spawnMgr)
+void SceneManager::configureNetworking(NetworkSpawnManager* spawnMgr)
 {
-	networkMode = mode;
 	spawnManager = spawnMgr;
 	networkConfigured = true;
 }
@@ -93,7 +91,7 @@ bool SceneManager::isNetworkConfigured() const
 
 void SceneManager::processSceneForNetwork(Scene& scene)
 {
-	if (networkMode == ConnectionMode::Host)
+	if (gameWorld->server != nullptr)
 	{
 		processForServer(scene);
 	}
@@ -424,7 +422,6 @@ std::string SceneManager::getFirstSceneName() const
 void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>& receivedObjects)
 {
 	if (!spawnManager || !activeScene) return;
-
 	std::unordered_set<uint32_t> receivedNetIds;
 	std::vector<std::pair<GameObject*, uint32_t>> toFixup;
 
@@ -449,6 +446,15 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 			if (auto parentNetId = existing->consumePendingParentNetId())
 			{
 				toFixup.push_back({existing, *parentNetId});
+			}
+			for (auto& child : existing->consumeInlineChildren())
+			{
+				GameObject* childPtr = child.get();
+				std::vector<Behaviour*> behaviours = child->getAllBehaviours();
+
+				activeScene->addGameObject(std::move(child));
+				behaviourSystem->initialiseRuntimeBehaviours(behaviours, *gameWorld);
+				addInlineChildrenRecursive(childPtr);
 			}
 		}
 		else

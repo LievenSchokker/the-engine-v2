@@ -70,7 +70,6 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
         return nullptr;
     }
 
-    //gameWorld->sceneManager->addGameObjectToActiveScene(std::move(gameObject));
 	gameWorld->sceneManager->getActiveScene()->addGameObject(std::move(gameObject));
 
     if (gameWorld->isServer())

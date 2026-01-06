@@ -20,7 +20,7 @@ std::unique_ptr<Scene> MultiplayerZandbak::getScene()
     auto renderer = player->addComponent<ShapeRenderer>();
     renderer->setCircle(50);
     renderer->setColor(Color(0,255,0));
-    auto movement = player->addComponent<PlayerControllerBehaviour>();
+    auto movement = player->addComponent<PlayerMovement>();
     player->getTransform()->setPosition((Vector2{500, 500}));
 
 	auto child = std::make_unique<GameObject>();
