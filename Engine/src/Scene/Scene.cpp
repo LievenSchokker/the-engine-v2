@@ -2,11 +2,11 @@
 
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
+#include "Core/ApplicationClock.h"
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "AI/Navigation/NavigationGridOptions.h"
-#include "../../inc/Scene/SlotMap/Slot.h"
 #include "Scene/SceneManager.h"
 
 #include <algorithm>
@@ -250,4 +250,95 @@ ObjectHandle Scene::findHandleByName(const std::string& name) const
 bool Scene::isValid(const ObjectHandle handle) const
 {
 	return gameObjects.isValid(handle);
+}
+
+void Scene::serialize(WriteArchive& archive) const
+{
+    std::string sceneName = name;
+    archive.process(sceneName);
+
+    std::map<const GameObject*, uint32_t> goToIndex;
+    uint32_t goCount = 0;
+
+    const auto& slots = gameObjects.getSlots();
+    for (uint32_t i = 0; i < slots.size(); ++i)
+    {
+        const auto& [object, generation] = slots[i];
+        if (object)
+        {
+            goToIndex[object.get()] = goCount;
+            ++goCount;
+        }
+    }
+
+    archive.process(goCount);
+
+    for (const auto& [object, generation] : slots)
+    {
+        if (object)
+        {
+            object->serialize(archive);
+        }
+    }
+
+    for (const auto& [object, generation] : slots)
+    {
+        if (object)
+        {
+            int32_t parentIndex = -1;
+            if (object->getParent())
+            {
+                auto it = goToIndex.find(object->getParent());
+                if (it != goToIndex.end())
+                {
+                    parentIndex = it->second;
+                }
+            }
+            archive.process(parentIndex);
+        }
+    }
+}
+
+void Scene::deserialize(ReadArchive& archive)
+{
+	destroyAllGameObjects();
+	archive.process(name);
+
+	uint32_t goCount;
+	archive.process(goCount);
+
+	std::vector<GameObject*> loadedObjects;
+	loadedObjects.reserve(goCount);
+
+	for (uint32_t i = 0; i < goCount; ++i)
+	{
+		auto go = std::make_unique<GameObject>();
+		go->deserialize(archive);
+
+		GameObject* rawPtr = go.get();
+		ObjectHandle handle = gameObjects.add(std::move(go));
+		rawPtr->setScene(*this);
+		rawPtr->setGameObjectHandle(handle);
+		loadedObjects.push_back(rawPtr);
+	}
+	
+	for (uint32_t i = 0; i < goCount; ++i)
+	{
+		int32_t parentIndex;
+		archive.process(parentIndex);
+		if (parentIndex >= 0)
+		{
+			loadedObjects[i]->setParent(loadedObjects[parentIndex]);
+		}
+	}
+
+	if (active && gameWorld && gameWorld->sceneManager)
+	{
+		for (GameObject* obj : loadedObjects)
+		{
+			auto behaviours = obj->getAllBehaviours();
+			gameWorld->sceneManager->getBehaviourSystem()
+				.initialiseRuntimeBehaviours(behaviours, *gameWorld);
+		}
+	}
 }

@@ -3,6 +3,7 @@
 
 #include "Core/GameWorld.h"
 #include "AI/Navigation/NavigationGridOptions.h"
+#include "Networking/Serialization/ISerializable.h"
 #include "SlotMap/SlotMap.h"
 
 class GameObject;
@@ -27,7 +28,7 @@ struct ObjectHandle;
  * Maintains lifecycle state and propagates core calls to its game objects when
  * active.
  */
-class Scene
+class Scene : public ISerializable
 {
 public:
 	/**
@@ -121,6 +122,11 @@ public:
 
     template <class Func>
     void forEachGameObject(Func&& func) const;
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
+
+
 
 private:
 	std::string name;

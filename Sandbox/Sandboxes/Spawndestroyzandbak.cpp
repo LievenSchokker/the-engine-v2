@@ -1,5 +1,4 @@
 #include "SpawnDestroyZandbak.h"
-
 #include "Behaviour/Behaviour.h"
 #include "Behaviours/TestLifeCycleBehaviour.h"
 #include "Component/ShapeRenderer.h"
