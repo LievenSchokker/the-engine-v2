@@ -65,8 +65,7 @@ void EngineLoop::initNetwork() const
 	if (game->getApplicationSpecifications().networkingOptions.mode ==
 	    EngineMode::CLIENT)
 	{
-		sceneManagerPtr->configureNetworking(ConnectionMode::Client,
-		                                     spawnManager.get());
+		sceneManagerPtr->configureNetworking(spawnManager.get());
 
 		ServerConnectionInformation serverInfo{
 			game->getApplicationSpecifications().networkingOptions.port,
@@ -82,8 +81,7 @@ void EngineLoop::initNetwork() const
 	if (game->getApplicationSpecifications().networkingOptions.mode ==
 	    EngineMode::SERVER)
 	{
-		sceneManagerPtr->configureNetworking(ConnectionMode::Host,
-		                                     spawnManager.get());
+		sceneManagerPtr->configureNetworking(spawnManager.get());
 	}
 	if (gameWorld->server != nullptr)
 	{

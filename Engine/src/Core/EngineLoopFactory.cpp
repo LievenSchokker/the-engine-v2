@@ -1,8 +1,4 @@
 #include "Core/EngineLoopFactory.h"
-
-#include <iostream>
-#include <ostream>
-
 #include "Audio/AudioSystem.h"
 #include "Audio/SDL/AudioBackendSDL.h"
 #include "Core/Options/ApplicationSpecifications.h"
@@ -20,6 +16,7 @@
 #include "Scene/SceneManager.h"
 
 #include <iostream>
+#include <ostream>
 
 std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     std::unique_ptr<Game> game)
@@ -76,6 +73,10 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
             auto system = std::make_unique<RenderSystem>(std::move(sdlRenderer));
             gameWorld->render = system.get();
 
+        	if (hasFlag(specs.engineSystem, EngineSystem::Events))
+        	{
+        		system->setupEvents(*gameWorld->getDispatcher());
+        	}
             loop->addSystem(std::move(system));
         }
     }
@@ -122,12 +123,6 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
         auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
         loop->addSystem(std::move(client));
     }
-	// NETWORKING
-	if (hasFlag(specs.engineSystem, EngineSystem::NetClient))
-	{
-		auto client = std::make_unique<Client>(std::make_unique<TransportGNS>());
-		loop->addSystem(std::move(client));
-	}
 
 	if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
 	{

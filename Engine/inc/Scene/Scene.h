@@ -3,18 +3,24 @@
 
 #include "Core/GameWorld.h"
 #include "AI/Navigation/NavigationGridOptions.h"
+#include "Networking/Serialization/ISerializable.h"
+#include "SlotMap/SlotMap.h"
 
-class NavigationSystem;
 class GameObject;
+class NavigationSystem;
+
 class Behaviour;
 struct RenderQueue;
 struct ShapeRenderCommand;
+struct ObjectHandle;
+
+#include "Core/GameWorld.h"
+
 
 #include <map>
 #include <memory>
 #include <string>
 #include <vector>
-#include "Core/GameWorld.h"
 
 /**
  * @brief Collection of game objects that can be started, updated, and rendered.
@@ -22,7 +28,7 @@ struct ShapeRenderCommand;
  * Maintains lifecycle state and propagates core calls to its game objects when
  * active.
  */
-class Scene
+class Scene : public ISerializable
 {
 public:
 	/**
@@ -38,8 +44,25 @@ public:
 	 *
 	 * @return Reference to the stored scene name.
 	 */
-	const std::string& getName() const;
-    int addGameObject(std::unique_ptr<GameObject> gameObject);
+	[[nodiscard]] const std::string& getName() const;
+
+    /**
+     * @brief Start the scene if it is not already active.
+     *
+     * Activates every stored object's components through their component
+     * manager.
+     */
+    void onStart(GameWorld& world);
+
+    /**
+     * @brief Stop the scene if it is active.
+     *
+     * Deactivates every stored object's components through their component
+     * manager.
+     */
+    void onStop();
+
+    ObjectHandle addGameObject(std::unique_ptr<GameObject> gameObject);
 
 	/**
 	 * @brief Remove a game object by name.
@@ -56,11 +79,7 @@ public:
 	 * @return true when an object was removed, false otherwise.
 	 */
 	bool removeGameObject(const std::string& name);
-
-    /**
-     * @brief Removes a GameObject from the scene (destroys it).
-     */
-    void removeGameObject(GameObject* obj);
+    bool removeGameObject(ObjectHandle handle);
 
     /**
      * @brief Look up a game object by name.
@@ -68,7 +87,10 @@ public:
      * @param name Name of the game object to retrieve.
      * @return Pointer to the object, or nullptr when not found.
      */
-    GameObject *getGameObject(const std::string &name) const;
+	GameObject* getGameObject(const std::string& name);
+	GameObject* getGameObject(ObjectHandle handle);
+    [[nodiscard]] const GameObject* getGameObject(const std::string& name) const;
+    [[nodiscard]] const GameObject* getGameObject(ObjectHandle handle) const;
 
 	/**
 	 * @brief Extract a game object from the scene without destroying it.
@@ -81,23 +103,7 @@ public:
 	 * @return unique_ptr to the extracted game object, or nullptr if not found.
 	 */
 	std::unique_ptr<GameObject> extractGameObject(const std::string& name);
-
-	/**
-	 * @brief Start the scene if it is not already active.
-	 *
-	 * Activates every stored object's components through their component
-	 * manager.
-	 */
-	void onStart(GameWorld& world);
-
-	/**
-	 * @brief Stop the scene if it is active.
-	 *
-	 * Deactivates every stored object's components through their component
-	 * manager.
-	 */
-	void onStop();
-	void onPause();
+    std::unique_ptr<GameObject> extractGameObject(ObjectHandle handle);
 
 	/**
 	 * Destroys all GameObjects in this scene and clears the @c gameObjects vector.
@@ -106,55 +112,35 @@ public:
 	 */
 	void destroyAllGameObjects();
 
-	template <class T>
-	std::vector<T*> getAllComponentsOfType() const;
-
-	/**
- * @brief Retrieves the id stored by this scene for a given GameObject.
- * @param gameObject the gameObject to look with for its id
- * @return the id that is assigned to the GameObject if found, -1 if the GameObject does not belong to this scene
- */
-	int getSceneId(const GameObject& gameObject) const;
-
-	/**
-	 * @brief Returns a GameObject from  this scene by providing its scene id.
-	 *
-	 * Returns
-	 * @param id
-	 * @return the GameObject whose id matches the argument, nullptr if the id is not found on any of this scene's GameObjects.
-	 */
-	GameObject* getGameObjectById(int id) const;
-
-
-	NavigationSystem* getNavigationSystem() const;
-
-	/**
-     ** @brief Removes a GameObject by pointer and returns it.
-	*/
-    std::unique_ptr<GameObject> extractGameObject(GameObject* obj);
-
-    /**
-     * @brief Gets mutable access to all GameObjects.
-     */
-    std::vector<std::unique_ptr<GameObject>>& getGameObjects();
-
-    const std::vector<std::unique_ptr<GameObject>>& getGameObjects() const;
-
-
     NavigationSystem* getNavigationSystem();
+
+    template <class Component>
+    std::vector<Component*> getAllComponentsOfType() const;
+
+    template <class Func>
+    void forEachGameObject(Func&& func);
+
+    template <class Func>
+    void forEachGameObject(Func&& func) const;
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
+
+
+
 private:
 	std::string name;
-	std::vector<std::unique_ptr<GameObject>> gameObjects;
+	SlotMap<GameObject> gameObjects;
+
 	bool active = false;
+	GameWorld* gameWorld = nullptr;
 
+	//TODO THESE SEEM SMELLY REMOVE
+	std::unique_ptr<NavigationSystem> navigationSystem;
 
-	void initialiseNavigationSystem(NavigationGridOptions options);
-    std::unique_ptr<NavigationSystem> navigationSystem;
-
-    /// Incremented everytime a GameObject is added to this scene.
-	std::vector<Behaviour*> beforeEnableBehaviours;
-    GameWorld* gameWorld = nullptr;
-
+    [[nodiscard]] ObjectHandle findHandleByName(const std::string& name) const;
+    [[nodiscard]] bool isValid(ObjectHandle handle) const;
+    void initialiseNavigationSystem(NavigationGridOptions options);
 };
 
 #include "Scene.inl"

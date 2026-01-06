@@ -25,14 +25,11 @@ void StateSyncSystem::broadcastState(uint32_t currentTick)
 {
 	StateSyncMessage message;
 	message.tick = currentTick;
-
 	for (auto* identity : registry->getAllIdentities())
 	{
 		if (!identity) continue;
-
 		GameObject* go = identity->getGameObject();
 		if (!go) continue;
-
 		message.addGameObject(go->clone());
 	}
 

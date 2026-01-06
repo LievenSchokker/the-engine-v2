@@ -1,7 +1,4 @@
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
-
-#include <corecrt_math_defines.h>
-
 #include "Component/Transform.h"
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"
@@ -10,19 +7,21 @@
 
 #include <iostream>
 
-#include <iostream>
-
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
-	: worldId{}
-	  , tickRate(newTickRate)
+	: worldId{}, tickRate(newTickRate)
 {
 }
 
 void Box2DPhysicsWorld::initialize()
 {
+	std::cout << "Box2DPhysicsWorld::initialize() called" << std::endl;
+
 	b2WorldDef worldDef = b2DefaultWorldDef();
+	worldDef.gravity = {0.0f, 150.0f};
 	worldDef.gravity = {0.0f, 10.0f};
 	worldId = b2CreateWorld(&worldDef);
+
+	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
 }
 
 void Box2DPhysicsWorld::step(float deltaTime)
@@ -113,7 +112,6 @@ void Box2DPhysicsWorld::handleEvents()
 
 		if ( !sensorGO || !visitorGO ) continue;
 
-
 		Collider* sensorCol = sensorGO->getComponent<Collider>();
 		Collider* visitorCol = visitorGO->getComponent<Collider>();
 
@@ -171,7 +169,7 @@ void Box2DPhysicsWorld::applyForce(const RigidBody* rigidBody, Vector2 force)
 
 void Box2DPhysicsWorld::shutdown()
 {
-	for (auto& [gameObject, box2DID] : bodies)
+	for ( auto& [gameObject, box2DID] : bodies )
 	{
 		b2DestroyBody(box2DID);
 	}

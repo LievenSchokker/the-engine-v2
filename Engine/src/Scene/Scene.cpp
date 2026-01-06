@@ -2,23 +2,16 @@
 
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
-#include "Component/BaseComponentTypes/RenderComponent.h"
-#include "Component/BaseComponentTypes/UIRenderComponent.h"
 #include "Core/ApplicationClock.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
-
+#include "AI/Navigation/NavigationGridOptions.h"
+#include "Scene/SceneManager.h"
 
 #include <algorithm>
 #include <iostream>
 #include <utility>
-
-#include "Game.h"
-#include "Behaviour/Behaviour.h"
-
-#include "AI/Navigation/NavigationGridOptions.h"
 
 Scene::Scene(std::string name) : name(std::move(name))
 {
@@ -34,202 +27,187 @@ const std::string& Scene::getName() const
 	return name;
 }
 
-int Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
-{
-	if (gameObject == nullptr)
-	{
-		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-		return false;
-	}
-    if ( gameObject == nullptr ) {
-        std::cerr << "[Scene] Error: Attempted to add a null game object\n";
-        return -1;
-    }
 
-	GameObject* addedObject = gameObject.get();
-    gameObjects.emplace_back(std::move(gameObject));
-	addedObject->setScene(*this);
-    return 0;
-}
+///     [[[ SCENE LIFECYCLE FUNCTIONS ]]]
 
-
-bool Scene::removeGameObject(const std::string& name)
-{
-	const auto it =
-		std::ranges::remove_if(gameObjects,
-		                       [&](const std::unique_ptr<GameObject>&
-		                       gameObject)
-		                       {
-			                       if (gameObject->getName() == name)
-			                       {
-				                       if (active && gameObject->getIsActive())
-				                       {
-					                       gameObject->destroy();
-					                       gameObject->onSceneDestroy();
-				                       }
-				                       return true;
-			                       }
-			                       return false;
-		                       }).begin();
-
-	if (it != gameObjects.end())
-	{
-        GameObject* gameObject = it->get();
-		return true;
-	}
-
-	return false;
-}
-
-GameObject* Scene::getGameObject(const std::string& name) const
-{
-	for (const auto& gameObject : gameObjects)
-	{
-		if (gameObject->getName() == name)
-		{
-			return gameObject.get();
-		}
-	}
-
-	return nullptr;
-}
-
-std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
-{
-	const auto it = std::ranges::find_if(gameObjects,
-	                                     [&](const std::unique_ptr<GameObject>&
-	                                     gameObject)
-	                                     {
-		                                     return gameObject->getName() ==
-		                                            name;
-	                                     });
-
-	if (it == gameObjects.end())
-	{
-		return nullptr;
-	}
-
-	GameObject* gameObject = it->get();
-
-	// Call onStop if scene is active
-	if (active && gameObject != nullptr)
-	{
-		gameObject->setBehavioursEnabled(false);
-	}
-
-	// Move ownership and remove from vector
-	auto result = std::move(*it);
-	gameObjects.erase(it);
-
-	return result;
-}
 
 void Scene::onStart(GameWorld& world)
 {
 	gameWorld = &world;
 	if (active) return;
 
-	/// Note: Somehwere the settings should be configured?
 	initialiseNavigationSystem({100, 100, Vector2{15, 15}});
-
 	active = true;
-
-	/// Store all behaviours from all gameobjects in this scene
-	std::vector<Behaviour*> allBehaviours;
-
-	/// Retrieve every behaviour on every GameObject in this scene object.
-	for (auto& gameObject : gameObjects)
-	{
-		for (auto& behaviour : gameObject->getAllBehaviours())
-		{
-			if (behaviour == nullptr) continue;
-
-			allBehaviours.emplace_back(behaviour);
-		}
-	}
-
-	// Reactivates behaviours
-	for (auto& behaviour : beforeEnableBehaviours)
-	{
-		behaviour->setEnabled(true);
-	}
-
-	beforeEnableBehaviours.clear();
-    active = true;
 }
+
 
 void Scene::onStop()
 {
-	if (!active)
+	if (!active) return;
+	active = false;
+}
+
+
+///     [[[ GAME OBJECT HANDLING AND LIFETIME FUNCTIONS ]]]
+
+ObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
+{
+	if (gameObject == nullptr)
 	{
-		return;
+		return ObjectHandle::null();
 	}
 
-	active = false;
-	for (auto& gameObject : gameObjects)
+	GameObject* obj = gameObject.get();
+	ObjectHandle handle = gameObjects.add(std::move(gameObject));
+
+	obj->setScene(*this);
+	obj->setGameObjectHandle(handle);
+
+	if (active && gameWorld && gameWorld->sceneManager)
 	{
-		const auto& enabledBehaviours = gameObject->getEnabledBehaviours();
-		beforeEnableBehaviours.insert(beforeEnableBehaviours.end(),
-		                              enabledBehaviours.begin(),
-		                              enabledBehaviours.end());
-		gameObject->setBehavioursEnabled(false);
+		std::vector<Behaviour*> behaviours = obj->getAllBehaviours();
+		gameWorld->sceneManager->getBehaviourSystem().
+				   initialiseRuntimeBehaviours(behaviours, *gameWorld);
 	}
+
+	// Recursively add inline children
+	std::function<void(GameObject*)> addInlineChildren = [&](GameObject* parent)
+	{
+		auto inlineChildren = parent->consumeInlineChildren();
+		for (auto& child : inlineChildren)
+		{
+			if (!child) continue;
+
+			GameObject* childPtr = child.get();
+			ObjectHandle childHandle = gameObjects.add(std::move(child));
+			childPtr->setScene(*this);
+			childPtr->setGameObjectHandle(childHandle);
+
+			if (active && gameWorld && gameWorld->sceneManager)
+			{
+				std::vector<Behaviour*> behaviours = childPtr->getAllBehaviours();
+				gameWorld->sceneManager->getBehaviourSystem().
+						   initialiseRuntimeBehaviours(behaviours, *gameWorld);
+			}
+
+			addInlineChildren(childPtr);
+		}
+	};
+
+	addInlineChildren(obj);
+
+	return handle;
+}
+
+bool Scene::removeGameObject(const std::string& name)
+{
+	ObjectHandle handle = findHandleByName(name);
+	if (handle.isNull()) return false;
+	return removeGameObject(handle);
+}
+
+bool Scene::removeGameObject(ObjectHandle handle)
+{
+	if (!gameObjects.isValid(handle)) return false;
+
+	GameObject* obj = gameObjects.resolve(handle);
+
+	std::vector<GameObject*> childrenCopy = obj->getChildren();
+	for (GameObject* child : childrenCopy)
+	{
+		if (child)
+		{
+			removeGameObject(child->getGameObjectHandle());
+		}
+	}
+
+	if (active && obj->getIsActive())
+	{
+		obj->destroy();
+		obj->onSceneDestroy();
+	}
+
+	gameObjects.destroy(handle);
+	return true;
+}
+
+GameObject* Scene::getGameObject(const std::string& name)
+{
+	return getGameObject(findHandleByName(name));
+}
+
+GameObject* Scene::getGameObject(ObjectHandle handle)
+{
+	return gameObjects.resolve(handle);
+}
+
+const GameObject* Scene::getGameObject(const std::string& name) const
+{
+	return getGameObject(findHandleByName(name));
+}
+
+const GameObject* Scene::getGameObject(ObjectHandle handle) const
+{
+	return gameObjects.resolve(handle);
+}
+
+std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
+{
+	return extractGameObject(findHandleByName(name));
+}
+
+std::unique_ptr<GameObject> Scene::extractGameObject(ObjectHandle handle)
+{
+	if (!gameObjects.isValid(handle)) return nullptr;
+
+	GameObject* obj = gameObjects.resolve(handle);
+	if (!obj) return nullptr;
+
+	if (obj->getParent() != nullptr) return nullptr;
+	std::function<void(GameObject*)> extractChildrenFromSlotMap = [&](GameObject* parent)
+	{
+		std::vector<GameObject*> childrenCopy = parent->getChildren();
+		for (GameObject* child : childrenCopy)
+		{
+			if (child)
+			{
+				extractChildrenFromSlotMap(child);
+				auto extracted = gameObjects.extract(child->getGameObjectHandle());
+				if (extracted)
+				{
+					parent->storeInlineChild(std::move(extracted));
+				}
+			}
+		}
+	};
+
+	extractChildrenFromSlotMap(obj);
+	return gameObjects.extract(handle);
 }
 
 void Scene::destroyAllGameObjects()
 {
-	for (auto& gameObject : gameObjects)
+	forEachGameObject([](GameObject& obj)
 	{
-		gameObject->onSceneDestroy();
-	}
-
+		obj.onSceneDestroy();
+	});
 	gameObjects.clear();
 }
 
-std::unique_ptr<GameObject> Scene::extractGameObject(GameObject* obj)
-{
-	for (auto it = gameObjects.begin(); it != gameObjects.end(); ++it)
-	{
-		if (it->get() == obj)
-		{
-			std::unique_ptr<GameObject> extracted = std::move(*it);
-			gameObjects.erase(it);
-			return extracted;
-		}
-	}
-	return nullptr;
-}
+//TODO Move this out of scene class
+//      [[[ NAVIGATGION SYSTEM FUNCTIONS ]]]
 
-void Scene::removeGameObject(GameObject* obj)
-{
-	gameObjects.erase(
-		std::remove_if(gameObjects.begin(), gameObjects.end(),
-		               [obj](const std::unique_ptr<GameObject>& ptr)
-		               {
-			               return ptr.get() == obj;
-		               }),
-		gameObjects.end()
-		);
-}
-
-std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects()
-{
-	return gameObjects;
-}
-
-const std::vector<std::unique_ptr<GameObject>>& Scene::getGameObjects() const
-{
-	return gameObjects;
-}
 
 void Scene::initialiseNavigationSystem(NavigationGridOptions options)
 {
-	std::unique_ptr<NavigationGrid> navGrid = std::make_unique<NavigationGrid>(
+	auto navGrid = std::make_unique<NavigationGrid>(
 		options.gridWidth, options.gridHeight, options.cellSize);
-	std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<
+	const std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<
 		NavigationObstacle>();
 
 	std::vector<BoundingBox> obstacleBounds{};
+
+	obstacleBounds.reserve(obstacles.size());
 
 	for (const auto& obstacle : obstacles)
 	{
@@ -243,9 +221,124 @@ void Scene::initialiseNavigationSystem(NavigationGridOptions options)
 
 NavigationSystem* Scene::getNavigationSystem()
 {
-    if (!navigationSystem)
+	if (!navigationSystem)
+	{
+		initialiseNavigationSystem({100, 100, Vector2{15, 15}});
+	}
+	return navigationSystem.get();
+}
+
+
+///      [[[ HELPER FUNCTIONS ]]]
+
+
+ObjectHandle Scene::findHandleByName(const std::string& name) const
+{
+	const auto& slots = gameObjects.getSlots();
+
+	for (uint32_t i = 0; i < slots.size(); i++)
+	{
+		const auto& [object, generation] = slots[i];
+		if (object && object->getName() == name)
+		{
+			return ObjectHandle{i, generation};
+		}
+	}
+	return ObjectHandle::null();
+}
+
+bool Scene::isValid(const ObjectHandle handle) const
+{
+	return gameObjects.isValid(handle);
+}
+
+void Scene::serialize(WriteArchive& archive) const
+{
+    std::string sceneName = name;
+    archive.process(sceneName);
+
+    std::map<const GameObject*, uint32_t> goToIndex;
+    uint32_t goCount = 0;
+
+    const auto& slots = gameObjects.getSlots();
+    for (uint32_t i = 0; i < slots.size(); ++i)
     {
-        initialiseNavigationSystem({100, 100, Vector2{15, 15}});
+        const auto& [object, generation] = slots[i];
+        if (object)
+        {
+            goToIndex[object.get()] = goCount;
+            ++goCount;
+        }
     }
-    return navigationSystem.get();
+
+    archive.process(goCount);
+
+    for (const auto& [object, generation] : slots)
+    {
+        if (object)
+        {
+            object->serialize(archive);
+        }
+    }
+
+    for (const auto& [object, generation] : slots)
+    {
+        if (object)
+        {
+            int32_t parentIndex = -1;
+            if (object->getParent())
+            {
+                auto it = goToIndex.find(object->getParent());
+                if (it != goToIndex.end())
+                {
+                    parentIndex = it->second;
+                }
+            }
+            archive.process(parentIndex);
+        }
+    }
+}
+
+void Scene::deserialize(ReadArchive& archive)
+{
+	destroyAllGameObjects();
+	archive.process(name);
+
+	uint32_t goCount;
+	archive.process(goCount);
+
+	std::vector<GameObject*> loadedObjects;
+	loadedObjects.reserve(goCount);
+
+	for (uint32_t i = 0; i < goCount; ++i)
+	{
+		auto go = std::make_unique<GameObject>();
+		go->deserialize(archive);
+
+		GameObject* rawPtr = go.get();
+		ObjectHandle handle = gameObjects.add(std::move(go));
+		rawPtr->setScene(*this);
+		rawPtr->setGameObjectHandle(handle);
+		loadedObjects.push_back(rawPtr);
+	}
+	
+	for (uint32_t i = 0; i < goCount; ++i)
+	{
+		int32_t parentIndex;
+		archive.process(parentIndex);
+		if (parentIndex >= 0)
+		{
+			loadedObjects[i]->setParent(loadedObjects[parentIndex]);
+		}
+	}
+
+	if (active && gameWorld && gameWorld->sceneManager)
+	{
+		for (GameObject* obj : loadedObjects)
+		{
+			auto behaviours = obj->getAllBehaviours();
+			gameWorld->sceneManager->getBehaviourSystem()
+				.initialiseRuntimeBehaviours(behaviours, *gameWorld);
+		}
+	}
 }

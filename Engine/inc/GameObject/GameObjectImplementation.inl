@@ -29,6 +29,11 @@ T* GameObject::addComponent(Args&&... args)
 
     newComponent->setGameObject(this);
 
+    if constexpr (std::is_base_of_v<Behaviour, T>)
+    {
+        behaviours.push_back(static_cast<Behaviour*>(rawPtr));
+    }
+
     internalAddComponent(std::move(newComponent));
     return rawPtr;
 }
@@ -47,6 +52,18 @@ T* GameObject::getComponent() const
         return dynamic_cast<T*>(iterator->get());
     }
     else return nullptr;
+}
+
+template <typename T>
+std::vector<T*> GameObject::getComponents() const
+{
+    std::vector<T*> result;
+    for (const auto& component : components) {
+        if (T* casted = dynamic_cast<T*>(component.get())) {
+            result.push_back(casted);
+        }
+    }
+    return result;
 }
 
 template <typename T>
@@ -122,4 +139,18 @@ auto GameObject::getComponentIterator() const -> std::vector<
                         {
                             return dynamic_cast<T*>(comp.get()) != nullptr;
                         });
+}
+
+template <typename T>
+std::vector<T*> GameObject::getAllComponentsOfType() const
+{
+    std::vector<T*> result;
+    for (const auto& component : components)
+    {
+        if (auto* casted = dynamic_cast<T*>(component.get()))
+        {
+            result.push_back(casted);
+        }
+    }
+    return result;
 }

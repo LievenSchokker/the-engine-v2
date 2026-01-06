@@ -26,14 +26,14 @@ ShapeRenderer& ShapeRenderer::setCircle(float newRadius)
 
 ShapeRenderer& ShapeRenderer::setRectangle(Vector2 newSize)
 {
-    type = RenderCommandType::Rectangle;
+	type = RenderCommandType::Rectangle;
 
-    constexpr float kEpsilon = 0.0001f;
+	constexpr float kEpsilon = 0.0001f;
 
-    size.x = std::max(newSize.x, kEpsilon);
-    size.y = std::max(newSize.y, kEpsilon);
+	size.x = std::max(newSize.x, kEpsilon);
+	size.y = std::max(newSize.y, kEpsilon);
 
-    return *this;
+	return *this;
 }
 
 Color ShapeRenderer::getColor() const
@@ -59,13 +59,16 @@ RenderCommandType ShapeRenderer::getShapeType() const
 void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 {
 	const Transform* transform = getTransform();
-	if ( transform == nullptr || type == RenderCommandType::None ) {
+	if ( transform == nullptr || type == RenderCommandType::None )
+	{
 		return;
 	}
 
-	const Vector2 position = transform->getPosition();
-	const double rotation = transform->getRotationAngle();
-	const Vector2 scale = Vector2Utils::sanitizeScale(transform->getScale());
+	// Use world transforms to respect parent-child hierarchy
+	const Vector2 position = transform->getWorldPosition();
+	const double rotation = transform->getWorldRotation();
+	const Vector2 scale =
+		Vector2Utils::sanitizeScale(transform->getWorldScale());
 
 	RenderCommand command;
 	command.type = type;

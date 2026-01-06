@@ -12,6 +12,7 @@
 #include "Sandboxes/Multiplayer/MultiplayerPhysicsZandbak.h"
 #include "Sandboxes/Multiplayer/MultiplayerZandbak.h"
 #include "Sandboxes/Multiplayer/MultiplayerZandbak.h"
+#include "Sandboxes/UserInterfaceZandbak.h"
 
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's
