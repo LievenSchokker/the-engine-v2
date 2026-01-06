@@ -25,7 +25,6 @@ GameObject::GameObject()
 	gameObjectHandle = ObjectHandle{0, 0};
 }
 
-
 GameObject::~GameObject()
 {
 	// Clean up parent-child relationship to prevent dangling pointers
@@ -513,7 +512,7 @@ std::unique_ptr<GameObject> GameObject::clone() const
 	serialize(writer);
 
 	std::vector<std::byte> bytes = writer.getBytes();
-	CerealReadArchive reader(bytes.data(), bytes.size());
+	ReadArchive reader(bytes.data(), bytes.size());
 
 	auto cloned = std::make_unique<GameObject>();
 	cloned->deserialize(reader);
