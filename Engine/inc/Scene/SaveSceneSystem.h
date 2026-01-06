@@ -108,7 +108,7 @@ private:
 	 */
 	static std::string makeFilePath(const Scene& scene,
 									const std::string& directory = "");
-	
+
 	static bool writeHeader(WriteArchive& archive, uint32_t sceneCount);
 	static bool readHeader(ReadArchive& archive, uint32_t& sceneCount);
 	static bool writeToFile(const std::vector<std::byte>& bytes,

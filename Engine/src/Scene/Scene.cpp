@@ -235,7 +235,7 @@ void Scene::serialize(WriteArchive& archive) const
                 auto it = goToIndex.find(object->getParent());
                 if (it != goToIndex.end())
                 {
-                    parentIndex = static_cast<int32_t>(it->second);
+                    parentIndex = it->second;
                 }
             }
             archive.process(parentIndex);
