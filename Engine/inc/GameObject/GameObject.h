@@ -345,8 +345,34 @@ class GameObject: public ISerializable
 	 */
 	void markTransformDirty();
 
+	/**
+	 * @brief Retrieves and clears the pending parent network ID.
+	 *
+	 * Used during network deserialization to defer parent-child
+	 * relationship setup until all objects are spawned.
+	 *
+	 * @return The pending parent network ID, or std::nullopt if none set.
+	 */
 	std::optional<uint32_t> consumePendingParentNetId();
+
+	/**
+	 * @brief Retrieves and clears all inline children.
+	 *
+	 * Transfers ownership of child GameObjects that were added during
+	 * deserialization. After calling, the internal container is empty.
+	 *
+	 * @return Vector of child GameObjects.
+	 */
 	std::vector<std::unique_ptr<GameObject>> consumeInlineChildren();
+
+	/**
+	 * @brief Stores a child GameObject for deferred processing.
+	 *
+	 * Used during deserialization to temporarily hold child objects
+	 * before they are added to the scene hierarchy.
+	 *
+	 * @param child The GameObject to store. Ownership is transferred.
+	 */
 	void storeInlineChild(std::unique_ptr<GameObject> child);
 
 private:
