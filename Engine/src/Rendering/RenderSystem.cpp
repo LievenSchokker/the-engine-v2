@@ -11,7 +11,8 @@
 #include <iostream>
 
 RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
-	: renderer(std::move(renderer))
+	: renderer(std::move(renderer)),
+	clearColor(Color::black())
 {
 }
 
