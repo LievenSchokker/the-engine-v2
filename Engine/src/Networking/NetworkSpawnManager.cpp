@@ -32,6 +32,7 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
     }
 
     auto gameObject = prefabLibrary->instantiate(assetId);
+
     if (!gameObject)
     {
         return nullptr;

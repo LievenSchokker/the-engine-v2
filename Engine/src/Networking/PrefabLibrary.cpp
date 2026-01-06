@@ -13,6 +13,12 @@ uint32_t PrefabLibrary::add(std::unique_ptr<GameObject> prefab)
 
     const uint32_t assetId = nextAssetId++;
 
+	if (prefab->getParent() != nullptr && !prefab->getParent()->hasComponent<NetworkIdentity>())
+	{
+		std::cerr << "[Network] Networked object cannot have non-networked parent\n";
+		return 0;
+	}
+
     if (prefab->getComponent<NetworkIdentity>())
     {
         networkPrefabIds.push_back(assetId);
@@ -28,6 +34,12 @@ void PrefabLibrary::add(const uint32_t assetId, std::unique_ptr<GameObject> pref
     {
         return;
     }
+
+	if (prefab->getParent() != nullptr && !prefab->getParent()->hasComponent<NetworkIdentity>())
+	{
+		std::cerr << "[Network] Networked object cannot have non-networked parent\n";
+		return;
+	}
 
     // Update nextAssetId to avoid conflicts
     if (assetId >= nextAssetId)

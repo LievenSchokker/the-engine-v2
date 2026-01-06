@@ -453,7 +453,6 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 				std::vector<Behaviour*> behaviours = child->getAllBehaviours();
 
 				activeScene->addGameObject(std::move(child));
-				behaviourSystem->initialiseRuntimeBehaviours(behaviours, *gameWorld);
 				addInlineChildrenRecursive(childPtr);
 			}
 		}
