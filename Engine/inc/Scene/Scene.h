@@ -80,8 +80,9 @@ public:
 	 */
 	bool removeGameObject(const std::string& name);
     bool removeGameObject(ObjectHandle handle);
+	void queueDestroy(ObjectHandle obj);
 
-    /**
+	/**
      * @brief Look up a game object by name.
      *
      * @param name Name of the game object to retrieve.

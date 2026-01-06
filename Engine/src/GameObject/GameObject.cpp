@@ -131,7 +131,6 @@ void GameObject::destroy()
 
 	// Remove parent relationship before destroying
 	setParent(nullptr);
-
 	// Destroy all children
 	// Create a copy of children vector since destroy() will modify it
 	std::vector<GameObject*> childrenCopy = children;
@@ -143,6 +142,11 @@ void GameObject::destroy()
 		}
 	}
 	disableAllBehaviours();
+
+	if (scene)
+	{
+		scene->queueDestroy(getGameObjectHandle());
+	}
 }
 
 

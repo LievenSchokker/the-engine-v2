@@ -7,6 +7,8 @@
 
 
 #include "BaseAgentModule.h"
+#include "GameObject/ObjectHandle.h"
+#include "Scene/Scene.h"
 class Scene;
 
 /**
@@ -45,8 +47,8 @@ class FollowTargetModule final : public BaseAgentModule
     private:
         /// The target to follow, internally used.
         /// Is retrieved every frame from the scene using the @c targetGameObjectId
-        const Transform* followTarget = nullptr;
-        int targetGameObjectId = 0;
+		const Transform* target = agentScene->getGameObject(targetGameObjectId)->getTransform();
+		ObjectHandle targetGameObjectId  = ObjectHandle::null();
         Scene* agentScene = nullptr;
 
         /// Radius in which this module computes a vector towards the target, internally used.

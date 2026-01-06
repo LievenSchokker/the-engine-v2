@@ -27,7 +27,6 @@ const std::string& Scene::getName() const
 	return name;
 }
 
-
 ///     [[[ SCENE LIFECYCLE FUNCTIONS ]]]
 
 
@@ -129,6 +128,14 @@ bool Scene::removeGameObject(ObjectHandle handle)
 
 	gameObjects.destroy(handle);
 	return true;
+}
+
+void Scene::queueDestroy(ObjectHandle obj)
+{
+	if (gameWorld && gameWorld->sceneManager)
+	{
+		gameWorld->sceneManager->queueDestroy(gameObjects.resolve(obj));
+	}
 }
 
 GameObject* Scene::getGameObject(const std::string& name)
