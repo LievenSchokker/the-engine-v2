@@ -245,33 +245,44 @@ void Scene::serialize(WriteArchive& archive) const
 
 void Scene::deserialize(ReadArchive& archive)
 {
-    destroyAllGameObjects();
-    archive.process(name);
+	destroyAllGameObjects();
+	archive.process(name);
 
-    uint32_t goCount;
-    archive.process(goCount);
+	uint32_t goCount;
+	archive.process(goCount);
 
-    std::vector<GameObject*> loadedObjects;
-    loadedObjects.reserve(goCount);
+	std::vector<GameObject*> loadedObjects;
+	loadedObjects.reserve(goCount);
 
-    for (uint32_t i = 0; i < goCount; ++i)
-    {
-        auto go = std::make_unique<GameObject>();
-        go->deserialize(archive);
+	for (uint32_t i = 0; i < goCount; ++i)
+	{
+		auto go = std::make_unique<GameObject>();
+		go->deserialize(archive);
 
-        GameObject* rawPtr = go.get();
-        addGameObject(std::move(go));
-        loadedObjects.push_back(rawPtr);
-    }
+		GameObject* rawPtr = go.get();
+		ObjectHandle handle = gameObjects.add(std::move(go));
+		rawPtr->setScene(*this);
+		rawPtr->setGameObjectHandle(handle);
+		loadedObjects.push_back(rawPtr);
+	}
+	
+	for (uint32_t i = 0; i < goCount; ++i)
+	{
+		int32_t parentIndex;
+		archive.process(parentIndex);
+		if (parentIndex >= 0)
+		{
+			loadedObjects[i]->setParent(loadedObjects[parentIndex]);
+		}
+	}
 
-    for (uint32_t i = 0; i < goCount; ++i)
-    {
-        int32_t parentIndex;
-        archive.process(parentIndex);
-
-        if (parentIndex >= 0 && parentIndex < static_cast<int32_t>(loadedObjects.size()))
-        {
-            loadedObjects[i]->setParent(loadedObjects[static_cast<size_t>(parentIndex)]);
-        }
-    }
+	if (active && gameWorld && gameWorld->sceneManager)
+	{
+		for (GameObject* obj : loadedObjects)
+		{
+			auto behaviours = obj->getAllBehaviours();
+			gameWorld->sceneManager->getBehaviourSystem()
+				.initialiseRuntimeBehaviours(behaviours, *gameWorld);
+		}
+	}
 }
