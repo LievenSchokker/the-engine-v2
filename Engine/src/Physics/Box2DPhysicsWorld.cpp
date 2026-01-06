@@ -198,15 +198,18 @@ void Box2DPhysicsWorld::syncTransforms()
     }
 }
 
+
 void Box2DPhysicsWorld::applyNetworkSnapshot()
 {
     constexpr float positionLerpFactor = 0.3f;
     constexpr float rotationLerpFactor = 0.3f;
     constexpr float snapThresholdSquared = 25.0f;
+    constexpr float closeEnoughSquared = 0.01f;
 
     for (auto& [rigidBody, bodyId] : bodies)
     {
-    	if (!rigidBody->isDynamic) continue;
+        if (!rigidBody->isDynamic) continue;
+
         const GameObject* gameObject = rigidBody->getGameObject();
         if (!gameObject) continue;
 
@@ -224,10 +227,15 @@ void Box2DPhysicsWorld::applyNetworkSnapshot()
         float dy = targetPos.y - currentPos.y;
         float distanceSquared = dx * dx + dy * dy;
 
-        Vector2 newPosition {0.0f, 0.0f};
+        Vector2 newPosition{0,0};
         float newAngle;
 
         if (distanceSquared > snapThresholdSquared)
+        {
+            newPosition = targetPos;
+            newAngle = targetAngle;
+        }
+        else if (distanceSquared < closeEnoughSquared)
         {
             newPosition = targetPos;
             newAngle = targetAngle;
@@ -236,16 +244,16 @@ void Box2DPhysicsWorld::applyNetworkSnapshot()
         {
             newPosition.x = currentPos.x + dx * positionLerpFactor;
             newPosition.y = currentPos.y + dy * positionLerpFactor;
+
             float angleDiff = targetAngle - currentAngle;
-            while (angleDiff > M_PI) angleDiff -= 2.0f * M_PI;
-            while (angleDiff < -M_PI) angleDiff += 2.0f * M_PI;
+            while (angleDiff > 3.14159265359) angleDiff -= 2.0f * 3.14159265359;
+            while (angleDiff < -3.14159265359) angleDiff += 2.0f * 3.14159265359;
             newAngle = currentAngle + angleDiff * rotationLerpFactor;
         }
 
         b2Body_SetTransform(bodyId, {newPosition.x, newPosition.y}, b2MakeRot(newAngle));
         b2Body_SetLinearVelocity(bodyId, {rigidBody->linearVelocity.x, rigidBody->linearVelocity.y});
         b2Body_SetAngularVelocity(bodyId, rigidBody->angularVelocity);
-
         b2Body_SetAwake(bodyId, true);
     }
 }
