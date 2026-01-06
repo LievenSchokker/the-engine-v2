@@ -1,5 +1,4 @@
 #include "Events/EventImplementations/ApplicationEvents.h"
-#include "Events/EventQueue.h"
 #include "Core/GameWorld.h"
 #include "Core/SystemStatus.h"
 #include "Events/SDL/SDLEventProccesor.h"
@@ -36,22 +35,13 @@ const std::string SDLEventProcessor::getName() const
     return "SDLEventProcessor";
 }
 
-bool SDLEventProcessor::pollEvents(EventQueue& queue)
-{
-    return processEvents([&queue](auto event)
-    {
-        queue.push(std::move(event));
-    });
-}
-
 bool SDLEventProcessor::pollEvents(EventDispatcher& dispatcher)
 {
-    return processEvents([&dispatcher](auto event)
-    {
-        dispatcher.dispatch(event);
-    });
+	return processEvents([&dispatcher](auto event)
+	{
+		dispatcher.dispatch(event);
+	});
 }
-
 
 void SDLEventProcessor::setUnhandledEventCallback(
     std::function<void(const SDL_Event&)> callback)
