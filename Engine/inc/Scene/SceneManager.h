@@ -210,7 +210,8 @@ private:
      * @return True if has NetworkIdentity.
      */
     [[nodiscard]] bool hasNetworkIdentity(const GameObject& obj) const;
-
+	
+	void addInlineChildrenRecursive(GameObject* obj);
     /// @brief Whether networking has been configured
     bool networkConfigured = false;
 

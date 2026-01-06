@@ -474,22 +474,11 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 			spawnManager->trackSpawnedObject(netId, rawPtr);
 			behaviourSystem->initialiseRuntimeBehaviours(behaviours, *gameWorld);
 
-			std::function<void(GameObject*)> addInlineChildren = [&](GameObject* obj)
-			{
-				for (auto& child : obj->consumeInlineChildren())
-				{
-					GameObject* childPtr = child.get();
-					activeScene->addGameObject(std::move(child));
-					addInlineChildren(childPtr);
-				}
-			};
-
-			addInlineChildren(rawPtr);
-
 			if (identity)
 			{
 				identity->onNetworkSpawn();
 			}
+			addInlineChildrenRecursive(rawPtr);
 		}
 	}
 
@@ -536,6 +525,16 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 
 		spawnManager->untrackSpawnedObject(netId);
 		activeScene->removeGameObject(object->getGameObjectHandle());
+	}
+}
+
+void SceneManager::addInlineChildrenRecursive(GameObject* obj)
+{
+	for (auto& child : obj->consumeInlineChildren())
+	{
+		GameObject* childPtr = child.get();
+		activeScene->addGameObject(std::move(child));
+		addInlineChildrenRecursive(childPtr);
 	}
 }
 
