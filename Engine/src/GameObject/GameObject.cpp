@@ -29,7 +29,7 @@ GameObject::GameObject()
 GameObject::~GameObject()
 {
 	// Clean up parent-child relationship to prevent dangling pointers
-	if ( parent != nullptr )
+	if (parent != nullptr)
 	{
 		parent->removeChild(this);
 		parent = nullptr;
@@ -38,9 +38,9 @@ GameObject::~GameObject()
 	transform = nullptr;
 
 	// Clear parent pointers from all children to prevent dangling pointers
-	for ( GameObject* child : children )
+	for (GameObject* child : children)
 	{
-		if ( child != nullptr )
+		if (child != nullptr)
 		{
 			child->parent = nullptr;
 		}
@@ -55,22 +55,24 @@ bool GameObject::compareTag(const std::string& other) const
 
 bool GameObject::hasComponent(const Component* comp) const
 {
-	if ( comp == nullptr ) return false;
+	if (comp == nullptr) return false;
 
 	auto it = std::ranges::find_if(
 		components, [&](const std::unique_ptr<Component>& component)
-		{ return component.get() == comp; });
+		{
+			return component.get() == comp;
+		});
 
 	return it != components.end();
 }
 
 void GameObject::removeComponent(Component* comp)
 {
-	if ( !comp || !hasComponent(comp) ) return;
+	if (!comp || !hasComponent(comp)) return;
 
 	/// If its a behaviour, we also need to remove it from the behaviours
 	/// vectors:
-	if ( auto* behaviour = dynamic_cast<Behaviour*>(comp) )
+	if (auto* behaviour = dynamic_cast<Behaviour*>(comp))
 	{
 		behaviour->setEnabled(false);
 
@@ -79,18 +81,20 @@ void GameObject::removeComponent(Component* comp)
 			behaviours.end());
 
 		enabledBehaviours.erase(std::remove(enabledBehaviours.begin(),
-											enabledBehaviours.end(), behaviour),
-								enabledBehaviours.end()
+		                                    enabledBehaviours.end(), behaviour),
+		                        enabledBehaviours.end()
 
-		);
+			);
 	}
 
 	/// Remove the component from the components vector.
 	auto it = std::ranges::find_if(
 		components, [&](const std::unique_ptr<Component>& component)
-		{ return component.get() == comp; });
+		{
+			return component.get() == comp;
+		});
 
-	if ( it != components.end() )
+	if (it != components.end())
 	{
 		it->get()->onDestroy();
 		components.erase(it);
@@ -106,10 +110,10 @@ const std::vector<Behaviour*>& GameObject::getEnabledBehaviours()
 {
 	enabledBehaviours.clear();
 
-	for ( Behaviour* behaviour : behaviours )
+	for (Behaviour* behaviour : behaviours)
 	{
-		if ( behaviour != nullptr && behaviour->getIsEnabled() )
-			enabledBehaviours.push_back(behaviour);
+		if (behaviour != nullptr && behaviour->getIsEnabled()) enabledBehaviours
+			.push_back(behaviour);
 	}
 
 	return enabledBehaviours;
@@ -117,7 +121,7 @@ const std::vector<Behaviour*>& GameObject::getEnabledBehaviours()
 
 void GameObject::destroy()
 {
-	if ( isDestroyed ) return;
+	if (isDestroyed) return;
 
 	isDestroyed = true;
 	setActive(false);
@@ -130,14 +134,14 @@ void GameObject::destroy()
 	// Destroy all children
 	// Create a copy of children vector since destroy() will modify it
 	std::vector<GameObject*> childrenCopy = children;
-	for ( GameObject* child : childrenCopy )
+	for (GameObject* child : childrenCopy)
 	{
-		if ( child != nullptr )
+		if (child != nullptr)
 		{
 			child->destroy();
 		}
 	}
-    disableAllBehaviours();
+	disableAllBehaviours();
 }
 
 
@@ -190,7 +194,7 @@ bool GameObject::getIsDestroyed() const
 
 int GameObject::getSceneId() const
 {
-	if ( scene == nullptr ) return -1;
+	if (scene == nullptr) return -1;
 
 	return sceneId;
 }
@@ -212,14 +216,14 @@ void GameObject::setTag(const std::string& newTag)
 
 void GameObject::setActive(const bool value)
 {
-	if ( isActive == value ) return;
+	if (isActive == value) return;
 
 	isActive = value;
 }
 
 void GameObject::setIsStatic(const bool value)
 {
-	if ( isStatic == value ) return;
+	if (isStatic == value) return;
 
 	isStatic = value;
 }
@@ -236,7 +240,7 @@ Scene* GameObject::getScene() const
 
 void GameObject::setBehavioursEnabled(const bool value) const
 {
-	if ( value )
+	if (value)
 	{
 		enableAllBehaviours();
 	}
@@ -248,17 +252,17 @@ void GameObject::setBehavioursEnabled(const bool value) const
 
 void GameObject::setParent(GameObject* newParent)
 {
-	if ( parent == newParent ) return;
+	if (parent == newParent) return;
 
 	GameObject* oldParent = parent;
 	Transform* newParentTransform =
 		newParent != nullptr ? newParent->getTransform() : nullptr;
 
 	// Update Transform first; it will reject circular references
-	if ( !transform->setParent(newParentTransform) ) return;
+	if (!transform->setParent(newParentTransform)) return;
 
 	// Remove from old parent's children list
-	if ( oldParent != nullptr )
+	if (oldParent != nullptr)
 	{
 		oldParent->removeChild(this);
 	}
@@ -267,7 +271,7 @@ void GameObject::setParent(GameObject* newParent)
 	parent = newParent;
 
 	// Add to new parent's children list
-	if ( parent != nullptr )
+	if (parent != nullptr)
 	{
 		parent->addChild(this);
 	}
@@ -291,13 +295,13 @@ int GameObject::getChildCount() const
 void GameObject::removeChild(GameObject* child)
 {
 	children.erase(std::remove(children.begin(), children.end(), child),
-				   children.end());
+	               children.end());
 }
 
 void GameObject::addChild(GameObject* child)
 {
 	// Check if already a child
-	if ( std::find(children.begin(), children.end(), child) == children.end() )
+	if (std::find(children.begin(), children.end(), child) == children.end())
 	{
 		children.push_back(child);
 	}
@@ -306,21 +310,40 @@ void GameObject::addChild(GameObject* child)
 void GameObject::markTransformDirty()
 {
 	// Mark this GameObject's Transform as dirty
-	if ( transform != nullptr )
+	if (transform != nullptr)
 	{
 		transform->markDirtyLocal();
 	}
 
 	// Mark all children's Transforms as dirty (their world matrices depend on
 	// this transform)
-	for ( GameObject* child : children )
+	for (GameObject* child : children)
 	{
-		if ( child != nullptr )
+		if (child != nullptr)
 		{
 			child->markTransformDirty();
 		}
 	}
 }
+
+std::optional<uint32_t> GameObject::consumePendingParentNetId()
+{
+	if (!hasPendingParent) return std::nullopt;
+	hasPendingParent = false;
+	return pendingParentNetId;
+}
+
+
+std::vector<std::unique_ptr<GameObject>> GameObject::consumeInlineChildren()
+{
+	return std::move(deserializedInlineChildren);
+}
+
+void GameObject::storeInlineChild(std::unique_ptr<GameObject> child)
+{
+	deserializedInlineChildren.push_back(std::move(child));
+}
+
 
 void GameObject::serialize(WriteArchive& archive) const
 {
@@ -343,11 +366,11 @@ void GameObject::serialize(WriteArchive& archive) const
 
 	// Count
 	uint32_t count = 0;
-	for ( const auto& comp : getComponents() )
+	for (const auto& comp : getComponents())
 	{
-		if ( dynamic_cast<Transform*>(comp.get()) ) continue;
+		if (dynamic_cast<Transform*>(comp.get())) continue;
 		const char* typeName = comp->getName();
-		if ( typeName && ComponentFactory::instance().isRegistered(typeName) )
+		if (typeName && ComponentFactory::instance().isRegistered(typeName))
 		{
 			count++;
 		}
@@ -355,11 +378,11 @@ void GameObject::serialize(WriteArchive& archive) const
 	archive.process(count);
 
 	// Components
-	for ( const auto& comp : getComponents() )
+	for (const auto& comp : getComponents())
 	{
-		if ( dynamic_cast<Transform*>(comp.get()) ) continue;
+		if (dynamic_cast<Transform*>(comp.get())) continue;
 		const char* typeName = comp->getName();
-		if ( !typeName || !ComponentFactory::instance().isRegistered(typeName) )
+		if (!typeName || !ComponentFactory::instance().isRegistered(typeName))
 		{
 			continue;
 		}
@@ -427,22 +450,22 @@ void GameObject::deserialize(ReadArchive& archive)
 	uint32_t count;
 	archive.process(count);
 
-	for ( uint32_t i = 0; i < count; ++i )
+	for (uint32_t i = 0; i < count; ++i)
 	{
 		std::string typeName;
 		archive.process(typeName);
 
-		if ( Component* existing = getComponentByTypeName(typeName) )
+		if (Component* existing = getComponentByTypeName(typeName))
 		{
 			existing->deserialize(archive);
 		}
 		else
 		{
 			auto comp = ComponentFactory::instance().create(typeName);
-			if ( !comp )
+			if (!comp)
 			{
 				std::cerr << "[GameObject] Unknown component: " << typeName
-						  << std::endl;
+					<< std::endl;
 				break;
 			}
 			comp->deserialize(archive);
@@ -473,9 +496,9 @@ void GameObject::deserialize(ReadArchive& archive)
 
 void GameObject::fixupPointersAfterClone()
 {
-	for ( auto& component : components )
+	for (auto& component : components)
 	{
-		if ( component )
+		if (component)
 		{
 			component->setGameObject(this);
 		}
@@ -527,7 +550,7 @@ void GameObject::copyStateFrom(const GameObject& source)
 
 void GameObject::enableAllBehaviours() const
 {
-	for ( auto& behaviour : behaviours )
+	for (auto& behaviour : behaviours)
 	{
 		behaviour->setEnabled(true);
 	}
@@ -535,7 +558,7 @@ void GameObject::enableAllBehaviours() const
 
 void GameObject::disableAllBehaviours() const
 {
-	for ( auto& behaviour : behaviours )
+	for (auto& behaviour : behaviours)
 	{
 		behaviour->setEnabled(false);
 	}
@@ -543,7 +566,7 @@ void GameObject::disableAllBehaviours() const
 
 void GameObject::destroyAllComponents()
 {
-	while ( !components.empty() )
+	while (!components.empty())
 	{
 		removeComponent(components.back().get());
 	}
@@ -551,10 +574,10 @@ void GameObject::destroyAllComponents()
 
 Component* GameObject::getComponentByTypeName(const std::string& typeName) const
 {
-	for ( const auto& comp : getComponents() )
+	for (const auto& comp : getComponents())
 	{
 		const char* compTypeName = comp->getName();
-		if ( compTypeName && typeName == compTypeName )
+		if (compTypeName && typeName == compTypeName)
 		{
 			return comp.get();
 		}
@@ -569,21 +592,21 @@ const std::vector<std::unique_ptr<Component>>& GameObject::getComponents() const
 
 ObjectHandle GameObject::getGameObjectHandle() const
 {
-    return gameObjectHandle;
+	return gameObjectHandle;
 }
 
 void GameObject::setGameObjectHandle(const ObjectHandle handle)
 {
-    gameObjectHandle = handle;
+	gameObjectHandle = handle;
 }
 
 void GameObject::internalAddComponent(std::unique_ptr<Component> component)
 {
-	if ( component != nullptr )
+	if (component != nullptr)
 	{
 		component->setGameObject(this);
 
-		if ( auto* behaviour = dynamic_cast<Behaviour*>(component.get()) )
+		if (auto* behaviour = dynamic_cast<Behaviour*>(component.get()))
 		{
 			behaviours.push_back(behaviour);
 		}

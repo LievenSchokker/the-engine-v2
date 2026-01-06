@@ -340,37 +340,23 @@ class GameObject: public ISerializable
 	 */
 	void markTransformDirty();
 
-	std::optional<uint32_t> consumePendingParentNetId()
-	{
-		if (!hasPendingParent) return std::nullopt;
-		hasPendingParent = false;
-		return pendingParentNetId;
-	}
-
-	std::vector<std::unique_ptr<GameObject>> consumeInlineChildren()
-	{
-		return std::move(deserializedInlineChildren);
-	}
-
-	void storeInlineChild(std::unique_ptr<GameObject> child)
-	{
-		deserializedInlineChildren.push_back(std::move(child));
-	}
+	std::optional<uint32_t> consumePendingParentNetId();
+	std::vector<std::unique_ptr<GameObject>> consumeInlineChildren();
+	void storeInlineChild(std::unique_ptr<GameObject> child);
 
 private:
 	void fixupPointersAfterClone();
 
 	Component* getComponentByTypeName(const std::string& typeName) const;
-
 	void enableAllBehaviours() const;
-
 	void disableAllBehaviours() const;
-
 	void internalAddComponent(std::unique_ptr<Component> component);
+
 	/// Helper function to iterate through @c components
 	template <typename T>
 	std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
 	/// Helper function to iterate through @c components, const version.
+	///
 	template <typename T>
 	std::vector<std::unique_ptr<Component>>::const_iterator
 

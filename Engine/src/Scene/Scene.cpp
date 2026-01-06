@@ -54,13 +54,10 @@ ObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
 	if (gameObject == nullptr)
 	{
-		std::cerr << "[Scene] Error: Attempted to add a null game object\n";
 		return ObjectHandle::null();
 	}
 
 	GameObject* obj = gameObject.get();
-	std::cout << "[Scene] Adding: " << obj->getName() << "\n";  // ADD
-
 	ObjectHandle handle = gameObjects.add(std::move(gameObject));
 
 	obj->setScene(*this);
@@ -77,16 +74,11 @@ ObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 	std::function<void(GameObject*)> addInlineChildren = [&](GameObject* parent)
 	{
 		auto inlineChildren = parent->consumeInlineChildren();
-		std::cout << "[Scene] " << parent->getName() << " has "
-				  << inlineChildren.size() << " inline children to add\n";  // ADD
-
 		for (auto& child : inlineChildren)
 		{
 			if (!child) continue;
 
 			GameObject* childPtr = child.get();
-			std::cout << "[Scene] Adding child: " << childPtr->getName() << "\n";  // ADD
-
 			ObjectHandle childHandle = gameObjects.add(std::move(child));
 			childPtr->setScene(*this);
 			childPtr->setGameObjectHandle(childHandle);
