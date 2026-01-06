@@ -52,6 +52,30 @@ public:
 	virtual void applyForce(const RigidBody* rigidBody, Vector2 force) = 0;
 
 	/**
+	 * @brief Sets the global gravity vector for the physics world.
+	 *
+	 * @param gravity Gravity vector in world units.
+	 */
+	virtual void setGravity(Vector2 gravity) = 0;
+
+	/**
+	 * @brief Sets the linear velocity of a physics body.
+	 *
+	 * @param rigidBody Pointer to the RigidBody whose body will be updated.
+	 * @param velocity Velocity vector in world units per second.
+	 */
+	virtual void setLinearVelocity(const RigidBody* rigidBody,
+								   Vector2 velocity) = 0;
+
+	/**
+	 * @brief Retrieves the current linear velocity of a physics body.
+	 *
+	 * @param rigidBody Pointer to the RigidBody whose velocity will be queried.
+	 * @return Velocity vector in world units per second.
+	 */
+	virtual Vector2 getLinearVelocity(const RigidBody* rigidBody) const = 0;
+
+	/**
 	 * @brief Synchronizes all registered GameObject transforms with the physics world.
 	 *
 	 * After stepping the simulation, this function updates each GameObject's

@@ -2,6 +2,8 @@
 #include "Component/Transform.h"
 #include "Scene/Scene.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "Physics/Components/RigidBody.h"
+#include "Physics/IPhysicsWorld.h"
 
 
 void Agent::onAwake()
@@ -10,6 +12,8 @@ void Agent::onAwake()
     {
         setEnabled(false);
     }
+
+    rigidBody = getComponent<RigidBody>();
 
     for (auto& moduleData  :  moduleDatas)
     {
@@ -21,6 +25,21 @@ void Agent::onAwake()
 void Agent::update(double deltaTime, const GameWorld& gameWorld)
 {
     Vector2 velocity = computeDesiredVelocity();
+
+    if (rigidBody != nullptr && gameWorld.physics != nullptr)
+    {
+        if (velocity.magnitude() > 0.0f && !rigidBody->isFixedRotation())
+        {
+            transform->rotateTowards(velocity, rotationTurnRate, deltaTime);
+        }
+
+        const Vector2 currentVelocity =
+            gameWorld.physics->getLinearVelocity(rigidBody);
+        const Vector2 velocityDelta = velocity - currentVelocity;
+        const float accelStrength = std::max(minAcceleration, maxSpeed * accelerationMultiplier);
+        gameWorld.physics->applyForce(rigidBody, velocityDelta * accelStrength);
+        return;
+    }
 
     if (velocity.magnitude() > 0.0f)
     {
@@ -115,6 +134,26 @@ void Agent::setRotationTurnRate(float value)
     rotationTurnRate = value;
 }
 
+float Agent::getAccelerationMultiplier() const
+{
+    return accelerationMultiplier;
+}
+
+void Agent::setAccelerationMultiplier(float value)
+{
+    accelerationMultiplier = value;
+}
+
+float Agent::getMinAcceleration() const
+{
+    return minAcceleration;
+}
+
+void Agent::setMinAcceleration(float value)
+{
+    minAcceleration = value;
+}
+
 
 bool Agent::requestPath(const Vector2 &target)
 {
@@ -143,11 +182,6 @@ bool Agent::hasPath() const
 {
     return currentPath.isValid();
 }
-
-
-
-
-
 
 
 

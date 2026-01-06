@@ -44,6 +44,28 @@ Color TilemapComponent::getTileColor(int tileId) const
 	}
 }
 
+void TilemapComponent::setTileCollider(int tileId, bool enabled)
+{
+	if ( enabled )
+	{
+		collidableTileIds.insert(tileId);
+	}
+	else
+	{
+		collidableTileIds.erase(tileId);
+	}
+}
+
+bool TilemapComponent::hasTileCollider(int tileId) const
+{
+	return collidableTileIds.contains(tileId);
+}
+
+const std::unordered_set<int>& TilemapComponent::getCollidableTileIds() const
+{
+	return collidableTileIds;
+}
+
 void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 {
 	if ( tilemapAsset == nullptr || !tilemapAsset->isLoaded() )
@@ -226,6 +248,15 @@ void TilemapComponent::serialize(WriteArchive& archive) const
 		archive.process(a);
 	}
 
+	// Collidable tile IDs
+	uint32_t colliderCount = static_cast<uint32_t>(collidableTileIds.size());
+	archive.process(colliderCount);
+	for (int tileId : collidableTileIds)
+	{
+		int id = tileId;
+		archive.process(id);
+	}
+
 	// Layer info
 	uint8_t lay = layer;
 	int8_t order = orderInLayer;
@@ -253,6 +284,17 @@ void TilemapComponent::deserialize(ReadArchive& archive)
 		archive.process(b);
 		archive.process(a);
 		tileColors[tileId] = Color(r, g, b, a);
+	}
+
+	// Collidable tile IDs
+	uint32_t colliderCount = 0;
+	archive.process(colliderCount);
+	collidableTileIds.clear();
+	for (uint32_t i = 0; i < colliderCount; ++i)
+	{
+		int tileId;
+		archive.process(tileId);
+		collidableTileIds.insert(tileId);
 	}
 
 	// Layer info

@@ -108,7 +108,23 @@ void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
 
 	//  Body definition
 	b2BodyDef def = b2DefaultBodyDef();
-	def.type = rigidBody->isDynamic ? b2_dynamicBody : b2_staticBody;
+	switch ( rigidBody->getBodyType() )
+	{
+		case RigidBody::BodyType::Static:
+			def.type = b2_staticBody;
+			break;
+		case RigidBody::BodyType::Kinematic:
+			def.type = b2_kinematicBody;
+			break;
+		case RigidBody::BodyType::Dynamic:
+		default:
+			def.type = b2_dynamicBody;
+			break;
+	}
+	def.fixedRotation = rigidBody->isFixedRotation();
+	def.linearDamping = rigidBody->getLinearDamping();
+	def.gravityScale = rigidBody->getGravityScale();
+	def.isBullet = rigidBody->getBullet();
 
 	Vector2 pos = transform->getPosition();
 	def.position = {pos.x, pos.y};
@@ -174,6 +190,35 @@ void Box2DPhysicsWorld::applyForce(const RigidBody* rigidBody, Vector2 force)
 
 	b2Vec2 b2Force = {force.x, force.y};
 	b2Body_ApplyForceToCenter(it->second, b2Force, true);
+}
+
+void Box2DPhysicsWorld::setGravity(Vector2 gravity)
+{
+	b2Vec2 gravityVec = {gravity.x, gravity.y};
+	b2World_SetGravity(worldId, gravityVec);
+}
+
+void Box2DPhysicsWorld::setLinearVelocity(const RigidBody* rigidBody,
+										  Vector2 velocity)
+{
+	if ( !rigidBody ) return;
+
+	auto it = bodies.find(rigidBody);
+	if ( it == bodies.end() ) return;
+
+	b2Vec2 b2Velocity = {velocity.x, velocity.y};
+	b2Body_SetLinearVelocity(it->second, b2Velocity);
+}
+
+Vector2 Box2DPhysicsWorld::getLinearVelocity(const RigidBody* rigidBody) const
+{
+	if ( !rigidBody ) return Vector2::zero();
+
+	auto it = bodies.find(rigidBody);
+	if ( it == bodies.end() ) return Vector2::zero();
+
+	b2Vec2 velocity = b2Body_GetLinearVelocity(it->second);
+	return {velocity.x, velocity.y};
 }
 
 void Box2DPhysicsWorld::shutdown()

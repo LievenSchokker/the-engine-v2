@@ -7,6 +7,7 @@
 #include "Behaviours/NavigationTest.h"
 #include "Component/GridComponent.h"
 #include "Component/ShapeRenderer.h"
+#include "Component/TilemapColliderComponent.h"
 #include "Component/TilemapComponent.h"
 #include "Component/Transform.h"
 #include "Core/GameWorld.h"
@@ -17,6 +18,9 @@
 #include "Input/InputManager.h"
 #include "Input/KeyCode.h"
 #include "Math/Vector2.h"
+#include "Physics/Components/Collider.h"
+#include "Physics/Components/RigidBody.h"
+#include "Physics/IPhysicsWorld.h"
 #include "Rendering/Color.h"
 #include "Scene/Scene.h"
 
@@ -173,6 +177,89 @@ class TilemapInputBehaviour: public Behaviour
 	Vector2 sampleBlockedCell;
 };
 
+/**
+ * @brief Movement controller for the player using WASD.
+ */
+class PlayerMovementBehaviour: public Behaviour
+{
+   public:
+	PlayerMovementBehaviour(float moveSpeed, float acceleration, float braking)
+		: moveSpeed(moveSpeed), acceleration(acceleration), braking(braking)
+	{
+	}
+
+	~PlayerMovementBehaviour() override = default;
+
+	void onAwake() override
+	{
+		rigidBody = getComponent<RigidBody>();
+	}
+
+	void update(double deltaTime, const GameWorld& world) override
+	{
+		(void)deltaTime;
+		if ( rigidBody == nullptr || world.input == nullptr ||
+			 world.physics == nullptr )
+		{
+			return;
+		}
+
+		Vector2 direction = Vector2::zero();
+		if ( world.input->isKeyDown(KeyCode::W) )
+		{
+			direction.y -= 1.0f;
+		}
+		if ( world.input->isKeyDown(KeyCode::S) )
+		{
+			direction.y += 1.0f;
+		}
+		if ( world.input->isKeyDown(KeyCode::A) )
+		{
+			direction.x -= 1.0f;
+		}
+		if ( world.input->isKeyDown(KeyCode::D) )
+		{
+			direction.x += 1.0f;
+		}
+
+		Vector2 desiredVelocity = Vector2::zero();
+		if ( direction != Vector2::zero() )
+		{
+			direction.normalize();
+			desiredVelocity = direction * moveSpeed;
+		}
+
+		const Vector2 currentVelocity =
+			world.physics->getLinearVelocity(rigidBody);
+		const Vector2 velocityDelta = desiredVelocity - currentVelocity;
+		const float forceScale =
+			(direction != Vector2::zero()) ? acceleration : braking;
+		world.physics->applyForce(rigidBody, velocityDelta * forceScale);
+	}
+
+   private:
+	RigidBody* rigidBody = nullptr;
+	float moveSpeed = 0.0f;
+	float acceleration = 0.0f;
+	float braking = 0.0f;
+};
+
+/**
+ * @brief Sets the physics world for top-down movement (no gravity).
+ */
+class TopDownPhysicsBehaviour: public Behaviour
+{
+   public:
+	void onStart() override
+	{
+		GameWorld* world = getWorld();
+		if ( world != nullptr && world->physics != nullptr )
+		{
+			world->physics->setGravity(Vector2::zero());
+		}
+	}
+};
+
 #undef main
 
 int main(int argc, char** argv)
@@ -239,12 +326,24 @@ int main(int argc, char** argv)
 	tilemapComponent->setTileColor(0, Color::lightGreen());	 // Low grass
 	tilemapComponent->setTileColor(1, Color::darkGray());	 // Rocks
 
+	// Enable colliders for solid tiles
+	tilemapComponent->setTileCollider(1, true);
+
+	auto* tilemapCollider =
+		tilemapObject->addComponent<TilemapColliderComponent>();
+	if ( tilemapCollider != nullptr )
+	{
+		tilemapCollider->setTilemapComponent(tilemapComponent);
+	}
+
 	// Add GridComponent for AI pathfinding (future use)
 	auto* gridComponent = tilemapObject->addComponent<GridComponent>();
 	std::unique_ptr<GameObject> blockedBoulder;
 	std::unique_ptr<GameObject> agentObject;
 	std::unique_ptr<GameObject> targetObject;
 	std::unique_ptr<GameObject> navInputObject;
+	std::unique_ptr<GameObject> playerObject;
+	std::unique_ptr<GameObject> pushBoxObject;
 	Agent* agentComponent = nullptr;
 	if ( gridComponent != nullptr )
 	{
@@ -297,6 +396,19 @@ int main(int argc, char** argv)
 		agentRenderer->setRectangle({20.0f, 20.0f})
 			.setColor(Color::red())
 			.setLayer(1);
+		agentObject->addComponent<RigidBody>();
+		auto* agentBody = agentObject->getComponent<RigidBody>();
+		if ( agentBody != nullptr )
+		{
+			agentBody->makeDynamic();
+			agentBody->setFixedRotation(true);
+			agentBody->setLinearDamping(6.0f);
+			agentBody->setGravityScale(0.0f);
+		}
+		auto* agentCollider = agentObject->addComponent<Collider>();
+		agentCollider->setRectangle({20.0f, 20.0f});
+		agentCollider->setDensity(1.0f);
+		agentCollider->setRestitution(0.0f);
 
 		agentComponent = agentObject->addComponent<Agent>();
 		agentComponent->setMaxSpeed(150.0f);
@@ -328,10 +440,55 @@ int main(int argc, char** argv)
 		navTest->setGridComponent(*gridComponent);
 	}
 
+	// Create a controllable player with physics
+	playerObject = std::make_unique<GameObject>();
+	playerObject->setName("Player");
+	playerObject->getTransform()->setPosition(
+		tilemapComponent->cellToWorld({1.0f, 1.0f}));
+	auto* playerRenderer = playerObject->addComponent<ShapeRenderer>();
+	playerRenderer->setCircle(8.0f).setColor(Color::blue()).setLayer(2);
+	playerObject->addComponent<RigidBody>();
+	auto* playerBody = playerObject->getComponent<RigidBody>();
+	if ( playerBody != nullptr )
+	{
+		playerBody->makeDynamic();
+		playerBody->setFixedRotation(true);
+		playerBody->setLinearDamping(12.0f);
+		playerBody->setGravityScale(0.0f);
+		playerBody->setBullet(true);
+	}
+	auto* playerCollider = playerObject->addComponent<Collider>();
+	playerCollider->setCircle(8.0f);
+	playerCollider->setDensity(1.0f);
+	playerCollider->setRestitution(0.0f);
+	playerObject->addComponent<PlayerMovementBehaviour>(260.0f, 2600.0f, 3200.0f);
+
+	// Create a pushable box
+	pushBoxObject = std::make_unique<GameObject>();
+	pushBoxObject->setName("PushBox");
+	pushBoxObject->getTransform()->setPosition(
+		tilemapComponent->cellToWorld({4.0f, 1.0f}));
+	auto* boxRenderer = pushBoxObject->addComponent<ShapeRenderer>();
+	boxRenderer->setCircle(14.0f).setColor(Color::orange()).setLayer(2);
+	pushBoxObject->addComponent<RigidBody>();
+	auto* boxBody = pushBoxObject->getComponent<RigidBody>();
+	if ( boxBody != nullptr )
+	{
+		boxBody->makeDynamic();
+		boxBody->setFixedRotation(true);
+		boxBody->setLinearDamping(4.0f);
+		boxBody->setGravityScale(0.0f);
+	}
+	auto* boxCollider = pushBoxObject->addComponent<Collider>();
+	boxCollider->setCircle(14.0f);
+	boxCollider->setDensity(2.0f);
+	boxCollider->setRestitution(0.0f);
+
 	// Create a GameObject for input handling
 	auto inputHandler = std::make_unique<GameObject>();
 	inputHandler->setName("InputHandler");
 	inputHandler->addComponent<TilemapInputBehaviour>(tilemapScene.get());
+	inputHandler->addComponent<TopDownPhysicsBehaviour>();
 
 	// Add to scene
 	tilemapScene->addGameObject(std::move(tilemapObject));
@@ -351,6 +508,14 @@ int main(int argc, char** argv)
 	if ( navInputObject != nullptr )
 	{
 		tilemapScene->addGameObject(std::move(navInputObject));
+	}
+	if ( playerObject != nullptr )
+	{
+		tilemapScene->addGameObject(std::move(playerObject));
+	}
+	if ( pushBoxObject != nullptr )
+	{
+		tilemapScene->addGameObject(std::move(pushBoxObject));
 	}
 	tilemapScene->addGameObject(std::move(inputHandler));
 
@@ -383,6 +548,7 @@ int main(int argc, char** argv)
 	std::cout << "  G - Toggle grid debug + path rendering\n";
 	std::cout << "  B - Toggle sample blocked cell\n";
 	std::cout << "  SPACE - Request path to target\n";
+	std::cout << "  WASD - Move player (push the box)\n";
 	std::cout << "  ESC - Exit\n\n";
 
 	game->addScene(std::move(tilemapScene));
