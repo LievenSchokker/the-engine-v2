@@ -1,7 +1,9 @@
 #pragma once
 
 
+#include "Behaviour/Behaviour.h"
 #include "Component/UIElement/UIElement.h"
+#include "Math/Vector2.h"
 
 #include <string>
 
@@ -21,6 +23,7 @@
 class UIPanelElement: public UIElement
 {
 public:
+
 	explicit UIPanelElement(
 		float x = 0,
 		float y = 0,
@@ -32,7 +35,6 @@ public:
 	void fillUserInterfaceRenderQueue(
 		IUserInterfaceRenderQueueWriter& queue) const override;
 
-
 	std::string getTitle() const;
 	bool hasBorder() const;
 	bool hasTitle() const;
@@ -41,12 +43,68 @@ public:
 
 	void setTitle(const std::string& newTitle);
 	void setBorder(bool enabled);
+	void setBackgroundColor(Color color);
+	Color getBorderColor() const;
+	float getBorderThickness() const;
+	float getPadding() const;
+	float getSpacing() const;
 	void setRowHeight(float height);
 	void setColumns(int cols);
 
+	void setBorderColor(Color color);
+	void setBorderThickness(float thickness);
+	void setPadding(float pad);
+	void setSpacing(float space);
+
+	Color getTitleBackgroundColor() const;
+	Color getTitleTextColor() const;
+	void setTitleBackgroundColor(Color color);
+	void setTitleTextColor(Color color);
+
+	bool isScrollable() const;
+	bool isResizable() const;
+	bool isMinimizable() const;
+	bool isClosable() const;
+
+	void setScrollable(bool enabled);
+	void setResizable(bool enabled);
+	void setMinimizable(bool enabled);
+	void setClosable(bool enabled);
+
+	float getTitleHeight() const;
+	float getTitlePadding() const;
+	float getTitleLabelPadding() const;
+
+	void setTitleHeight(float height);
+	void setTitlePadding(float pad);
+	void setTitleLabelPadding(float pad);
 private:
 	std::string title;
 
+	float borderThickness = 1.0f;
+	float padding = 4.0f;
+	float spacing = 4.0f;
+	float opacity = 1.0f;
+
+	Color titleBackgroundColor = Color(40, 40, 40, 255);
+	Color titleTextColor = Color::white();
+	Color borderColor = Color::white();
+
+	Alignment titleAlignment = Alignment::Left;
+
+	bool scrollable = false;
+	bool horizontalScrollbar = false;
+	bool verticalScrollbar = false;
+	Vector2 scrollOffset = {0, 0};
+
+	float titleHeight = 24.0f;
+	float titlePadding = 4.0f;
+	float titleLabelPadding = 4.0f;
+
+	bool resizable = false;
+	bool minimizable = false;
+	bool closable = false;
+	bool isMinimized = false;
 	/// Visual border around the panel edges. Disabled by default to allow
 	/// seamless embedding; enable for distinct visual grouping.
 	bool border = false;
@@ -58,4 +116,6 @@ private:
 	/// Number of elements per row before wrapping. Single-column (default)
 	/// produces a vertical list; increase for toolbars or button grids.
 	int columns = 1;
+
+	Color backgroundColor = Color::blue();
 };

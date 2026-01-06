@@ -11,6 +11,7 @@
 #include "Sandboxes/PathFindingZandbak.h"
 #include "Sandboxes/Multiplayer/MultiplayerZandbak.h"
 #include "Sandboxes/Multiplayer/MultiplayerZandbak.h"
+#include "Sandboxes/UserInterfaceZandbak.h"
 
 // This has been added because sometimes SDL causes main to be redefined.
 // Which then causes linking error's
@@ -65,7 +66,7 @@ int main(int argc, char** argv)
     };
 
     /// Note: Change the unique_ptr to create the sandbox you want
-    std::unique_ptr<IZandbak> zandbak = std::make_unique<MultiplayerZandbak>();
+    std::unique_ptr<IZandbak> zandbak = std::make_unique<UserInterfaceZandbak>();
 	std::unique_ptr<Scene> scene = zandbak->getScene();
 
 	spel->addScene(std::move(scene));

@@ -55,6 +55,6 @@ public:
 	std::unique_ptr<IRenderer> renderer;
 	std::vector<Camera*> cameras;
 	RenderQueue queue;
-	Color clearColor = Color::black();
+	Color clearColor = Color::white();
 	void collectCommands(Scene& scene);
 };

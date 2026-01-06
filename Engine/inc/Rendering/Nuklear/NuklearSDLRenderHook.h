@@ -92,6 +92,7 @@ private:
 	void flushCommands();
 	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
+	void renderPanelContents(uint32_t panelId);
 	void renderButton(const UIRenderCommand& command);
 	void renderElement(const UIRenderCommand& command);
 	void renderChart(const UIRenderCommand& command);
@@ -106,12 +107,22 @@ private:
 	SDL_Renderer* sdlRenderer;
 	nk_context* nuklearContext;
 	EventDispatcher* eventDispatcher;
-	bool pendingMouseDown[3] = {false, false, false};  // LEFT, MIDDLE, RIGHT
+	
+	bool pendingMouseDown[3] = {false, false, false};
 	bool pendingMouseUp[3] = {false, false, false};
 	int clickX[3] = {0, 0, 0};
 	int clickY[3] = {0, 0, 0};
 	int mouseX;
 	int mouseY;
+
+	struct PanelState {
+		float x, y, width, height;
+		bool initialized = false;
+		bool isMinimized = false;
+		bool isClosed = false;
+	};
+
+	std::unordered_map<uint32_t, PanelState> panelStateCache;
 
 	std::vector<UIRenderCommand> commandQueue;
 

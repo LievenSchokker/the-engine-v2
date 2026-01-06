@@ -29,6 +29,11 @@ T* GameObject::addComponent(Args&&... args)
 
     newComponent->setGameObject(this);
 
+    if constexpr (std::is_base_of_v<Behaviour, T>)
+    {
+        behaviours.push_back(static_cast<Behaviour*>(rawPtr));
+    }
+
     internalAddComponent(std::move(newComponent));
     return rawPtr;
 }
