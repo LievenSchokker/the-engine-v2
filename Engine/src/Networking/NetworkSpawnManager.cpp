@@ -32,6 +32,7 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
     }
 
     auto gameObject = prefabLibrary->instantiate(assetId);
+
     if (!gameObject)
     {
         return nullptr;
@@ -70,7 +71,6 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
         return nullptr;
     }
 
-    //gameWorld->sceneManager->addGameObjectToActiveScene(std::move(gameObject));
 	gameWorld->sceneManager->getActiveScene()->addGameObject(std::move(gameObject));
 
     if (gameWorld->isServer())
@@ -123,6 +123,7 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 	spawnedObjects.erase(netId);
 	objectAssets.erase(netId);
     identityRegistry->unregisterIdentity(identity);
+
 	object->destroy();
 }
 

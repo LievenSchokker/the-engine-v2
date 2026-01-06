@@ -24,7 +24,7 @@ void BehaviourSystem::initialiseScene(Scene& scene, GameWorld& world)
     startBehaviours(allBehaviours);
 }
 
-void BehaviourSystem::update(Scene& scene, double deltaTime, const GameWorld& world)
+void BehaviourSystem::update(Scene& scene, double deltaTime, const GameWorld& world, bool fixed)
 {
     const bool clockPaused = (world.clock != nullptr && world.clock->isPaused());
 
@@ -53,11 +53,18 @@ void BehaviourSystem::update(Scene& scene, double deltaTime, const GameWorld& wo
 
             if (clockPaused && !behaviour->shouldRunWhenPaused())
                 continue;
-
-            behaviour->update(deltaTime, world);
+			if (fixed)
+			{
+				behaviour->fixedUpdate();
+			}
+        	else
+        	{
+        		behaviour->update(deltaTime, world);
+        	}
         }
     }
 }
+
 
 void BehaviourSystem::awakeBehaviours(const std::vector<Behaviour*>& behaviours, GameWorld& world)
 {

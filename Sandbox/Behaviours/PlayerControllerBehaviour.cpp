@@ -30,6 +30,10 @@ void PlayerControllerBehaviour::onStart()
 	}
 }
 
+void PlayerControllerBehaviour::fixedUpdate()
+{
+}
+
 void PlayerControllerBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 {
 	inputManager = gameWorld.input;
