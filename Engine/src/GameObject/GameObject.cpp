@@ -112,8 +112,10 @@ const std::vector<Behaviour*>& GameObject::getEnabledBehaviours()
 
 	for (Behaviour* behaviour : behaviours)
 	{
-		if (behaviour != nullptr && behaviour->getIsEnabled()) enabledBehaviours
-			.push_back(behaviour);
+		if (behaviour != nullptr && behaviour->getIsEnabled())
+		{
+			enabledBehaviours.push_back(behaviour);
+		}
 	}
 
 	return enabledBehaviours;
