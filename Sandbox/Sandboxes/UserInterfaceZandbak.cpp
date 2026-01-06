@@ -1,13 +1,12 @@
 #include "UserInterfaceZandbak.h"
 
 #include "Component/Profiler/Profiler.h"
-#include "Component/UIElement/Button.h"
+#include "Component/UIElement/UIButton.h"
 #include "Component/UIElement/UIPanelElement.h"
 #include "Component/UIElement/UIProgressBar.h"
-#include "Component/UIElement/UITextElement.h"
 #include "Component/UIElement/UISpacer.h"
+#include "Component/UIElement/UITextElement.h"
 #include "Scene/Scene.h"
-
 
 std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
 {
@@ -168,7 +167,7 @@ std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
     blueBar2->setBarColor(Color(100, 100, 255, 255));
     blueBar2->setBackgroundColor(Color(20, 20, 60, 255));
 
-	menu4->addComponent<Button>();
+	menu4->addComponent<UIButton>();
     // Add in order (back to front)
     scene->addGameObject(std::move(menu4));
     scene->addGameObject(std::move(menu3));
