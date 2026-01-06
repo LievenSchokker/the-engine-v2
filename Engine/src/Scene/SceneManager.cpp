@@ -455,11 +455,11 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 		{
 			if (!received) continue;
 
-			auto* cloneIdentity = received->getComponent<NetworkIdentity>();
-			if (cloneIdentity)
+			auto* identity = received->getComponent<NetworkIdentity>();
+			if (identity)
 			{
-				cloneIdentity->setWorld(gameWorld);
-				spawnManager->getNetworkIdentityRegistry().registerIdentity(cloneIdentity);
+				identity->setWorld(gameWorld);
+				spawnManager->getNetworkIdentityRegistry().registerIdentity(identity);
 			}
 
 			std::vector<Behaviour*> behaviours = received->getAllBehaviours();
@@ -486,9 +486,9 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 
 			addInlineChildren(rawPtr);
 
-			if (cloneIdentity)
+			if (identity)
 			{
-				cloneIdentity->onNetworkSpawn();
+				identity->onNetworkSpawn();
 			}
 		}
 	}
