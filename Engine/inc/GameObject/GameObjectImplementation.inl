@@ -27,13 +27,7 @@ T* GameObject::addComponent(Args&&... args)
     auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
     T* rawPtr = newComponent.get();
 
-    newComponent->setGameObject(this);
-
-    if constexpr (std::is_base_of_v<Behaviour, T>)
-    {
-        behaviours.push_back(static_cast<Behaviour*>(rawPtr));
-    }
-
+	
     internalAddComponent(std::move(newComponent));
     return rawPtr;
 }
