@@ -421,15 +421,14 @@ std::string SceneManager::getFirstSceneName() const
 	return "";
 }
 
-void SceneManager::applyNetworkSnapshot(
-	const std::vector<std::unique_ptr<GameObject>>& receivedObjects)
+void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>& receivedObjects)
 {
 	if (!spawnManager || !activeScene) return;
 
 	std::unordered_set<uint32_t> receivedNetIds;
 	std::vector<std::pair<GameObject*, uint32_t>> toFixup;
 
-	for (const auto& received : receivedObjects)
+	for (auto& received : receivedObjects)
 	{
 		if (!received) continue;
 
@@ -454,25 +453,24 @@ void SceneManager::applyNetworkSnapshot(
 		}
 		else
 		{
-			auto clone = received->clone();
-			if (!clone) continue;
+			if (!received) continue;
 
-			auto* cloneIdentity = clone->getComponent<NetworkIdentity>();
+			auto* cloneIdentity = received->getComponent<NetworkIdentity>();
 			if (cloneIdentity)
 			{
 				cloneIdentity->setWorld(gameWorld);
 				spawnManager->getNetworkIdentityRegistry().registerIdentity(cloneIdentity);
 			}
 
-			std::vector<Behaviour*> behaviours = clone->getAllBehaviours();
-			GameObject* rawPtr = clone.get();
+			std::vector<Behaviour*> behaviours = received->getAllBehaviours();
+			GameObject* rawPtr = received.get();
 
-			if (auto parentNetId = clone->consumePendingParentNetId())
+			if (auto parentNetId = received->consumePendingParentNetId())
 			{
 				toFixup.push_back({rawPtr, *parentNetId});
 			}
 
-			activeScene->addGameObject(std::move(clone));
+			activeScene->addGameObject(std::move(received));
 			spawnManager->trackSpawnedObject(netId, rawPtr);
 			behaviourSystem->initialiseRuntimeBehaviours(behaviours, *gameWorld);
 

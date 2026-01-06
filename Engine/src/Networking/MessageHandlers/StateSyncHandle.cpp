@@ -15,7 +15,7 @@ StateSyncMessageHandler::StateSyncMessageHandler(GameWorld& world, NetworkIdenti
 
 void StateSyncMessageHandler::handleMessageInternal()
 {
-	const StateSyncMessage* message = getMessage();
+	StateSyncMessage* message = getMessage();
 	if (!message) return;
 
 	gameWorld->sceneManager->applyNetworkSnapshot(message->gameObjects);
