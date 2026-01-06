@@ -45,6 +45,11 @@ class GameObject: public ISerializable
 	 */
 	~GameObject() override;
 
+	GameObject(const GameObject& other) = delete;
+	GameObject(GameObject&& other) = delete;
+	GameObject& operator=(const GameObject& other) = delete;
+	GameObject& operator=(GameObject&& other) = delete;
+
 	/**
 	 * @brief Serializes this GameObject and all its components.
 	 */
