@@ -485,6 +485,8 @@ void GameObject::deserialize(ReadArchive& archive)
 
 	uint32_t childCount;
 	archive.process(childCount);
+	deserializedInlineChildren.clear();
+	deserializedInlineChildren.reserve(childCount);
 	for (uint32_t i = 0; i < childCount; ++i)
 	{
 		auto child = std::make_unique<GameObject>();
