@@ -206,6 +206,7 @@ void Box2DPhysicsWorld::applyNetworkSnapshot()
 
     for (auto& [rigidBody, bodyId] : bodies)
     {
+    	if (!rigidBody->isDynamic) continue;
         const GameObject* gameObject = rigidBody->getGameObject();
         if (!gameObject) continue;
 

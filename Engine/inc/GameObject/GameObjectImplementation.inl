@@ -27,7 +27,7 @@ T* GameObject::addComponent(Args&&... args)
     auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
     T* rawPtr = newComponent.get();
 
-	
+
     internalAddComponent(std::move(newComponent));
     return rawPtr;
 }
