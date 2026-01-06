@@ -2,6 +2,8 @@
 
 #include "GameObject/GameObject.h"
 #include "Behaviour/Behaviour.h"
+#include "Component/GridComponent.h"
+#include "AI/Navigation/GridComponentNavigationSurface.h"
 #include "AI/Navigation/NavigationObstacle.h"
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
@@ -144,8 +146,30 @@ void Scene::destroyAllGameObjects()
 
 void Scene::initialiseNavigationSystem(NavigationGridOptions options)
 {
-	auto navGrid = std::make_unique<NavigationGrid>(
-		options.gridWidth, options.gridHeight, options.cellSize);
+	std::unique_ptr<INavigationSurface> navSurface;
+	GridComponent* gridComponent = nullptr;
+	const std::vector<GridComponent*> gridComponents =
+		getAllComponentsOfType<GridComponent>();
+
+	for (GridComponent* candidate : gridComponents)
+	{
+		if (candidate != nullptr && candidate->isReady())
+		{
+			gridComponent = candidate;
+			break;
+		}
+	}
+
+	if (gridComponent != nullptr)
+	{
+		navSurface =
+			std::make_unique<GridComponentNavigationSurface>(*gridComponent);
+	}
+	else
+	{
+		navSurface = std::make_unique<NavigationGrid>(
+			options.gridWidth, options.gridHeight, options.cellSize);
+	}
 	const std::vector<NavigationObstacle*> obstacles = getAllComponentsOfType<
 		NavigationObstacle>();
 
@@ -158,7 +182,7 @@ void Scene::initialiseNavigationSystem(NavigationGridOptions options)
 		obstacleBounds.push_back(obstacle->getBounds());
 	}
 
-	navigationSystem = std::make_unique<NavigationSystem>(std::move(navGrid));
+	navigationSystem = std::make_unique<NavigationSystem>(std::move(navSurface));
 	navigationSystem->bake(obstacleBounds);
 }
 
@@ -170,6 +194,19 @@ NavigationSystem* Scene::getNavigationSystem()
 		initialiseNavigationSystem({100, 100, Vector2{15, 15}});
 	}
 	return navigationSystem.get();
+}
+
+void Scene::setNavigationSurface(
+	std::unique_ptr<INavigationSurface> navSurface)
+{
+	if (!navigationSystem)
+	{
+		navigationSystem =
+			std::make_unique<NavigationSystem>(std::move(navSurface));
+		return;
+	}
+
+	navigationSystem->setNavigationSurface(std::move(navSurface));
 }
 
 

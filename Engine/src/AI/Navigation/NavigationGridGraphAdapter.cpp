@@ -20,12 +20,10 @@ float NavigationGridGraphAdapter::getCost(const Vector2 from, const Vector2 to) 
 
 std::vector<Vector2> NavigationGridGraphAdapter::getNeighbours(const Vector2 node) const
 {
-    bool includeOrdinals = true; /// Replace with a valid solution to pass options or somehting
-    return grid.getNeighbours(node, includeOrdinals);
+    return grid.getNeighbours(node);
 }
 
 bool NavigationGridGraphAdapter::isValid(const Vector2 node) const
 {
     return (grid.isInGrid(node) && grid.isWalkable(node));
 }
-

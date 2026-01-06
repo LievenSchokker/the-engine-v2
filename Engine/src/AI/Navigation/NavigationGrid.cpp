@@ -8,7 +8,6 @@
 
 #include "AI/Navigation/BoundingBox.h"
 #include "AI/Navigation/CardinalDirections.h"
-#include "AI/Navigation/CompassDirections.h"
 #include "AI/Navigation/GridCell.h"
 #include "Math/Vector2.h"
 #include <algorithm>
@@ -134,15 +133,11 @@ const std::vector<GridCell> &NavigationGrid::getCells() const
 }
 
 
-std::vector<Vector2> NavigationGrid::getNeighbours(Vector2 cellPos, bool diagonalNeighbours) const
+std::vector<Vector2> NavigationGrid::getNeighbours(Vector2 cellPos) const
 {
     std::vector<Vector2> validNeighbours;
 
-    std::vector<Vector2> directions;
-    if (diagonalNeighbours)
-        directions = CompassDirections::getDirections();
-    else
-        directions = CardinalDirections::getDirections();
+    std::vector<Vector2> directions = CardinalDirections::getDirections();
 
     for (Vector2 direction : directions)
     {
