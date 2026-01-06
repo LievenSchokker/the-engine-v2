@@ -2,6 +2,7 @@
 
 #include "MultiplayerPhysicsZandbak.h"
 
+#include "Behaviours/PhysicsMovement.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
 #include "Demo/PlayerMovement.h"
@@ -28,7 +29,7 @@ std::unique_ptr<Scene> MultiplayerPhysicsZandbak::getScene()
 
 	// Falling dynamic box
 	auto fallingBox = std::make_unique<GameObject>();
-	fallingBox->addComponent<PlayerMovement>();
+	fallingBox->addComponent<PhysicsMovement>();
 	fallingBox->setName("FallingBox");
 	fallingBox->getTransform()->setPosition({200.0f, 100.0f});  // Above the ground
 	fallingBox->addComponent<ShapeRenderer>()->setRectangle({50, 50}).setColor(Color::darkBlue());
