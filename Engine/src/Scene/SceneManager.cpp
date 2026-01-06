@@ -5,6 +5,7 @@
 #include "Component/NetworkIdentity.h"
 #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkSpawnManager.h"
+#include "Physics/IPhysicsWorld.h"
 
 #include <iostream>
 #include <utility>
@@ -515,6 +516,12 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 			toRemove.push_back(netId);
 		}
 	}
+
+	if (gameWorld && gameWorld->physics)
+	{
+		gameWorld->physics->applyNetworkSnapshot();
+	}
+
 	for (const uint32_t netId : toRemove)
 	{
 		GameObject* object = spawnManager->getObjectByNetId(netId);

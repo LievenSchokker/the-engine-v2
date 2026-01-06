@@ -2,11 +2,22 @@
 
 #include "../../Component/BaseComponentTypes/Component.h"
 #include "Math/Vector2.h"
+#include "Networking/Serialization/RegistrationBase.h"
 #include "Physics/PhysicsShapes.h"
 
-class Collider: public Component
+class Collider: public Component, public RegistrationBase<Collider>
 {
-   private:
+public:
+	static constexpr const char* name()
+	{
+		return "Collider";
+	}
+	const char* getName() const override { return name(); }
+
+
+	~Collider() override = default;
+	Collider() = default;
+private:
 	PhysicsShapeType shape = PhysicsShapeType::None;
 	bool sensor = false;
 	float density = 1.0f;
@@ -72,4 +83,7 @@ class Collider: public Component
 	 * @brief Calls all onSensorExit on all behaviours
 	 */
 	void onSensorExit(Collider* other);
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 };

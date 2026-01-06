@@ -15,7 +15,7 @@ void FollowTargetModule::initialise()
 {
     if (followTarget != nullptr)
     {
-        targetGameObjectId = followTarget->getGameObject()->getSceneId();
+        targetGameObjectId = followTarget->getGameObject()->getGameObjectHandle();
     }
 
     agentScene = agent.getGameObject()->getScene();
@@ -27,7 +27,7 @@ Vector2 FollowTargetModule::compute()
     if (followTarget == nullptr)
         return Vector2::zero();
 
-    GameObject* targetObject = nullptr;
+    GameObject* targetObject = agentScene->getGameObject(targetGameObjectId);
 
     if (targetObject == nullptr)
         return Vector2::zero();
@@ -51,7 +51,7 @@ Vector2 FollowTargetModule::compute()
 void FollowTargetModule::setFollowTarget(const Transform& target)
 {
     followTarget = &target;
-    targetGameObjectId = target.getGameObject()->getSceneId();
+    targetGameObjectId = target.getGameObject()->getGameObjectHandle();
 }
 
 

@@ -1,7 +1,10 @@
 #pragma once
+
+
 #include "IPhysicsWorld.h"
 #include "Core/IEngineSystems.h"
 
+#include <memory>
 
 class PhysicsSystem : public IEngineSystems
 {

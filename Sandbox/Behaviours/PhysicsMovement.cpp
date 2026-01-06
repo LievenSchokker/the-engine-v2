@@ -1,3 +1,9 @@
+//
+// Created by Lieven Schokker on 06/01/2026.
+//
+
+#include "PhysicsMovement.h"
+
 #include "Demo/PlayerMovement.h"
 #include "Core/GameWorld.h"
 #include "Input/InputManager.h"
@@ -6,25 +12,24 @@
 #include "Component/ShapeRenderer.h"
 #include "GameObject/GameObject.h"
 #include "Networking/NetworkBuilder.h"
+#include "Physics/Components/RigidBody.h"
 
 #include <iostream>
 
-#include "Component/Camera.h"
-
-PlayerMovement::PlayerMovement()
+PhysicsMovement::PhysicsMovement()
 {
     authorityType = AuthorityType::ClientAuthority;
 }
 
-void PlayerMovement::onStart()
+void PhysicsMovement::onStart()
 {
 }
 
-void PlayerMovement::onNetworkSpawn()
+void PhysicsMovement::onNetworkSpawn()
 {
 }
 
-void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
+void PhysicsMovement::registerNetworkMethods(NetworkBuilder& builder)
 {
     builder.command("MoveUp", [this](ReadArchive&)
     {
@@ -44,32 +49,32 @@ void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
     });
 }
 
-void PlayerMovement::update(double deltaTime,const GameWorld& world)
+void PhysicsMovement::update(double deltaTime, const GameWorld& world)
 {
-	if (!hasAuthority())
-	{
-		return;
-	}
+    if (!hasAuthority())
+    {
+        return;
+    }
 
-	handleInput();
+    handleInput();
 }
 
-void PlayerMovement::serialize(WriteArchive& archive) const
+void PhysicsMovement::serialize(WriteArchive& archive) const
 {
     archive.process(const_cast<float&>(moveSpeed));
 }
 
-void PlayerMovement::deserialize(ReadArchive& archive)
+void PhysicsMovement::deserialize(ReadArchive& archive)
 {
     archive.process(moveSpeed);
 }
 
-void PlayerMovement::handleInput()
+void PhysicsMovement::handleInput()
 {
-	if (!gameWorld || !gameWorld->input) {
-		return;
-	}
-
+    if (!gameWorld || !gameWorld->input)
+    {
+        return;
+    }
 
     auto* input = gameWorld->input;
     if (input->isKeyDown(KeyCode::W) || input->isKeyDown(KeyCode::UP_ARROW))
@@ -94,13 +99,25 @@ void PlayerMovement::handleInput()
     }
 }
 
-void PlayerMovement::applyMovement(const float dirX, const float dirY) const
+void PhysicsMovement::applyMovement(const float dirX, const float dirY) const
 {
+    GameObject* go = getGameObject();
+    if (!go) return;
 
-	Transform* transform = getGameObject()->getTransform();
-    float dt = 1.0f / 60.0f;
-    Vector2 pos = transform->getPosition();
-    pos.x += dirX * moveSpeed * dt;
-    pos.y += dirY * moveSpeed * dt;
-    transform->setPosition(pos);
+    auto* rb = go->getComponent<RigidBody>();
+
+    if (rb && gameWorld && gameWorld->physics)
+    {
+        Vector2 force(dirX * moveSpeed, dirY * moveSpeed);
+        gameWorld->physics->applyForce(rb, force * 10000);
+    }
+    else
+    {
+        Transform* transform = go->getTransform();
+        float dt = 1.0f / 60.0f;
+        Vector2 pos = transform->getPosition();
+        pos.x += dirX * moveSpeed * dt;
+        pos.y += dirY * moveSpeed * dt;
+        transform->setPosition(pos);
+    }
 }

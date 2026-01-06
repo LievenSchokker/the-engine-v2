@@ -78,6 +78,8 @@ public:
     void shutdown(GameWorld& gameWorld) override;
     const std::string getName() const override;
 
+    void setLastReceivedTick(uint32_t lastReceivedTick);
+    uint32_t getLastReceivedTick();
 private:
     /**
      * @brief Callback invoked when a message is received from the server.
@@ -97,4 +99,6 @@ private:
     ///< The current server connection.
     Connection currentConnection{};
     std::unique_ptr<spelmotorNetworking::MessageDispatcher> messageDispatcher;
+
+    uint32_t lastReceivedTick;
 };

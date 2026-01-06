@@ -1,5 +1,4 @@
 #include "Physics/Box2D/Box2DPhysicsWorld.h"
-
 #include "Component/Transform.h"
 #include "Physics/Components/Collider.h"
 #include "Physics/Components/RigidBody.h"
@@ -19,18 +18,81 @@ void Box2DPhysicsWorld::initialize()
 
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = {0.0f, 150.0f};
+	worldDef.gravity = {0.0f, 10.0f};
 	worldId = b2CreateWorld(&worldDef);
 
-	std::cout << "Box2D world created, id.index1 = " << worldId.index1
-			  << std::endl;
+	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
 }
 
 void Box2DPhysicsWorld::step(float deltaTime)
 {
-	float timeStep = 1.0f / tickRate;
-	int subStepCount = 4;
+	const float timeStep = 1.0f / tickRate;
+	const int subStepCount = 4;
 
 	b2World_Step(worldId, timeStep, subStepCount);
+	handleEvents();
+	syncTransforms();
+}
+
+void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
+{
+    if (!rigidBody) {
+        return;
+    }
+
+    GameObject* gameObject = rigidBody->getGameObject();
+    if (!gameObject) {
+        return;
+    }
+    auto* transform = gameObject->getTransform();
+    auto* collider = gameObject->getComponent<Collider>();
+
+    if (!collider || !transform) {
+        return;
+    }
+
+    b2BodyDef def = b2DefaultBodyDef();
+    def.type = rigidBody->isDynamic ? b2_dynamicBody : b2_staticBody;
+
+    Vector2 pos = transform->getPosition();
+    def.position = {pos.x, pos.y};
+
+    def.rotation = b2MakeRot(transform->getRotationAngle());
+
+    b2BodyId body = b2CreateBody(worldId, &def);
+
+    b2ShapeDef shapeDef = b2DefaultShapeDef();
+    shapeDef.density = collider->getDensity();
+    shapeDef.isSensor = collider->isSensor();
+    shapeDef.enableSensorEvents = true;
+
+    b2ShapeId shapeId = b2_nullShapeId;
+
+    if (collider->getShape() == PhysicsShapeType::Circle)
+    {
+        b2Circle circle;
+        circle.center = {0.0f, 0.0f};
+        circle.radius = collider->radius;
+        shapeId = b2CreateCircleShape(body, &shapeDef, &circle);
+    }
+    else if (collider->getShape() == PhysicsShapeType::Rectangle)
+    {
+        b2Polygon poly = b2MakeBox(collider->size.x * 0.5f, collider->size.y * 0.5f);
+        shapeId = b2CreatePolygonShape(body, &shapeDef, &poly);
+    }
+
+
+    if (b2Shape_IsValid(shapeId))
+    {
+        b2Shape_SetUserData(shapeId, gameObject);
+    }
+
+    b2Body_SetUserData(body, gameObject);
+    bodies[rigidBody] = body;
+}
+
+void Box2DPhysicsWorld::handleEvents()
+{
 	b2SensorEvents sensorEvents = b2World_GetSensorEvents(worldId);
 
 	// Look at the sensor touches
@@ -81,72 +143,7 @@ void Box2DPhysicsWorld::step(float deltaTime)
 		if ( sensorCol && visitorCol ) sensorCol->onSensorExit(visitorCol);
 	}
 
-	// Sync transforms to gameobjects
-	syncTransforms();
 }
-
-void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
-{
-	if ( !rigidBody ) return;
-
-	// RigidBody always knows its owning GameObject
-	GameObject* gameObject = rigidBody->getGameObject();
-	if ( !gameObject ) return;
-
-	auto* transform = gameObject->getTransform();
-	auto* collider = gameObject->getComponent<Collider>();
-
-	// Cannot create a physics body without a collider
-	if ( !collider || !transform ) return;
-
-	//  Body definition
-	b2BodyDef def = b2DefaultBodyDef();
-	def.type = rigidBody->isDynamic ? b2_dynamicBody : b2_staticBody;
-
-	Vector2 pos = transform->getPosition();
-	def.position = {pos.x, pos.y};
-	def.rotation = b2MakeRot(transform->getRotationAngle());
-
-	b2BodyId body = b2CreateBody(worldId, &def);
-
-	// Shape definition
-	b2ShapeDef shapeDef = b2DefaultShapeDef();
-	shapeDef.density = collider->getDensity();
-	shapeDef.isSensor = collider->isSensor();
-	shapeDef.enableSensorEvents = true;
-
-	// Create the correct shape and get b2ShapeId
-	b2ShapeId shapeId = b2_nullShapeId;
-
-	if ( collider->getShape() == PhysicsShapeType::Circle )
-	{
-		b2Circle circle;
-		circle.center = {0.0f, 0.0f};
-		circle.radius = collider->radius;
-
-		shapeId = b2CreateCircleShape(body, &shapeDef, &circle);
-	}
-	else if ( collider->getShape() == PhysicsShapeType::Rectangle )
-	{
-		b2Polygon poly =
-			b2MakeBox(collider->size.x * 0.5f, collider->size.y * 0.5f);
-
-		shapeId = b2CreatePolygonShape(body, &shapeDef, &poly);
-	}
-
-	if ( b2Shape_IsValid(shapeId) )
-	{
-		b2Shape_SetUserData(shapeId, gameObject);
-		b2Shape_SetRestitution(shapeId, collider->getRestitution());
-	}
-
-	// Assign user data to the body (optional)
-	b2Body_SetUserData(body, gameObject);
-
-	// Store mapping RigidBody* → b2BodyId
-	bodies[rigidBody] = body;
-}
-
 void Box2DPhysicsWorld::destroyBody(const RigidBody* rigidBody)
 {
 	if ( !rigidBody ) return;
@@ -169,6 +166,7 @@ void Box2DPhysicsWorld::applyForce(const RigidBody* rigidBody, Vector2 force)
 	b2Body_ApplyForceToCenter(it->second, b2Force, true);
 }
 
+
 void Box2DPhysicsWorld::shutdown()
 {
 	for ( auto& [gameObject, box2DID] : bodies )
@@ -182,15 +180,80 @@ void Box2DPhysicsWorld::shutdown()
 
 void Box2DPhysicsWorld::syncTransforms()
 {
-	for ( auto& [rigidBody, box2DID] : bodies )
-	{
-		GameObject* gameObject = rigidBody->getGameObject();
+    for (auto& [rigidBody, box2DID] : bodies)
+    {
+        GameObject* gameObject = rigidBody->getGameObject();
 
-		// component knows its owner
-		b2Vec2 pos = b2Body_GetPosition(box2DID);
-		b2Rot rot = b2Body_GetRotation(box2DID);
+        b2Vec2 position = b2Body_GetPosition(box2DID);
+        b2Rot rotation = b2Body_GetRotation(box2DID);
+        b2Vec2 linearVel = b2Body_GetLinearVelocity(box2DID);
+        float angularVel = b2Body_GetAngularVelocity(box2DID);
 
-		gameObject->getTransform()->setPosition(Vector2(pos.x, pos.y));
-		gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rot));
-	}
+        gameObject->getTransform()->setPosition(Vector2(position.x, position.y));
+        gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rotation));
+
+        auto* rb = const_cast<RigidBody*>(rigidBody);
+        rb->linearVelocity = {linearVel.x, linearVel.y};
+        rb->angularVelocity = angularVel;
+    }
+}
+
+
+void Box2DPhysicsWorld::applyNetworkSnapshot()
+{
+    constexpr float positionLerpFactor = 0.3f;
+    constexpr float rotationLerpFactor = 0.3f;
+    constexpr float snapThresholdSquared = 25.0f;
+    constexpr float closeEnoughSquared = 0.01f;
+
+    for (auto& [rigidBody, bodyId] : bodies)
+    {
+        if (!rigidBody->isDynamic) continue;
+
+        const GameObject* gameObject = rigidBody->getGameObject();
+        if (!gameObject) continue;
+
+        const Transform* transform = gameObject->getTransform();
+        if (!transform) continue;
+
+        const Vector2 targetPos = transform->getPosition();
+        const float targetAngle = transform->getRotationAngle();
+
+        b2Vec2 currentPos = b2Body_GetPosition(bodyId);
+        b2Rot currentRot = b2Body_GetRotation(bodyId);
+        float currentAngle = b2Rot_GetAngle(currentRot);
+
+        float dx = targetPos.x - currentPos.x;
+        float dy = targetPos.y - currentPos.y;
+        float distanceSquared = dx * dx + dy * dy;
+
+        Vector2 newPosition{0,0};
+        float newAngle;
+
+        if (distanceSquared > snapThresholdSquared)
+        {
+            newPosition = targetPos;
+            newAngle = targetAngle;
+        }
+        else if (distanceSquared < closeEnoughSquared)
+        {
+            newPosition = targetPos;
+            newAngle = targetAngle;
+        }
+        else
+        {
+            newPosition.x = currentPos.x + dx * positionLerpFactor;
+            newPosition.y = currentPos.y + dy * positionLerpFactor;
+
+            float angleDiff = targetAngle - currentAngle;
+            while (angleDiff > 3.14159265359) angleDiff -= 2.0f * 3.14159265359;
+            while (angleDiff < -3.14159265359) angleDiff += 2.0f * 3.14159265359;
+            newAngle = currentAngle + angleDiff * rotationLerpFactor;
+        }
+
+        b2Body_SetTransform(bodyId, {newPosition.x, newPosition.y}, b2MakeRot(newAngle));
+        b2Body_SetLinearVelocity(bodyId, {rigidBody->linearVelocity.x, rigidBody->linearVelocity.y});
+        b2Body_SetAngularVelocity(bodyId, rigidBody->angularVelocity);
+        b2Body_SetAwake(bodyId, true);
+    }
 }
