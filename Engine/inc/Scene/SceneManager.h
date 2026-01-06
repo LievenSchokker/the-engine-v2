@@ -182,8 +182,7 @@ public:
      * @return Name of the first scene, or empty string if no scenes.
      */
     [[nodiscard]] std::string getFirstSceneName() const;
-	void applyNetworkSnapshot(
-		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
+	void applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>& receivedObjects);
 
 	BehaviourSystem& getBehaviourSystem();
 private:
