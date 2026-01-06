@@ -5,13 +5,22 @@
 #include "Game.h"
 #include "Input/InputManager.h"
 #include "Events/EventImplementations/ApplicationEvents.h"
+#include "Networking/Client.h"
+#include "Networking/NetworkSpawnManager.h"
+#include "Networking/Server/Server.h"
+
 #include <ostream>
 
 EngineLoop::EngineLoop(std::unique_ptr<Game> game)
-    : game(std::move(game))
-    , gameWorld(std::make_unique<GameWorld>())
-    , clockFunction([]() { return 0.0; })
-    , sceneManagerPtr(nullptr)
+	: pendingSceneName()
+	  , game(std::move(game))
+	  , gameWorld(std::make_unique<GameWorld>())
+	  , spawnManager(std::make_unique<NetworkSpawnManager>(gameWorld.get()))
+	  , sceneManagerPtr(nullptr)
+	  , clockFunction([]()
+	  {
+		  return 0.0;
+	  })
 {
 }
 
@@ -19,31 +28,71 @@ EngineLoop::~EngineLoop() = default;
 
 ApplicationSpecifications EngineLoop::getSpecifications() const
 {
-    return game->getApplicationSpecifications();
+	return game->getApplicationSpecifications();
 }
 
 void EngineLoop::addSystem(std::unique_ptr<IEngineSystems> system)
 {
-    systems.push_back(std::move(system));
+	systems.push_back(std::move(system));
 }
 
 void EngineLoop::start()
 {
+	gameWorld->spawnManager = spawnManager.get();
 
-    //This is where each system will give its reference to the gameWorld.
-    for (const auto& system : systems)
-    {
-        system->start(*gameWorld);
-    }
+	for (const auto& system : systems)
+	{
+		system->start(*gameWorld);
+	}
 
-    //I left the InputManager out of this for now since it's still a singleton
-    //TODO Remove singleton and use reference via GameWorld for polling.
-    sceneManagerPtr = gameWorld->sceneManager;
-
+	sceneManagerPtr = gameWorld->sceneManager;
 
 	if (gameWorld->getDispatcher() != nullptr)
 	{
 		initializeCloseEvent(*gameWorld->getDispatcher());
+	}
+
+	initNetwork();
+
+	if (!pendingSceneName.empty() && sceneManagerPtr)
+	{
+		sceneManagerPtr->setActiveScene(pendingSceneName);
+	}
+}
+
+void EngineLoop::initNetwork() const
+{
+	if (game->getApplicationSpecifications().networkingOptions.mode ==
+	    EngineMode::CLIENT)
+	{
+		sceneManagerPtr->configureNetworking(spawnManager.get());
+
+		ServerConnectionInformation serverInfo{
+			game->getApplicationSpecifications().networkingOptions.port,
+			game->getApplicationSpecifications().networkingOptions.serverIP
+		};
+
+		if (gameWorld->getDispatcher() != nullptr)
+		{
+			gameWorld->client->connectToServer(serverInfo);
+		}
+	}
+
+	if (game->getApplicationSpecifications().networkingOptions.mode ==
+	    EngineMode::SERVER)
+	{
+		sceneManagerPtr->configureNetworking(spawnManager.get());
+	}
+	if (gameWorld->server != nullptr)
+	{
+		NetworkSpawnManager* spawnMgr = spawnManager.get();
+
+		gameWorld->server->setClientConnectedCallback(
+			[spawnMgr](int clientId)
+			{
+				spawnMgr->syncExistingObjects(clientId);
+			}
+			);
 	}
 }
 
@@ -57,88 +106,90 @@ void EngineLoop::initializeCloseEvent(EventDispatcher& dispatcher)
 
 void EngineLoop::update(const double deltaTime)
 {
-    for (const auto& system : systems)
-    {
-        system->update(deltaTime, *gameWorld);
-    }
+	for (const auto& system : systems)
+	{
+		system->update(deltaTime, *gameWorld);
+	}
 }
 
 void EngineLoop::fixedUpdate(const double deltaTime)
 {
-    for (const auto& system : systems)
-    {
-        system->fixedUpdate(deltaTime, *gameWorld);
-    }
+	for (const auto& system : systems)
+	{
+		system->fixedUpdate(deltaTime, *gameWorld);
+	}
 }
 
 void EngineLoop::shutdown()
 {
-    for (auto systemEntry = systems.rbegin(); systemEntry != systems.rend(); ++systemEntry)
-    {
-        (*systemEntry)->shutdown(*gameWorld);
-    }
-    systems.clear();
+	for (auto systemEntry = systems.rbegin(); systemEntry != systems.rend(); ++
+	     systemEntry)
+	{
+		(*systemEntry)->shutdown(*gameWorld);
+	}
+	systems.clear();
 }
 
 bool EngineLoop::isShutdownRequested() const
 {
-    return shutdownRequested;
+	return shutdownRequested;
 }
 
 EngineLoop::ClockFunction EngineLoop::getClock()
 {
-    return clockFunction;
+	return clockFunction;
 }
 
 GameWorld* EngineLoop::getGameWorld()
 {
-    return gameWorld.get();
+	return gameWorld.get();
 }
 
-void EngineLoop::setGameWorld(std::unique_ptr<GameWorld> gameWorld)
+void EngineLoop::setGameWorld(std::unique_ptr<GameWorld> newGameWorld)
 {
-	gameWorld = std::move(gameWorld);
+	this->gameWorld = std::move(newGameWorld);
 }
 
 SceneManager* EngineLoop::getSceneManager()
 {
-    return sceneManagerPtr;
+	return sceneManagerPtr;
 }
 
 Game* EngineLoop::getGame() const
 {
-    return game.get();
+	return game.get();
 }
 
 IBackendContext* EngineLoop::getBackendContext() const
 {
-    return backendContext.get();
+	return backendContext.get();
 }
 
-const std::vector<std::unique_ptr<IEngineSystems>>& EngineLoop::getSystems() const
+const std::vector<std::unique_ptr<IEngineSystems>>&
+EngineLoop::getSystems() const
 {
-    return systems;
+	return systems;
 }
 
 void EngineLoop::setApplicationClock(ApplicationClock* clock)
 {
-    if (gameWorld)
-    {
-        gameWorld->clock = clock;
-    }
+	if (gameWorld)
+	{
+		gameWorld->clock = clock;
+	}
 }
 
 void EngineLoop::setClockFunction(ClockFunction func)
 {
-    clockFunction = std::move(func);
+	clockFunction = std::move(func);
 }
 
 void EngineLoop::setBackendContext(std::unique_ptr<IBackendContext> context)
 {
-    backendContext = std::move(context);
+	backendContext = std::move(context);
 }
 
 void EngineLoop::requestShutdown()
 {
-    shutdownRequested = true;
+	shutdownRequested = true;
 }

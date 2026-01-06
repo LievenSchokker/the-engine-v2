@@ -19,12 +19,14 @@ public:
 TEST(SceneManagerTest, MainFlowIntegration)
 {
     // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
-    SceneManager sceneManager{*gameWorld};  // Was missing
+    auto gameWorld = std::make_unique<GameWorld>();
+    SceneManager sceneManager{*gameWorld};
+    sceneManager.start(*gameWorld);  // Initialize sceneManager
+
     auto prototypeScene = std::make_unique<Scene>("PrototypeScene");
     auto gameObject = std::make_unique<MockGameObject>("ExampleGameObject");
-    auto* gameObjectPtr = gameObject.get();
-    prototypeScene->addRunTimeGameObject(std::move(gameObject), *gameWorld);
+    prototypeScene->addGameObject(std::move(gameObject));  // Use addGameObject before activation
+
     bool sceneAdded = sceneManager.addScene(std::move(prototypeScene));
     ASSERT_TRUE(sceneAdded);
 
@@ -42,18 +44,18 @@ TEST(SceneManagerTest, MainFlowIntegration)
 TEST(SceneManagerTest, CompleteLifecycle)
 {
     // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
-	std::unique_ptr<Scene> scene = std::make_unique<Scene>("Scene");
-	SceneManager sceneManager{*gameWorld};
+    auto gameWorld = std::make_unique<GameWorld>();
+    SceneManager sceneManager{*gameWorld};
+    sceneManager.start(*gameWorld);
+
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Object1");
-    auto* obj1Ptr = obj1.get();
-    scene1->addRunTimeGameObject(std::move(obj1), *gameWorld);
+    scene1->addGameObject(std::move(obj1));  // Before activation
 
     auto scene2 = std::make_unique<Scene>("Scene2");
     auto obj2 = std::make_unique<MockGameObject>("Object2");
-    auto* obj2Ptr = obj2.get();
-    scene2->addRunTimeGameObject(std::move(obj2), *gameWorld);
+    scene2->addGameObject(std::move(obj2));  // Before activation
+
     sceneManager.addScene(std::move(scene1));
     sceneManager.addScene(std::move(scene2));
 
@@ -69,14 +71,14 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Activate Scene1
     sceneManager.loadScene("Scene1");
-    sceneManager.update(0.1f, *gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld);
 
     // Assert
     EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene1");
 
     // Act - Pause
     sceneManager.pause();
-    sceneManager.update(0.1f, *gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld);
 
     // Assert
     EXPECT_TRUE(sceneManager.isPaused());
@@ -89,7 +91,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Resume
     sceneManager.resume();
-    sceneManager.update(0.1f, *gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld);
 
     // Assert
     EXPECT_FALSE(sceneManager.isPaused());
@@ -102,7 +104,7 @@ TEST(SceneManagerTest, CompleteLifecycle)
 
     // Act - Switch to Scene2
     sceneManager.setActiveScene("Scene2");
-    sceneManager.update(0.2f, *gameWorld.get());
+    sceneManager.update(0.2f, *gameWorld);
 
     // Assert
     EXPECT_EQ(sceneManager.getActiveScene()->getName(), "Scene2");
@@ -122,8 +124,10 @@ TEST(SceneManagerTest, CompleteLifecycle)
 TEST(SceneManagerTest, ErrorHandling)
 {
     // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
+    auto gameWorld = std::make_unique<GameWorld>();
     SceneManager sceneManager{*gameWorld};
+    sceneManager.start(*gameWorld);
+
     auto scene1 = std::make_unique<Scene>("ValidScene");
     sceneManager.addScene(std::move(scene1));
 
@@ -147,50 +151,53 @@ TEST(SceneManagerTest, ErrorHandling)
 
 TEST(SceneManagerTest, AddGameObjectToActiveScene)
 {
-    // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
-    SceneManager sceneManager{*gameWorld};
-    auto scene1 = std::make_unique<Scene>("Scene1");
-    auto obj1 = std::make_unique<MockGameObject>("Object1");
-    scene1->addRunTimeGameObject(std::move(obj1), *gameWorld);
-    bool sceneAdded = sceneManager.addScene(std::move(scene1));
-    ASSERT_TRUE(sceneAdded);
-    Scene* scenePtr = sceneManager.getScene("Scene1");
-    ASSERT_NE(scenePtr, nullptr);
+	// Arrange
+	auto gameWorld = std::make_unique<GameWorld>();
+	SceneManager sceneManager{*gameWorld};
+	sceneManager.start(*gameWorld);
 
-    // Act & Assert - Add object to inactive scene
-    auto obj2 = std::make_unique<MockGameObject>("Object2");
-    auto* obj2Ptr = obj2.get();
-    scenePtr->addRunTimeGameObject(std::move(obj2), *gameWorld);
+	auto scene1 = std::make_unique<Scene>("Scene1");
+	auto obj1 = std::make_unique<MockGameObject>("Object1");
+	scene1->addGameObject(std::move(obj1));  // Before activation
 
-    // Act - Activate scene
-    sceneManager.setActiveScene("Scene1");
+	bool sceneAdded = sceneManager.addScene(std::move(scene1));
+	ASSERT_TRUE(sceneAdded);
+	Scene* scenePtr = sceneManager.getScene("Scene1");
+	ASSERT_NE(scenePtr, nullptr);
 
-    // Assert - Objects added before activation should exist
-    EXPECT_NE(scenePtr->getGameObject("Object1"), nullptr);
-    EXPECT_NE(scenePtr->getGameObject("Object2"), nullptr);
+	// Act & Assert - Add object to inactive scene (use scene directly)
+	auto obj2 = std::make_unique<MockGameObject>("Object2");
+	scenePtr->addGameObject(std::move(obj2));  // Add to scene directly before activation
 
-    // Act - Add object to active scene
-    auto obj3 = std::make_unique<MockGameObject>("Object3");
-    auto* obj3Ptr = obj3.get();
-    scenePtr->addRunTimeGameObject(std::move(obj3), *gameWorld);
+	// Act - Activate scene
+	sceneManager.setActiveScene("Scene1");
 
-    // Assert - Object added to active scene should exist
-    EXPECT_NE(scenePtr->getGameObject("Object3"), nullptr);
+	// Assert - Objects added before activation should exist
+	EXPECT_NE(scenePtr->getGameObject("Object1"), nullptr);
+	EXPECT_NE(scenePtr->getGameObject("Object2"), nullptr);
+
+	// Act - Add object to active scene (use addGameObjectToActiveScene)
+	auto obj3 = std::make_unique<MockGameObject>("Object3");
+	sceneManager.getActiveScene()->addGameObject(std::move(obj3));
+
+	// Assert - Object added to active scene should exist
+	EXPECT_NE(scenePtr->getGameObject("Object3"), nullptr);
 }
 
 TEST(SceneManagerTest, UpdateWithNoActiveScene)
 {
     // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
+    auto gameWorld = std::make_unique<GameWorld>();
     SceneManager sceneManager{*gameWorld};
+    sceneManager.start(*gameWorld);
+
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Object1");
-    scene1->addRunTimeGameObject(std::move(obj1), *gameWorld);
+    scene1->addGameObject(std::move(obj1));
     sceneManager.addScene(std::move(scene1));
 
     // Act - Should not crash with no active scene
-    sceneManager.update(0.1f, *gameWorld.get());
+    sceneManager.update(0.1f, *gameWorld);
 
     // Assert - Scene should still be retrievable
     EXPECT_NE(sceneManager.getScene("Scene1"), nullptr);
@@ -200,12 +207,14 @@ TEST(SceneManagerTest, UpdateWithNoActiveScene)
 TEST(SceneManagerTest, TransferGameObject)
 {
     // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
+    auto gameWorld = std::make_unique<GameWorld>();
     SceneManager sceneManager{*gameWorld};
+    sceneManager.start(*gameWorld);
+
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Player");
     auto* obj1Ptr = obj1.get();
-    scene1->addRunTimeGameObject(std::move(obj1), *gameWorld);
+    scene1->addGameObject(std::move(obj1));
 
     auto scene2 = std::make_unique<Scene>("Scene2");
     sceneManager.addScene(std::move(scene1));
@@ -229,7 +238,7 @@ TEST(SceneManagerTest, TransferGameObject)
     auto scene3 = std::make_unique<Scene>("Scene3");
     auto obj2 = std::make_unique<MockGameObject>("Enemy");
     auto* obj2Ptr = obj2.get();
-    scene3->addRunTimeGameObject(std::move(obj2), *gameWorld);
+    scene3->addGameObject(std::move(obj2));
     sceneManager.addScene(std::move(scene3));
     sceneManager.setActiveScene("Scene3");
 
@@ -244,15 +253,17 @@ TEST(SceneManagerTest, TransferGameObject)
 TEST(SceneManagerTest, TransferGameObjectErrorCases)
 {
     // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
+    auto gameWorld = std::make_unique<GameWorld>();
     SceneManager sceneManager{*gameWorld};
+    sceneManager.start(*gameWorld);
+
     auto scene1 = std::make_unique<Scene>("Scene1");
     auto obj1 = std::make_unique<MockGameObject>("Player");
-    scene1->addRunTimeGameObject(std::move(obj1), *gameWorld);
+    scene1->addGameObject(std::move(obj1));
 
     auto scene2 = std::make_unique<Scene>("Scene2");
     auto obj2 = std::make_unique<MockGameObject>("Player");
-    scene2->addRunTimeGameObject(std::move(obj2), *gameWorld);
+    scene2->addGameObject(std::move(obj2));
 
     sceneManager.addScene(std::move(scene1));
     sceneManager.addScene(std::move(scene2));
@@ -267,11 +278,11 @@ TEST(SceneManagerTest, TransferGameObjectErrorCases)
 TEST(SceneTest, ExtractGameObject)
 {
     // Arrange
-    std::unique_ptr<GameWorld> gameWorld = std::make_unique<GameWorld>();
+    auto gameWorld = std::make_unique<GameWorld>();
     Scene scene("TestScene");
     auto obj = std::make_unique<MockGameObject>("TestObj");
     auto* objPtr = obj.get();
-    scene.addRunTimeGameObject(std::move(obj), *gameWorld);
+    scene.addGameObject(std::move(obj));  // Use addGameObject
 
     // Act & Assert - Extract from inactive scene
     auto extracted = scene.extractGameObject("TestObj");
@@ -283,7 +294,7 @@ TEST(SceneTest, ExtractGameObject)
     Scene scene2("TestScene2");
     auto obj2 = std::make_unique<MockGameObject>("TestObj2");
     auto* obj2Ptr = obj2.get();
-    scene2.addRunTimeGameObject(std::move(obj2), *gameWorld);
+    scene2.addGameObject(std::move(obj2));
     scene2.onStart(*gameWorld);
 
     // Act & Assert

@@ -5,6 +5,7 @@
 
 #include "Component/Transform.h"
 #include "Core/GameWorld.h"
+#include "Scene/SceneManager.h"
 
 void SimpleMoveBehaviour::onAwake()
 {
@@ -31,7 +32,6 @@ void SimpleMoveBehaviour::update(double deltaTime, const GameWorld& gameWorld)
 
 void SimpleMoveBehaviour::onDisable()
 {
-	std::cout << "SimpleMoveBehaviour is now disabled" << std::endl;
 	currentSpeed = 0;
 }
 
@@ -48,14 +48,35 @@ void SimpleMoveBehaviour::pollInput()
 
 	currentDirection = {0.0f, 0.0f};
 
-	if (inputManager->isKeyDown(KeyCode::W))
-	    currentDirection.y -= 1.0f;
-	if (inputManager->isKeyDown(KeyCode::S))
-	    currentDirection.y += 1.0f;
-	if (inputManager->isKeyDown(KeyCode::A))
-	    currentDirection.x -= 1.0f;
-	if (inputManager->isKeyDown(KeyCode::D))
-	    currentDirection.x += 1.0f;
+    if (inputManager->isKeyDown(KeyCode::H))
+    {
+        if (gameObject != nullptr)
+        {
+            if (clone != nullptr)
+            {
+                clone->destroy();
+                clone = nullptr;
+            }
+            std::unique_ptr<GameObject> clone = gameObject->clone();
+        }
+    }
 
-    currentDirection = currentDirection.normalised();
+    if (inputManager->isKeyDown(KeyCode::L))
+    {
+        if (clone != nullptr)
+        {
+            getWorld()->sceneManager->getActiveScene()->addGameObject(std::move(clone));
+            clone = nullptr;
+            gameObject->destroy();
+        }
+    }
+
+	if (inputManager->isKeyDown(KeyCode::W))
+	    currentDirection.y -= 0.1f;
+	if (inputManager->isKeyDown(KeyCode::S))
+	    currentDirection.y += 0.1f;
+	if (inputManager->isKeyDown(KeyCode::A))
+	    currentDirection.x -= 0.1f;
+	if (inputManager->isKeyDown(KeyCode::D))
+	    currentDirection.x += 0.1f;
 }

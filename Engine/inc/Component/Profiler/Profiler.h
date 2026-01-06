@@ -49,13 +49,8 @@ public:
 	UIRenderCommand renderSceneLabel() const;
 	/// @}
 
+
 	void update(double deltaTime, const GameWorld& world) override;
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::Unknown;
-	}
-
-
 	void toggle();
 
 	void setUpdateInterval(float seconds);

@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include "Networking/ComponentType.h"
 #include "Networking/Serialization/ISerializable.h"
 #include "Networking/Serialization/Serialization.h"
@@ -20,28 +18,41 @@ class GameObject;
  */
 class Component : public ISerializable
 {
-    public:
-        Component(): gameObject(nullptr), transform(nullptr) {};
-        virtual ~Component() = 0;
+public:
+	Component() : gameObject(nullptr), transform(nullptr)
+	{
+	};
+	virtual ~Component() = 0;
 
-      /**
-      * @brief Sets the GameObject that this component lives on.
-      * Also sets the @c transform field to the GameObject's Transform.
-      * @param object Pointer to the GameObject to associate with this component.
-      */
-        void setGameObject(GameObject* object);
+	Component(const Component& other) = delete;
+	Component(Component&& other) = delete;
+	Component& operator=(const Component& other) = delete;
+	Component& operator=(Component&& other) = delete;
 
-        /**
-        * @brief Adds a new component of type T to the owning GameObject.
-        *
-        * This is a template method that forwards the call to the GameObject's
-        * addComponent method. Creates the component if it does not already exist.
-        *
-        * @tparam T Type of the component to add (must inherit from Component)
-        * @return Pointer to the newly added component
-        */
-        template <typename T>
-        T* addComponent();
+	/**
+	* @brief Sets the GameObject that this component lives on.
+	* Also sets the @c transform field to the GameObject's Transform.
+	* @param object Pointer to the GameObject to associate with this component.
+	*/
+	void setGameObject(GameObject* object);
+
+	static constexpr const char* name() {
+		return "component";
+	}
+
+	virtual const char* getName() const { return name(); }
+
+	/**
+	* @brief Adds a new component of type T to the owning GameObject.
+	*
+	* This is a template method that forwards the call to the GameObject's
+	* addComponent method. Creates the component if it does not already exist.
+	*
+	* @tparam T Type of the component to add (must inherit from Component)
+	* @return Pointer to the newly added component
+	*/
+	template <typename T>
+	T* addComponent();
 
         /**
         * @brief Retrieves a component of type T from the owning GameObject.
@@ -86,20 +97,19 @@ class Component : public ISerializable
       */
         GameObject* getGameObject() const;
 
-        /**
-        * @brief Returns the Transform of the GameObject this component belongs to.
-        * @return Pointer to the associated GameObject's Transform.
-        */
-        Transform* getTransform() const;
-    virtual ComponentType getComponentType() const;
+	/**
+	* @brief Returns the Transform of the GameObject this component belongs to.
+	* @return Pointer to the associated GameObject's Transform.
+	*/
+	const Transform* getTransform() const;
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 protected:
 	/// The @c GameObject this component is attached to, a component is always attached to a GameObject
 	GameObject* gameObject;
 
-        /// The @c Transform that is attached to the associated GameObject.
-        Transform* transform;
+	/// The @c Transform that is attached to the associated GameObject.
+	Transform* transform;
 };
 
 /// Implementation of the template functions:

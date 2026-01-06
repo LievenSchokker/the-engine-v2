@@ -1,5 +1,7 @@
 #pragma once
 
+#include "GameObject.h"
+
 
 #include <algorithm>
 
@@ -50,6 +52,18 @@ T* GameObject::getComponent() const
         return dynamic_cast<T*>(iterator->get());
     }
     else return nullptr;
+}
+
+template <typename T>
+std::vector<T*> GameObject::getComponents() const
+{
+    std::vector<T*> result;
+    for (const auto& component : components) {
+        if (T* casted = dynamic_cast<T*>(component.get())) {
+            result.push_back(casted);
+        }
+    }
+    return result;
 }
 
 template <typename T>
@@ -128,18 +142,15 @@ auto GameObject::getComponentIterator() const -> std::vector<
 }
 
 template <typename T>
-std::vector<T*> GameObject::getComponents() const
+std::vector<T*> GameObject::getAllComponentsOfType() const
 {
-	std::vector<T*> result;
-
-	for (const auto& component : components)
-	{
-		T* casted = dynamic_cast<T*>(component.get());
-		if (casted != nullptr)
-		{
-			result.push_back(casted);
-		}
-	}
-
-	return result;
+    std::vector<T*> result;
+    for (const auto& component : components)
+    {
+        if (auto* casted = dynamic_cast<T*>(component.get()))
+        {
+            result.push_back(casted);
+        }
+    }
+    return result;
 }

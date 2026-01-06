@@ -78,7 +78,7 @@ TEST(ShapeRendererTest, FillsQueueWithCircleCommand)
     circle->getTransform()->setPosition({42.0, 24.0});
     circle->getTransform()->setScale({1.0, 1.0});
     circle->addComponent<ShapeRenderer>()->setCircle(25.0).setColor(Color::blue());
-    scene.addRunTimeGameObject(std::move(circle), *gameworld);
+    scene.addGameObject(std::move(circle));
 
     // Act
     RenderQueue queue;
@@ -111,7 +111,7 @@ TEST(ShapeRendererTest, FillsQueueWithRectangleCommand)
     rect->getTransform()->setRotationAngle(33.0);
     rect->getTransform()->setScale({1.0, 1.0});
     rect->addComponent<ShapeRenderer>()->setRectangle({80.0, 40.0}).setColor(Color::yellow());
-    scene.addRunTimeGameObject(std::move(rect), *gameworld);
+    scene.addGameObject(std::move(rect));
 
     // Act
     RenderQueue queue;
@@ -147,14 +147,14 @@ TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
     auto* shape1 = circle1->addComponent<ShapeRenderer>();
     shape1->setCircle(25.0).setColor(Color::blue());
     shape1->setLayer(2);  // Layer 2
-    scene->addRunTimeGameObject(std::move(circle1), *gameworld);
+    scene->addGameObject(std::move(circle1));
 
     auto circle2 = std::make_unique<GameObject>();
     circle2->getTransform()->setPosition({10.0, 10.0});
     auto* shape2 = circle2->addComponent<ShapeRenderer>();
     shape2->setCircle(15.0).setColor(Color::red());
     shape2->setLayer(1);  // Layer 1
-    scene->addRunTimeGameObject(std::move(circle2), *gameworld);
+    scene->addGameObject(std::move(circle2));
 
 	auto world = std::make_unique<GameWorld>();
     auto sceneManager = std::make_unique<SceneManager>(*world);
@@ -185,12 +185,12 @@ TEST(RenderSystemTest, SkipsInactiveGameObjects)
 
     auto activeObj = std::make_unique<GameObject>();
     activeObj->addComponent<ShapeRenderer>()->setCircle(10.0);
-    scene->addRunTimeGameObject(std::move(activeObj), *gameworld);
+    scene->addGameObject(std::move(activeObj));
 
     auto inactiveObj = std::make_unique<GameObject>();
     inactiveObj->addComponent<ShapeRenderer>()->setCircle(20.0);
     inactiveObj->setActive(false);
-    scene->addRunTimeGameObject(std::move(inactiveObj), *gameworld);
+    scene->addGameObject(std::move(inactiveObj));
 
 	auto world = std::make_unique<GameWorld>();
     auto sceneManager = std::make_unique<SceneManager>(*world);

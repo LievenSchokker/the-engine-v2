@@ -1,4 +1,4 @@
-#include "Behaviour/NetworkBehaviour.h"
+    #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkBuilder.h"
 #include "Networking/NetworkSpawnManager.h"
 
@@ -48,7 +48,6 @@ void NetworkIdentity::onNetworkSpawn()
 	{
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
-			netBehaviour->setWorldRefrence(gameWorld);
 			netBehaviour->identity = this;
 
 			if (std::ranges::find(networkBehaviours, netBehaviour) == networkBehaviours.end())

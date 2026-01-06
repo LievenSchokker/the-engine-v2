@@ -26,14 +26,14 @@ ShapeRenderer& ShapeRenderer::setCircle(float newRadius)
 
 ShapeRenderer& ShapeRenderer::setRectangle(Vector2 newSize)
 {
-    type = RenderCommandType::Rectangle;
+	type = RenderCommandType::Rectangle;
 
-    constexpr float kEpsilon = 0.0001f;
+	constexpr float kEpsilon = 0.0001f;
 
-    size.x = std::max(newSize.x, kEpsilon);
-    size.y = std::max(newSize.y, kEpsilon);
+	size.x = std::max(newSize.x, kEpsilon);
+	size.y = std::max(newSize.y, kEpsilon);
 
-    return *this;
+	return *this;
 }
 
 Color ShapeRenderer::getColor() const
@@ -59,13 +59,16 @@ RenderCommandType ShapeRenderer::getShapeType() const
 void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 {
 	const Transform* transform = getTransform();
-	if ( transform == nullptr || type == RenderCommandType::None ) {
+	if ( transform == nullptr || type == RenderCommandType::None )
+	{
 		return;
 	}
 
-	const Vector2 position = transform->getPosition();
-	const double rotation = transform->getRotationAngle();
-	const Vector2 scale = Vector2Utils::sanitizeScale(transform->getScale());
+	// Use world transforms to respect parent-child hierarchy
+	const Vector2 position = transform->getWorldPosition();
+	const double rotation = transform->getWorldRotation();
+	const Vector2 scale =
+		Vector2Utils::sanitizeScale(transform->getWorldScale());
 
 	RenderCommand command;
 	command.type = type;
@@ -83,18 +86,15 @@ void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 
 void ShapeRenderer::serialize(WriteArchive& archive) const
 {
-	// Shape type
 	uint8_t shapeType = static_cast<uint8_t>(type);
 	archive.process(shapeType);
 
-	// Color (RGBA)
 	uint8_t r = color.r, g = color.g, b = color.b, a = color.a;
 	archive.process(r);
 	archive.process(g);
 	archive.process(b);
 	archive.process(a);
 
-	// Dimensions
 	float rad = radius;
 	float sizeX = size.x;
 	float sizeY = size.y;
@@ -102,17 +102,12 @@ void ShapeRenderer::serialize(WriteArchive& archive) const
 	archive.process(sizeX);
 	archive.process(sizeY);
 
-	// Layer info
 	uint8_t lay = layer;
 	int8_t order = orderInLayer;
 	archive.process(lay);
 	archive.process(order);
 }
 
-ComponentType ShapeRenderer::getComponentType() const
-{
-	return ComponentType::ShapeRenderer;
-}
 void ShapeRenderer::deserialize(ReadArchive& archive)
 {
 	// Shape type

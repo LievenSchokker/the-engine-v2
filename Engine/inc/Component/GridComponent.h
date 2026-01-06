@@ -48,6 +48,11 @@ public:
 	GridComponent(const GridComponent&) = delete;
 	GridComponent& operator=(const GridComponent&) = delete;
 
+	static constexpr const char* name()
+	{
+		return "Grid";
+	}
+	const char* getName() const override { return name(); }
 	/**
 	 * @brief Set the tilemap component to use for grid queries.
 	 * @param tilemap Pointer to a TilemapComponent
@@ -224,14 +229,6 @@ public:
 	bool isReady() const;
 	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
-
-
-
-	ComponentType getComponentType() const override
-	{
-		return ComponentType::Grid;
-	}
-
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 
@@ -250,5 +247,6 @@ private:
 
 	static std::pair<int, int> cellKey(Vector2 cell);
 	uint8_t layer = 0;
-	int8_t orderInLayer = 0;
+	int8_t orderInLayer =
+		1;	// Default to 1 so debug overlays render above base content
 };

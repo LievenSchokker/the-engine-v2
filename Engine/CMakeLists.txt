@@ -33,9 +33,9 @@ find_package(SDL2_mixer CONFIG REQUIRED)
 find_package(GameNetworkingSockets CONFIG REQUIRED)
 
 target_link_libraries(engine PUBLIC
-        SDL2::SDL2
-        SDL2_image::SDL2_image
-        SDL2_mixer::SDL2_mixer
+        $<IF:$<TARGET_EXISTS:SDL2::SDL2>,SDL2::SDL2,SDL2::SDL2-static>
+        $<IF:$<TARGET_EXISTS:SDL2_image::SDL2_image>,SDL2_image::SDL2_image,SDL2_image::SDL2_image-static>
+        $<IF:$<TARGET_EXISTS:SDL2_mixer::SDL2_mixer>,SDL2_mixer::SDL2_mixer,SDL2_mixer::SDL2_mixer-static>
         GameNetworkingSockets::GameNetworkingSockets
         box2d
 )

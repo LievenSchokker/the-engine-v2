@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include "Component/BaseComponentTypes/Component.h"
 #include "GameObject/GameObject.h"
 
 template <typename T>

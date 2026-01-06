@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(engineSandbox)
 
 # Glob the Behaviour sources
-file(GLOB BEHAVIOUR_SOURCES
+file(GLOB_RECURSE BEHAVIOUR_SOURCES
         "${CMAKE_CURRENT_SOURCE_DIR}/Behaviours/*.cpp"
         "${CMAKE_CURRENT_SOURCE_DIR}/Behaviours/*.h"
         "${CMAKE_CURRENT_SOURCE_DIR}/Examples/*.cpp"
@@ -40,7 +40,7 @@ endfunction()
 # Create separate executables for each sandbox
 # (You can comment out the executables you don't want to build.)
 add_sandbox_executable(engineSandbox_main main.cpp)
-add_sandbox_executable(engineSandbox_physics Physics.cpp)
+add_sandbox_executable(engineSandbox_physics sandbox_physics.cpp)
 add_sandbox_executable(engineSandbox_animation_spritesheets sandbox_animation_spritesheets.cpp)
 add_sandbox_executable(engineSandbox_animation_transforms sandbox_animation_transforms.cpp)
 add_sandbox_executable(engineSandbox_input sandbox_input.cpp)
@@ -48,3 +48,4 @@ add_sandbox_executable(engineSandbox_scene sandbox_scene.cpp)
 add_sandbox_executable(engineSandbox_tilemap_and_grid sandbox_tilemap_and_grid.cpp)
 add_sandbox_executable(engineSandbox_debug_time_controls sandbox_debug_time_controls.cpp)
 add_sandbox_executable(engineSandbox_audio sandbox_audio.cpp)
+add_sandbox_executable(engineSandbox_parent_child sandbox_parent_child.cpp)

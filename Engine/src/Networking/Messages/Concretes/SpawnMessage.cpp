@@ -26,25 +26,28 @@ std::vector<std::byte> SpawnMessage::serialize() const
 
 bool SpawnMessage::deserialize(const std::byte* data, size_t length)
 {
-	if (!data || length == 0) return false;
+    if (!data || length == 0) return false;
 
-	try {
-		ReadArchive archive(data, length);
-		archive.process(netId);
-		archive.process(assetId);
-		archive.process(ownerId);
+    try {
+        ReadArchive archive(data, length);
+        archive.process(netId);
+        archive.process(assetId);
+        archive.process(ownerId);
 
-		bool hasGameObject = false;
-		archive.process(hasGameObject);
-		if (hasGameObject)
-		{
-			gameObject = std::make_unique<GameObject>();
-			gameObject->deserialize(archive);
-		}
-		return validate();
-	} catch (...) {
-		return false;
-	}
+        bool hasGameObject = false;
+        archive.process(hasGameObject);
+
+        if (hasGameObject)
+        {
+            gameObject = std::make_unique<GameObject>();
+            gameObject->deserialize(archive);
+        }
+        return validate();
+    } catch (const std::exception& e) {
+        return false;
+    } catch (...) {
+        return false;
+    }
 }
 
 bool SpawnMessage::validate() const

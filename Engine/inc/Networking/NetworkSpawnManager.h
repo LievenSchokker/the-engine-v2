@@ -8,12 +8,12 @@
 #include "NetworkingIdentityRegistry.h"
 #include "Core/GameWorld.h"
 #include "Math/Vector2.h"
+#include "Networking/PrefabLibrary.h"
 
 class GameObject;
 class Scene;
 class Server;
 class NetworkIdentity;
-class PrefabLibrary;
 struct SpawnMessage;
 
 /**

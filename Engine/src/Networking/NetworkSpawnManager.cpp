@@ -32,6 +32,7 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
     }
 
     auto gameObject = prefabLibrary->instantiate(assetId);
+
     if (!gameObject)
     {
         return nullptr;
@@ -70,11 +71,11 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
         return nullptr;
     }
 
-    getScene()->addGameObject(std::move(gameObject));
+	gameWorld->sceneManager->getActiveScene()->addGameObject(std::move(gameObject));
 
     if (gameWorld->isServer())
     {
-        identity->onNetworkInstantiate(nextNetworkId++);
+        identity->onNetworkInstantiate(nextNetworkId);
     }
 
     identity->onNetworkSpawn();
@@ -122,6 +123,7 @@ void NetworkSpawnManager::despawnObject(uint32_t netId)
 	spawnedObjects.erase(netId);
 	objectAssets.erase(netId);
     identityRegistry->unregisterIdentity(identity);
+
 	object->destroy();
 }
 
@@ -189,17 +191,29 @@ SpawnMessage NetworkSpawnManager::createSpawnMessage(
 
 void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 {
-	if (!message.gameObject)
-	{
-		return;
-	}
+    if (!message.gameObject)
+    {
+        return;
+    }
 
-	if (!getScene())
-	{
-		return;
-	}
+    if (!getScene())
+    {
+        return;
+    }
 
 	auto* identity = message.gameObject->getComponent<NetworkIdentity>();
+
+
+    if (spawnedObjects.contains(message.netId))
+    {
+        if (GameObject* existing = spawnedObjects[message.netId])
+        {
+            existing->copyStateFrom(*message.gameObject);
+        }
+
+        return;
+    }
+
 	if (!identity)
 	{
 		identity = message.gameObject->addComponent<NetworkIdentity>();
@@ -217,8 +231,7 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	GameObject* rawPtr = message.gameObject.get();
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
-
-	getScene()->addGameObject(std::move(message.gameObject));
+	gameWorld->sceneManager->getActiveScene()->addGameObject(std::move(message.gameObject));
 	identity->onNetworkSpawn();
 }
 

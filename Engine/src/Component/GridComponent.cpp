@@ -365,9 +365,9 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 
 			// Calculate line length and angle
 			double lineLength = std::sqrt(lineVector.x * lineVector.x +
-			                              lineVector.y * lineVector.y);
-			double angle = 0;
-				// std::atan2(lineVector.y, lineVector.x) * 180.0 / M_PI;
+										  lineVector.y * lineVector.y);
+			double angle =
+				std::atan2(lineVector.y, lineVector.x) * 180.0 / M_PI;
 
 			// Calculate line center position
 			Vector2 lineCenter{0.0, 0.0};
@@ -402,7 +402,6 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		dot.color = debugWalkableDotColor;
 		dot.layer = layer;
 		dot.orderInLayer = orderInLayer;
-		queue.push(dot);
 		queue.push(dot);
 	}
 

@@ -26,7 +26,7 @@ Vector2 AvoidTargetModule::compute()
     if (target == nullptr)
         return Vector2::zero();
 
-    GameObject* targetObject = agentScene->getGameObjectById(targetGameObjectId);
+    GameObject* targetObject = nullptr;
 
     if (targetObject == nullptr)
         return Vector2::zero();

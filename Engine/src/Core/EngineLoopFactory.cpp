@@ -1,8 +1,4 @@
 #include "Core/EngineLoopFactory.h"
-
-#include <iostream>
-#include <ostream>
-
 #include "Audio/AudioSystem.h"
 #include "Audio/SDL/AudioBackendSDL.h"
 #include "Core/Options/ApplicationSpecifications.h"
@@ -20,6 +16,7 @@
 #include "Scene/SceneManager.h"
 
 #include <iostream>
+#include <ostream>
 
 std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     std::unique_ptr<Game> game)
@@ -111,8 +108,13 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     }
 
     const std::string sceneName = scenePtr->getName();
+	loop->setPendingSceneName(sceneName);
     sceneManager->addScene(std::move(scenePtr));
-    sceneManager->setActiveScene(sceneName);
+
+    for (auto& scene : gamePtr->getAllScenes())
+    {
+        sceneManager->addScene(std::move(scene));
+    }
     loop->addSystem(std::move(sceneManager));
 
     // NETWORKING
@@ -122,16 +124,16 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
         loop->addSystem(std::move(client));
     }
 
-    if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
-    {
-        auto server = std::make_unique<Server>(
-            ServerConnectionInformation{
-                specs.networkingOptions.port,
-                specs.networkingOptions.serverIP
-            },
-            std::make_unique<TransportGNS>());
-        loop->addSystem(std::move(server));
-    }
+	if (hasFlag(specs.engineSystem, EngineSystem::NetServer))
+	{
+		auto server = std::make_unique<Server>(
+			ServerConnectionInformation{
+				specs.networkingOptions.port,
+				specs.networkingOptions.serverIP
+			},
+			std::make_unique<TransportGNS>());
+		loop->addSystem(std::move(server));
+	}
 
     return loop;
 }

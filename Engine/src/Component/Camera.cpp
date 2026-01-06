@@ -55,3 +55,25 @@ void Camera::setViewport(float x, float y)
 	viewportX = x;
 	viewportY = y;
 }
+
+void Camera::serialize(WriteArchive& archive) const
+{
+    archive.process(zoom);
+    archive.process(viewportX);
+    archive.process(viewportY);
+    archive.process(offset.x);
+    archive.process(offset.y);
+    archive.process(viewHeight);
+    archive.process(viewportX);
+}
+
+void Camera::deserialize(ReadArchive& archive)
+{
+    archive.process(zoom);
+    archive.process(viewportX);
+    archive.process(viewportY);
+    archive.process(offset.x);
+    archive.process(offset.y);
+    archive.process(viewHeight);
+    archive.process(viewportX);
+}

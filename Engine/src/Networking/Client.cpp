@@ -1,4 +1,6 @@
 #include "Networking/Client.h"
+
+#include "Networking/NetworkSpawnManager.h"
 #include "Networking/TransportGNS.h"
 #include "Networking/Connection/Connection.h"
 #include "Networking/Connection/ConnectionStatus.h"
@@ -14,127 +16,154 @@
 
 
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
-    : transport(std::move(injectedTransport))
+	: transport(std::move(injectedTransport)),
+	  currentConnection{ConnectionMode::Client, -1,
+	                    ConnectionStatus::Disconnected}
 {
-    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
-
-    transport->setOnMessageReceived([this](const IncomingRawMessage& message)
-    {
-        onMessageReceived(message);
-    });
-
-    transport->setOnConnectionChanged([this](const Connection& connection)
-    {
-        onConnectionChanged(connection);
-    });
-    messageDispatcher = nullptr;
+	messageDispatcher = nullptr;
 }
 
 
 Client::~Client()
 {
-    disconnect();
+	disconnect();
 }
 
 
-bool Client::connectToServer(const ServerConnectionInformation&  serverInformartion) const
+bool Client::connectToServer(
+	const ServerConnectionInformation& serverInformartion) const
 {
-    if (transport->connectByIPAdress(serverInformartion.ip.c_str(), serverInformartion.port) != TransportResult::SUCCESS)
-    {
-        std::cerr << "Failed to connect to " << serverInformartion.ip << ":" << serverInformartion.port << std::endl;
-        return false;
-    }
-    return true;
+	if (transport->connectByIPAdress(serverInformartion.ip.c_str(),
+	                                 serverInformartion.port) !=
+	    TransportResult::SUCCESS)
+	{
+		std::cerr << "Failed to connect to " << serverInformartion.ip << ":" <<
+			serverInformartion.port << std::endl;
+		return false;
+	}
+	return true;
 }
 
+SystemStatus Client::start(GameWorld& gameWorld)
+{
+	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
+
+	transport->setOnMessageReceived([this](const IncomingRawMessage& message)
+	{
+		onMessageReceived(message);
+	});
+
+	transport->setOnConnectionChanged([this](const Connection& connection)
+	{
+		onConnectionChanged(connection);
+	});
+
+	gameWorld.client = this;
+	if (gameWorld.spawnManager != nullptr)
+	{
+		messageDispatcher =
+			spelmotorNetworking::MessageDispatcherFactory::createClientDispatcher(
+				gameWorld, *gameWorld.spawnManager,
+				gameWorld.spawnManager->getNetworkIdentityRegistry());
+	}
+	else
+	{
+		std::cerr <<
+			"Client failed to create message dispatcher, SpawnManager cannot be null"
+			<< std::endl;
+		return SystemStatus::ERROR;
+	}
+	return SystemStatus::RUNNING;
+}
 
 void Client::disconnect()
 {
-    if (currentConnection.connectionStatus == ConnectionStatus::Connected)
-    {
-        transport->disconnectFromSocket(currentConnection.transportConnectionId);
-    }
-    transport->closeOpenSocket();
-    currentConnection.connectionStatus = ConnectionStatus::Disconnected;
+	if (currentConnection.connectionStatus == ConnectionStatus::Connected)
+	{
+		transport->
+			disconnectFromSocket(currentConnection.transportConnectionId);
+	}
+	transport->closeOpenSocket();
+	currentConnection.connectionStatus = ConnectionStatus::Disconnected;
 }
 
 
 bool Client::sendMessage(const IMessage& message) const
 {
-    if (currentConnection.connectionStatus != ConnectionStatus::Connected)
-    {
-        return false;
-    }
+	if (currentConnection.connectionStatus != ConnectionStatus::Connected)
+	{
+		return false;
+	}
 
-    const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
-        message,
-        currentConnection.transportConnectionId,
-        SendMode::ReliableOrdered
-    );
+	const OutgoingRawMessage outgoing = MessageWriter::writeMessage(
+		message,
+		currentConnection.transportConnectionId,
+		SendMode::ReliableOrdered
+		);
 
-    const TransportResult result = transport->send(outgoing);
-    return result == TransportResult::SUCCESS;
+	const TransportResult result = transport->send(outgoing);
+	return result == TransportResult::SUCCESS;
 }
 
 
 void Client::update(double deltaTime, const GameWorld& gameWorld)
 {
-    transport->poll();
+	transport->poll();
 }
 
 
 bool Client::isConnected() const
 {
-    return currentConnection.connectionStatus == ConnectionStatus::Connected;
+	return currentConnection.connectionStatus == ConnectionStatus::Connected;
 }
 
 
 void Client::onConnectionChanged(const Connection& connection)
 {
-    currentConnection = connection;
+	currentConnection = connection;
 
-    switch (connection.connectionStatus)
-    {
-    case ConnectionStatus::Connected:
-        std::cout << "Connected to server" << std::endl;
-        break;
+	switch (connection.connectionStatus)
+	{
+		case ConnectionStatus::Connected:
+			std::cout << "Connected to server" << std::endl;
+			break;
 
-    case ConnectionStatus::Connecting:
-        std::cout << "Connecting..." << std::endl;
-        break;
+		case ConnectionStatus::Connecting:
+			std::cout << "Connecting..." << std::endl;
+			break;
 
-    case ConnectionStatus::Error:
-        disconnect();
-        std::cout << "Disconnected from server" << std::endl;
-        break;
+		case ConnectionStatus::Error:
+			disconnect();
+			std::cout << "Disconnected from server" << std::endl;
+			break;
 
-    default:
-        break;
-    }
+		default:
+			break;
+	}
 }
 
 
 void Client::onMessageReceived(const IncomingRawMessage& rawMessage) const
 {
-    std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
+	std::unique_ptr<IMessage> message = MessageReader::readMessage(rawMessage);
 
 	if (message->getMessageType() == MessageTypes::SpawnMessage)
 	{
-		std::cout << rawMessage.length << std::endl;
 	}
 
-    if (message == nullptr)
-    {
-        std::cerr << "Failed to parse message" << std::endl;
-        return;
-    }
+	if (message == nullptr)
+	{
+		std::cerr << "Failed to parse message" << std::endl;
+		return;
+	}
 
-    messageDispatcher->processMessage(std::move(message));
+	messageDispatcher->processMessage(std::move(message));
 }
 
-void Client::injectMessageDispatcher(std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
+void Client::injectMessageDispatcher(
+	std::unique_ptr<spelmotorNetworking::MessageDispatcher> dispatcher)
 {
-    messageDispatcher = std::move(dispatcher);
+	messageDispatcher = std::move(dispatcher);
 }
 
 void Client::shutdown(GameWorld& world)
@@ -147,4 +176,3 @@ const std::string Client::getName() const
 {
 	return "Client";
 }
-

@@ -1,9 +1,11 @@
 #include "Core/Options/ApplicationSpecifications.h"
 #include "Behaviour/Behaviour.h"
+#include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Behaviours/SimpleMoveBehaviour.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/Transform.h"
 #include "Core/GameWorld.h"
+#include "Core/Options/ApplicationSpecifications.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
@@ -12,6 +14,7 @@
 #include "Rendering/RenderSystem.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
+#include "Scene/SaveSceneSystem.h"
 
 #include <iostream>
 #include <memory>
@@ -19,61 +22,140 @@
 #define SCREEN_WIDTH 700
 #define SCREEN_HEIGHT 700
 
+/// Path for saving/loading scenes
+static const std::string SAVE_PATH = "saves/";
+static const std::string SAVE_FILENAME = "quicksave.scene";
+
 /**
  * @brief Behavior class that handles input for the sandbox scene.
  *
  * Handles:
  * - SPACE key: Toggles clear color between dark green and dark purple
+ * - R key: Rotates the YellowRectangle
+ * - S key: Saves the current scene
+ * - L key: Loads the last saved scene
  * - Mouse wheel Y: Rotates the YellowRectangle
  * - Mouse wheel X: Moves and scales the BlueCircle
  */
-class SandboxInputBehaviour final: public Behaviour
+class SandboxInputBehaviour final: public Behaviour, RegistrationBase<SandboxInputBehaviour>
 {
    public:
-	explicit SandboxInputBehaviour(Scene* scene)
-		: scene(scene), inputManager(nullptr)
-	{
-	}
-
+	SandboxInputBehaviour() = default;
 	~SandboxInputBehaviour() override = default;
 
 	void onAwake() override
 	{
-		inputManager = InputManager::getInstance();
+		std::cout << "Sandbox Awake" << std::endl;
 	}
 
+	static constexpr const char* name()
+	{
+		return "SandboxInputBehaviour";
+	}
+
+	const char* getName() const override { return name(); }
+
+	void onEnable() override
+	{
+		std::cout << "Sandbox Enable" << std::endl;
+		std::cout << "R - Rotate YellowRectangle" << std::endl;
+		std::cout << "S - Save current scene" << std::endl;
+		std::cout << "L - Load last saved scene" << std::endl;
+		std::cout << "SPACE - Toggle background color" << std::endl;
+		std::cout << "ENTER - Switch scenes" << std::endl;
+	}
+
+	void serialize(WriteArchive& archive) const override
+	{
+		std::cout << "Sandbox Serialize" << std::endl;
+	}
+	void deserialize(ReadArchive& archive) override
+	{
+		std::cout << "Sandbox Deserialize" << std::endl;
+	}
 	void update(double deltaTime, const GameWorld& world) override
 	{
-		(void)deltaTime;
-
-		if ( inputManager == nullptr || scene == nullptr )
+	    (void)deltaTime;
+		Scene* scene = world.sceneManager->getActiveScene();
+		if ( scene == nullptr )
 		{
 			return;
 		}
-		if ( inputManager->wasKeyPressed(KeyCode::D) )
+
+		if ( world.input->wasKeyPressed(KeyCode::R) )
 		{
-			auto circle = scene->getGameObject("BlueCircle");
-			auto component = circle->getComponent<SimpleMoveBehaviour>();
-			component->setEnabled(!component->getIsEnabled());
+			GameObject* rectangle = scene->getGameObject("YellowRectangle");
+			if ( rectangle != nullptr )
+			{
+				double currentRotation = rectangle->getTransform()->getRotationAngle();
+				rectangle->getTransform()->setRotationAngle(currentRotation + 15.0);
+			}
 		}
 
-		// Handle SPACE key to toggle clear color
-		if ( inputManager->wasKeyPressed(KeyCode::SPACE) )
+		if ( world.input->wasKeyPressed(KeyCode::S) )
 		{
-			auto w = world;
+			std::string savePath = SAVE_PATH + SAVE_FILENAME;
+
+			if ( SaveSceneSystem::saveScene(*scene, savePath) )
+			{
+				std::cout << "Scene saved successfully to: " << savePath << std::endl;
+			}
+			else
+			{
+				std::cout << "Failed to save scene!" << std::endl;
+			}
+		}
+
+		if ( world.input->wasKeyPressed(KeyCode::L) )
+		{
+			std::string savePath = SAVE_PATH + SAVE_FILENAME;
+
+			if ( !SaveSceneSystem::isValidSceneFile(savePath) )
+			{
+				std::cout << "[Load] No valid save file found at: " << savePath << std::endl;
+				return;
+			}
+
+			auto loadedScene = SaveSceneSystem::loadScene(savePath);
+			if ( loadedScene != nullptr )
+			{
+				std::string sceneName = loadedScene->getName();
+				SceneManager* sm = world.sceneManager;
+				sm->removeScene(sceneName);
+				sm->addScene(std::move(loadedScene));
+				sm->setActiveScene(sceneName);
+				std::cout << "[Load] Scene loaded successfully from: " << savePath << std::endl;
+			}
+			else
+			{
+				std::cout << "[Load] Failed to load scene!" << std::endl;
+			}
+		}
+
+		if ( world.input->wasKeyPressed(KeyCode::E) )
+		{
+			auto circle = scene->getGameObject("BlueCircle");
+			GameObject* rectangle = scene->getGameObject("YellowRectangle");
+			if ( rectangle != nullptr )
+			{
+				rectangle->getTransform()->setRotationAngle(rectangle->getTransform()->getRotationAngle() + 5.0);
+			}
+		}
+
+		if ( world.input->wasKeyPressed(KeyCode::SPACE) )
+		{
 			Color clearColor = world.render->getClearColor();
 			clearColor = (clearColor == Color::darkGreen())
 							 ? Color::darkPurple()
 							 : Color::darkGreen();
 
-			// Try to set clear color through RenderSystem if available
 			if ( world.render != nullptr )
 			{
 				world.render->setClearColor(clearColor);
 			}
 		}
 
-		if ( inputManager->wasKeyPressed(KeyCode::ENTER) )
+		if ( world.input->wasKeyPressed(KeyCode::ENTER) )
 		{
 			SceneManager* sm = world.sceneManager;
 			Scene* active = sm->getActiveScene();
@@ -82,87 +164,10 @@ class SandboxInputBehaviour final: public Behaviour
 				sm->setActiveScene("SecondScene");
 			else
 			{
-				bool hardReset = false;
-				if ( hardReset )
-				{
-					sm->removeScene("PrototypeScene");
-					auto newScene = createPrototypeScene();
-					sm->addScene(std::move(newScene));
-					sm->setActiveScene("PrototypeScene");
-				}
-				else
-				{
-					sm->setActiveScene("PrototypeScene");
-				}
-			}
-		}
-
-		// Handle mouse wheel Y to rotate rectangle
-		if ( inputManager->wheelDeltaY() != 0 )
-		{
-			GameObject* rectangle = scene->getGameObject("YellowRectangle");
-			if ( rectangle != nullptr )
-			{
-				double currentRotation =
-					rectangle->getTransform()->getRotationAngle();
-				rectangle->getTransform()->setRotationAngle(
-					currentRotation + inputManager->wheelDeltaY());
-			}
-		}
-
-		// Handle mouse wheel X to move and scale circle
-		if ( inputManager->wheelDeltaX() != 0 )
-		{
-			GameObject* circle = scene->getGameObject("BlueCircle");
-			if ( circle != nullptr )
-			{
-				Vector2 currentPosition = circle->getTransform()->getPosition();
-				circle->getTransform()->setPosition(
-					{currentPosition.x +
-						 static_cast<float>(inputManager->wheelDeltaX()) *
-							 10.0f,
-					 currentPosition.y});
-				Vector2 currentScale = circle->getTransform()->getScale();
-				circle->getTransform()->setScale(
-					{currentScale.x +
-						 static_cast<float>(inputManager->wheelDeltaX()) * 0.1f,
-					 currentScale.y +
-						 static_cast<float>(inputManager->wheelDeltaX()) *
-							 0.1f});
+				sm->loadScene("PrototypeScene");
 			}
 		}
 	}
-
-	std::unique_ptr<Scene> createPrototypeScene()
-	{
-		auto scene = std::make_unique<Scene>("PrototypeScene");
-
-		auto circle = std::make_unique<GameObject>();
-		circle->setName("BlueCircle");
-		circle->getTransform()->setPosition({150.0, 140.0});
-		circle->getTransform()->setScale({1.0, 1.0});
-		circle->addComponent<ShapeRenderer>()->setCircle(50.0).setColor(
-			Color::lightBlue());
-		circle->addComponent<SimpleMoveBehaviour>();
-
-		auto rectangle = std::make_unique<GameObject>();
-		rectangle->setName("YellowRectangle");
-		rectangle->getTransform()->setPosition({320.0, 240.0});
-		rectangle->getTransform()->setRotationAngle(25.0);
-		rectangle->getTransform()->setScale({1.0, 1.0});
-		rectangle->addComponent<ShapeRenderer>()
-			->setRectangle({140.0, 80.0})
-			.setColor(Color::lightRed());
-
-		scene->addGameObject(std::move(circle));
-		scene->addGameObject(std::move(rectangle));
-
-		return scene;
-	}
-
-   private:
-	Scene* scene;
-	InputManager* inputManager;
 };
 
 //////////////////////////////
@@ -216,11 +221,6 @@ std::unique_ptr<Scene> createSecondScene()
 		.setColor(Color::green());
 	scene->addGameObject(std::move(rectB));
 
-	// auto handler = std::make_unique<GameObject>();
-	// handler->setName("InputHandler");
-	// handler->addComponent<SandboxInputBehaviour>(scene.get());
-	// scene->addGameObject(std::move(handler));
-
 	return scene;
 }
 
@@ -246,17 +246,33 @@ int main(int argc, char** argv)
 	auto prototypeScene = createPrototypeScene();
 	auto secondScene = createSecondScene();
 
+	// Create a debug controller and add it directly to the persistent scene
+	// This ensures debug controls work across all scene transitions
+	auto debugController = std::make_unique<GameObject>();
+	debugController->setName("DebugController");
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::NUMBER_1_AND_EXCLAMATION,	// Pause key
+		std::nullopt,						// Normal speed (disabled)
+		KeyCode::NUMBER_2_AND_AT,			// Slow (enabled)
+		KeyCode::NUMBER_3_AND_HASHMARK,		// Very slow (enabled)
+		KeyCode::NUMBER_4_AND_DOLLAR,		// Fast (enabled)
+		std::nullopt,						// Very fast (disabled)
+		true								// Print menu
+	);
+
+	prototypeScene->addGameObject(std::move(debugController));
+
 	// Attach behavior
 	auto goInputHandler = std::make_unique<GameObject>();
 	goInputHandler->setName("InputHandler");
-	goInputHandler->addComponent<SandboxInputBehaviour>(prototypeScene.get());
+	goInputHandler->addComponent<SandboxInputBehaviour>();
 	prototypeScene->addGameObject(std::move(goInputHandler));
 	game->addScene(std::move(prototypeScene));
 
 	// Attach behavior
 	auto goInputHandler2 = std::make_unique<GameObject>();
 	goInputHandler2->setName("InputHandler");
-	goInputHandler2->addComponent<SandboxInputBehaviour>(secondScene.get());
+	goInputHandler2->addComponent<SandboxInputBehaviour>();
 	secondScene->addGameObject(std::move(goInputHandler2));
 	game->addScene(std::move(secondScene));
 

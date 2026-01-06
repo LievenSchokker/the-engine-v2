@@ -17,7 +17,8 @@
  *
  * The unified EngineLoop implementation allows different configurations to
  * initialize only the subsystems they need (e.g., servers skip rendering,
- * clients skip authoritative game state) while sharing the same update contract.
+ * clients skip authoritative game state) while sharing the same update
+ * contract.
  *
  * @see EngineLoop, SpelMotor
  */
@@ -25,7 +26,7 @@ class IEngineLoop
 {
 	using ClockFunction = std::function<double()>;
 
-public:
+   public:
 	virtual ~IEngineLoop() = default;
 
 	/**
