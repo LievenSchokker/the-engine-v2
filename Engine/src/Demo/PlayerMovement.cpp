@@ -17,7 +17,7 @@ void PlayerMovement::onNetworkSpawn()
 
 void PlayerMovement::registerNetworkMethods(NetworkBuilder& builder)
 {
-	// Clean! Just point to the method - args are auto-deserialized
+	//Kijk sam super simpel no problemo!!
 	builder.command("Move", &PlayerMovement::applyMovement);
 }
 
