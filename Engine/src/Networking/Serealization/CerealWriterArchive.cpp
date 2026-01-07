@@ -16,3 +16,8 @@ std::vector<std::byte> CerealWriteArchive::getBytes() const
     auto span = std::as_bytes(std::span{data});
     return {span.begin(), span.end()};
 }
+
+void CerealWriteArchive::processBytes(const void* data, const size_t size)
+{
+	archive(cereal::binary_data(const_cast<void*>(data), size));
+}

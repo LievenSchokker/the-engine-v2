@@ -20,25 +20,49 @@ ActionMessage::ActionMessage(uint32_t componentId, uint32_t objectId,
 std::vector<std::byte> ActionMessage::serialize() const
 {
 	WriteArchive archive;
-	archive.process(networkComponentIdentity);
-	archive.process(networkGameObjectIdentity);
-	archive.process(actionKey);
-	archive.process(tick);
+
+	archive.process(const_cast<uint32_t&>(networkComponentIdentity));
+	archive.process(const_cast<uint32_t&>(networkGameObjectIdentity));
+	archive.process(const_cast<std::string&>(actionKey));
+	archive.process(const_cast<uint32_t&>(tick));
+
+	// Serialize payload
+	uint32_t payloadSize = static_cast<uint32_t>(payload.size());
+	archive.process(payloadSize);
+	if (payloadSize > 0)
+	{
+		archive.processBytes(payload.data(), payloadSize);
+	}
+
 	return archive.getBytes();
 }
 
-bool ActionMessage::deserialize(const std::byte* data, const size_t length)
+bool ActionMessage::deserialize(const std::byte* data, size_t length)
 {
 	if (!data || length == 0) return false;
 
-	try {
+	try
+	{
 		ReadArchive archive(data, length);
+
 		archive.process(networkComponentIdentity);
 		archive.process(networkGameObjectIdentity);
 		archive.process(actionKey);
 		archive.process(tick);
-		return validate();
-	} catch (...) {
+
+		// Deserialize payload
+		uint32_t payloadSize;
+		archive.process(payloadSize);
+		payload.resize(payloadSize);
+		if (payloadSize > 0)
+		{
+			archive.processBytes(payload.data(), payloadSize);
+		}
+
+		return true;
+	}
+	catch (...)
+	{
 		return false;
 	}
 }
@@ -87,6 +111,16 @@ void ActionMessage::setAction(std::string action)
 void ActionMessage::setTick(uint32_t t)
 {
 	tick = t;
+}
+
+const std::vector<std::byte>& ActionMessage::getPayload() const
+{
+	return payload;
+}
+
+void ActionMessage::setPayload(std::vector<std::byte> data)
+{
+	payload = std::move(data);
 }
 
 MessageTypes ActionMessage::getMessageType() const

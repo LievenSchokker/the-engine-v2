@@ -21,6 +21,7 @@ bool NetworkIdentity::hasAuthority() const
 	{
 		return true;
 	}
+
 	return ownerId == gameWorld->localClientId;
 }
 
@@ -93,7 +94,8 @@ int NetworkIdentity::getOwnerId() const
 
 
 void NetworkIdentity::dispatchAction(const uint32_t componentId,
-                                     const std::string& action) const
+									 const std::string& action,
+									 const std::vector<std::byte>& payload) const
 {
 	if (componentId >= networkBehaviours.size())
 	{
@@ -102,7 +104,7 @@ void NetworkIdentity::dispatchAction(const uint32_t componentId,
 
 	if (NetworkBehaviour* behaviour = networkBehaviours[componentId])
 	{
-		behaviour->executeAction(action);
+		behaviour->executeAction(action, payload);
 	}
 }
 

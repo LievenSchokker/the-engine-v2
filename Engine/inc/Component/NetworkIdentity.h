@@ -82,11 +82,13 @@ public:
 	 * @param componentId The component index from ActionMessage
 	 * @param action The action key
 	 * @param payload
+	 * @param payload
 	 * @param payloadSize
 	 * @param payload Serialized arguments
 	 * @param length Payload size
 	 */
-	void dispatchAction(uint32_t componentId, const std::string& action) const;
+	void dispatchAction(uint32_t componentId, const std::string& action,
+						const std::vector<std::byte>& payload) const;
 
 	GameWorld* getWorld() const;
 	void setWorld(GameWorld* world);
