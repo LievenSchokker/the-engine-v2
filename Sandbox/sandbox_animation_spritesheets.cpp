@@ -82,11 +82,10 @@ int main(int argc, char** argv)
     ApplicationSpecifications spec = {};
     spec.networkingOptions.port = 8080;
     spec.networkingOptions.serverIP = "127.0.0.1";
-    spec.networkingOptions.mode = EngineMode::CLIENT;
     spec.networkingOptions.tickRate = 60;
     spec.engineSystem = EngineSystem::Client;
-    spec.renderBackend = RenderBackend::SDL;
-    spec.windowOptions = {"Player Game", SCREEN_WIDTH, SCREEN_HEIGHT};
+    spec.renderSettings.renderBackend = RenderBackend::SDL;
+    spec.renderSettings.windowOptions = {"Player Game", false, SCREEN_WIDTH, SCREEN_HEIGHT};
     spec.maxFrameTime = 0.1;
 
     std::unique_ptr<Game> game = std::make_unique<Game>();

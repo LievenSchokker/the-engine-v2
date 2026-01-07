@@ -13,6 +13,7 @@ std::optional<RenderCommand> WorldToCameraSpaceAdapter::Transform(
 	const float zoom = camera.getZoom();
 	const float ppm = camera.getPixelsPerMeter();
 
+	//Remove camera Position from world so everything is rendered relative to camera,
 	const float viewX = command.position.x - (cameraPos.x + offset.x);
 	const float viewY = command.position.y - (cameraPos.y + offset.y);
 
@@ -23,6 +24,7 @@ std::optional<RenderCommand> WorldToCameraSpaceAdapter::Transform(
 
 	RenderCommand result = command;
 
+	//Need to get center off screen otherwise camera would be at 0,0
 	const float centerX = camera.getViewWidth() / 2.0f;
 	const float centerY = camera.getViewHeight() / 2.0f;
 
