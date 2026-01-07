@@ -62,8 +62,7 @@ void EngineLoop::start()
 
 void EngineLoop::initNetwork() const
 {
-	if (game->getApplicationSpecifications().networkingOptions.mode ==
-	    EngineMode::CLIENT)
+	if (hasFlag(game->getApplicationSpecifications().engineSystem , EngineSystem::NetClient))
 	{
 		sceneManagerPtr->configureNetworking(spawnManager.get());
 
@@ -78,8 +77,7 @@ void EngineLoop::initNetwork() const
 		}
 	}
 
-	if (game->getApplicationSpecifications().networkingOptions.mode ==
-	    EngineMode::SERVER)
+	if (hasFlag(game->getApplicationSpecifications().engineSystem , EngineSystem::NetServer))
 	{
 		sceneManagerPtr->configureNetworking(spawnManager.get());
 	}

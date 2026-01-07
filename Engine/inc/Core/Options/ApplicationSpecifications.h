@@ -10,7 +10,7 @@ enum class EngineSystem : uint32_t;
 struct ApplicationSpecifications
 {
     NetworkingOptions networkingOptions{};
-    RenderSettings renderBackend{};
+    RenderSettings renderSettings{};
     EngineSystem engineSystem{};
     double maxFrameTime{};
 };
