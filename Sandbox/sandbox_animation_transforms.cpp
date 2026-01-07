@@ -21,6 +21,8 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
+class Camera;
+
 /**
  * @brief Behavior class that handles input for the animation demo.
  *

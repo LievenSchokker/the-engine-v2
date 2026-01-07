@@ -24,17 +24,6 @@
 #include <iostream>
 #include <memory>
 
-// Screen dimensions in pixels (logical resolution)
-constexpr int SCREEN_WIDTH = 1024;
-constexpr int SCREEN_HEIGHT = 768;
-
-// Physics/world scale
-constexpr float PIXELS_PER_METER = 50.0f;
-
-// World dimensions in meters
-constexpr float WORLD_WIDTH = SCREEN_WIDTH / PIXELS_PER_METER;   // 20.48 meters
-constexpr float WORLD_HEIGHT = SCREEN_HEIGHT / PIXELS_PER_METER; // 15.36 meters
-
 /**
  * @brief Simple behavior to handle ESC key for exit.
  *
@@ -85,7 +74,7 @@ int main(int argc, char** argv)
     spec.networkingOptions.tickRate = 60;
     spec.engineSystem = EngineSystem::Client;
     spec.renderSettings.renderBackend = RenderBackend::SDL;
-    spec.renderSettings.windowOptions = {"Player Game", false, SCREEN_WIDTH, SCREEN_HEIGHT};
+    spec.renderSettings.windowOptions = {"Player Game", false, 700, 700};
     spec.maxFrameTime = 0.1;
 
     std::unique_ptr<Game> game = std::make_unique<Game>();
@@ -98,17 +87,9 @@ int main(int argc, char** argv)
     // Create Player GameObject
     auto player = std::make_unique<GameObject>();
     player->setName("Player");
-	player->addComponent<Camera>(0.1, Vector2{0.0, 0.0}, SCREEN_WIDTH, SCREEN_HEIGHT);
+	player->addComponent<Camera>(1, Vector2{0.0, 0.0}, 4, 3);
     // Position in meters (center of world)
-    player->getTransform()->setPosition({WORLD_WIDTH / 2.0f, WORLD_HEIGHT / 2.0f});
-
-    // Scale: sprite is 64x64 pixels, we want it to be ~2 meters tall
-    // 2 meters * 50 PPM = 100 pixels, so scale = 100/64 ≈ 1.5625
-    // Or simpler: if 1 unit = 1 meter in world space, scale by desired meter size
-    constexpr float PLAYER_SIZE_METERS = 2.0f;
-    constexpr float PLAYER_FRAME_SIZE = 64.0f;
-    float playerScale = PLAYER_SIZE_METERS / (PLAYER_FRAME_SIZE / PIXELS_PER_METER);
-    player->getTransform()->setScale({playerScale, playerScale});
+    player->getTransform()->setPosition({ 2.0f,  2.0f});
 
     auto* playerSprite = player->addComponent<SpriteComponent>();
     bool playerLoaded = SpritesheetLoader::loadSpritesheet(
@@ -196,12 +177,12 @@ int main(int argc, char** argv)
     rat->setName("Rat");
 
     // Position in meters
-    rat->getTransform()->setPosition({4.0f, WORLD_HEIGHT / 2.0f});
+    rat->getTransform()->setPosition({4.0f, 2.0f});
 
     // Scale: rat sprite is 32x32, we want it ~1 meter tall
     constexpr float RAT_SIZE_METERS = 1.0f;
     constexpr float RAT_FRAME_SIZE = 32.0f;
-    float ratScale = RAT_SIZE_METERS / (RAT_FRAME_SIZE / PIXELS_PER_METER);
+    float ratScale = RAT_SIZE_METERS / (RAT_FRAME_SIZE);
     rat->getTransform()->setScale({ratScale, ratScale});
 
     auto* ratSprite = rat->addComponent<SpriteComponent>();
@@ -226,8 +207,8 @@ int main(int argc, char** argv)
         AnimationCurve ratCurve(EasingType::EaseInOutQuad);
 
         // Positions in meters
-        Vector2 ratStartPos{4.0f, WORLD_HEIGHT / 2.0f};
-        Vector2 ratEndPos{16.0f, WORLD_HEIGHT / 2.0f};
+        Vector2 ratStartPos{4.0f,  2.0f};
+        Vector2 ratEndPos{16.0f,  2.0f};
         float ratMoveDuration = 3.0f; // 3 seconds to cross ~12 meters
 
         // Forward track
@@ -302,13 +283,5 @@ int main(int argc, char** argv)
 
     game->addScene(std::move(gameScene));
     game->setApplicationSpecifications(spec);
-
-    std::cout << "\n=== Player Game ===\n";
-    std::cout << "World size: " << WORLD_WIDTH << "x" << WORLD_HEIGHT << " meters\n";
-    std::cout << "Pixels per meter: " << PIXELS_PER_METER << "\n";
-    std::cout << "Controls:\n";
-    std::cout << "  WASD or Arrow Keys - Move player\n";
-    std::cout << "  ESC - Exit\n\n";
-
     return SpelMotorEntry::main(std::move(game));
 }

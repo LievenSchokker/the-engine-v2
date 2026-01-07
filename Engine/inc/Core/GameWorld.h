@@ -29,8 +29,8 @@ public:
 	AudioManager* audio = nullptr;
 	Client* client = nullptr;
 	Server* server = nullptr;
-	ApplicationSpecifications specs = {};
 	NetworkSpawnManager* spawnManager = nullptr;
+	ApplicationSpecifications specs = {};
 
 	bool isClient() const
 	{

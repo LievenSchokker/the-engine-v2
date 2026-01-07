@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include "Events/EventImplementations/ApplicationEvents.h"
 #include "External/IBackendContext.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/IUIRenderHook.h"
@@ -141,15 +142,11 @@ class SDLRenderer: public IRenderer
 					const Rect* srcRect, double rotationDegrees,
 					const Vector2& scale, const Color& tint, bool flipX = false,
 					bool flipY = false);
-
-
    private:
 	std::unique_ptr<IUIRenderHook> userInterfaceHook;
 	void setupEvents(EventDispatcher& dispatcher) override;
 	SDL_Texture* getOrCreateTexture(IImage* image);
 	void clearTextureCache();
-	void setLogicalSize(int width, int height) override;
-	void setLetterboxRect(const Rect& rect) override;
 	bool ensureSolidQuadTexture();
 	void destroySolidQuadTexture();
 	SDL_Window* window =

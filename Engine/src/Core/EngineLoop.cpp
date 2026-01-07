@@ -22,6 +22,7 @@ EngineLoop::EngineLoop(std::unique_ptr<Game> game)
 		  return 0.0;
 	  })
 {
+	gameWorld->specs = this->game->getApplicationSpecifications();
 }
 
 EngineLoop::~EngineLoop() = default;

@@ -1,4 +1,4 @@
-#include "../../Engine/inc/Rendering/viewport/WorldToCameraSpaceAdapter.h"
+#include "../../Engine/inc/Rendering/viewport/WorldToCameraViewSpaceAdapter.h"
 #include "Component/Camera.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"

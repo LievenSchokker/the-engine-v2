@@ -26,7 +26,6 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 
     GameWorld* gameWorld = loop->getGameWorld();
     Game* gamePtr = loop->getGame();
-
     std::unique_ptr<IBackendContext> backendContext{};
     IBackendContext* contextPtr = nullptr;
 
