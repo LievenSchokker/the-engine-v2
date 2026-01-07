@@ -2,9 +2,11 @@
 #include "AI/Modules/FollowPathModule.h"
 #include "AI/Navigation/Pathfinding/PathRenderer.h"
 #include "Assets/AssetManager.h"
+#include "Assets/SDLImage.h"
 #include "Assets/TilemapAsset.h"
 #include "Behaviour/Behaviour.h"
 #include "Behaviours/NavigationTest.h"
+#include "Component/Camera.h"
 #include "Component/GridComponent.h"
 #include "Component/ShapeRenderer.h"
 #include "Component/TilemapColliderComponent.h"
@@ -27,6 +29,7 @@
 #include <iostream>
 #include <memory>
 #include <random>
+#include <algorithm>
 #include <vector>
 
 #define SCREEN_WIDTH 1024
@@ -40,30 +43,30 @@ std::mt19937& tilemapSandboxRng()
 	return engine;
 }
 
-bool tryGetRandomWalkableCell(const GridComponent& grid,
-                              Vector2& outCell,
-                              const Vector2* avoidCell = nullptr)
+bool tryGetRandomWalkableCell(const GridComponent& grid, Vector2& outCell,
+							  const Vector2* avoidCell = nullptr)
 {
 	const int width = grid.getGridWidth();
 	const int height = grid.getGridHeight();
-	if (width <= 0 || height <= 0)
+	if ( width <= 0 || height <= 0 )
 	{
 		return false;
 	}
 
 	std::vector<Vector2> candidates;
-	candidates.reserve(static_cast<size_t>(width * height));
+	candidates.reserve(static_cast<size_t>(width) *
+					   static_cast<size_t>(height));
 
-	for (int y = 0; y < height; ++y)
+	for ( int y = 0; y < height; ++y )
 	{
-		for (int x = 0; x < width; ++x)
+		for ( int x = 0; x < width; ++x )
 		{
 			Vector2 cell{static_cast<float>(x), static_cast<float>(y)};
-			if (!grid.isWalkable(cell))
+			if ( !grid.isWalkable(cell) )
 			{
 				continue;
 			}
-			if (avoidCell != nullptr && cell == *avoidCell)
+			if ( avoidCell != nullptr && cell == *avoidCell )
 			{
 				continue;
 			}
@@ -71,7 +74,7 @@ bool tryGetRandomWalkableCell(const GridComponent& grid,
 		}
 	}
 
-	if (candidates.empty())
+	if ( candidates.empty() )
 	{
 		return false;
 	}
@@ -80,7 +83,7 @@ bool tryGetRandomWalkableCell(const GridComponent& grid,
 	outCell = candidates[dist(tilemapSandboxRng())];
 	return true;
 }
-} // namespace
+}  // namespace
 
 /**
  * @brief Behavior class that handles input for the tilemap/grid demo.
@@ -121,7 +124,8 @@ class TilemapInputBehaviour: public Behaviour
 
 		if ( gridComponent != nullptr && pathRenderer != nullptr )
 		{
-			pathRenderer->setRenderEnabled(gridComponent->isDebugRenderEnabled());
+			pathRenderer->setRenderEnabled(
+				gridComponent->isDebugRenderEnabled());
 		}
 	}
 
@@ -141,8 +145,8 @@ class TilemapInputBehaviour: public Behaviour
 			{
 				pathRenderer->setRenderEnabled(newState);
 			}
-			std::cout << "Grid debug rendering: "
-					  << (newState ? "ON" : "OFF") << std::endl;
+			std::cout << "Grid debug rendering: " << (newState ? "ON" : "OFF")
+					  << std::endl;
 		}
 
 		// Toggle sample blocked cell with 'B' key
@@ -268,14 +272,46 @@ int main(int argc, char** argv)
 	(void)argv;
 
 	ApplicationSpecifications spec = {};
+	EngineMode mode = EngineMode::CLIENT;
+    spec.engineSystem = EngineSystem::Client;
+    if (argc > 1)
+    {
+        std::string arg = argv[1];
+        if (arg == "server")
+        {
+            mode = EngineMode::SERVER;
+            spec.engineSystem = EngineSystem::Server;
+            std::cout << "Starting as SERVER..." << std::endl;
+        }
+        else if (arg == "client")
+        {
+            mode = EngineMode::CLIENT;
+            spec.engineSystem = EngineSystem::Client;
+            std::cout << "Starting as CLIENT..." << std::endl;
+        }
+        else
+        {
+            std::cerr << "Unknown mode: " << arg << std::endl;
+            std::cerr << "Usage: " << argv[0] << " [server|client]" << std::endl;
+            return 1;
+        }
+    }
+    else
+    {
+        std::cout << "No mode specified, defaulting to CLIENT..." << std::endl;
+        std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
+    }
+
+
+    spec.networkingOptions.mode = mode;
 	spec.networkingOptions.port = 8080;
-	spec.networkingOptions.serverIP = "127.0.0.1";
-	spec.networkingOptions.mode = EngineMode::CLIENT;
-	spec.networkingOptions.tickRate = 60;
+    spec.networkingOptions.serverIP = "127.0.0.1";
+    spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
 	spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
+	spec.clearColor = Color(106, 168, 169);
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 
@@ -301,6 +337,24 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	// Load tileset image
+	std::string tilesetPath = "build/Sandbox/Assets/Tilemap_color1.png";
+	assetManager.add(tilesetPath, std::make_unique<SDLImage>());
+	IImage* tilesetImage = nullptr;
+	if ( !assetManager.load(tilesetPath) )
+	{
+		std::cerr << "Failed to load tileset: " << tilesetPath << std::endl;
+	}
+	else
+	{
+		tilesetImage = dynamic_cast<IImage*>(assetManager.get(tilesetPath));
+		if ( tilesetImage == nullptr )
+		{
+			std::cerr << "Failed to get tileset image: " << tilesetPath
+					  << std::endl;
+		}
+	}
+
 	// Create a GameObject for the tilemap
 	auto tilemapObject = std::make_unique<GameObject>();
 	tilemapObject->setName("LevelTilemap");
@@ -320,14 +374,32 @@ int main(int argc, char** argv)
 	// Common sizes: 16x16, 32x32, 48x48, 64x64 pixels.
 	// This is the recommended approach - developers should manually configure
 	// tile size to match their art assets and game design.
-	tilemapComponent->setTileSize({32.0, 32.0});
+	tilemapComponent->setTileSize({64.0, 64.0});
+
+	if ( tilesetImage != nullptr )
+	{
+		tilemapComponent->setTileset(tilesetImage);
+		// Map CSV tile IDs to sprites by selecting (row,col) in the tileset.
+		tilemapComponent->setTileSprite(1, 1, 1);
+		tilemapComponent->setTileSprite(2, 0, 1);
+		tilemapComponent->setTileSprite(3, 1, 2);
+		tilemapComponent->setTileSprite(4, 2, 1);
+		tilemapComponent->setTileSprite(5, 1, 0);
+		tilemapComponent->setTileSprite(6, 0, 0);
+		tilemapComponent->setTileSprite(7, 0, 2);
+		tilemapComponent->setTileSprite(8, 2, 2);
+		tilemapComponent->setTileSprite(9, 2, 0);
+	}
+	else
+	{
+		std::cout << "[TilemapSandbox] Tileset not loaded; using colors.\n";
+	}
 
 	// Set colors for different tile IDs
-	tilemapComponent->setTileColor(0, Color::lightGreen());	 // Low grass
-	tilemapComponent->setTileColor(1, Color::darkGray());	 // Rocks
+	tilemapComponent->setTileColor(0, Color(106, 168, 169));  // Water
 
 	// Enable colliders for solid tiles
-	tilemapComponent->setTileCollider(1, true);
+	tilemapComponent->setTileCollider(0, true);
 
 	auto* tilemapCollider =
 		tilemapObject->addComponent<TilemapColliderComponent>();
@@ -344,49 +416,62 @@ int main(int argc, char** argv)
 	std::unique_ptr<GameObject> navInputObject;
 	std::unique_ptr<GameObject> playerObject;
 	std::unique_ptr<GameObject> pushBoxObject;
+	std::unique_ptr<GameObject> cameraObject;
 	Agent* agentComponent = nullptr;
 	if ( gridComponent != nullptr )
 	{
 		gridComponent->setTilemapComponent(tilemapComponent);
-		gridComponent->setWalkableTileIds({0});
+		gridComponent->setWalkableTileIds({1, 2, 3, 4, 5, 6, 7, 8, 9});
 
 		// Set movement costs/weights for pathfinding
 		// 1.0 = normal speed, higher = slower, lower = faster
-		gridComponent->setTileWeight(0, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(1, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(2, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(3, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(4, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(5, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(6, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(7, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(8, 1.0);  // Low grass: normal
+		gridComponent->setTileWeight(9, 1.0);  // Low grass: normal
 
 		// Mark a sample blocked cell dynamically and visualize it with a
 		// boulder
-		Vector2 blockedCell{10.0, 7.0};
-		gridComponent->blockCell(blockedCell);
+		// Vector2 blockedCell{10.0, 7.0};
+		// gridComponent->blockCell(blockedCell);
 
-		blockedBoulder = std::make_unique<GameObject>();
-		blockedBoulder->setName("BlockedBoulder");
-		auto* boulderRenderer = blockedBoulder->addComponent<ShapeRenderer>();
-		boulderRenderer->setRectangle(tilemapComponent->getTileSize())
-			.setColor(Color::gray())
-			.setLayer(1);
-		blockedBoulder->getTransform()->setPosition(
-			tilemapComponent->cellToWorld(blockedCell));
+		// blockedBoulder = std::make_unique<GameObject>();
+		// blockedBoulder->setName("BlockedBoulder");
+		// auto* boulderRenderer =
+		// blockedBoulder->addComponent<ShapeRenderer>();
+		// boulderRenderer->setRectangle(tilemapComponent->getTileSize())
+		// 	.setColor(Color::gray())
+		// 	.setLayer(1);
+		// blockedBoulder->getTransform()->setPosition(
+		// 	tilemapComponent->cellToWorld(blockedCell));
 
 		Vector2 agentCell = Vector2::zero();
-		if (!tryGetRandomWalkableCell(*gridComponent, agentCell))
+		if ( !tryGetRandomWalkableCell(*gridComponent, agentCell) )
 		{
-			std::cout << "[TilemapSandbox] No walkable agent cell found; using (0,0).\n";
+			std::cout << "[TilemapSandbox] No walkable agent cell found; using "
+						 "(0,0).\n";
 		}
 
 		Vector2 targetCell = agentCell;
-		if (!tryGetRandomWalkableCell(*gridComponent, targetCell, &agentCell))
+		if ( !tryGetRandomWalkableCell(*gridComponent, targetCell, &agentCell) )
 		{
-			if (!tryGetRandomWalkableCell(*gridComponent, targetCell))
+			if ( !tryGetRandomWalkableCell(*gridComponent, targetCell) )
 			{
-				std::cout << "[TilemapSandbox] No walkable target cell found; using agent cell.\n";
+				std::cout << "[TilemapSandbox] No walkable target cell found; "
+							 "using agent cell.\n";
 				targetCell = agentCell;
 			}
 		}
 
-		if (targetCell == agentCell)
+		if ( targetCell == agentCell )
 		{
-			std::cout << "[TilemapSandbox] Agent/target cells overlap; path may be empty.\n";
+			std::cout << "[TilemapSandbox] Agent/target cells overlap; path "
+						 "may be empty.\n";
 		}
 
 		// Create an agent that uses the tilemap-backed navigation surface
@@ -423,9 +508,7 @@ int main(int argc, char** argv)
 		targetObject = std::make_unique<GameObject>();
 		targetObject->setName("Target");
 		auto* targetRenderer = targetObject->addComponent<ShapeRenderer>();
-		targetRenderer->setCircle(6.0f)
-			.setColor(Color::yellow())
-			.setLayer(1);
+		targetRenderer->setCircle(6.0f).setColor(Color::yellow()).setLayer(1);
 		targetObject->getTransform()->setPosition(
 			tilemapComponent->cellToWorld(targetCell));
 
@@ -438,6 +521,41 @@ int main(int argc, char** argv)
 		navTest->setAgent(*agentComponent);
 		navTest->setTarget(*targetObject->getTransform());
 		navTest->setGridComponent(*gridComponent);
+	}
+
+	// Set up a camera that scales the tilemap to the window size.
+	{
+		cameraObject = std::make_unique<GameObject>();
+		cameraObject->setName("MainCamera");
+		auto* camera =
+			cameraObject->addComponent<Camera>(1.0f, Vector2::zero(),
+											   static_cast<float>(SCREEN_WIDTH),
+											   static_cast<float>(SCREEN_HEIGHT));
+		const float mapWidth =
+			static_cast<float>(tilemapComponent->getGridWidth()) *
+			static_cast<float>(tilemapComponent->getTileSize().x);
+		const float mapHeight =
+			static_cast<float>(tilemapComponent->getGridHeight()) *
+			static_cast<float>(tilemapComponent->getTileSize().y);
+		float zoom = 1.0f;
+		if ( mapWidth > 0.0f && mapHeight > 0.0f )
+		{
+			const float zoomX =
+				static_cast<float>(SCREEN_WIDTH) / mapWidth;
+			const float zoomY =
+				static_cast<float>(SCREEN_HEIGHT) / mapHeight;
+			zoom = std::min(zoomX, zoomY);
+		}
+		camera->setZoom(zoom);
+
+		const Transform* tilemapTransform = tilemapObject->getTransform();
+		const Vector2 mapOrigin =
+			(tilemapTransform != nullptr)
+				? tilemapTransform->getWorldPosition()
+				: Vector2::zero();
+		cameraObject->getTransform()->setPosition(
+			{mapOrigin.x + (mapWidth * 0.5f),
+			 mapOrigin.y + (mapHeight * 0.5f)});
 	}
 
 	// Create a controllable player with physics
@@ -461,13 +579,14 @@ int main(int argc, char** argv)
 	playerCollider->setCircle(8.0f);
 	playerCollider->setDensity(1.0f);
 	playerCollider->setRestitution(0.0f);
-	playerObject->addComponent<PlayerMovementBehaviour>(260.0f, 2600.0f, 3200.0f);
+	playerObject->addComponent<PlayerMovementBehaviour>(260.0f, 2600.0f,
+														3200.0f);
 
 	// Create a pushable box
 	pushBoxObject = std::make_unique<GameObject>();
 	pushBoxObject->setName("PushBox");
 	pushBoxObject->getTransform()->setPosition(
-		tilemapComponent->cellToWorld({4.0f, 1.0f}));
+		tilemapComponent->cellToWorld({3.0f, 1.0f}));
 	auto* boxRenderer = pushBoxObject->addComponent<ShapeRenderer>();
 	boxRenderer->setCircle(14.0f).setColor(Color::orange()).setLayer(2);
 	pushBoxObject->addComponent<RigidBody>();
@@ -516,6 +635,10 @@ int main(int argc, char** argv)
 	if ( pushBoxObject != nullptr )
 	{
 		tilemapScene->addGameObject(std::move(pushBoxObject));
+	}
+	if ( cameraObject != nullptr )
+	{
+		tilemapScene->addGameObject(std::move(cameraObject));
 	}
 	tilemapScene->addGameObject(std::move(inputHandler));
 

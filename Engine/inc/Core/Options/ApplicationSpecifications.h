@@ -4,6 +4,7 @@
 #include "Networking/NetworkingOptions.h"
 #include "Rendering/Window/WindowOptions.h"
 #include "Rendering/RenderBackend.h"
+#include "Rendering/Color.h"
 
 enum class EngineSystem : uint32_t;
 
@@ -13,6 +14,7 @@ struct ApplicationSpecifications
     WindowOptions windowOptions{};
     RenderBackend renderBackend{};
     EngineSystem engineSystem{};
+    Color clearColor = Color::black();
     double maxFrameTime{};
 };
 

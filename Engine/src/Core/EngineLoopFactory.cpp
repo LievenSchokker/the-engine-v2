@@ -71,6 +71,7 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
             sdlRenderer->open(specs.windowOptions);
 
             auto system = std::make_unique<RenderSystem>(std::move(sdlRenderer));
+            system->setClearColor(specs.clearColor);
             gameWorld->render = system.get();
 
             loop->addSystem(std::move(system));

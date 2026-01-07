@@ -1,14 +1,15 @@
 #pragma once
 
-#include "Math/Vector2.h"
-#include "Rendering/Color.h"
 #include "BaseComponentTypes/RenderComponent.h"
+#include "Math/Vector2.h"
 #include "Networking/Serialization/RegistrationBase.h"
+#include "Rendering/Color.h"
 
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
+class IImage;
 class TilemapAsset;
 
 /**
@@ -16,26 +17,34 @@ class TilemapAsset;
  * functionality.
  *
  * This component:
- * - Renders tiles as colored rectangles (one per non-empty tile)
+ * - Renders tiles as sprites when mapped, otherwise colored rectangles
  * - Provides coordinate conversion between world space and grid space
  * - Can be queried for tile information at specific grid coordinates
  *
  * The tilemap is positioned based on the GameObject's Transform.
  */
 class TilemapComponent: public RenderComponent,
-                        RegistrationBase<TilemapComponent>
+						RegistrationBase<TilemapComponent>
 {
-public:
-	TilemapComponent() : tileSize{32.0, 32.0}
-	{
-	};
+   public:
+	TilemapComponent() : tileSize{32.0, 32.0} {};
 	~TilemapComponent() override = default;
 
 	static constexpr const char* name()
 	{
 		return "Tilemap";
 	}
-	const char* getName() const override { return name(); }
+
+	const char* getName() const override
+	{
+		return name();
+	}
+
+	struct TileSprite
+	{
+		int frameIndex = 0;
+		Color tint = Color::white();
+	};
 
 	/**
 	 * @brief Set the tilemap asset to use.
@@ -67,6 +76,76 @@ public:
 	 * @return The color, or white if not set
 	 */
 	Color getTileColor(int tileId) const;
+
+	/**
+	 * @brief Set the tileset image used for tile sprites.
+	 * @param image Pointer to a loaded tileset image
+	 */
+	void setTileset(IImage* image);
+
+	/**
+	 * @brief Get the tileset image used for tile sprites.
+	 */
+	IImage* getTileset() const;
+
+	/**
+	 * @brief Set the spritesheet frame size (in pixels) used when slicing the
+	 * tileset image into frames.
+	 *
+	 * This is intentionally separate from `tileSize`:
+	 * - `tileSize` controls the size of a tile in *world units*.
+	 * - `tilesetFrameSize` controls the size of a frame in the *image*
+	 * (pixels).
+	 *
+	 * If left unset (0,0), the component falls back to using `tileSize` as the
+	 * frame size (legacy behavior).
+	 */
+	void setTilesetFrameSize(Vector2 frameSizePixels);
+
+	/**
+	 * @brief Get the configured tileset frame size (pixels). May be (0,0) if
+	 * unset.
+	 */
+	Vector2 getTilesetFrameSize() const;
+
+	/**
+	 * @brief Set the sprite frame for a specific tile ID.
+	 * @param tileId The tile ID to set sprite for
+	 * @param frameIndex The frame index in the tileset
+	 * @param tint Optional tint color (white for no tint)
+	 */
+	void setTileSprite(int tileId, int frameIndex,
+					   const Color& tint = Color::white());
+
+	/**
+	 * @brief Set the sprite frame for a tile ID using tileset row/column.
+	 * @param tileId The tile ID to set sprite for
+	 * @param row The row index in the tileset (0-based)
+	 * @param col The column index in the tileset (0-based)
+	 * @param tint Optional tint color (white for no tint)
+	 */
+	void setTileSprite(int tileId, int row, int col,
+					   const Color& tint = Color::white());
+
+	/**
+	 * @brief Set the shared tileset image and sprite frame for a tile ID.
+	 * @param tileId The tile ID to set sprite for
+	 * @param image Pointer to a loaded tileset image (shared)
+	 * @param frameIndex The frame index in the tileset
+	 * @param tint Optional tint color (white for no tint)
+	 */
+	void setTileSprite(int tileId, IImage* image, int frameIndex,
+					   const Color& tint = Color::white());
+
+	/**
+	 * @brief Check if a tile ID has a sprite mapping.
+	 */
+	bool hasTileSprite(int tileId) const;
+
+	/**
+	 * @brief Get the sprite mapping for a tile ID, or nullptr if missing.
+	 */
+	const TileSprite* getTileSprite(int tileId) const;
 
 	/**
 	 * @brief Enable or disable colliders for a specific tile ID.
@@ -143,10 +222,13 @@ public:
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
 
-private:
+   private:
 	TilemapAsset* tilemapAsset = nullptr;
+	IImage* tilesetImage = nullptr;
 	Vector2 tileSize;
+	Vector2 tilesetFrameSize{0.0, 0.0};
 	std::unordered_map<int, Color> tileColors;
+	std::unordered_map<int, TileSprite> tileSprites;
 	std::unordered_set<int> collidableTileIds;
 	uint8_t layer = 0;
 	int8_t orderInLayer = 0;
