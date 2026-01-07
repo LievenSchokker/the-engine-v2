@@ -5,22 +5,15 @@
 
 class GameWorld;
 
-/**
- * @brief Simple networked player movement with payload-based commands.
- */
 class PlayerMovement final : public NetworkBehaviour,
 							 RegistrationBase<PlayerMovement>
 {
 public:
 	PlayerMovement();
 
-	static constexpr const char* name()
-	{
-		return "PlayerMovement";
-	}
+	static constexpr const char* name() { return "PlayerMovement"; }
 	const char* getName() const override { return name(); }
 
-	void onStart() override;
 	void onNetworkSpawn() override;
 	void registerNetworkMethods(NetworkBuilder& builder) override;
 	void update(double deltaTime, const GameWorld& world) override;
