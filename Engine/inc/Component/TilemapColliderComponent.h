@@ -58,6 +58,18 @@ protected:
 	void onDestroy() override;
 
 private:
+	struct BakeContext;
+	bool ensureTilemapReady();
+	bool buildBakeContext(BakeContext& context) const;
+	void populateCollidableMask(const BakeContext& context,
+	                            std::vector<uint8_t>& collidable) const;
+	ObjectHandle spawnCollider(const BakeContext& context,
+	                           int x,
+	                           int y,
+	                           int rectWidth,
+	                           int rectHeight,
+	                           int colliderIndex) const;
+
 	TilemapComponent* tilemapComponent = nullptr;
 	bool autoBake = true;
 	bool hasBaked = false;
