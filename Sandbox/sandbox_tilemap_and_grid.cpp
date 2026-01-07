@@ -134,6 +134,11 @@ class TilemapInputBehaviour: public Behaviour
 		(void)deltaTime;
 		(void)world;
 
+		if ( world.input == nullptr )
+		{
+			return;
+		}
+
 		// Toggle debug rendering with 'G' key
 		if ( world.input->wasKeyPressed(KeyCode::G) &&
 			 gridComponent != nullptr )
@@ -308,7 +313,6 @@ int main(int argc, char** argv)
     spec.networkingOptions.serverIP = "127.0.0.1";
     spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
-	spec.engineSystem = EngineSystem::Client;
 	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 	spec.clearColor = Color(106, 168, 169);
