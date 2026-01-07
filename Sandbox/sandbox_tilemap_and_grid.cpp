@@ -197,7 +197,7 @@ int main(int argc, char** argv)
 
 	// Create AssetManager and load tilemap
 	AssetManager assetManager;
-	std::string tilemapPath = "build/Sandbox/Assets/level1_tilemap.csv";
+	std::string tilemapPath = "Assets/level1_tilemap.csv";
 
 	assetManager.add(tilemapPath, std::make_unique<TilemapAsset>());
 	if ( !assetManager.load(tilemapPath) )
