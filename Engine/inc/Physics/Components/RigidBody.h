@@ -5,7 +5,7 @@
 #include "Networking/Serialization/RegistrationBase.h"
 #include "Physics/IPhysicsWorld.h"
 
-class RigidBody: public Behaviour, public RegistrationBase<RigidBody>
+class	RigidBody: public Behaviour, public RegistrationBase<RigidBody>
 {
 public:
 	static constexpr const char* name()
