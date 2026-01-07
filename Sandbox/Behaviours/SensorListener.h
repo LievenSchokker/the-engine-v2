@@ -1,6 +1,9 @@
 
 #include <iostream>
 
+#include "Behaviour/Behaviour.h"
+#include "Physics/Components/Collider.h"
+
 class SensorListener: public Behaviour
 {
    public:
