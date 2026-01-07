@@ -111,4 +111,8 @@ class IRenderer
 	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 
 	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
+
+	virtual void setLogicalSize(int width, int height) = 0;
+	virtual void setLetterboxRect(const Rect& rectangle) = 0;
+	//virtual void onWindowResize(int physicalWidth, int physicalHeight) = 0;
 };

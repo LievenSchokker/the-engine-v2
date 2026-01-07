@@ -1,10 +1,10 @@
-#include <gtest/gtest.h>
-
+#include "../../Engine/inc/Rendering/viewport/WorldToCameraSpaceAdapter.h"
 #include "Component/Camera.h"
 #include "Component/Transform.h"
 #include "GameObject/GameObject.h"
 #include "Rendering/RenderCommand.h"
-#include "Rendering/ViewAdapters/WorldToCameraSpaceAdapter.h"
+
+#include <gtest/gtest.h>
 
 class CameraTest : public ::testing::Test
 {

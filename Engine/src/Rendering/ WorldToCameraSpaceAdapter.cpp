@@ -1,71 +1,60 @@
+#include "../../inc/Rendering/viewport/WorldToCameraSpaceAdapter.h"
 #include "Component/Transform.h"
-#include "Rendering/ViewAdapters/WorldToCameraSpaceAdapter.h"
 #include "Scene/Scene.h"
 
 std::optional<RenderCommand> WorldToCameraSpaceAdapter::Transform(
-    const Camera& camera, const RenderCommand& command)
+	const Camera& camera, const RenderCommand& command)
 {
-    Vector2 cameraPos = Vector2::zero();
-    if (camera.getTransform() != nullptr)
-    {
-        cameraPos = camera.getTransform()->getPosition();
-    }
-    else
-    {
-        cameraPos = Vector2{0, 0};
-    }
+	Vector2 cameraPos = camera.getTransform()
+		? camera.getTransform()->getPosition()
+		: Vector2::zero();
 
-    const Vector2 offset = camera.getOffset();
-    const float zoom = camera.getZoom();
+	const Vector2 offset = camera.getOffset();
+	const float zoom = camera.getZoom();
+	const float ppm = camera.getPixelsPerMeter();
 
-    const float viewX = command.position.x - (cameraPos.x + offset.x);
-    const float viewY = command.position.y - (cameraPos.y + offset.y);
+	const float viewX = command.position.x - (cameraPos.x + offset.x);
+	const float viewY = command.position.y - (cameraPos.y + offset.y);
 
-    if (!IsInView(camera, command, viewX, viewY))
-    {
-        return std::nullopt;
-    }
+	if (!IsInView(camera, command, viewX, viewY))
+	{
+		return std::nullopt;
+	}
 
-    RenderCommand result = command;
+	RenderCommand result = command;
 
-    //IMPORTANT THIS IS NOT WINDOW HEIGHT
-    const float centerX = camera.getViewWidth() / 2.0f;
-    const float centerY = camera.getViewHeight() / 2.0f;
+	const float centerX = camera.getViewWidth() / 2.0f;
+	const float centerY = camera.getViewHeight() / 2.0f;
 
-    // Apply zoom, center in view, then offset to viewport position
-    result.position.x = (viewX * zoom) + centerX + camera.getViewportX();
-    result.position.y = (viewY * zoom) + centerY + camera.getViewportY();
+	result.position.x = (viewX * ppm * zoom) + centerX + camera.getViewportX();
+	result.position.y = (viewY * ppm * zoom) + centerY + camera.getViewportY();
 
-    result.size.x = command.size.x * zoom;
-    result.size.y = command.size.y * zoom;
-    result.radius = command.radius * zoom;
+	result.size.x = command.size.x * ppm * zoom;
+	result.size.y = command.size.y * ppm * zoom;
+	result.radius = command.radius * ppm * zoom;
 
-    return result;
+	return result;
 }
 
 bool WorldToCameraSpaceAdapter::IsInView(
-    const Camera& camera, const RenderCommand& command,
-    const float viewX, const float viewY)
+	const Camera& camera, const RenderCommand& command,
+	const float viewX, const float viewY)
 {
-    const float halfWidth = camera.getViewWidth() / 2.0f;
-    const float halfHeight = camera.getViewHeight() / 2.0f;
-    const float zoom = camera.getZoom();
+	const float ppm = camera.getPixelsPerMeter();
+	const float zoom = camera.getZoom();
 
-    const float viewLeft = -halfWidth / zoom;
-    const float viewRight = halfWidth / zoom;
-    const float viewTop = -halfHeight / zoom;
-    const float viewBottom = halfHeight / zoom;
+	const float halfWidthMeters = (camera.getViewWidth() / 2.0f) / (ppm * zoom);
+	const float halfHeightMeters = (camera.getViewHeight() / 2.0f) / (ppm * zoom);
 
-    float objectRadius = 0.0f;
-    if (command.type == RenderCommandType::Circle) {
-        objectRadius = command.radius;
-    } else {
-        objectRadius = std::max(command.size.x, command.size.y) / 2.0f;
-    }
+	float objectRadius = 0.0f;
+	if (command.type == RenderCommandType::Circle) {
+		objectRadius = command.radius;
+	} else {
+		objectRadius = std::max(command.size.x, command.size.y) / 2.0f;
+	}
 
-    //Is the object inside of the camera square Yess? Render it else no
-    return viewX + objectRadius >= viewLeft &&
-        viewX - objectRadius <= viewRight &&
-        viewY + objectRadius >= viewTop &&
-        viewY - objectRadius <= viewBottom;
+	return viewX + objectRadius >= -halfWidthMeters &&
+		   viewX - objectRadius <= halfWidthMeters &&
+		   viewY + objectRadius >= -halfHeightMeters &&
+		   viewY - objectRadius <= halfHeightMeters;
 }

@@ -148,6 +148,8 @@ class SDLRenderer: public IRenderer
 	void setupEvents(EventDispatcher& dispatcher) override;
 	SDL_Texture* getOrCreateTexture(IImage* image);
 	void clearTextureCache();
+	void setLogicalSize(int width, int height) override;
+	void setLetterboxRect(const Rect& rect) override;
 	bool ensureSolidQuadTexture();
 	void destroySolidQuadTexture();
 	SDL_Window* window =
@@ -156,6 +158,10 @@ class SDLRenderer: public IRenderer
 		nullptr;  ///< Must be destroyed before window; null-checked for safety
 	SDL_Texture* solidQuadTexture =
 		nullptr;  ///< Texture for solid quad rendering
-	std::unordered_map<IImage*, SDL_Texture*> textureCache;
-	///< Cache of textures created from IImage surfaces
+	std::unordered_map<IImage*, SDL_Texture*> textureCache; ///< Cache of textures created from IImage surfaces
+
+	SDL_Texture* renderTarget = nullptr;
+	int logicalWidth = 1280;
+	int logicalHeight = 720;
+	Rect letterboxRect;
 };

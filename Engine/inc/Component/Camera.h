@@ -102,8 +102,10 @@ public:
 
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
-
+	float getPixelsPerMeter() const { return pixelsPerMeter; }
+	void setPixelsPerMeter(float ppm) { pixelsPerMeter = ppm; }
 private:
+	float pixelsPerMeter = 50.0f;
 	float zoom;
 	Vector2 offset{0,0};
 	float viewWidth;

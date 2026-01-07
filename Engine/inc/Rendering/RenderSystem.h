@@ -2,12 +2,12 @@
 
 #include "Component/Camera.h"
 #include "Core/IEngineSystems.h"
-#include "Rendering/Color.h"
 #include "Events/EventDispatcher/EventDispatcher.h"
 #include "External/SDLBackendContext.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/Color.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Scene/Scene.h"
+#include "viewport/viewportConfig.h"
 
 class IRenderer;
 
@@ -35,6 +35,9 @@ public:
 
 
 	void setupEvents(EventDispatcher& dispatcher) const;
+
+	SystemStatus start(GameWorld& gameWorld) override;
+
 	/**
 	 * @brief Executes a full render frame: collect, sort, draw, present.
 	 *
@@ -52,6 +55,7 @@ public:
 
    private:
 	const std::string getName() const override;
+	ViewportConfig viewportConfig;
 	std::unique_ptr<IRenderer> renderer;
 	std::vector<Camera*> cameras;
 	RenderQueue queue;

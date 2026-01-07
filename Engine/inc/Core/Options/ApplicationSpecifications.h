@@ -1,17 +1,16 @@
 #pragma once
 
-
 #include "Networking/NetworkingOptions.h"
-#include "Rendering/Window/WindowOptions.h"
+#include "RenderSettings.h"
 #include "Rendering/RenderBackend.h"
+#include "Rendering/Window/WindowOptions.h"
 
 enum class EngineSystem : uint32_t;
 
 struct ApplicationSpecifications
 {
     NetworkingOptions networkingOptions{};
-    WindowOptions windowOptions{};
-    RenderBackend renderBackend{};
+    RenderSettings renderBackend{};
     EngineSystem engineSystem{};
     double maxFrameTime{};
 };

@@ -1,10 +1,11 @@
 #include "Rendering/RenderSystem.h"
 
+#include "../../inc/Rendering/viewport/WorldToCameraSpaceAdapter.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Component/UIElement/UIElement.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
-#include "Rendering/ViewAdapters/WorldToCameraSpaceAdapter.h"
+#include "Rendering/viewport/viewPortCalculator.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
@@ -25,6 +26,25 @@ void RenderSystem::setupEvents(EventDispatcher& dispatcher) const
 		renderer->setupEvents(dispatcher);
 	}
 }
+
+SystemStatus RenderSystem::start(GameWorld& gameWorld)
+{
+	// Set logical resolution
+	viewportConfig.logicalWidth = 2560;
+	viewportConfig.logicalHeight = 1600;
+	viewportConfig.pixelsPerMeter = 50.0f;
+
+	renderer->setLogicalSize(viewportConfig.logicalWidth, viewportConfig.logicalHeight);
+	viewportConfig.physicalWidth = viewportConfig.logicalWidth;
+	viewportConfig.physicalHeight = viewportConfig.logicalHeight;
+
+	ViewportCalculator::recalculate(viewportConfig);
+	renderer->setLetterboxRect(viewportConfig.letterboxRect);
+
+	return SystemStatus::RUNNING;
+}
+
+
 
 void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
