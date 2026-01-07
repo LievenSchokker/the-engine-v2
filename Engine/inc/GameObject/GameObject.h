@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "ObjectHandle.h"
 #include "Networking/Serialization/ISerializable.h"
 #include "Networking/Serialization/Serialization.h"
