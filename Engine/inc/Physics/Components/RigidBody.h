@@ -32,6 +32,7 @@ public:
 	void serialize(WriteArchive& archive) const override
 	{
 		Component::serialize(archive);
+		archive.process(isDynamic);
 		archive.process(linearVelocity.x);
 		archive.process(linearVelocity.y);
 		archive.process(angularVelocity);
@@ -40,6 +41,7 @@ public:
 	void deserialize(ReadArchive& archive) override
 	{
 		Component::deserialize(archive);
+		archive.process(isDynamic);
 		archive.process(linearVelocity.x);
 		archive.process(linearVelocity.y);
 		archive.process(angularVelocity);
