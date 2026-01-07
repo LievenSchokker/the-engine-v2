@@ -67,7 +67,7 @@ int main(int argc, char** argv)
     };
 
     /// Note: Change the unique_ptr to create the sandbox you want
-    std::unique_ptr<IZandbak> zandbak = std::make_unique<PathFindingZandbak>();
+    std::unique_ptr<IZandbak> zandbak = std::make_unique<MultiplayerZandbak>();
 	std::unique_ptr<Scene> scene = zandbak->getScene();
 
 	spel->addScene(std::move(scene));
