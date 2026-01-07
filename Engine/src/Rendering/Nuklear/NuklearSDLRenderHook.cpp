@@ -519,7 +519,7 @@ void NuklearSDLRenderHook::renderButton(const UIRenderCommand& command)
 	}
 
 	// Apply custom colors
-	struct nk_style_button originalStyle = nuklearContext->style.button;
+	const struct nk_style_button originalStyle = nuklearContext->style.button;
 
 	nuklearContext->style.button.normal = nk_style_item_color(
 		nk_rgba(command.normalColor.r, command.normalColor.g,
