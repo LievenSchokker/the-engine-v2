@@ -18,7 +18,7 @@ void Box2DPhysicsWorld::initialize()
 
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = {0.0f, 150.0f};
-	worldDef.gravity = {0.0f, 10.0f};
+	worldDef.gravity = {0.0f, 0.0f};
 	worldId = b2CreateWorld(&worldDef);
 
 	std::cout << "Box2D world created, id.index1 = " << worldId.index1 << std::endl;
@@ -164,6 +164,30 @@ void Box2DPhysicsWorld::applyForce(const RigidBody* rigidBody, Vector2 force)
 
 	b2Vec2 b2Force = {force.x, force.y};
 	b2Body_ApplyForceToCenter(it->second, b2Force, true);
+}
+
+void Box2DPhysicsWorld::setLinearVelocity(const RigidBody* rigidBody, Vector2 velocity)
+{
+	if (!rigidBody) return;
+
+	auto it = bodies.find(rigidBody);
+	if (it == bodies.end()) return;
+
+	b2BodyId bodyId = it->second;
+
+	b2Body_SetLinearVelocity(bodyId, {velocity.x, velocity.y});
+	b2Body_SetAwake(bodyId, true);
+}
+
+Vector2 Box2DPhysicsWorld::getLinearVelocity(const RigidBody* rigidBody) const
+{
+	if (!rigidBody) return {0.0f, 0.0f};
+
+	auto it = bodies.find(rigidBody);
+	if (it == bodies.end()) return {0.0f, 0.0f};
+
+	b2Vec2 vel = b2Body_GetLinearVelocity(it->second);
+	return {vel.x, vel.y};
 }
 
 
