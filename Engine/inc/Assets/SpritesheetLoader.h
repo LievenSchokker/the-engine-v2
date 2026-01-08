@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "Animation/SpritesheetDefinition.h"
+
 class AssetManager;
 class SpriteComponent;
 
@@ -36,6 +38,8 @@ class SpritesheetLoader
 								SpriteComponent* sprite,
 								const std::string& path, int rows, int cols,
 								int frameWidth, int frameHeight);
+
+    static bool loadSpritesheet(AssetManager* assetManager, SpriteComponent* sprite, const std::string& path, SpritesheetDefinition definition);
 
    private:
 	// Prevent instantiation

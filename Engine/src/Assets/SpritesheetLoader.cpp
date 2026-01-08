@@ -8,6 +8,11 @@
 
 #include <iostream>
 
+bool SpritesheetLoader::loadSpritesheet(AssetManager* assetManager, SpriteComponent* sprite, const std::string& path, SpritesheetDefinition definition)
+{
+    return loadSpritesheet(assetManager, sprite, path, definition.rows, definition.columns, definition.frameWidth, definition.frameHeight);
+}
+
 bool SpritesheetLoader::loadSpritesheet(AssetManager* assetManager,
 										SpriteComponent* sprite,
 										const std::string& path, int rows,

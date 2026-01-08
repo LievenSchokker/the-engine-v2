@@ -269,3 +269,8 @@ void SpriteComponent::deserialize(ReadArchive& archive)
     flipX = (fx != 0);
     flipY = (fy != 0);
 }
+
+std::string SpriteComponent::getPendingPath()
+{
+    return pendingSpritePath;
+}

@@ -182,8 +182,9 @@ public:
      */
     [[nodiscard]] std::string getFirstSceneName() const;
 	void applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>& receivedObjects);
+    void reloadAssetsForGameObject(GameObject* obj, AssetManager& assetManager);
 
-	BehaviourSystem& getBehaviourSystem();
+    BehaviourSystem& getBehaviourSystem();
 private:
     /**
      * @brief Processes a scene for networking based on configured mode.

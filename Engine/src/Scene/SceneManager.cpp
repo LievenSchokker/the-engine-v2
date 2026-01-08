@@ -10,6 +10,9 @@
 #include <iostream>
 #include <utility>
 
+#include "Assets/SpritesheetLoader.h"
+#include "Component/SpriteComponent.h"
+
 SceneManager::SceneManager(GameWorld& gameWorld)
 	: gameWorld(&gameWorld),
 	  scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>()),
@@ -538,6 +541,17 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 		spawnManager->untrackSpawnedObject(netId);
 		activeScene->removeGameObject(object->getGameObjectHandle());
 	}
+}
+
+void SceneManager::reloadAssetsForGameObject(GameObject* obj, AssetManager& assetManager)
+{
+    for (auto& component : obj->getComponents())
+    {
+        if (auto* sprite = dynamic_cast<SpriteComponent*>(component.get()))
+        {
+             SpritesheetLoader::loadSpritesheet(&assetManager, sprite, sprite->getPendingPath(), sprite->getSpritesheetDefinition());
+        }
+    }
 }
 
 void SceneManager::addInlineChildrenRecursive(GameObject* obj)

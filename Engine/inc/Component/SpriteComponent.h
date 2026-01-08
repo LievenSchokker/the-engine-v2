@@ -148,6 +148,8 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
     void serialize(WriteArchive& archive) const override;
     void deserialize(ReadArchive& archive) override;
 
+    std::string getPendingPath();
+
    private:
 	IImage* sprite = nullptr;
     std::string pendingSpritePath;
@@ -159,7 +161,6 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 	Vector2 offset{0.0, 0.0};
 	bool flipX = false;
 	bool flipY = false;
-
 	/**
 	 * @brief Calculates the source rectangle for the current frame.
 	 * @return Rect for the current frame, or empty rect if invalid
