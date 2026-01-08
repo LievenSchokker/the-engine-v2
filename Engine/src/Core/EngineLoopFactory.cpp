@@ -27,7 +27,7 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     auto loop = std::make_unique<EngineLoop>(std::move(game));
 
     GameWorld* gameWorld = loop->getGameWorld();
-    gameWorld->assetManager = std::move(assets);
+    gameWorld->setAssetManager(std::move(assets));
     Game* gamePtr = loop->getGame();
     std::unique_ptr<IBackendContext> backendContext{};
     IBackendContext* contextPtr = nullptr;

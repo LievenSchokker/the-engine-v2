@@ -8,6 +8,9 @@
 #include "Rendering/Color.h"
 #include "Rendering/Rect.h"
 
+
+class AssetManager;
+
 /**
  * @class SpriteComponent
  * @brief Component that renders a sprite from a spritesheet.
@@ -20,8 +23,15 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 {
    public:
 	SpriteComponent() = default;
-	static constexpr const char* name() { return "Sprite"; }
-	const char* getName() const override { return name(); }
+	explicit SpriteComponent(std::string path, SpritesheetDefinition def);
+	static constexpr const char* name()
+	{
+	    return "Sprite";
+	}
+	const char* getName() const override
+	{
+	    return name();
+	}
 	/**
 	 * @brief Sets the spritesheet image and grid definition.
 	 *
@@ -136,8 +146,15 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 	 */
 	void fillRenderQueue(IRenderQueueWriter& queue) const override;
 
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
+
+    std::string getPath();
+	void setPath(const std::string& path);
+	void setSpriteSheetDefer(SpritesheetDefinition def);
    private:
 	IImage* sprite = nullptr;
+    std::string spritePath;
 	SpritesheetDefinition spritesheetDef{0, 0, 0, 0};
 	int currentFrame = 0;
 	Vector2 renderSize{1, 1};
@@ -146,7 +163,6 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 	Vector2 offset{0.0, 0.0};
 	bool flipX = false;
 	bool flipY = false;
-
 	/**
 	 * @brief Calculates the source rectangle for the current frame.
 	 * @return Rect for the current frame, or empty rect if invalid

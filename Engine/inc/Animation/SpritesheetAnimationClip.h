@@ -19,7 +19,7 @@
  * walk.name = "walk";
  * @endcode
  */
-struct SpritesheetAnimationClip
+struct SpritesheetAnimationClip : ISerializable
 {
 	/**
 	 * @brief Frame sequence to animate through.
@@ -48,4 +48,46 @@ struct SpritesheetAnimationClip
 	 * Used to identify and play the animation by name.
 	 */
 	std::string name;
+
+
+
+    void serialize(WriteArchive& archive) const
+    {
+        archive.process(name);
+
+        auto frameCount = static_cast<uint32_t>(frames.size());
+        archive.process(frameCount);
+        for (int frame : frames)
+        {
+            int32_t f = frame;
+            archive.process(f);
+        }
+
+        float dur = frameDuration;
+        archive.process(dur);
+
+        uint8_t loopFlag = loop ? 1 : 0;
+        archive.process(loopFlag);
+    }
+
+    void deserialize(ReadArchive& archive)
+    {
+        archive.process(name);
+
+        uint32_t frameCount;
+        archive.process(frameCount);
+        frames.resize(frameCount);
+        for (uint32_t i = 0; i < frameCount; ++i)
+        {
+            int32_t f;
+            archive.process(f);
+            frames[i] = static_cast<int>(f);
+        }
+
+        archive.process(frameDuration);
+
+        uint8_t loopFlag;
+        archive.process(loopFlag);
+        loop = (loopFlag != 0);
+    }
 };

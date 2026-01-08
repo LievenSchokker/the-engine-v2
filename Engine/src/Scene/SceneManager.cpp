@@ -12,6 +12,9 @@
 #include <iostream>
 #include <utility>
 
+#include "Assets/SpritesheetLoader.h"
+#include "Component/SpriteComponent.h"
+
 SceneManager::SceneManager(GameWorld& gameWorld)
 	: gameWorld(&gameWorld),
 	  scenes(std::unordered_map<std::string, std::unique_ptr<Scene>>()),
@@ -486,6 +489,13 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 				activeScene->addGameObject(std::move(child));
 				addInlineChildrenRecursive(childPtr);
 			}
+
+			if (gameWorld != nullptr && gameWorld->getAssetManager())
+			{
+				// #todo not every snapshot
+				reloadAssetsForGameObject(existing, *gameWorld->getAssetManager());
+			}
+
 		}
 		else
 		{
@@ -509,6 +519,11 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 			activeScene->addGameObject(std::move(received));
 			spawnManager->trackSpawnedObject(netId, rawPtr);
 			behaviourSystem->initialiseRuntimeBehaviours(behaviours, *gameWorld);
+
+			if (gameWorld != nullptr && gameWorld->getAssetManager())
+			{
+				reloadAssetsForGameObject(rawPtr, *gameWorld->getAssetManager());
+			}
 
 			if (identity)
 			{
@@ -568,6 +583,29 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 		spawnManager->untrackSpawnedObject(netId);
 		activeScene->removeGameObject(object->getGameObjectHandle());
 	}
+}
+
+void SceneManager::reloadAssetsForGameObject(GameObject* obj, AssetManager& assetManager)
+{
+    for (auto& component : obj->getComponents())
+    {
+        if (auto* sprite = dynamic_cast<SpriteComponent*>(component.get()))
+        {
+        	if (sprite->getSprite() != nullptr && sprite->getSprite()->isLoaded())
+        	{
+        		continue;
+        	}
+
+        	std::string path = sprite->getPath();
+        	if (path.empty())
+        	{
+        		continue;
+        	}
+
+        	auto def = sprite->getSpritesheetDefinition();
+        	SpritesheetLoader::loadSpritesheet(&assetManager, sprite, path, def);
+        }
+    }
 }
 
 void SceneManager::addInlineChildrenRecursive(GameObject* obj)

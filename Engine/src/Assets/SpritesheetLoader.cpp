@@ -8,6 +8,11 @@
 
 #include <iostream>
 
+bool SpritesheetLoader::loadSpritesheet(AssetManager* assetManager, SpriteComponent* sprite, const std::string& path, SpritesheetDefinition definition)
+{
+    return loadSpritesheet(assetManager, sprite, path, definition.rows, definition.columns, definition.frameWidth, definition.frameHeight);
+}
+
 bool SpritesheetLoader::loadSpritesheet(AssetManager* assetManager,
 										SpriteComponent* sprite,
 										const std::string& path, int rows,
@@ -26,6 +31,8 @@ bool SpritesheetLoader::loadSpritesheet(AssetManager* assetManager,
 		return false;
 	}
 
+	//Server side we don't have SDL need path to send to client for loading
+	sprite->setPath(path);
 	// Add and load the image asset
 	if ( !assetManager->has(path) )
 	{

@@ -20,9 +20,15 @@ struct SpritesheetAnimationClip;
  * play/pause/stop controls and time scaling. It inherits from Behaviour
  * so Scene automatically updates it each frame along with other behaviours.
  */
-class Animator: public Behaviour
+class Animator: public Behaviour, RegistrationBase<Animator>
 {
    public:
+    static constexpr const char* name()
+    {
+        return "Animator";
+    }
+    const char* getName() const override { return name(); }
+
 	/**
 	 * @brief Constructs an Animator component.
 	 */
@@ -170,6 +176,8 @@ class Animator: public Behaviour
 		std::unique_ptr<AnimationClip> targetClip,
 		const SpritesheetAnimationClip& spritesheetClip);
 
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
    private:
 	AnimationClip* currentClip;
 	bool isPlaying;

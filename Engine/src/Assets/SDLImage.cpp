@@ -26,7 +26,6 @@ SDLImage::~SDLImage()
 bool SDLImage::load(const std::string & filepath)
 {
 	unLoad();
-
 	surface = IMG_Load(filepath.c_str());
 
 	if(surface == nullptr)

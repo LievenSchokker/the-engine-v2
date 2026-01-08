@@ -12,6 +12,9 @@
 
 #include <iostream>
 
+#include "Assets/SpritesheetLoader.h"
+#include "Component/SpriteComponent.h"
+
 NetworkSpawnManager::NetworkSpawnManager(GameWorld* gameWorlds) :
        identityRegistry(std::make_unique<NetworkIdentityRegistry>())
      , prefabLibrary(std::make_unique<PrefabLibrary>())
@@ -229,6 +232,12 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	}
 
 	GameObject* rawPtr = message.gameObject.get();
+
+	if (gameWorld->isClient())
+	{
+		loadAssetsForGameObject(rawPtr);
+	}
+
 	spawnedObjects[message.netId] = rawPtr;
 	objectAssets[message.netId] = message.assetId;
 	gameWorld->sceneManager->getActiveScene()->addGameObject(std::move(message.gameObject));
@@ -292,4 +301,38 @@ void NetworkSpawnManager::trackSpawnedObject(uint32_t netId, GameObject* object)
 void NetworkSpawnManager::untrackSpawnedObject(uint32_t netId)
 {
     spawnedObjects.erase(netId);
+}
+
+void NetworkSpawnManager::loadAssetsForGameObject(GameObject* obj)
+{
+	if (!obj || !gameWorld) return;
+
+	AssetManager* assetManager = gameWorld->getAssetManager();
+	if (!assetManager) return;
+
+	for (auto& component : obj->getComponents())
+	{
+		// #TODO MAKE A GENERIC ASSETCOMPONENT
+		if (auto* sprite = dynamic_cast<SpriteComponent*>(component.get()))
+		{
+			// Skip if already loaded
+			if (sprite->getSprite() != nullptr && sprite->getSprite()->isLoaded())
+			{
+				continue;
+			}
+
+			std::string path = sprite->getPath();
+			if (path.empty())
+			{
+				continue;
+			}
+
+			SpritesheetLoader::loadSpritesheet(
+				assetManager,
+				sprite,
+				path,
+				sprite->getSpritesheetDefinition()
+			);
+		}
+	}
 }

@@ -47,3 +47,8 @@ void GameWorld::setAssetManager(std::unique_ptr<AssetManager> asset_manager)
 {
     assetManager = std::move(asset_manager);
 }
+
+AssetManager* GameWorld::getAssetManager()
+{
+    return assetManager.get();
+}

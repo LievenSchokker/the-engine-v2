@@ -10,6 +10,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include "Networking/Serialization/RegistrationBase.h"
+
 class TilemapComponent;
 
 /**
@@ -39,9 +41,10 @@ struct CellKeyHash
  *
  * Designed for future AI pathfinding algorithms (A*, Dijkstra, etc.)
  */
-class GridComponent: public RenderComponent
+class GridComponent: public RenderComponent, RegistrationBase<GridComponent>
 {
 public:
+
 	GridComponent();
 	~GridComponent() override = default;
 

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Animation/AnimationEnums.h"
+#include "Networking/Serialization/ISerializable.h"
+#include "Networking/Serialization/Serialization.h"
 
 /**
  * @class AnimationCurve
@@ -9,7 +11,7 @@
  * AnimationCurve evaluates easing functions at normalized time values [0, 1]
  * to create smooth animation transitions.
  */
-class AnimationCurve
+class AnimationCurve : public ISerializable
 {
    public:
 	/**
@@ -38,6 +40,9 @@ class AnimationCurve
 	 */
 	void setType(EasingType type);
 
-   private:
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
+
+private:
 	EasingType type;
 };

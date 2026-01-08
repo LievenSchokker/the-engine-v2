@@ -82,6 +82,8 @@ public:
     void trackSpawnedObject(uint32_t netId, GameObject* object);
     void untrackSpawnedObject(uint32_t netId);
 
+	void loadAssetsForGameObject(GameObject *obj);
+
 private:
 	SpawnMessage createSpawnMessage(const NetworkIdentity* identity,
 	                                uint32_t assetId);

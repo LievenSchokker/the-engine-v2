@@ -17,9 +17,14 @@ class Transform;
  * Frame) of a Transform or Sprite component over a duration using an easing
  * curve.
  */
-class AnimationTrack
+class AnimationTrack : public ISerializable
 {
    public:
+    /**
+     * @brief Default constructor for deserialization.
+     */
+    AnimationTrack();
+
 	/**
 	 * @brief Constructs an AnimationTrack.
 	 *
@@ -99,6 +104,8 @@ class AnimationTrack
 	 */
 	const AnimationCurve& getCurve() const;
 
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
    private:
 	TargetType target;
 	PropertyType property;
