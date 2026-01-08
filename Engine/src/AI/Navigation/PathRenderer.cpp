@@ -8,6 +8,9 @@
 
 void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 {
+    if (!renderEnabled)
+        return;
+
     const float circleRadius = pathRenderOptions.circleRadius;
     const Color circleColor = currentPath.isValid() ? pathRenderOptions.validPathColor : pathRenderOptions.invalidPathColor;
 
@@ -19,6 +22,8 @@ void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
         command.position = node;
         command.radius = circleRadius;
         command.color = circleColor;
+        command.layer = layer;
+        command.orderInLayer = orderInLayer;
         queue.push(command);
     }
 }
@@ -28,5 +33,3 @@ void PathRenderer::setPath(const PathResult &newPath)
 {
     currentPath = newPath;
 }
-
-

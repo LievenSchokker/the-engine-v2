@@ -88,12 +88,11 @@ class NavigationGrid final : public INavigationSurface
         /**
          * Retrieves every neighbour cell from the provided cell
          *
-         * Can be used to get neighbours in 4 (NESW) or 8 (NESW + diagonals) directions
+         * Can be used to get neighbours in 4 (NESW)
          * @param origin The position of the cell to look for neighbours from
-         * @param diagonalNeighbours Should diagonal neighbours be included?
          * @return a vector<Vector2> containing each neighbour of the origin cell
          */
-        std::vector<Vector2> getNeighbours(Vector2 origin, bool diagonalNeighbours) const;
+        std::vector<Vector2> getNeighbours(Vector2 origin) const;
 
         /**
          * @brief Checks whether the given cell in the grid isWalkable

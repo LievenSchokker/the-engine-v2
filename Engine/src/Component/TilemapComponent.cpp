@@ -109,7 +109,7 @@ Vector2 TilemapComponent::worldToCell(Vector2 worldPos) const
 		return {0.0, 0.0};
 	}
 
-	const Vector2 origin = transform->getPosition();
+	const Vector2 origin = transform->getWorldPosition();
 
 	// Convert world position to grid coordinates
 	Vector2 relativePos{0.0, 0.0};
@@ -136,7 +136,7 @@ Vector2 TilemapComponent::cellToWorld(Vector2 cell) const
 		return {0.0, 0.0};
 	}
 
-	const Vector2 origin = transform->getPosition();
+	const Vector2 origin = transform->getWorldPosition();
 
 	// Convert grid coordinates to world position (center of tile)
 	Vector2 worldPos{0.0, 0.0};
