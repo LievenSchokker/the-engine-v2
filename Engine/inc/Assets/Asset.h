@@ -18,15 +18,15 @@ public:
 
     virtual bool reload()
     {
-        if (filepath.empty()) return false;
-        return load(filepath);
+        if (assetPath.empty()) return false;
+        return load(assetPath);
     }
 
     AssetType getAssetType() { return assetType; }
 
-    std::string getAssetpath() { return filepath; }
-
+    std::string getAssetpath() { return assetPath; }
+    void setAssetpath(const std::string& path) { assetPath = path; }
 protected:
     AssetType assetType = AssetType::None;
-    std::string filepath;
+    std::string assetPath;
 };

@@ -23,6 +23,7 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 {
    public:
 	SpriteComponent() = default;
+	explicit SpriteComponent(std::string path, SpritesheetDefinition def);
 	static constexpr const char* name()
 	{
 	    return "Sprite";
@@ -148,11 +149,12 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
     void serialize(WriteArchive& archive) const override;
     void deserialize(ReadArchive& archive) override;
 
-    std::string getPendingPath();
-
+    std::string getPath();
+	void setPath(const std::string& path);
+	void setSpriteSheetDefer(SpritesheetDefinition def);
    private:
 	IImage* sprite = nullptr;
-    std::string pendingSpritePath;
+    std::string spritePath;
 	SpritesheetDefinition spritesheetDef{0, 0, 0, 0};
 	int currentFrame = 0;
 	Vector2 renderSize{1, 1};

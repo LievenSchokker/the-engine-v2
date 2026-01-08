@@ -19,7 +19,7 @@ bool TilemapAsset::load(const std::string& filepath)
 				  << std::endl;
 		return false;
 	}
-
+	assetPath = filepath;
 	tiles.clear();
 	width = 0;
 	height = 0;

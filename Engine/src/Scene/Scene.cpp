@@ -15,6 +15,9 @@
 #include <iostream>
 #include <utility>
 
+#include "Assets/SpritesheetLoader.h"
+#include "Component/SpriteComponent.h"
+
 Scene::Scene(std::string name) : name(std::move(name))
 {
 }
@@ -35,6 +38,27 @@ void Scene::onStart(GameWorld& world)
 {
 	gameWorld = &world;
 	if ( active ) return;
+
+	AssetManager* assetManager = gameWorld->getAssetManager();
+	if (assetManager)
+	{
+		forEachGameObject([&](GameObject& obj) {
+			for (auto& component : obj.getComponents()) {
+				if (auto* sprite = dynamic_cast<SpriteComponent*>(component.get())) {
+					if (sprite->getSprite() == nullptr && !sprite->getPath().empty()) {
+						std::cout << sprite->getPath() << std::endl;
+						std::cout << "loading" << std::endl;
+						SpritesheetLoader::loadSpritesheet(
+							assetManager,
+							sprite,
+							sprite->getPath(),
+							sprite->getSpritesheetDefinition()
+						);
+					}
+				}
+			}
+		});
+	}
 
 	initialiseNavigationSystem({100, 100, Vector2{15, 15}});
 	active = true;

@@ -459,6 +459,12 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 				activeScene->addGameObject(std::move(child));
 				addInlineChildrenRecursive(childPtr);
 			}
+
+			if (gameWorld != nullptr && gameWorld->getAssetManager())
+			{
+				reloadAssetsForGameObject(existing, *gameWorld->getAssetManager());
+			}
+
 		}
 		else
 		{
@@ -482,6 +488,11 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 			activeScene->addGameObject(std::move(received));
 			spawnManager->trackSpawnedObject(netId, rawPtr);
 			behaviourSystem->initialiseRuntimeBehaviours(behaviours, *gameWorld);
+
+			if (gameWorld != nullptr && gameWorld->getAssetManager())
+			{
+				reloadAssetsForGameObject(rawPtr, *gameWorld->getAssetManager());
+			}
 
 			if (identity)
 			{
@@ -549,7 +560,19 @@ void SceneManager::reloadAssetsForGameObject(GameObject* obj, AssetManager& asse
     {
         if (auto* sprite = dynamic_cast<SpriteComponent*>(component.get()))
         {
-             SpritesheetLoader::loadSpritesheet(&assetManager, sprite, sprite->getPendingPath(), sprite->getSpritesheetDefinition());
+        	if (sprite->getSprite() != nullptr && sprite->getSprite()->isLoaded())
+        	{
+        		continue;
+        	}
+
+        	std::string path = sprite->getPath();
+        	if (path.empty())
+        	{
+        		continue;
+        	}
+
+        	auto def = sprite->getSpritesheetDefinition();
+        	SpritesheetLoader::loadSpritesheet(&assetManager, sprite, path, def);
         }
     }
 }

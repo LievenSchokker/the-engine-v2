@@ -51,6 +51,7 @@ bool AssetManager::load(const std::string & filePath)
 		return false;
 	}
 
+	asset->setAssetpath(filePath);
 	if(!asset->isLoaded())
 	{
 		return asset->load(filePath);
@@ -68,7 +69,7 @@ bool AssetManager::unLoad(const std::string & filePath)
 	{
 		return false;
 	}
-
+	asset->setAssetpath("");
 	if(asset->isLoaded())
 	{
 		return asset->unLoad();

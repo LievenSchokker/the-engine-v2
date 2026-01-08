@@ -31,6 +31,8 @@ bool SpritesheetLoader::loadSpritesheet(AssetManager* assetManager,
 		return false;
 	}
 
+	//Server side we don't have SDL need path to send to client for loading
+	sprite->setPath(path);
 	// Add and load the image asset
 	if ( !assetManager->has(path) )
 	{
