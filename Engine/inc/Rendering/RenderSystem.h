@@ -2,12 +2,13 @@
 
 #include "Component/Camera.h"
 #include "Core/IEngineSystems.h"
-#include "Rendering/Color.h"
 #include "Events/EventDispatcher/EventDispatcher.h"
+#include "Events/EventImplementations/ApplicationEvents.h"
 #include "External/SDLBackendContext.h"
-#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Rendering/Color.h"
+#include "Rendering/RenderQueue/RenderQueue.h"
 #include "Scene/Scene.h"
+#include "viewport/viewportConfig.h"
 
 class IRenderer;
 
@@ -32,9 +33,13 @@ public:
 	 *
 	 */
 	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
+ void setupEvents(EventDispatcher& dispatcher);
 
+ void setupEvents(EventDispatcher& dispatcher) const;
+	void onWindowResize(const WindowResizeEvent& event);
 
-	void setupEvents(EventDispatcher& dispatcher) const;
+	SystemStatus start(GameWorld& gameWorld) override;
+
 	/**
 	 * @brief Executes a full render frame: collect, sort, draw, present.
 	 *
@@ -44,17 +49,20 @@ public:
 	 *
 	 */
 	void update(double deltaTime, const GameWorld& gameWorld) override;
+	void shutdown(GameWorld& gameWorld) override;
 	void processWorldCommands();
 	void setClearColor(const Color& color);
-	void updateCameras(const Scene& scene);
+		void updateCameras(const Scene& scene);
 
 	const Color& getClearColor() const;
 
    private:
 	const std::string getName() const override;
+	WindowOptions windowOptions;
 	std::unique_ptr<IRenderer> renderer;
 	std::vector<Camera*> cameras;
 	RenderQueue queue;
 	Color clearColor = Color::white();
 	void collectCommands(Scene& scene);
+	std::vector<SubscriptionHandle> subscriptions;
 };

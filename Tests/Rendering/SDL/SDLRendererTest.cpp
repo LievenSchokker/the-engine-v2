@@ -26,7 +26,7 @@ TEST_F(SDLRendererTest, OpenCloseTest)
 	SDLRenderer render(*ctx);
 	EXPECT_FALSE(render.isOpen()) << "Window should not be open initially";
 
-	WindowOptions opts{"Test Window", 640, 480};
+	WindowOptions opts{"Test Window", true, 640, 480};
 
 	render.open(opts);
 

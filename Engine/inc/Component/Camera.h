@@ -75,39 +75,11 @@ public:
 	 */
 	float getViewHeight() const;
 
-	/**
-	 * @brief Gets the viewport X position on screen.
-	 * @return X coordinate of the viewport's top-left corner in screen pixels
-	 */
-	float getViewportX() const;
-
-	/**
-	 * @brief Gets the viewport Y position on screen.
-	 * @return Y coordinate of the viewport's top-left corner in screen pixels
-	 */
-	float getViewportY() const;
-
-	/**
-	 * @brief Sets the viewport position on screen.
-	 *
-	 * The viewport determines where on the screen this camera renders its output.
-	 * For split-screen setups:
-	 * - Left camera: setViewport(0, 0)
-	 * - Right camera: setViewport(screenWidth / 2, 0)
-	 *
-	 * @param x X coordinate of the viewport's top-left corner
-	 * @param y Y coordinate of the viewport's top-left corner
-	 */
-	void setViewport(float x, float y);
-
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
-
 private:
 	float zoom;
 	Vector2 offset{0,0};
 	float viewWidth;
 	float viewHeight;
-	float viewportX;
-	float viewportY;
 };
