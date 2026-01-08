@@ -23,6 +23,7 @@ class GameWorld
 public:
 	GameWorld() = default;
 
+	// Non owning pointer to different systems
 	SceneManager* sceneManager = nullptr;
 	IPhysicsWorld* physics = nullptr;
 	RenderSystem* render = nullptr;
@@ -52,7 +53,6 @@ public:
     void setAssetManager(std::unique_ptr<AssetManager> asset_manager);
     AssetManager* getAssetManager();
     int localClientId = -1;
-
 private:
     std::unique_ptr<AssetManager> assetManager = nullptr;
 	std::unique_ptr<EventDispatcher> dispatcher = nullptr;

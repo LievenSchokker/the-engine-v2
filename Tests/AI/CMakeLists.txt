@@ -6,6 +6,7 @@ add_executable(engine_ai_tests
         tests_pathResult.cpp
         tests_aStarPathfinder.cpp
         tests_gridGraphAdapter.cpp
+        tests_gridComponentNavigationSurface.cpp
         tests_navigationSystem.cpp
 )
 

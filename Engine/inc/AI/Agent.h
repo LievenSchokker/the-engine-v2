@@ -13,6 +13,7 @@
 struct ModuleData;
 enum class ModuleStatus;
 enum class ModuleType;
+class RigidBody;
 
 
 /**
@@ -25,7 +26,13 @@ enum class ModuleType;
 class Agent final : public Behaviour
 {
     public:
-        Agent() : currentVelocity(Vector2::zero()), maxSpeed(1), arrivingDistance(10.0f), rotationTurnRate(90)
+        Agent()
+            : currentVelocity(Vector2::zero()),
+              maxSpeed(1),
+              arrivingDistance(10.0f),
+              rotationTurnRate(90),
+              accelerationMultiplier(12.0f),
+              minAcceleration(120.0f)
         {
             pathFinder = std::make_unique<AStarPathFinder>(HeuristicType::CHEBYSHEV);
         };
@@ -162,6 +169,29 @@ class Agent final : public Behaviour
         void setRotationTurnRate(float value);
 
         /**
+         * @brief Retrieves the acceleration multiplier used for physics-driven agents.
+         * This scales the acceleration based on @c maxSpeed.
+         */
+        float getAccelerationMultiplier() const;
+
+        /**
+         * @brief Sets the acceleration multiplier used for physics-driven agents.
+         * Higher values make the agent converge to its desired velocity faster.
+         */
+        void setAccelerationMultiplier(float value);
+
+        /**
+         * @brief Retrieves the minimum acceleration used for physics-driven agents.
+         * This acts as a floor so slow agents still respond promptly.
+         */
+        float getMinAcceleration() const;
+
+        /**
+         * @brief Sets the minimum acceleration used for physics-driven agents.
+         */
+        void setMinAcceleration(float value);
+
+        /**
          * @brief Computes a path for this agent, using the scene's @c NavigationSystem
          *
          * This method does not return any other information about the path. To get the actual path,
@@ -215,6 +245,12 @@ class Agent final : public Behaviour
         /// @brief The rate to turn the agent towards its current velocity with, in degrees (0 -360).
         float rotationTurnRate;
 
+        /// @brief Multiplier that converts @c maxSpeed into acceleration strength for physics bodies.
+        float accelerationMultiplier;
+
+        /// @brief Minimum acceleration to keep low-speed agents responsive.
+        float minAcceleration;
+
         /// @brief Pathfinder this agent wants to use for pathfinding.
         std::unique_ptr<IPathFinder> pathFinder;
 
@@ -222,6 +258,8 @@ class Agent final : public Behaviour
         /// Note: An agent itself does nothing with a path, he only stores it so modules and other behaviours can make use of it.
         /// To get a new path to a target, use the @c requestPath() method
         PathResult currentPath;
+
+        RigidBody* rigidBody = nullptr;
 };
 
 #include "AI/AgentImplementation.h"

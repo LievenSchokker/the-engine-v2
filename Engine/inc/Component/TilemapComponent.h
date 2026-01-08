@@ -6,6 +6,7 @@
 #include "Networking/Serialization/RegistrationBase.h"
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 class TilemapAsset;
@@ -66,6 +67,23 @@ public:
 	 * @return The color, or white if not set
 	 */
 	Color getTileColor(int tileId) const;
+
+	/**
+	 * @brief Enable or disable colliders for a specific tile ID.
+	 * @param tileId The tile ID to set collider for
+	 * @param enabled True to add colliders for this tile ID
+	 */
+	void setTileCollider(int tileId, bool enabled);
+
+	/**
+	 * @brief Check if a tile ID should spawn colliders.
+	 */
+	bool hasTileCollider(int tileId) const;
+
+	/**
+	 * @brief Retrieve all tile IDs that should spawn colliders.
+	 */
+	const std::unordered_set<int>& getCollidableTileIds() const;
 
 	/**
 	 * @brief Build render commands for all visible tiles.
@@ -129,6 +147,7 @@ private:
 	TilemapAsset* tilemapAsset = nullptr;
 	Vector2 tileSize;
 	std::unordered_map<int, Color> tileColors;
+	std::unordered_set<int> collidableTileIds;
 	uint8_t layer = 0;
 	int8_t orderInLayer = 0;
 };
