@@ -462,6 +462,7 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 
 			if (gameWorld != nullptr && gameWorld->getAssetManager())
 			{
+				// #todo not every snapshot
 				reloadAssetsForGameObject(existing, *gameWorld->getAssetManager());
 			}
 

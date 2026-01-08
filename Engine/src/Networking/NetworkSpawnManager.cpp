@@ -312,7 +312,7 @@ void NetworkSpawnManager::loadAssetsForGameObject(GameObject* obj)
 
 	for (auto& component : obj->getComponents())
 	{
-		//TODO MAKE A GENERIC ASSETCOMPONENT
+		// #TODO MAKE A GENERIC ASSETCOMPONENT
 		if (auto* sprite = dynamic_cast<SpriteComponent*>(component.get()))
 		{
 			// Skip if already loaded
