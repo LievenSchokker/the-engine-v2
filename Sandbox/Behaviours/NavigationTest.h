@@ -4,7 +4,8 @@
 
 #pragma once
 
-#include "Behaviour/Behaviour.h"
+#include "Behaviour/NetworkBehaviour.h"
+#include "Networking/Serialization/RegistrationBase.h"
 
 #include <string>
 
@@ -16,7 +17,8 @@ class GridComponent;
 
 /// NOTE: This is a temporary class used to test Agent navigation.
 /// #TODO THIS SHOULD BE REMOVED FROM THE ENGINE BEFORE DELIVERING
-class NavigationTest : public Behaviour
+class NavigationTest : public NetworkBehaviour,
+                       RegistrationBase<NavigationTest>
 {
     public:
         explicit NavigationTest()
@@ -39,8 +41,17 @@ class NavigationTest : public Behaviour
         };
         ~NavigationTest() override = default;
 
+        static constexpr const char* name()
+        {
+            return "NavigationTest";
+        }
+        const char* getName() const override { return name(); }
+
         void onAwake() override;
         void update(double deltaTime, const GameWorld& world) override;
+        void registerNetworkMethods(NetworkBuilder& builder) override;
+        void serialize(WriteArchive& archive) const override;
+        void deserialize(ReadArchive& archive) override;
 
         void setTarget(Transform& targetTransform);
         void setAgent(Agent& agent);
@@ -52,6 +63,7 @@ class NavigationTest : public Behaviour
                             float followPathRadius);
 
     private:
+        void handlePathRequest();
         void resolveReferences();
         void configureAgentIfNeeded();
 

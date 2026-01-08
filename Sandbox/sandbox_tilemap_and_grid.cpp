@@ -4,8 +4,8 @@
 #include "Assets/SDLImage.h"
 #include "Assets/TilemapAsset.h"
 #include "Behaviour/Behaviour.h"
-#include "Behaviours/NetworkedObjectMarker.h"
 #include "Behaviours/NavigationTest.h"
+#include "Behaviours/NetworkedObjectMarker.h"
 #include "Component/Camera.h"
 #include "Component/GridComponent.h"
 #include "Component/ShapeRenderer.h"
@@ -14,6 +14,7 @@
 #include "Component/Transform.h"
 #include "Core/GameWorld.h"
 #include "Core/Options/ApplicationSpecifications.h"
+#include "Demo/PlayerMovement.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
@@ -25,13 +26,11 @@
 #include "Physics/IPhysicsWorld.h"
 #include "Rendering/Color.h"
 #include "Scene/Scene.h"
-#include "Demo/PlayerMovement.h"
 
-
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <random>
-#include <algorithm>
 #include <vector>
 
 #define SCREEN_WIDTH 1024
@@ -213,40 +212,40 @@ int main(int argc, char** argv)
 
 	ApplicationSpecifications spec = {};
 	EngineMode mode = EngineMode::CLIENT;
-    spec.engineSystem = EngineSystem::Client;
-    if (argc > 1)
-    {
-        std::string arg = argv[1];
-        if (arg == "server")
-        {
-            mode = EngineMode::SERVER;
-            spec.engineSystem = EngineSystem::Server;
-            std::cout << "Starting as SERVER..." << std::endl;
-        }
-        else if (arg == "client")
-        {
-            mode = EngineMode::CLIENT;
-            spec.engineSystem = EngineSystem::Client;
-            std::cout << "Starting as CLIENT..." << std::endl;
-        }
-        else
-        {
-            std::cerr << "Unknown mode: " << arg << std::endl;
-            std::cerr << "Usage: " << argv[0] << " [server|client]" << std::endl;
-            return 1;
-        }
-    }
-    else
-    {
-        std::cout << "No mode specified, defaulting to CLIENT..." << std::endl;
-        std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
-    }
+	spec.engineSystem = EngineSystem::Client;
+	if ( argc > 1 )
+	{
+		std::string arg = argv[1];
+		if ( arg == "server" )
+		{
+			mode = EngineMode::SERVER;
+			spec.engineSystem = EngineSystem::Server;
+			std::cout << "Starting as SERVER..." << std::endl;
+		}
+		else if ( arg == "client" )
+		{
+			mode = EngineMode::CLIENT;
+			spec.engineSystem = EngineSystem::Client;
+			std::cout << "Starting as CLIENT..." << std::endl;
+		}
+		else
+		{
+			std::cerr << "Unknown mode: " << arg << std::endl;
+			std::cerr << "Usage: " << argv[0] << " [server|client]"
+					  << std::endl;
+			return 1;
+		}
+	}
+	else
+	{
+		std::cout << "No mode specified, defaulting to CLIENT..." << std::endl;
+		std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
+	}
 
-
-    spec.networkingOptions.mode = mode;
+	spec.networkingOptions.mode = mode;
 	spec.networkingOptions.port = 8080;
-    spec.networkingOptions.serverIP = "127.0.0.1";
-    spec.networkingOptions.tickRate = 60;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.tickRate = 60;
 	spec.renderBackend = RenderBackend::SDL;
 	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
@@ -420,20 +419,6 @@ int main(int argc, char** argv)
 		agentRenderer->setRectangle({20.0f, 20.0f})
 			.setColor(Color::red())
 			.setLayer(1);
-		agentObject->addComponent<RigidBody>();
-		auto* agentBody = agentObject->getComponent<RigidBody>();
-		if ( agentBody != nullptr )
-		{
-			agentBody->makeDynamic();
-			agentBody->setFixedRotation(true);
-			agentBody->setLinearDamping(6.0f);
-			agentBody->setGravityScale(0.0f);
-		}
-		auto* agentCollider = agentObject->addComponent<Collider>();
-		agentCollider->setRectangle({20.0f, 20.0f});
-		agentCollider->setDensity(1.0f);
-		agentCollider->setRestitution(0.0f);
-
 		agentComponent = agentObject->addComponent<Agent>();
 		agentObject->addComponent<NetworkedObjectMarker>();
 
@@ -458,17 +443,19 @@ int main(int argc, char** argv)
 		navTest->setAgent(*agentComponent);
 		navTest->setTarget(*targetObject->getTransform());
 		navTest->setGridComponent(*gridComponent);
-		navTest->setAgentConfig(150.0f, 180.0f, 4.0f, 150.0f, 4.0f);
+		// Parameters: maxSpeed, turnRate, arrivingDistance, followPathWeight,
+		// followPathRadius Note: followPathWeight IS the actual speed (not
+		// maxSpeed which just caps it)
+		navTest->setAgentConfig(0.1f, 0.0f, 0.0f, 0.1f, 0.1f);
 	}
 
 	// Set up a camera that scales the tilemap to the window size.
 	{
 		cameraObject = std::make_unique<GameObject>();
 		cameraObject->setName("MainCamera");
-		auto* camera =
-			cameraObject->addComponent<Camera>(1.0f, Vector2::zero(),
-											   static_cast<float>(SCREEN_WIDTH),
-											   static_cast<float>(SCREEN_HEIGHT));
+		auto* camera = cameraObject->addComponent<Camera>(
+			1.0f, Vector2::zero(), static_cast<float>(SCREEN_WIDTH),
+			static_cast<float>(SCREEN_HEIGHT));
 		const float mapWidth =
 			static_cast<float>(tilemapComponent->getGridWidth()) *
 			static_cast<float>(tilemapComponent->getTileSize().x);
@@ -478,19 +465,16 @@ int main(int argc, char** argv)
 		float zoom = 1.0f;
 		if ( mapWidth > 0.0f && mapHeight > 0.0f )
 		{
-			const float zoomX =
-				static_cast<float>(SCREEN_WIDTH) / mapWidth;
-			const float zoomY =
-				static_cast<float>(SCREEN_HEIGHT) / mapHeight;
+			const float zoomX = static_cast<float>(SCREEN_WIDTH) / mapWidth;
+			const float zoomY = static_cast<float>(SCREEN_HEIGHT) / mapHeight;
 			zoom = std::min(zoomX, zoomY);
 		}
 		camera->setZoom(zoom);
 
 		const Transform* tilemapTransform = tilemapObject->getTransform();
-		const Vector2 mapOrigin =
-			(tilemapTransform != nullptr)
-				? tilemapTransform->getWorldPosition()
-				: Vector2::zero();
+		const Vector2 mapOrigin = (tilemapTransform != nullptr)
+									  ? tilemapTransform->getWorldPosition()
+									  : Vector2::zero();
 		cameraObject->getTransform()->setPosition(
 			{mapOrigin.x + (mapWidth * 0.5f),
 			 mapOrigin.y + (mapHeight * 0.5f)});
