@@ -5,6 +5,8 @@
 #include "Component/NetworkIdentity.h"
 #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkSpawnManager.h"
+#include "Physics/Components/RigidBody.h"
+#include "Physics/IPhysicsWorld.h"
 
 #include <iostream>
 #include <utility>
@@ -430,6 +432,18 @@ void SceneManager::applyNetworkSnapshot(
 		if (existing)
 		{
 			existing->copyStateFrom(*received);
+			if (gameWorld && gameWorld->physics)
+			{
+				auto* rigidBody = existing->getComponent<RigidBody>();
+				auto* transform = existing->getTransform();
+				if (rigidBody && transform)
+				{
+					gameWorld->physics->setBodyTransform(
+						rigidBody,
+						transform->getPosition(),
+						transform->getRotationAngle());
+				}
+			}
 		}
 		else
 		{

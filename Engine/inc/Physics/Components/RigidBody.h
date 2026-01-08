@@ -1,10 +1,17 @@
 #pragma once
 
 #include "Behaviour/Behaviour.h"
+#include "Networking/Serialization/RegistrationBase.h"
 
-class RigidBody: public Behaviour
+class RigidBody: public Behaviour, RegistrationBase<RigidBody>
 {
    public:
+	static constexpr const char* name()
+	{
+		return "RigidBody";
+	}
+	const char* getName() const override { return name(); }
+
 	enum class BodyType
 	{
 		Static,
@@ -71,6 +78,9 @@ class RigidBody: public Behaviour
 	{
 		return isBullet;
 	}
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 
    protected:
 	void onStart() override;

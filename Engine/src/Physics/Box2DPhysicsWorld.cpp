@@ -198,6 +198,20 @@ void Box2DPhysicsWorld::setGravity(Vector2 gravity)
 	b2World_SetGravity(worldId, gravityVec);
 }
 
+void Box2DPhysicsWorld::setBodyTransform(const RigidBody* rigidBody,
+										 Vector2 position,
+										 float rotationAngle)
+{
+	if ( !rigidBody ) return;
+
+	auto it = bodies.find(rigidBody);
+	if ( it == bodies.end() ) return;
+
+	b2Vec2 b2Position = {position.x, position.y};
+	b2Rot b2Rotation = b2MakeRot(rotationAngle);
+	b2Body_SetTransform(it->second, b2Position, b2Rotation);
+}
+
 void Box2DPhysicsWorld::setLinearVelocity(const RigidBody* rigidBody,
 										  Vector2 velocity)
 {

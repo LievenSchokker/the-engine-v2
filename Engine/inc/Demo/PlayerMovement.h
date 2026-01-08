@@ -2,9 +2,9 @@
 
 
 #include "Behaviour/NetworkBehaviour.h"
-#include "Math/Vector2.h"
 
 class GameWorld;
+class RigidBody;
 
 /**
  * @brief Simple networked player movement.
@@ -36,5 +36,8 @@ private:
 	void handleInput();
 	void applyMovement(float dirX, float dirY) const;
 
-	float moveSpeed = 200.0f;
+	RigidBody* rigidBody = nullptr;
+	float moveSpeed = 300.0f;
+	float acceleration = 12.0f;
+	float braking = 18.0f;
 };

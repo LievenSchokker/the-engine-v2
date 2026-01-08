@@ -3,16 +3,27 @@
 #include "../../Component/BaseComponentTypes/Component.h"
 #include "Math/Vector2.h"
 #include "Physics/PhysicsShapes.h"
+#include "Networking/Serialization/RegistrationBase.h"
 
-class Collider: public Component
+class Collider: public Component, RegistrationBase<Collider>
 {
-   private:
+public:
+	static constexpr const char* name()
+	{
+		return "Collider";
+	}
+	const char* getName() const override { return name(); }
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
+
+private:
 	PhysicsShapeType shape = PhysicsShapeType::None;
 	bool sensor = false;
 	float density = 1.0f;
 	float restitution = 0.0f;
 
-   public:
+public:
 	float radius = 0.0f;			 // circle
 	Vector2 size = Vector2::zero();	 // box
 

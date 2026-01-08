@@ -59,6 +59,17 @@ public:
 	virtual void setGravity(Vector2 gravity) = 0;
 
 	/**
+	 * @brief Teleports a physics body to a new position and rotation.
+	 *
+	 * @param rigidBody Pointer to the RigidBody whose body will be updated.
+	 * @param position New position in world units.
+	 * @param rotationAngle New rotation angle.
+	 */
+	virtual void setBodyTransform(const RigidBody* rigidBody,
+								  Vector2 position,
+								  float rotationAngle) = 0;
+
+	/**
 	 * @brief Sets the linear velocity of a physics body.
 	 *
 	 * @param rigidBody Pointer to the RigidBody whose body will be updated.

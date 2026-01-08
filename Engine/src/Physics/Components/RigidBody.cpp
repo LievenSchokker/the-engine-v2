@@ -3,6 +3,48 @@
 #include "Core/GameWorld.h"
 #include "Physics/IPhysicsWorld.h"
 
+void RigidBody::serialize(WriteArchive& archive) const
+{
+	uint8_t bodyTypeValue = static_cast<uint8_t>(bodyType);
+	archive.process(bodyTypeValue);
+
+	bool fixed = fixedRotation;
+	archive.process(fixed);
+
+	float damping = linearDamping;
+	archive.process(damping);
+
+	float gravity = gravityScale;
+	archive.process(gravity);
+
+	bool bullet = isBullet;
+	archive.process(bullet);
+}
+
+void RigidBody::deserialize(ReadArchive& archive)
+{
+	uint8_t bodyTypeValue = 0;
+	archive.process(bodyTypeValue);
+
+	bool fixed = false;
+	archive.process(fixed);
+
+	float damping = 0.0f;
+	archive.process(damping);
+
+	float gravity = 1.0f;
+	archive.process(gravity);
+
+	bool bullet = false;
+	archive.process(bullet);
+
+	bodyType = static_cast<BodyType>(bodyTypeValue);
+	fixedRotation = fixed;
+	linearDamping = damping;
+	gravityScale = gravity;
+	isBullet = bullet;
+}
+
 void RigidBody::onStart()
 {
 	// Create physics body when the RigidBody behaviour starts

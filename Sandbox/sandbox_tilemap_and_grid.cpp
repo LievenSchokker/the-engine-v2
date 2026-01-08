@@ -25,6 +25,8 @@
 #include "Physics/IPhysicsWorld.h"
 #include "Rendering/Color.h"
 #include "Scene/Scene.h"
+#include "Demo/PlayerMovement.h"
+
 
 #include <iostream>
 #include <memory>
@@ -187,73 +189,6 @@ class TilemapInputBehaviour: public Behaviour
 };
 
 /**
- * @brief Movement controller for the player using WASD.
- */
-class PlayerMovementBehaviour: public Behaviour
-{
-   public:
-	PlayerMovementBehaviour(float moveSpeed, float acceleration, float braking)
-		: moveSpeed(moveSpeed), acceleration(acceleration), braking(braking)
-	{
-	}
-
-	~PlayerMovementBehaviour() override = default;
-
-	void onAwake() override
-	{
-		rigidBody = getComponent<RigidBody>();
-	}
-
-	void update(double deltaTime, const GameWorld& world) override
-	{
-		(void)deltaTime;
-		if ( rigidBody == nullptr || world.input == nullptr ||
-			 world.physics == nullptr )
-		{
-			return;
-		}
-
-		Vector2 direction = Vector2::zero();
-		if ( world.input->isKeyDown(KeyCode::W) )
-		{
-			direction.y -= 1.0f;
-		}
-		if ( world.input->isKeyDown(KeyCode::S) )
-		{
-			direction.y += 1.0f;
-		}
-		if ( world.input->isKeyDown(KeyCode::A) )
-		{
-			direction.x -= 1.0f;
-		}
-		if ( world.input->isKeyDown(KeyCode::D) )
-		{
-			direction.x += 1.0f;
-		}
-
-		Vector2 desiredVelocity = Vector2::zero();
-		if ( direction != Vector2::zero() )
-		{
-			direction.normalize();
-			desiredVelocity = direction * moveSpeed;
-		}
-
-		const Vector2 currentVelocity =
-			world.physics->getLinearVelocity(rigidBody);
-		const Vector2 velocityDelta = desiredVelocity - currentVelocity;
-		const float forceScale =
-			(direction != Vector2::zero()) ? acceleration : braking;
-		world.physics->applyForce(rigidBody, velocityDelta * forceScale);
-	}
-
-   private:
-	RigidBody* rigidBody = nullptr;
-	float moveSpeed = 0.0f;
-	float acceleration = 0.0f;
-	float braking = 0.0f;
-};
-
-/**
  * @brief Sets the physics world for top-down movement (no gravity).
  */
 class TopDownPhysicsBehaviour: public Behaviour
@@ -324,7 +259,7 @@ int main(int argc, char** argv)
 
 	// Create AssetManager and load tilemap
 	AssetManager assetManager;
-	std::string tilemapPath = "build/Sandbox/Assets/level1_tilemap.csv";
+	std::string tilemapPath = "Assets/level1_tilemap.csv";
 
 	assetManager.add(tilemapPath, std::make_unique<TilemapAsset>());
 	if ( !assetManager.load(tilemapPath) )
@@ -342,7 +277,7 @@ int main(int argc, char** argv)
 	}
 
 	// Load tileset image
-	std::string tilesetPath = "build/Sandbox/Assets/Tilemap_color1.png";
+	std::string tilesetPath = "Assets/Tilemap_color1.png";
 	assetManager.add(tilesetPath, std::make_unique<SDLImage>());
 	IImage* tilesetImage = nullptr;
 	if ( !assetManager.load(tilesetPath) )
@@ -583,8 +518,7 @@ int main(int argc, char** argv)
 	playerCollider->setCircle(8.0f);
 	playerCollider->setDensity(1.0f);
 	playerCollider->setRestitution(0.0f);
-	playerObject->addComponent<PlayerMovementBehaviour>(260.0f, 2600.0f,
-														3200.0f);
+	playerObject->addComponent<PlayerMovement>();
 
 	// Create a pushable box
 	pushBoxObject = std::make_unique<GameObject>();
