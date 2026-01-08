@@ -5,7 +5,7 @@
 #include "Networking/Serialization/RegistrationBase.h"
 #include "Physics/IPhysicsWorld.h"
 
-class RigidBody: public Behaviour, public RegistrationBase<RigidBody>
+class	RigidBody: public Behaviour, public RegistrationBase<RigidBody>
 {
 public:
 	static constexpr const char* name()
@@ -32,6 +32,7 @@ public:
 	void serialize(WriteArchive& archive) const override
 	{
 		Component::serialize(archive);
+		archive.process(isDynamic);
 		archive.process(linearVelocity.x);
 		archive.process(linearVelocity.y);
 		archive.process(angularVelocity);
@@ -40,6 +41,7 @@ public:
 	void deserialize(ReadArchive& archive) override
 	{
 		Component::deserialize(archive);
+		archive.process(isDynamic);
 		archive.process(linearVelocity.x);
 		archive.process(linearVelocity.y);
 		archive.process(angularVelocity);
