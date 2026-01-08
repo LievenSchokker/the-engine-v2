@@ -19,7 +19,6 @@ void Box2DPhysicsWorld::initialize()
 
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	worldDef.gravity = {0.0f, 150.0f};
-	worldDef.gravity = {0.0f, 0.0f};
 	worldId = b2CreateWorld(&worldDef);
 
 	std::cout << "Box2D world created, id.index1 = " << worldId.index1
