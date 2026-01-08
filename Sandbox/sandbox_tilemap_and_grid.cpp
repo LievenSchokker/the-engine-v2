@@ -250,7 +250,6 @@ int main(int argc, char** argv)
 										 SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 	spec.clearColor = Color(106, 168, 169);
-	spec.engineSystem = EngineSystem::Client;
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 
