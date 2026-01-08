@@ -24,6 +24,8 @@
 #include <iostream>
 #include <memory>
 
+#include "Component/ShapeRenderer.h"
+
 /**
  * @brief Simple behavior to handle ESC key for exit.
  *
@@ -177,18 +179,14 @@ int main(int argc, char** argv)
     rat->setName("Rat");
 
     // Position in meters
-    rat->getTransform()->setPosition({4.0f, 2.0f});
+    rat->getTransform()->setPosition({3.0f, 2.0f});
 
-    // Scale: rat sprite is 32x32, we want it ~1 meter tall
-    constexpr float RAT_SIZE_METERS = 1.0f;
-    constexpr float RAT_FRAME_SIZE = 32.0f;
-    float ratScale = RAT_SIZE_METERS / (RAT_FRAME_SIZE);
-    rat->getTransform()->setScale({ratScale, ratScale});
+
 
     auto* ratSprite = rat->addComponent<SpriteComponent>();
     bool ratLoaded = SpritesheetLoader::loadSpritesheet(
         assetManager.get(), ratSprite, "Assets/rat.png", 1, 4, 32, 32);
-
+    ratSprite->setSize(Vector2{0.5, 0.5});
     if (ratLoaded)
     {
         auto* ratAnimator = rat->addComponent<Animator>();
@@ -207,9 +205,10 @@ int main(int argc, char** argv)
         AnimationCurve ratCurve(EasingType::EaseInOutQuad);
 
         // Positions in meters
-        Vector2 ratStartPos{4.0f,  2.0f};
-        Vector2 ratEndPos{16.0f,  2.0f};
-        float ratMoveDuration = 3.0f; // 3 seconds to cross ~12 meters
+        Vector2 ratStartPos{3.0f, 2.0f};
+        Vector2 ratEndPos{1.0f, 2.0f};
+
+        float ratMoveDuration = 3.0f;
 
         // Forward track
         AnimationTrack ratForwardTrack(
@@ -226,12 +225,12 @@ int main(int argc, char** argv)
         // FlipX tracks
         AnimationTrack ratFlipForwardTrack(
             TargetType::Sprite, PropertyType::FlipX, ratMoveDuration, false,
-            0, 0, ratCurve);
+            1, 1, ratCurve);
         ratMoveClip->addTrack(ratFlipForwardTrack);
 
         AnimationTrack ratFlipReverseTrack(
             TargetType::Sprite, PropertyType::FlipX, ratMoveDuration, false,
-            1, 1, ratCurve);
+            0, 0, ratCurve);
         ratMoveClip->addTrack(ratFlipReverseTrack);
 
         SpritesheetAnimationClip ratWalkClip;
@@ -275,12 +274,11 @@ int main(int argc, char** argv)
         std::nullopt,
         true
     );
-
+    
     gameScene->addGameObject(std::move(debugController));
     gameScene->addGameObject(std::move(player));
     gameScene->addGameObject(std::move(rat));
     gameScene->addGameObject(std::move(exitHandler));
-
     game->addScene(std::move(gameScene));
     game->setApplicationSpecifications(spec);
     return SpelMotorEntry::main(std::move(game));
