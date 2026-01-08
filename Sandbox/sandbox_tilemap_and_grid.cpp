@@ -277,7 +277,7 @@ int main(int argc, char** argv)
 	}
 
 	// Load tileset image
-	std::string tilesetPath = "build/Sandbox/Assets/Tilemap_color1.png";
+	std::string tilesetPath = "Assets/Tilemap_color1.png";
 	assetManager.add(tilesetPath, std::make_unique<SDLImage>());
 	IImage* tilesetImage = nullptr;
 	if ( !assetManager.load(tilesetPath) )
