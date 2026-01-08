@@ -30,8 +30,9 @@ public:
     /**
      * @brief Ticks enabled behaviours. Respects pause state via shouldRunWhenPaused().
      * @param deltaTime Frame time in seconds.
+     * @param fixed
      */
-    void update(Scene& scene, double deltaTime, const GameWorld& world);
+    void update(Scene& scene, double deltaTime, const GameWorld& world, bool fixed);
 
     /**
      * @brief Calls awake() on behaviours that haven't yet awoken.

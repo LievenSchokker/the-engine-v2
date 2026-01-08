@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+#include "Networking/Client.h"
+
 StateSyncMessageHandler::StateSyncMessageHandler(GameWorld& world, NetworkIdentityRegistry& registry)
     : BaseMessageHandler<StateSyncMessage>(world)
     , registry(registry)
@@ -15,8 +17,17 @@ StateSyncMessageHandler::StateSyncMessageHandler(GameWorld& world, NetworkIdenti
 
 void StateSyncMessageHandler::handleMessageInternal()
 {
-	const StateSyncMessage* message = getMessage();
+	StateSyncMessage* message = getMessage();
 	if (!message) return;
 
+
+    uint32_t lastTick = gameWorld->client->getLastReceivedTick();
+    // Skip check if we haven't received anything yet
+    if (message->tick <= lastTick && message->tick != 0)
+    {
+        return;
+    }
+
+    gameWorld->client->setLastReceivedTick(message->tick);
 	gameWorld->sceneManager->applyNetworkSnapshot(message->gameObjects);
 }

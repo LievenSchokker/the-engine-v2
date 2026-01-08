@@ -87,6 +87,25 @@ struct UIRenderCommand
 	Color pressedColor = Color(30, 30, 30, 255);
 	Color textColor = Color::white();
 
+	Color borderColor = Color::white();
+	float borderThickness = 1.0f;
+	float rounding = 0.0f;
+	float padding = 4.0f;
+	float spacing = 4.0f;
+
+	Color titleBackgroundColor = Color(40, 40, 40, 255);
+	Color titleTextColor = Color::white();
+
+	bool scrollable = false;
+	bool movable = false;
+	bool resizable = false;
+	bool minimizable = false;
+	bool closable = false;
+
+	float titleHeight = 24.0f;
+	float titlePadding = 4.0f;
+	float titleLabelPadding = 4.0f;
+
 	/**
 	 * @brief Composite key for depth sorting.
 	 *

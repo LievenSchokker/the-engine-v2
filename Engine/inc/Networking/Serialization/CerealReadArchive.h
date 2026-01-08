@@ -63,6 +63,11 @@ public:
        archive(value);
     }
 
+	void processBytes(void* data, size_t size)
+    {
+    	archive(cereal::binary_data(data, size));
+    }
+
     size_t getBytesRead()
     {
         return static_cast<size_t>(stream.tellg());

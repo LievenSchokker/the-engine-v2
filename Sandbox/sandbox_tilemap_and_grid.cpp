@@ -26,10 +26,10 @@
 #include "Rendering/Color.h"
 #include "Scene/Scene.h"
 
+#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <random>
-#include <algorithm>
 #include <vector>
 
 #define SCREEN_WIDTH 1024
@@ -278,44 +278,42 @@ int main(int argc, char** argv)
 
 	ApplicationSpecifications spec = {};
 	EngineMode mode = EngineMode::CLIENT;
-    spec.engineSystem = EngineSystem::Client;
-    if (argc > 1)
-    {
-        std::string arg = argv[1];
-        if (arg == "server")
-        {
-            mode = EngineMode::SERVER;
-            spec.engineSystem = EngineSystem::Server;
-            std::cout << "Starting as SERVER..." << std::endl;
-        }
-        else if (arg == "client")
-        {
-            mode = EngineMode::CLIENT;
-            spec.engineSystem = EngineSystem::Client;
-            std::cout << "Starting as CLIENT..." << std::endl;
-        }
-        else
-        {
-            std::cerr << "Unknown mode: " << arg << std::endl;
-            std::cerr << "Usage: " << argv[0] << " [server|client]" << std::endl;
-            return 1;
-        }
-    }
-    else
-    {
-        std::cout << "No mode specified, defaulting to CLIENT..." << std::endl;
-        std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
-    }
+	spec.engineSystem = EngineSystem::Client;
+	if ( argc > 1 )
+	{
+		std::string arg = argv[1];
+		if ( arg == "server" )
+		{
+			mode = EngineMode::SERVER;
+			spec.engineSystem = EngineSystem::Server;
+			std::cout << "Starting as SERVER..." << std::endl;
+		}
+		else if ( arg == "client" )
+		{
+			mode = EngineMode::CLIENT;
+			spec.engineSystem = EngineSystem::Client;
+			std::cout << "Starting as CLIENT..." << std::endl;
+		}
+		else
+		{
+			std::cerr << "Unknown mode: " << arg << std::endl;
+			std::cerr << "Usage: " << argv[0] << " [server|client]"
+					  << std::endl;
+			return 1;
+		}
+	}
+	else
+	{
+		std::cout << "No mode specified, defaulting to CLIENT..." << std::endl;
+		std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
+	}
 
-
-    spec.networkingOptions.mode = mode;
-	spec.networkingOptions.port = 8080;
-    spec.networkingOptions.serverIP = "127.0.0.1";
-    spec.networkingOptions.tickRate = 60;
-	spec.renderBackend = RenderBackend::SDL;
-	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.renderSettings.renderBackend = RenderBackend::SDL;
+	spec.renderSettings.windowOptions = {"Tilemap Example", false, SCREEN_WIDTH,
+										 SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 	spec.clearColor = Color(106, 168, 169);
+	spec.engineSystem = EngineSystem::Client;
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 
@@ -324,7 +322,7 @@ int main(int argc, char** argv)
 
 	// Create AssetManager and load tilemap
 	AssetManager assetManager;
-	std::string tilemapPath = "build/Sandbox/Assets/level1_tilemap.csv";
+	std::string tilemapPath = "Assets/level1_tilemap.csv";
 
 	assetManager.add(tilemapPath, std::make_unique<TilemapAsset>());
 	if ( !assetManager.load(tilemapPath) )
@@ -342,7 +340,7 @@ int main(int argc, char** argv)
 	}
 
 	// Load tileset image
-	std::string tilesetPath = "build/Sandbox/Assets/Tilemap_color1.png";
+	std::string tilesetPath = "Assets/Tilemap_color1.png";
 	assetManager.add(tilesetPath, std::make_unique<SDLImage>());
 	IImage* tilesetImage = nullptr;
 	if ( !assetManager.load(tilesetPath) )
@@ -531,10 +529,9 @@ int main(int argc, char** argv)
 	{
 		cameraObject = std::make_unique<GameObject>();
 		cameraObject->setName("MainCamera");
-		auto* camera =
-			cameraObject->addComponent<Camera>(1.0f, Vector2::zero(),
-											   static_cast<float>(SCREEN_WIDTH),
-											   static_cast<float>(SCREEN_HEIGHT));
+		auto* camera = cameraObject->addComponent<Camera>(
+			1.0f, Vector2::zero(), static_cast<float>(SCREEN_WIDTH),
+			static_cast<float>(SCREEN_HEIGHT));
 		const float mapWidth =
 			static_cast<float>(tilemapComponent->getGridWidth()) *
 			static_cast<float>(tilemapComponent->getTileSize().x);
@@ -544,19 +541,16 @@ int main(int argc, char** argv)
 		float zoom = 1.0f;
 		if ( mapWidth > 0.0f && mapHeight > 0.0f )
 		{
-			const float zoomX =
-				static_cast<float>(SCREEN_WIDTH) / mapWidth;
-			const float zoomY =
-				static_cast<float>(SCREEN_HEIGHT) / mapHeight;
+			const float zoomX = static_cast<float>(SCREEN_WIDTH) / mapWidth;
+			const float zoomY = static_cast<float>(SCREEN_HEIGHT) / mapHeight;
 			zoom = std::min(zoomX, zoomY);
 		}
 		camera->setZoom(zoom);
 
 		const Transform* tilemapTransform = tilemapObject->getTransform();
-		const Vector2 mapOrigin =
-			(tilemapTransform != nullptr)
-				? tilemapTransform->getWorldPosition()
-				: Vector2::zero();
+		const Vector2 mapOrigin = (tilemapTransform != nullptr)
+									  ? tilemapTransform->getWorldPosition()
+									  : Vector2::zero();
 		cameraObject->getTransform()->setPosition(
 			{mapOrigin.x + (mapWidth * 0.5f),
 			 mapOrigin.y + (mapHeight * 0.5f)});

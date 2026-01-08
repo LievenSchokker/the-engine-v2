@@ -14,6 +14,7 @@
 #include "Rendering/RenderSystem.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
+#include "Scene/SaveSceneSystem.h"
 
 #include <iostream>
 #include <memory>
@@ -21,31 +22,116 @@
 #define SCREEN_WIDTH 700
 #define SCREEN_HEIGHT 700
 
+/// Path for saving/loading scenes
+static const std::string SAVE_PATH = "saves/";
+static const std::string SAVE_FILENAME = "quicksave.scene";
+
 /**
  * @brief Behavior class that handles input for the sandbox scene.
  *
  * Handles:
  * - SPACE key: Toggles clear color between dark green and dark purple
+ * - R key: Rotates the YellowRectangle
+ * - S key: Saves the current scene
+ * - L key: Loads the last saved scene
  * - Mouse wheel Y: Rotates the YellowRectangle
  * - Mouse wheel X: Moves and scales the BlueCircle
  */
-class SandboxInputBehaviour final: public Behaviour
+class SandboxInputBehaviour final: public Behaviour, RegistrationBase<SandboxInputBehaviour>
 {
    public:
-	explicit SandboxInputBehaviour(Scene* scene) : scene(scene)
-	{
-	}
-
+	SandboxInputBehaviour() = default;
 	~SandboxInputBehaviour() override = default;
 
+	void onAwake() override
+	{
+		std::cout << "Sandbox Awake" << std::endl;
+	}
+
+	static constexpr const char* name()
+	{
+		return "SandboxInputBehaviour";
+	}
+
+	const char* getName() const override { return name(); }
+
+	void onEnable() override
+	{
+		std::cout << "Sandbox Enable" << std::endl;
+		std::cout << "R - Rotate YellowRectangle" << std::endl;
+		std::cout << "S - Save current scene" << std::endl;
+		std::cout << "L - Load last saved scene" << std::endl;
+		std::cout << "SPACE - Toggle background color" << std::endl;
+		std::cout << "ENTER - Switch scenes" << std::endl;
+	}
+
+	void serialize(WriteArchive& archive) const override
+	{
+		std::cout << "Sandbox Serialize" << std::endl;
+	}
+	void deserialize(ReadArchive& archive) override
+	{
+		std::cout << "Sandbox Deserialize" << std::endl;
+	}
 	void update(double deltaTime, const GameWorld& world) override
 	{
 	    (void)deltaTime;
-
+		Scene* scene = world.sceneManager->getActiveScene();
 		if ( scene == nullptr )
 		{
 			return;
 		}
+
+		if ( world.input->wasKeyPressed(KeyCode::R) )
+		{
+			GameObject* rectangle = scene->getGameObject("YellowRectangle");
+			if ( rectangle != nullptr )
+			{
+				double currentRotation = rectangle->getTransform()->getRotationAngle();
+				rectangle->getTransform()->setRotationAngle(currentRotation + 15.0);
+			}
+		}
+
+		if ( world.input->wasKeyPressed(KeyCode::S) )
+		{
+			std::string savePath = SAVE_PATH + SAVE_FILENAME;
+
+			if ( SaveSceneSystem::saveScene(*scene, savePath) )
+			{
+				std::cout << "Scene saved successfully to: " << savePath << std::endl;
+			}
+			else
+			{
+				std::cout << "Failed to save scene!" << std::endl;
+			}
+		}
+
+		if ( world.input->wasKeyPressed(KeyCode::L) )
+		{
+			std::string savePath = SAVE_PATH + SAVE_FILENAME;
+
+			if ( !SaveSceneSystem::isValidSceneFile(savePath) )
+			{
+				std::cout << "[Load] No valid save file found at: " << savePath << std::endl;
+				return;
+			}
+
+			auto loadedScene = SaveSceneSystem::loadScene(savePath);
+			if ( loadedScene != nullptr )
+			{
+				std::string sceneName = loadedScene->getName();
+				SceneManager* sm = world.sceneManager;
+				sm->removeScene(sceneName);
+				sm->addScene(std::move(loadedScene));
+				sm->setActiveScene(sceneName);
+				std::cout << "[Load] Scene loaded successfully from: " << savePath << std::endl;
+			}
+			else
+			{
+				std::cout << "[Load] Failed to load scene!" << std::endl;
+			}
+		}
+
 		if ( world.input->wasKeyPressed(KeyCode::E) )
 		{
 			auto circle = scene->getGameObject("BlueCircle");
@@ -56,11 +142,6 @@ class SandboxInputBehaviour final: public Behaviour
 			}
 		}
 
-		if (world.input->wasKeyPressed(KeyCode::W))
-		{
-
-		}
-		// Handle SPACE key to toggle clear color
 		if ( world.input->wasKeyPressed(KeyCode::SPACE) )
 		{
 			Color clearColor = world.render->getClearColor();
@@ -68,7 +149,6 @@ class SandboxInputBehaviour final: public Behaviour
 							 ? Color::darkPurple()
 							 : Color::darkGreen();
 
-			// Try to set clear color through RenderSystem if available
 			if ( world.render != nullptr )
 			{
 				world.render->setClearColor(clearColor);
@@ -87,32 +167,7 @@ class SandboxInputBehaviour final: public Behaviour
 				sm->loadScene("PrototypeScene");
 			}
 		}
-
-		// Handle mouse wheel X to move and scale circle
-		if ( world.input->wheelDeltaX() != 0 )
-		{
-			GameObject* circle = scene->getGameObject("BlueCircle");
-			if ( circle != nullptr )
-			{
-				Vector2 currentPosition = circle->getTransform()->getPosition();
-				circle->getTransform()->setPosition(
-					{currentPosition.x +
-						 static_cast<float>(world.input->wheelDeltaX()) *
-							 10.0f,
-					 currentPosition.y});
-				Vector2 currentScale = circle->getTransform()->getScale();
-				circle->getTransform()->setScale(
-					{currentScale.x +
-						 static_cast<float>(world.input->wheelDeltaX()) * 0.1f,
-					 currentScale.y +
-						 static_cast<float>(world.input->wheelDeltaX()) *
-							 0.1f});
-			}
-		}
 	}
-
-   private:
-	Scene* scene;
 };
 
 //////////////////////////////
@@ -166,11 +221,6 @@ std::unique_ptr<Scene> createSecondScene()
 		.setColor(Color::green());
 	scene->addGameObject(std::move(rectB));
 
-	// auto handler = std::make_unique<GameObject>();
-	// handler->setName("InputHandler");
-	// handler->addComponent<SandboxInputBehaviour>(scene.get());
-	// scene->addGameObject(std::move(handler));
-
 	return scene;
 }
 
@@ -215,14 +265,14 @@ int main(int argc, char** argv)
 	// Attach behavior
 	auto goInputHandler = std::make_unique<GameObject>();
 	goInputHandler->setName("InputHandler");
-	goInputHandler->addComponent<SandboxInputBehaviour>(prototypeScene.get());
+	goInputHandler->addComponent<SandboxInputBehaviour>();
 	prototypeScene->addGameObject(std::move(goInputHandler));
 	game->addScene(std::move(prototypeScene));
 
 	// Attach behavior
 	auto goInputHandler2 = std::make_unique<GameObject>();
 	goInputHandler2->setName("InputHandler");
-	goInputHandler2->addComponent<SandboxInputBehaviour>(secondScene.get());
+	goInputHandler2->addComponent<SandboxInputBehaviour>();
 	secondScene->addGameObject(std::move(goInputHandler2));
 	game->addScene(std::move(secondScene));
 

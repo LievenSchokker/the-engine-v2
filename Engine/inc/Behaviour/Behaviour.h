@@ -3,8 +3,8 @@
 #include "Component/BaseComponentTypes/Component.h"
 #include "Component/BaseComponentTypes/Component.h"
 #include "Events/Subscriptions/SubscriptionScope.h"
+#include "Physics/Components/Collider.h"
 
-class Collider;
 class GameWorld;
 
 /**

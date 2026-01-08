@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/IEngineSystems.h"
-#include "Events/EventQueue.h"
 #include "Events/EventDispatcher/EventDispatcher.h"
 #include "Input/MouseButton.h"
 #include "Events/IEventProccesor.h"
@@ -24,7 +23,6 @@ public:
 	void update(double deltaTime, const GameWorld& gameWorld) override;
 	void shutdown(GameWorld& gameWorld) override;
 	[[nodiscard]] const std::string getName() const override;
-	bool pollEvents(EventQueue& queue) override;
 	bool pollEvents(EventDispatcher& dispatcher) override;
 
 	/**
