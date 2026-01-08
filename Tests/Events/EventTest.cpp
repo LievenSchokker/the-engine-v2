@@ -301,13 +301,6 @@ TEST(SubscriptionHandleTest, ZeroIdHandleCanBeInvalidated)
     EXPECT_FALSE(handle.isValid());
 }
 
-
-
-
-
-
-
-
 TEST(EventSystemIntegration, MultipleScopesWithSameDispatcher)
 {
     EventDispatcher dispatcher;

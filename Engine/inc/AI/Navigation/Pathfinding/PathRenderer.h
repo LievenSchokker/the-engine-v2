@@ -34,6 +34,24 @@ class PathRenderer : public RenderComponent
         explicit PathRenderer(PathRenderOptions renderOptions) : pathRenderOptions(renderOptions) {}
         ~PathRenderer() override = default;
 
+        PathRenderer& setLayer(uint8_t l)
+        {
+            layer = l;
+            return *this;
+        }
+
+        PathRenderer& setOrderInLayer(int8_t order)
+        {
+            orderInLayer = order;
+            return *this;
+        }
+
+        PathRenderer& setRenderEnabled(bool enabled)
+        {
+            renderEnabled = enabled;
+            return *this;
+        }
+
         /**
          * @brief Visualise the path.
          * @param queue
@@ -49,4 +67,7 @@ class PathRenderer : public RenderComponent
     private:
         PathRenderOptions pathRenderOptions;
         PathResult currentPath;
+        uint8_t layer = 0;
+        int8_t orderInLayer = 0;
+        bool renderEnabled = true;
 };

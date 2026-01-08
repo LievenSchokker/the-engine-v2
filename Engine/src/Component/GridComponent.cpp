@@ -64,6 +64,26 @@ bool GridComponent::isWalkableAtWorld(Vector2 worldPos) const
 	return isWalkable(cell);
 }
 
+Vector2 GridComponent::worldToCell(Vector2 worldPos) const
+{
+	if (tilemapComponent == nullptr || !tilemapComponent->isReady())
+	{
+		return {0.0f, 0.0f};
+	}
+
+	return tilemapComponent->worldToCell(worldPos);
+}
+
+Vector2 GridComponent::cellToWorld(Vector2 cell) const
+{
+	if (tilemapComponent == nullptr || !tilemapComponent->isReady())
+	{
+		return {0.0f, 0.0f};
+	}
+
+	return tilemapComponent->cellToWorld(cell);
+}
+
 void GridComponent::setWalkableTileIds(const std::vector<int>& tileIds)
 {
 	walkableTileIds.clear();
@@ -131,7 +151,7 @@ double GridComponent::getCellWeight(Vector2 cell) const
 
 std::vector<Vector2> GridComponent::getWalkableNeighbors(Vector2 cell) const
 {
-	std::vector<Vector2> neighbors = getNeighbors(cell, false);
+	std::vector<Vector2> neighbors = getNeighbors(cell);
 
 	// Filter to only walkable neighbors
 	std::vector<Vector2> walkableNeighbors;
@@ -146,8 +166,7 @@ std::vector<Vector2> GridComponent::getWalkableNeighbors(Vector2 cell) const
 	return walkableNeighbors;
 }
 
-std::vector<Vector2> GridComponent::getNeighbors(Vector2 cell,
-                                                 bool includeDiagonals) const
+std::vector<Vector2> GridComponent::getNeighbors(Vector2 cell) const
 {
 	std::vector<Vector2> neighbors;
 
@@ -156,15 +175,6 @@ std::vector<Vector2> GridComponent::getNeighbors(Vector2 cell,
 	neighbors.push_back({cell.x, cell.y + 1}); // Down
 	neighbors.push_back({cell.x - 1, cell.y}); // Left
 	neighbors.push_back({cell.x + 1, cell.y}); // Right
-
-	// 8-directional neighbors (including diagonals)
-	if (includeDiagonals)
-	{
-		neighbors.push_back({cell.x - 1, cell.y - 1}); // Up-Left
-		neighbors.push_back({cell.x + 1, cell.y - 1}); // Up-Right
-		neighbors.push_back({cell.x - 1, cell.y + 1}); // Down-Left
-		neighbors.push_back({cell.x + 1, cell.y + 1}); // Down-Right
-	}
 
 	// Filter out invalid cells
 	std::vector<Vector2> validNeighbors;
@@ -291,7 +301,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		}
 	}
 
-	const Vector2 origin = transform->getPosition();
+	const Vector2 origin = transform->getWorldPosition();
 	const Vector2 tileSize = tilemapComponent->getTileSize();
 	const int width = tilemapComponent->getGridWidth();
 	const int height = tilemapComponent->getGridHeight();
@@ -334,14 +344,9 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 
 	// Second pass: Draw lines FIRST (so they appear below dots)
 	// Lines connecting walkable tiles to their walkable neighbors
-	// Includes diagonals for visualization purposes
 	for (const auto& [cell, center] : walkableCenters)
 	{
-		// Use diagonals for debug visualization when requested while
-		// pathfinding logic elsewhere can still choose 4-directional neighbors
-		// if needed
-		std::vector<Vector2> neighbors =
-			getNeighbors(cell, debugShowDiagonalLinks);
+		std::vector<Vector2> neighbors = getNeighbors(cell);
 
 		for (const auto& neighborCell : neighbors)
 		{

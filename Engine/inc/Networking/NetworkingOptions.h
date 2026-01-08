@@ -8,7 +8,6 @@
 
 struct NetworkingOptions
 {
-    EngineMode mode;
     int tickRate;
     uint16_t port;
     std::string serverIP;

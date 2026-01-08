@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Events/EventDispatcher/EventDispatcher.h"
+#include "Options/ApplicationSpecifications.h"
+#include "Assets/AssetManager.h"
 
 #include <memory>
-
-#include "Assets/AssetManager.h"
-#include "Events/EventDispatcher/EventDispatcher.h"
 
 class ApplicationClock;
 class AudioManager;
@@ -34,6 +34,7 @@ public:
 
 	std::unique_ptr<AssetManager> assetManager = nullptr;
 	NetworkSpawnManager* spawnManager = nullptr;
+	ApplicationSpecifications specs = {};
 
 	bool isClient() const
 	{

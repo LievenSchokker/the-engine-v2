@@ -42,7 +42,7 @@ void SDLRenderer::open(const WindowOptions& options)
 		return;
 	}
 
-	Uint32 flags = SDL_WINDOW_SHOWN;
+	Uint32 flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 
 #if defined linux && SDL_VERSION_ATLEAST(2, 0, 8)
 	// Disable compositor bypass
