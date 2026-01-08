@@ -274,7 +274,7 @@ int main(int argc, char** argv)
         std::nullopt,
         true
     );
-    
+
     gameScene->addGameObject(std::move(debugController));
     gameScene->addGameObject(std::move(player));
     gameScene->addGameObject(std::move(rat));

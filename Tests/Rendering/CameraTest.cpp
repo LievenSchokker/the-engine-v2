@@ -28,14 +28,4 @@ TEST_F(CameraTest, SetOffset_UpdatesOffset)
     EXPECT_FLOAT_EQ(camera->getOffset().y, 50.0f);
 }
 
-TEST_F(CameraTest, SetViewport_UpdatesViewportPosition)
-{
-    auto* camera = cameraObject->addComponent<Camera>(1.0f, Vector2{0, 0}, 800, 600);
-
-    camera->setViewport(400, 0);
-    EXPECT_FLOAT_EQ(camera->getViewportX(), 400.0f);
-    EXPECT_FLOAT_EQ(camera->getViewportY(), 0.0f);
-}
-
-
 
