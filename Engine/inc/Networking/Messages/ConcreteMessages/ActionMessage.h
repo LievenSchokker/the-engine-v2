@@ -98,10 +98,12 @@ public:
     void setAction(std::string action);
     void setTick(uint32_t tick);
     /// @}
-
+	void setPayload(std::vector<std::byte> data);
+	const std::vector<std::byte>& getPayload() const;
 private:
     uint32_t networkComponentIdentity; ///< Routes to the handling component
     uint32_t networkGameObjectIdentity; ///< Routes to the target entity
     std::string actionKey;              ///< Identifies the RPC to invoke
     uint32_t tick;                      ///< Simulation frame for temporal ordering
+	std::vector<std::byte> payload;
 };

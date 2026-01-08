@@ -59,15 +59,21 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	/**
 	 * @brief Applies a force to the center of mass of a physics body.
 	 *
-	 * @param rigitBody Pointer to the RigidBody whose body will receive the
+	 * @param rigidBody Pointer to the RigidBody whose body will receive the
 	 * force.
 	 * @param force Force vector in world units.
 	 */
 	void applyForce(const RigidBody* rigidBody, Vector2 force) override;
 
+	void setLinearVelocity(const RigidBody* rigidBody, Vector2 velocity) override;
+
+	Vector2 getLinearVelocity(const RigidBody* rigidBody) const override;
+
+
 	void initialize() override;
 	void step(float deltaTime) override;
 	void shutdown() override;
+
 	/**
 	 * @brief Synchronizes all registered RigidBody transforms with the physics
 	 * world.

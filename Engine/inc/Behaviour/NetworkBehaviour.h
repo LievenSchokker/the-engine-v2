@@ -116,10 +116,12 @@ public:
 	 * targeting this component. Routes to the appropriate registered callback.
 	 *
 	 * @param actionKey The command/RPC name from ActionMessage::getAction()
+	 * @param payload
 	 * @param payload Serialized arguments from ActionMessage
 	 * @param payloadLength Size of payload in bytes
 	 */
-	void executeAction(const std::string& actionKey);
+	void executeAction(const std::string& actionKey,
+					   const std::vector<std::byte>& payload);
 
 	void setComponentNetworkId(uint32_t id);
 
