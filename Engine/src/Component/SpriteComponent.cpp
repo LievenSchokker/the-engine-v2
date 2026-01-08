@@ -22,7 +22,6 @@ void SpriteComponent::setSprite(IImage *image, SpritesheetDefinition def)
 {
 	sprite = image;
 	spritesheetDef = def;
-	currentFrame = 0;
 
 	// Validate spritesheet definition
 	if (spritesheetDef.rows <= 0 || spritesheetDef.columns <= 0 ||
@@ -33,9 +32,12 @@ void SpriteComponent::setSprite(IImage *image, SpritesheetDefinition def)
 		return;
 	}
 
-	// Clamp current frame to valid range
-	if (currentFrame >= getFrameCount()) { currentFrame = std::max(0, getFrameCount() - 1); }
-
+	// Clamp current frame to valid range (instead of resetting)
+	if (currentFrame >= getFrameCount())
+	{
+		currentFrame = std::max(0, getFrameCount() - 1);
+	}
+	
 	// Set default render size to frame size if not custom
 	if (!hasCustomSize)
 	{
@@ -188,7 +190,6 @@ void SpriteComponent::deserialize(ReadArchive &archive)
 	// Current frame
 	int32_t frame;
 	archive.process(frame);
-	currentFrame = frame;
 
 	// Render size
 	float sizeX, sizeY;

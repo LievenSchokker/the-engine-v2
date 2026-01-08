@@ -94,6 +94,7 @@ void AnimationTrack::apply(Animator* animator, float normalizedTime) const
 		return;
 	}
 
+
 	// Evaluate easing curve
 	float easedT = curve.evaluate01(normalizedTime);
 
@@ -330,7 +331,7 @@ const AnimationCurve& AnimationTrack::getCurve() const
 {
 	return curve;
 }
-void AnimationTrack::serialize(CerealWriteArchive& archive) const
+void AnimationTrack::serialize(WriteArchive& archive) const
 {
     auto targetType = static_cast<uint8_t>(target);
     auto propertyType = static_cast<uint8_t>(property);
