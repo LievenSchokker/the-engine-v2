@@ -5,8 +5,6 @@ Camera::Camera(float zoom, Vector2 offset, float viewWidth, float viewHeight)
 	, offset(offset)
 	, viewWidth(viewWidth)
 	, viewHeight(viewHeight)
-	, viewportX(0)
-	, viewportY(0)
 {
 }
 
@@ -40,40 +38,21 @@ float Camera::getViewHeight() const
 	return viewHeight;
 }
 
-float Camera::getViewportX() const
-{
-	return viewportX;
-}
-
-float Camera::getViewportY() const
-{
-	return viewportY;
-}
-
-void Camera::setViewport(float x, float y)
-{
-	viewportX = x;
-	viewportY = y;
-}
 
 void Camera::serialize(WriteArchive& archive) const
 {
     archive.process(zoom);
-    archive.process(viewportX);
-    archive.process(viewportY);
     archive.process(offset.x);
     archive.process(offset.y);
     archive.process(viewHeight);
-    archive.process(viewportX);
+	archive.process(viewWidth);
 }
 
 void Camera::deserialize(ReadArchive& archive)
 {
     archive.process(zoom);
-    archive.process(viewportX);
-    archive.process(viewportY);
     archive.process(offset.x);
     archive.process(offset.y);
     archive.process(viewHeight);
-    archive.process(viewportX);
+	archive.process(viewWidth);
 }

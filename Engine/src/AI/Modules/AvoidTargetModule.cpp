@@ -14,7 +14,7 @@ void AvoidTargetModule::initialise()
 {
     if (target != nullptr)
     {
-        targetGameObjectId = target->getGameObject()->getSceneId();
+        targetGameObjectId = target->getGameObject()->getGameObjectHandle();
     }
 
     agentScene = agent.getGameObject()->getScene();
@@ -26,7 +26,7 @@ Vector2 AvoidTargetModule::compute()
     if (target == nullptr)
         return Vector2::zero();
 
-    GameObject* targetObject = nullptr;
+    GameObject* targetObject = agentScene->getGameObject(targetGameObjectId);
 
     if (targetObject == nullptr)
         return Vector2::zero();
@@ -50,7 +50,7 @@ void AvoidTargetModule::setFollowTarget(const Transform& newTarget)
 {
     target = &newTarget;
     agentScene = agent.getGameObject()->getScene();
-    targetGameObjectId = target->getGameObject()->getSceneId();
+    targetGameObjectId = target->getGameObject()->getGameObjectHandle();
 }
 
 

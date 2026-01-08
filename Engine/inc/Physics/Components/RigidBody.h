@@ -1,16 +1,22 @@
 #pragma once
 
 #include "Behaviour/Behaviour.h"
+#include "Core/GameWorld.h"
 #include "Networking/Serialization/RegistrationBase.h"
+#include "Physics/IPhysicsWorld.h"
 
-class RigidBody: public Behaviour, RegistrationBase<RigidBody>
+class RigidBody: public Behaviour, public RegistrationBase<RigidBody>
 {
    public:
 	static constexpr const char* name()
 	{
 		return "RigidBody";
 	}
-	const char* getName() const override { return name(); }
+
+	const char* getName() const override
+	{
+		return name();
+	}
 
 	enum class BodyType
 	{
@@ -19,19 +25,24 @@ class RigidBody: public Behaviour, RegistrationBase<RigidBody>
 		Kinematic
 	};
 
+	bool isDynamic = true;
+
 	void makeStatic()
 	{
 		bodyType = BodyType::Static;
+		isDynamic = false;
 	}
 
 	void makeDynamic()
 	{
 		bodyType = BodyType::Dynamic;
+		isDynamic = true;
 	}
 
 	void makeKinematic()
 	{
 		bodyType = BodyType::Kinematic;
+		isDynamic = false;
 	}
 
 	BodyType getBodyType() const
@@ -78,6 +89,9 @@ class RigidBody: public Behaviour, RegistrationBase<RigidBody>
 	{
 		return isBullet;
 	}
+
+	Vector2 linearVelocity{0.0f, 0.0f};
+	float angularVelocity{0.0f};
 
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;

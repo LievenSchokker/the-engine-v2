@@ -6,6 +6,7 @@
 #include "Rendering/RenderQueue/IRenderQueueWriter.h"
 
 #include <algorithm>
+#include <numeric>
 
 void SpriteComponent::setSprite(IImage* image, SpritesheetDefinition def)
 {
@@ -29,10 +30,13 @@ void SpriteComponent::setSprite(IImage* image, SpritesheetDefinition def)
 	}
 
 	// Set default render size to frame size if not custom
-	if ( !hasCustomSize )
+	if (!hasCustomSize)
 	{
-		renderSize = {static_cast<float>(spritesheetDef.frameWidth),
-					  static_cast<float>(spritesheetDef.frameHeight)};
+		int gcd = std::gcd(spritesheetDef.frameWidth, spritesheetDef.frameHeight);
+		renderSize = {
+			static_cast<float>(spritesheetDef.frameWidth / gcd),
+			static_cast<float>(spritesheetDef.frameHeight / gcd)
+		};
 	}
 }
 
@@ -69,12 +73,7 @@ void SpriteComponent::setSize(Vector2 size)
 
 Vector2 SpriteComponent::getSize() const
 {
-	if ( hasCustomSize )
-	{
-		return renderSize;
-	}
-	return {static_cast<float>(spritesheetDef.frameWidth),
-			static_cast<float>(spritesheetDef.frameHeight)};
+	return renderSize;
 }
 
 void SpriteComponent::setTint(const Color& newTint)

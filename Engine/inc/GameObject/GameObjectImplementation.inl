@@ -1,8 +1,5 @@
 #pragma once
 
-#include "GameObject.h"
-
-
 #include <algorithm>
 
 
@@ -27,7 +24,6 @@ T* GameObject::addComponent(Args&&... args)
     auto newComponent = std::make_unique<T>(std::forward<Args>(args)...);
     T* rawPtr = newComponent.get();
 
-    newComponent->setGameObject(this);
 
     internalAddComponent(std::move(newComponent));
     return rawPtr;

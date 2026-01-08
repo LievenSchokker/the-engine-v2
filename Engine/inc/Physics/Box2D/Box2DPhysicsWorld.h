@@ -45,6 +45,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 * @param rigidBody Pointer to the RigidBody containing physics components.
 	 */
 	void createBody(const RigidBody* rigidBody) override;
+	void handleEvents();
 
 	/**
 	 * @brief Destroys a previously created physics body.
@@ -58,7 +59,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	/**
 	 * @brief Applies a force to the center of mass of a physics body.
 	 *
-	 * @param rigitBody Pointer to the RigidBody whose body will receive the
+	 * @param rigidBody Pointer to the RigidBody whose body will receive the
 	 * force.
 	 * @param force Force vector in world units.
 	 */
@@ -74,6 +75,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	void initialize() override;
 	void step(float deltaTime) override;
 	void shutdown() override;
+
 	/**
 	 * @brief Synchronizes all registered RigidBody transforms with the physics
 	 * world.
@@ -83,6 +85,7 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 * rotation.
 	 */
 	void syncTransforms() override;
+	void applyNetworkSnapshot() override;
 private:
 	/**
 	 * @brief Box2D world identifier.

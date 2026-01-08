@@ -242,14 +242,15 @@ int main(int argc, char** argv)
 		std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
 	}
 
-	spec.networkingOptions.mode = mode;
 	spec.networkingOptions.port = 8080;
 	spec.networkingOptions.serverIP = "127.0.0.1";
 	spec.networkingOptions.tickRate = 60;
-	spec.renderBackend = RenderBackend::SDL;
-	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.renderSettings.renderBackend = RenderBackend::SDL;
+	spec.renderSettings.windowOptions = {"Tilemap Example", false, SCREEN_WIDTH,
+										 SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 	spec.clearColor = Color(106, 168, 169);
+	spec.engineSystem = EngineSystem::Client;
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 
@@ -276,7 +277,7 @@ int main(int argc, char** argv)
 	}
 
 	// Load tileset image
-	std::string tilesetPath = "Assets/Tilemap_color1.png";
+	std::string tilesetPath = "build/Sandbox/Assets/Tilemap_color1.png";
 	assetManager.add(tilesetPath, std::make_unique<SDLImage>());
 	IImage* tilesetImage = nullptr;
 	if ( !assetManager.load(tilesetPath) )

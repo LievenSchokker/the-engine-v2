@@ -10,8 +10,8 @@ protected:
     void SetUp() override
     {
         specs = ApplicationSpecifications{};
-        specs.renderBackend = RenderBackend::SDL;
-        specs.windowOptions = {"Test", 100, 100};
+        specs.renderSettings.renderBackend = RenderBackend::SDL;
+        specs.renderSettings.windowOptions = {"Test", false, 100, 100};
         specs.networkingOptions.port = 7777;
         specs.networkingOptions.serverIP = "127.0.0.1";
         specs.networkingOptions.tickRate = 60;

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "ObjectHandle.h"
 #include "Networking/Serialization/ISerializable.h"
 #include "Networking/Serialization/Serialization.h"
@@ -44,6 +46,11 @@ class GameObject: public ISerializable
 	 * @brief Destructor. Cleans up all components and resources.
 	 */
 	~GameObject() override;
+
+	GameObject(const GameObject& other) = delete;
+	GameObject(GameObject&& other) = delete;
+	GameObject& operator=(const GameObject& other) = delete;
+	GameObject& operator=(GameObject&& other) = delete;
 
 	/**
 	 * @brief Serializes this GameObject and all its components.
@@ -147,14 +154,13 @@ class GameObject: public ISerializable
 	 * @brief Retrieves a vector of all Behaviours attached to this GameObject
 	 */
 	const std::vector<Behaviour*>& getAllBehaviours() const;
-	const std::vector<Behaviour*>& getEnabledBehaviours();
 
 	/**
 	 * @brief Returns all active Behaviour components attached to this
 	 * GameObject.
 	 * @return Vector of pointers to active Behaviour components
 	 */
-	const std::vector<Behaviour*>& getEnabledBehaviours() const;
+	const std::vector<Behaviour*>& getEnabledBehaviours();
 
 	/**
 	 * @brief Returns the Transform of this GameObject.
@@ -341,19 +347,49 @@ class GameObject: public ISerializable
 	 */
 	void markTransformDirty();
 
+	/**
+	 * @brief Retrieves and clears the pending parent network ID.
+	 *
+	 * Used during network deserialization to defer parent-child
+	 * relationship setup until all objects are spawned.
+	 *
+	 * @return The pending parent network ID, or std::nullopt if none set.
+	 */
+	std::optional<uint32_t> consumePendingParentNetId();
+
+	/**
+	 * @brief Retrieves and clears all inline children.
+	 *
+	 * Transfers ownership of child GameObjects that were added during
+	 * deserialization. After calling, the internal container is empty.
+	 *
+	 * @return Vector of child GameObjects.
+	 */
+	std::vector<std::unique_ptr<GameObject>> consumeInlineChildren();
+
+	/**
+	 * @brief Stores a child GameObject for deferred processing.
+	 *
+	 * Used during deserialization to temporarily hold child objects
+	 * before they are added to the scene hierarchy.
+	 *
+	 * @param child The GameObject to store. Ownership is transferred.
+	 */
+	void storeInlineChild(std::unique_ptr<GameObject> child);
+
 private:
 	void fixupPointersAfterClone();
+
 	Component* getComponentByTypeName(const std::string& typeName) const;
-
 	void enableAllBehaviours() const;
-
 	void disableAllBehaviours() const;
-
 	void internalAddComponent(std::unique_ptr<Component> component);
+
 	/// Helper function to iterate through @c components
 	template <typename T>
 	std::vector<std::unique_ptr<Component>>::iterator getComponentIterator();
 	/// Helper function to iterate through @c components, const version.
+	///
 	template <typename T>
 	std::vector<std::unique_ptr<Component>>::const_iterator
 
@@ -385,6 +421,10 @@ private:
 	void removeChild(GameObject* child);
 	void addChild(GameObject* child);
     ObjectHandle gameObjectHandle;
+
+	uint32_t pendingParentNetId = 0;
+	bool hasPendingParent = false;
+	std::vector<std::unique_ptr<GameObject>> deserializedInlineChildren;
 };
 
 #include "GameObjectImplementation.inl"

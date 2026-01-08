@@ -2,28 +2,32 @@
 
 #include "../../Component/BaseComponentTypes/Component.h"
 #include "Math/Vector2.h"
-#include "Physics/PhysicsShapes.h"
 #include "Networking/Serialization/RegistrationBase.h"
+#include "Physics/PhysicsShapes.h"
 
-class Collider: public Component, RegistrationBase<Collider>
+class Collider: public Component, public RegistrationBase<Collider>
 {
-public:
+   public:
 	static constexpr const char* name()
 	{
 		return "Collider";
 	}
-	const char* getName() const override { return name(); }
 
-	void serialize(WriteArchive& archive) const override;
-	void deserialize(ReadArchive& archive) override;
+	const char* getName() const override
+	{
+		return name();
+	}
 
-private:
+	~Collider() override = default;
+	Collider() = default;
+
+   private:
 	PhysicsShapeType shape = PhysicsShapeType::None;
 	bool sensor = false;
 	float density = 1.0f;
 	float restitution = 0.0f;
 
-public:
+   public:
 	float radius = 0.0f;			 // circle
 	Vector2 size = Vector2::zero();	 // box
 
@@ -83,4 +87,7 @@ public:
 	 * @brief Calls all onSensorExit on all behaviours
 	 */
 	void onSensorExit(Collider* other);
+
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 };

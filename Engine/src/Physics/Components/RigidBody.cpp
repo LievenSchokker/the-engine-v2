@@ -6,6 +6,8 @@
 
 void RigidBody::serialize(WriteArchive& archive) const
 {
+	Component::serialize(archive);
+
 	uint8_t bodyTypeValue = static_cast<uint8_t>(bodyType);
 	archive.process(bodyTypeValue);
 
@@ -20,10 +22,17 @@ void RigidBody::serialize(WriteArchive& archive) const
 
 	bool bullet = isBullet;
 	archive.process(bullet);
+
+	archive.process(isDynamic);
+	archive.process(linearVelocity.x);
+	archive.process(linearVelocity.y);
+	archive.process(angularVelocity);
 }
 
 void RigidBody::deserialize(ReadArchive& archive)
 {
+	Component::deserialize(archive);
+
 	uint8_t bodyTypeValue = 0;
 	archive.process(bodyTypeValue);
 
@@ -39,6 +48,11 @@ void RigidBody::deserialize(ReadArchive& archive)
 	bool bullet = false;
 	archive.process(bullet);
 
+	archive.process(isDynamic);
+	archive.process(linearVelocity.x);
+	archive.process(linearVelocity.y);
+	archive.process(angularVelocity);
+
 	bodyType = static_cast<BodyType>(bodyTypeValue);
 	fixedRotation = fixed;
 	linearDamping = damping;
@@ -52,15 +66,15 @@ void RigidBody::onStart()
 	GameWorld* world = getWorld();
 	if ( world != nullptr && world->physics != nullptr )
 	{
-		if (world->isClient() && !world->isServer())
+		if ( world->isClient() && !world->isServer() )
 		{
 			auto* identity = getComponent<NetworkIdentity>();
-			if (identity != nullptr)
+			if ( identity != nullptr )
 			{
 				const int ownerId = identity->getOwnerId();
-				if (ownerId < 0 || ownerId != world->localClientId)
+				if ( ownerId < 0 || ownerId != world->localClientId )
 				{
-					if (bodyType == BodyType::Dynamic)
+					if ( bodyType == BodyType::Dynamic )
 					{
 						// Avoid client simulation fighting server snapshots.
 						bodyType = BodyType::Kinematic;
