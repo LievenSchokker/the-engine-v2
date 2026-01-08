@@ -2,6 +2,7 @@
 
 
 #include "Serialization.h"
+#include "Assets/AssetManager.h"
 
 class CerealWriteArchive;
 class CerealReadArchive;

@@ -4,14 +4,15 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include "Asset.h"
 
-class Asset;
+
 class AssetManager
 {
 public:
 	AssetManager() = default;
 
-	~AssetManager() = default;
+	~AssetManager();
 
 	void add(const std::string & filePath, std::unique_ptr<Asset> asset);
 
@@ -26,7 +27,7 @@ public:
 	bool unLoad(const std::string & filePath);
 
 private:
-	std::unordered_map<std::string, std::unique_ptr<Asset> > assets;
+	std::unordered_map<std::string, std::unique_ptr<Asset>> assets;
 };
 
 

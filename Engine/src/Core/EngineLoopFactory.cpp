@@ -29,6 +29,9 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     std::unique_ptr<IBackendContext> backendContext{};
     IBackendContext* contextPtr = nullptr;
 
+    //AssetManager
+    gameWorld->setAssetManager(std::make_unique<AssetManager>());
+
 	// BACKEND CONTEXT
     if (specs.renderSettings.renderBackend == RenderBackend::SDL)
     {

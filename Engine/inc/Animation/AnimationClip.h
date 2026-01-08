@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "Networking/Serialization/ISerializable.h"
+
 /**
  * @class AnimationClip
  * @brief Container for multiple AnimationTracks that play together.
@@ -12,9 +14,14 @@
  * An AnimationClip represents a complete animation sequence composed of
  * multiple tracks that can animate different properties simultaneously.
  */
-class AnimationClip
+class AnimationClip : public ISerializable
 {
    public:
+    /**
+     * @brief Default constructor for deserialization.
+     */
+    AnimationClip();
+
 	/**
 	 * @brief Constructs an AnimationClip.
 	 *
@@ -77,6 +84,8 @@ class AnimationClip
 	 */
 	std::vector<AnimationTrack>& getTracks();
 
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
    private:
 	std::string name;
 	float length;

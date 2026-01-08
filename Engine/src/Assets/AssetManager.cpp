@@ -6,7 +6,7 @@
 #include "Assets/AssetManager.h"
 #include "Assets/Asset.h"
 
-
+AssetManager::~AssetManager() = default;
 
 void AssetManager::add(const std::string & fileName, std::unique_ptr<Asset> asset)
 {

@@ -5,6 +5,13 @@
 #include <algorithm>
 #include <map>
 
+AnimationClip::AnimationClip()
+    : name("")
+    , length(0.0f)
+    , loop(false)
+{
+}
+
 AnimationClip::AnimationClip(const std::string& name, bool loop)
 	: name(name), length(0.0f), loop(loop)
 {
@@ -73,9 +80,47 @@ void AnimationClip::updateLength()
 		propertyTotalDuration[prop] += track.getDuration();
 	}
 
-	// Clip length is the maximum total duration across all properties
 	for ( const auto& [prop, totalDuration] : propertyTotalDuration )
 	{
 		length = std::max(length, totalDuration);
 	}
+}
+void AnimationClip::serialize(CerealWriteArchive& archive) const
+{
+    archive.process(name);
+
+    uint8_t loopFlag = loop ? 1 : 0;
+    archive.process(loopFlag);
+
+    uint32_t trackCount = static_cast<uint32_t>(tracks.size());
+    archive.process(trackCount);
+
+    for (const auto& track : tracks)
+    {
+        track.serialize(archive);
+    }
+}
+
+void AnimationClip::deserialize(ReadArchive& archive)
+{
+    archive.process(name);
+
+    uint8_t loopFlag;
+    archive.process(loopFlag);
+    loop = (loopFlag != 0);
+
+    uint32_t trackCount;
+    archive.process(trackCount);
+
+    tracks.clear();
+    tracks.reserve(trackCount);
+
+    for (uint32_t i = 0; i < trackCount; ++i)
+    {
+        AnimationTrack track;
+        track.deserialize(archive);
+        tracks.push_back(std::move(track));
+    }
+
+    updateLength();
 }

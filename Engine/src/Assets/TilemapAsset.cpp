@@ -13,7 +13,6 @@ TilemapAsset::TilemapAsset()
 bool TilemapAsset::load(const std::string& filepath)
 {
 	unLoad();
-
 	std::ifstream file(filepath);
 	if ( !file.is_open() ) {
 		std::cerr << "[TilemapAsset] Failed to open file: " << filepath

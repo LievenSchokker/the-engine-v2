@@ -8,6 +8,17 @@
 #include <algorithm>
 #include <cmath>
 
+AnimationTrack::AnimationTrack()
+    : target(TargetType::Transform)
+    , property(PropertyType::Position)
+    , duration(0.0f)
+    , relative(false)
+    , fromValue(Vector2{0.0f, 0.0f})
+    , toValue(Vector2{0.0f, 0.0f})
+    , curve(EasingType::Linear)
+{
+}
+
 AnimationTrack::AnimationTrack(TargetType target, PropertyType property,
 							   float duration, bool relative,
 							   std::variant<Vector2, float, int> fromValue,
@@ -318,4 +329,123 @@ const std::variant<Vector2, float, int>& AnimationTrack::getToValue() const
 const AnimationCurve& AnimationTrack::getCurve() const
 {
 	return curve;
+}
+void AnimationTrack::serialize(CerealWriteArchive& archive) const
+{
+    auto targetType = static_cast<uint8_t>(target);
+    auto propertyType = static_cast<uint8_t>(property);
+    archive.process(targetType);
+    archive.process(propertyType);
+
+    float dur = duration;
+    archive.process(dur);
+
+    uint8_t rel = relative ? 1 : 0;
+    archive.process(rel);
+
+    // Variant type index
+    auto fromIndex = static_cast<uint8_t>(fromValue.index());
+    auto toIndex = static_cast<uint8_t>(toValue.index());
+    archive.process(fromIndex);
+    archive.process(toIndex);
+
+    // Serialize fromValue based on type
+    if (std::holds_alternative<Vector2>(fromValue))
+    {
+        Vector2 v = std::get<Vector2>(fromValue);
+        archive.process(v.x);
+        archive.process(v.y);
+    }
+    else if (std::holds_alternative<float>(fromValue))
+    {
+        float f = std::get<float>(fromValue);
+        archive.process(f);
+    }
+    else
+    {
+        int32_t i = std::get<int>(fromValue);
+        archive.process(i);
+    }
+
+    // Serialize toValue based on type
+    if (std::holds_alternative<Vector2>(toValue))
+    {
+        Vector2 v = std::get<Vector2>(toValue);
+        archive.process(v.x);
+        archive.process(v.y);
+    }
+    else if (std::holds_alternative<float>(toValue))
+    {
+        float f = std::get<float>(toValue);
+        archive.process(f);
+    }
+    else
+    {
+        int32_t i = std::get<int>(toValue);
+        archive.process(i);
+    }
+
+    curve.serialize(archive);
+}
+
+void AnimationTrack::deserialize(ReadArchive& archive)
+{
+    uint8_t targetType, propertyType;
+    archive.process(targetType);
+    archive.process(propertyType);
+    target = static_cast<TargetType>(targetType);
+    property = static_cast<PropertyType>(propertyType);
+
+    archive.process(duration);
+
+    uint8_t rel;
+    archive.process(rel);
+    relative = (rel != 0);
+
+    uint8_t fromIndex, toIndex;
+    archive.process(fromIndex);
+    archive.process(toIndex);
+
+    // Deserialize fromValue
+    if (fromIndex == 0)
+    {
+        float x, y;
+        archive.process(x);
+        archive.process(y);
+        fromValue = Vector2{x, y};
+    }
+    else if (fromIndex == 1)
+    {
+        float f;
+        archive.process(f);
+        fromValue = f;
+    }
+    else
+    {
+        int32_t i;
+        archive.process(i);
+        fromValue = static_cast<int>(i);
+    }
+
+    // Deserialize toValue
+    if (toIndex == 0)
+    {
+        float x, y;
+        archive.process(x);
+        archive.process(y);
+        toValue = Vector2{x, y};
+    }
+    else if (toIndex == 1)
+    {
+        float f;
+        archive.process(f);
+        toValue = f;
+    }
+    else
+    {
+        int32_t i;
+        archive.process(i);
+        toValue = static_cast<int>(i);
+    }
+    curve.deserialize(archive);
 }

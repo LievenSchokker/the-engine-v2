@@ -71,3 +71,16 @@ void AnimationCurve::setType(EasingType newType)
 {
 	type = newType;
 }
+
+void AnimationCurve::serialize(CerealWriteArchive& archive) const
+{
+    auto easingType = static_cast<uint8_t>(type);
+    archive.process(easingType);
+}
+
+void AnimationCurve::deserialize(ReadArchive& archive)
+{
+    uint8_t easingType;
+    archive.process(easingType);
+    type = static_cast<EasingType>(easingType);
+}

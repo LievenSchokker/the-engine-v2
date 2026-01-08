@@ -8,6 +8,9 @@
 #include "Rendering/Color.h"
 #include "Rendering/Rect.h"
 
+
+class AssetManager;
+
 /**
  * @class SpriteComponent
  * @brief Component that renders a sprite from a spritesheet.
@@ -142,8 +145,12 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 	 */
 	void fillRenderQueue(IRenderQueueWriter& queue) const override;
 
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
+
    private:
 	IImage* sprite = nullptr;
+    std::string pendingSpritePath;
 	SpritesheetDefinition spritesheetDef{0, 0, 0, 0};
 	int currentFrame = 0;
 	Vector2 renderSize{1, 1};

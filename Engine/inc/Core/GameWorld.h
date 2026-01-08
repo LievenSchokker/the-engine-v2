@@ -5,6 +5,8 @@
 
 #include <memory>
 
+#include "Assets/AssetManager.h"
+
 class ApplicationClock;
 class AudioManager;
 class Server;
@@ -47,8 +49,11 @@ public:
 	bool sendToClient(int clientId, const IMessage& message);
 	void setDispatcher(std::unique_ptr<EventDispatcher> dispatcher);
 	EventDispatcher* getDispatcher();
-	int localClientId = -1;
+    void setAssetManager(std::unique_ptr<AssetManager> asset_manager);
+    AssetManager* getAssetManager();
+    int localClientId = -1;
 
 private:
+    std::unique_ptr<AssetManager> assetManager = nullptr;
 	std::unique_ptr<EventDispatcher> dispatcher = nullptr;
 };

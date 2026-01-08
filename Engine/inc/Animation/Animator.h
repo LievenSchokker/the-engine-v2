@@ -176,6 +176,8 @@ class Animator: public Behaviour, RegistrationBase<Animator>
 		std::unique_ptr<AnimationClip> targetClip,
 		const SpritesheetAnimationClip& spritesheetClip);
 
+    void serialize(WriteArchive& archive) const override;
+    void deserialize(ReadArchive& archive) override;
    private:
 	AnimationClip* currentClip;
 	bool isPlaying;

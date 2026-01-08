@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <numeric>
 
+#include "Assets/AssetManager.h"
+
 void SpriteComponent::setSprite(IImage* image, SpritesheetDefinition def)
 {
 	sprite = image;
@@ -177,4 +179,93 @@ Rect SpriteComponent::calculateSourceRect() const
 	srcRect.h = spritesheetDef.frameHeight;
 
 	return srcRect;
+}
+
+void SpriteComponent::serialize(CerealWriteArchive& archive) const
+{
+    // Get path from sprite asset, or empty if no sprite
+    std::string path = (sprite != nullptr) ? sprite->getAssetpath() : std::string();
+    archive.process(path);
+
+    // Spritesheet definition
+    spritesheetDef.serialize(archive);
+
+    // Current frame
+    int32_t frame = currentFrame;
+    archive.process(frame);
+
+    // Render size
+    float sizeX = renderSize.x;
+    float sizeY = renderSize.y;
+    archive.process(sizeX);
+    archive.process(sizeY);
+
+    // Has custom size flag
+    uint8_t customSize = hasCustomSize ? 1 : 0;
+    archive.process(customSize);
+
+    // Tint color
+    uint8_t r = tint.r, g = tint.g, b = tint.b, a = tint.a;
+    archive.process(r);
+    archive.process(g);
+    archive.process(b);
+    archive.process(a);
+
+    // Offset
+    float offsetX = offset.x;
+    float offsetY = offset.y;
+    archive.process(offsetX);
+    archive.process(offsetY);
+
+    // Flip flags
+    uint8_t fx = flipX ? 1 : 0;
+    uint8_t fy = flipY ? 1 : 0;
+    archive.process(fx);
+    archive.process(fy);
+}
+
+void SpriteComponent::deserialize(ReadArchive& archive)
+{
+    archive.process(pendingSpritePath);
+    sprite = nullptr;
+
+    // Spritesheet definition
+    spritesheetDef.deserialize(archive);
+
+    // Current frame
+    int32_t frame;
+    archive.process(frame);
+    currentFrame = frame;
+
+    // Render size
+    float sizeX, sizeY;
+    archive.process(sizeX);
+    archive.process(sizeY);
+    renderSize = Vector2{sizeX, sizeY};
+
+    // Has custom size flag
+    uint8_t customSize;
+    archive.process(customSize);
+    hasCustomSize = (customSize != 0);
+
+    // Tint color
+    uint8_t r, g, b, a;
+    archive.process(r);
+    archive.process(g);
+    archive.process(b);
+    archive.process(a);
+    tint = Color(r, g, b, a);
+
+    // Offset
+    float offsetX, offsetY;
+    archive.process(offsetX);
+    archive.process(offsetY);
+    offset = Vector2{offsetX, offsetY};
+
+    // Flip flags
+    uint8_t fx, fy;
+    archive.process(fx);
+    archive.process(fy);
+    flipX = (fx != 0);
+    flipY = (fy != 0);
 }

@@ -18,6 +18,7 @@ class AudioManager;
 class MusicSource: public Component, RegistrationBase<MusicSource>
 {
    public:
+    MusicSource() = default;
 	MusicSource(AudioManager* audioManagerPtr);
 	~MusicSource();
 
