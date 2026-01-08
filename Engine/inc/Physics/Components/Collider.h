@@ -7,17 +7,21 @@
 
 class Collider: public Component, public RegistrationBase<Collider>
 {
-public:
+   public:
 	static constexpr const char* name()
 	{
 		return "Collider";
 	}
-	const char* getName() const override { return name(); }
 
+	const char* getName() const override
+	{
+		return name();
+	}
 
 	~Collider() override = default;
 	Collider() = default;
-private:
+
+   private:
 	PhysicsShapeType shape = PhysicsShapeType::None;
 	bool sensor = false;
 	float density = 1.0f;

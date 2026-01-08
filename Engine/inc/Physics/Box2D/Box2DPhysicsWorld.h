@@ -65,6 +65,9 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 */
 	void applyForce(const RigidBody* rigidBody, Vector2 force) override;
 	void setGravity(Vector2 gravity) override;
+	void setBodyTransform(const RigidBody* rigidBody,
+						  Vector2 position,
+						  float rotationAngle) override;
 	void setLinearVelocity(const RigidBody* rigidBody,
 						   Vector2 velocity) override;
 	Vector2 getLinearVelocity(const RigidBody* rigidBody) const override;

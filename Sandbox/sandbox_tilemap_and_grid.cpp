@@ -1,11 +1,11 @@
 #include "AI/Agent.h"
-#include "AI/Modules/FollowPathModule.h"
 #include "AI/Navigation/Pathfinding/PathRenderer.h"
 #include "Assets/AssetManager.h"
 #include "Assets/SDLImage.h"
 #include "Assets/TilemapAsset.h"
 #include "Behaviour/Behaviour.h"
 #include "Behaviours/NavigationTest.h"
+#include "Behaviours/NetworkedObjectMarker.h"
 #include "Component/Camera.h"
 #include "Component/GridComponent.h"
 #include "Component/ShapeRenderer.h"
@@ -14,6 +14,7 @@
 #include "Component/Transform.h"
 #include "Core/GameWorld.h"
 #include "Core/Options/ApplicationSpecifications.h"
+#include "Demo/PlayerMovement.h"
 #include "EntryPoint.h"
 #include "Game.h"
 #include "GameObject/GameObject.h"
@@ -187,73 +188,6 @@ class TilemapInputBehaviour: public Behaviour
 };
 
 /**
- * @brief Movement controller for the player using WASD.
- */
-class PlayerMovementBehaviour: public Behaviour
-{
-   public:
-	PlayerMovementBehaviour(float moveSpeed, float acceleration, float braking)
-		: moveSpeed(moveSpeed), acceleration(acceleration), braking(braking)
-	{
-	}
-
-	~PlayerMovementBehaviour() override = default;
-
-	void onAwake() override
-	{
-		rigidBody = getComponent<RigidBody>();
-	}
-
-	void update(double deltaTime, const GameWorld& world) override
-	{
-		(void)deltaTime;
-		if ( rigidBody == nullptr || world.input == nullptr ||
-			 world.physics == nullptr )
-		{
-			return;
-		}
-
-		Vector2 direction = Vector2::zero();
-		if ( world.input->isKeyDown(KeyCode::W) )
-		{
-			direction.y -= 1.0f;
-		}
-		if ( world.input->isKeyDown(KeyCode::S) )
-		{
-			direction.y += 1.0f;
-		}
-		if ( world.input->isKeyDown(KeyCode::A) )
-		{
-			direction.x -= 1.0f;
-		}
-		if ( world.input->isKeyDown(KeyCode::D) )
-		{
-			direction.x += 1.0f;
-		}
-
-		Vector2 desiredVelocity = Vector2::zero();
-		if ( direction != Vector2::zero() )
-		{
-			direction.normalize();
-			desiredVelocity = direction * moveSpeed;
-		}
-
-		const Vector2 currentVelocity =
-			world.physics->getLinearVelocity(rigidBody);
-		const Vector2 velocityDelta = desiredVelocity - currentVelocity;
-		const float forceScale =
-			(direction != Vector2::zero()) ? acceleration : braking;
-		world.physics->applyForce(rigidBody, velocityDelta * forceScale);
-	}
-
-   private:
-	RigidBody* rigidBody = nullptr;
-	float moveSpeed = 0.0f;
-	float acceleration = 0.0f;
-	float braking = 0.0f;
-};
-
-/**
  * @brief Sets the physics world for top-down movement (no gravity).
  */
 class TopDownPhysicsBehaviour: public Behaviour
@@ -308,12 +242,14 @@ int main(int argc, char** argv)
 		std::cout << "Usage: " << argv[0] << " [server|client]" << std::endl;
 	}
 
+	spec.networkingOptions.port = 8080;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.tickRate = 60;
 	spec.renderSettings.renderBackend = RenderBackend::SDL;
 	spec.renderSettings.windowOptions = {"Tilemap Example", false, SCREEN_WIDTH,
 										 SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 	spec.clearColor = Color(106, 168, 169);
-	spec.engineSystem = EngineSystem::Client;
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
 
@@ -483,25 +419,8 @@ int main(int argc, char** argv)
 		agentRenderer->setRectangle({20.0f, 20.0f})
 			.setColor(Color::red())
 			.setLayer(1);
-		agentObject->addComponent<RigidBody>();
-		auto* agentBody = agentObject->getComponent<RigidBody>();
-		if ( agentBody != nullptr )
-		{
-			agentBody->makeDynamic();
-			agentBody->setFixedRotation(true);
-			agentBody->setLinearDamping(6.0f);
-			agentBody->setGravityScale(0.0f);
-		}
-		auto* agentCollider = agentObject->addComponent<Collider>();
-		agentCollider->setRectangle({20.0f, 20.0f});
-		agentCollider->setDensity(1.0f);
-		agentCollider->setRestitution(0.0f);
-
 		agentComponent = agentObject->addComponent<Agent>();
-		agentComponent->setMaxSpeed(150.0f);
-		agentComponent->setRotationTurnRate(180.0f);
-		agentComponent->setArrivingDistance(4.0f);
-		agentComponent->addAgentModule<FollowPathModule>(150.0f, 4.0f);
+		agentObject->addComponent<NetworkedObjectMarker>();
 
 		agentObject->getTransform()->setPosition(
 			tilemapComponent->cellToWorld(agentCell));
@@ -511,6 +430,7 @@ int main(int argc, char** argv)
 		targetObject->setName("Target");
 		auto* targetRenderer = targetObject->addComponent<ShapeRenderer>();
 		targetRenderer->setCircle(6.0f).setColor(Color::yellow()).setLayer(1);
+		targetObject->addComponent<NetworkedObjectMarker>();
 		targetObject->getTransform()->setPosition(
 			tilemapComponent->cellToWorld(targetCell));
 
@@ -523,6 +443,10 @@ int main(int argc, char** argv)
 		navTest->setAgent(*agentComponent);
 		navTest->setTarget(*targetObject->getTransform());
 		navTest->setGridComponent(*gridComponent);
+		// Parameters: maxSpeed, turnRate, arrivingDistance, followPathWeight,
+		// followPathRadius Note: followPathWeight IS the actual speed (not
+		// maxSpeed which just caps it)
+		navTest->setAgentConfig(0.1f, 0.0f, 0.0f, 0.1f, 0.1f);
 	}
 
 	// Set up a camera that scales the tilemap to the window size.
@@ -577,8 +501,7 @@ int main(int argc, char** argv)
 	playerCollider->setCircle(8.0f);
 	playerCollider->setDensity(1.0f);
 	playerCollider->setRestitution(0.0f);
-	playerObject->addComponent<PlayerMovementBehaviour>(260.0f, 2600.0f,
-														3200.0f);
+	playerObject->addComponent<PlayerMovement>();
 
 	// Create a pushable box
 	pushBoxObject = std::make_unique<GameObject>();
@@ -600,6 +523,7 @@ int main(int argc, char** argv)
 	boxCollider->setCircle(14.0f);
 	boxCollider->setDensity(2.0f);
 	boxCollider->setRestitution(0.0f);
+	pushBoxObject->addComponent<NetworkedObjectMarker>();
 
 	// Create a GameObject for input handling
 	auto inputHandler = std::make_unique<GameObject>();

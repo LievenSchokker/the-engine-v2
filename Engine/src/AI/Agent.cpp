@@ -1,4 +1,5 @@
 #include "AI/Agent.h"
+#include "Component/NetworkIdentity.h"
 #include "Component/Transform.h"
 #include "Scene/Scene.h"
 #include "AI/Navigation/NavigationSystem.h"
@@ -24,6 +25,19 @@ void Agent::onAwake()
 
 void Agent::update(double deltaTime, const GameWorld& gameWorld)
 {
+    if (gameWorld.isClient() && !gameWorld.isServer())
+    {
+        auto* identity = getComponent<NetworkIdentity>();
+        if (identity != nullptr)
+        {
+            const int ownerId = identity->getOwnerId();
+            if (ownerId < 0 || ownerId != gameWorld.localClientId)
+            {
+                return;
+            }
+        }
+    }
+
     Vector2 velocity = computeDesiredVelocity();
 
     if (rigidBody != nullptr && gameWorld.physics != nullptr)
@@ -182,7 +196,6 @@ bool Agent::hasPath() const
 {
     return currentPath.isValid();
 }
-
 
 
 

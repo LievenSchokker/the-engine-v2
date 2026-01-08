@@ -35,14 +35,15 @@ Vector2 FollowPathModule::compute()
             return Vector2::zero();
     }
 
-    /// Agent is still following along the path.
-    const Vector2& currentWaypoint = currentPath[currentPathIndex];
-    if (Vector2::distance(agentTransform.getPosition(), currentWaypoint) < waypointRadius)
+    /// Skip waypoints the agent has already passed
+    while (currentPathIndex < currentPath.size() - 1 &&
+           Vector2::distance(agentTransform.getPosition(), currentPath[currentPathIndex]) < waypointRadius)
     {
         currentPathIndex++;
-        return Vector2::zero();
     }
 
+    /// Agent is still following along the path.
+    const Vector2& currentWaypoint = currentPath[currentPathIndex];
     return (currentWaypoint - agentTransform.getPosition()).normalised();
 }
 

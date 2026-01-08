@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Behaviour/NetworkBehaviour.h"
-#include "Math/Vector2.h"
 
 class GameWorld;
+class RigidBody;
 
 class PlayerMovement final : public NetworkBehaviour,
 							 RegistrationBase<PlayerMovement>
@@ -14,6 +14,7 @@ public:
 	static constexpr const char* name() { return "PlayerMovement"; }
 	const char* getName() const override { return name(); }
 
+	void onStart() override;
 	void onNetworkSpawn() override;
 	void registerNetworkMethods(NetworkBuilder& builder) override;
 	void update(double deltaTime, const GameWorld& world) override;
@@ -24,5 +25,8 @@ private:
 	void handleInput();
 	void applyMovement(float dirX, float dirY);
 
-	float moveSpeed = 200.0f;
+	RigidBody* rigidBody = nullptr;
+	float moveSpeed = 300.0f;
+	float acceleration = 12.0f;
+	float braking = 18.0f;
 };

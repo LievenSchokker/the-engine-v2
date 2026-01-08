@@ -5,7 +5,9 @@
 #include "Component/NetworkIdentity.h"
 #include "Behaviour/NetworkBehaviour.h"
 #include "Networking/NetworkSpawnManager.h"
+#include "Physics/Components/RigidBody.h"
 #include "Physics/IPhysicsWorld.h"
+#include "Math/Vector2.h"
 
 #include <iostream>
 #include <utility>
@@ -443,6 +445,34 @@ void SceneManager::applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>
 		if (existing)
 		{
 			existing->copyStateFrom(*received);
+			if (gameWorld && gameWorld->physics)
+			{
+				auto* rigidBody = existing->getComponent<RigidBody>();
+				auto* transform = existing->getTransform();
+				if (rigidBody && transform)
+				{
+					gameWorld->physics->setBodyTransform(
+						rigidBody,
+						transform->getPosition(),
+						transform->getRotationAngle());
+					if (gameWorld->isClient() && !gameWorld->isServer())
+					{
+						auto* existingIdentity =
+							existing->getComponent<NetworkIdentity>();
+						if (existingIdentity != nullptr)
+						{
+							const int ownerId = existingIdentity->getOwnerId();
+							if (ownerId < 0 ||
+								ownerId != gameWorld->localClientId)
+							{
+								gameWorld->physics->setLinearVelocity(
+									rigidBody,
+									Vector2{0.0f, 0.0f});
+							}
+						}
+					}
+				}
+			}
 
 			if (auto parentNetId = existing->consumePendingParentNetId())
 			{

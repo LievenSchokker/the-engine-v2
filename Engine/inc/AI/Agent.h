@@ -7,6 +7,7 @@
 
 
 #include "Behaviour/Behaviour.h"
+#include "Networking/Serialization/RegistrationBase.h"
 #include "Math/Vector2.h"
 #include "Navigation/Pathfinding/AStarPathFinder.h"
 
@@ -23,7 +24,7 @@ class RigidBody;
  * Each update cycle, the Agent computes a direction vector based on the modules, scales them with their weight, resulting in a single desired force vector.
  * This vector is then used to set the velocity of the agent, clamping it to a maximum.
  */
-class Agent final : public Behaviour
+class Agent final : public Behaviour, public RegistrationBase<Agent>
 {
     public:
         Agent()
@@ -38,6 +39,16 @@ class Agent final : public Behaviour
         };
 
         ~Agent() override = default;
+
+        static constexpr const char* name()
+        {
+            return "Agent";
+        }
+
+        const char* getName() const override
+        {
+            return name();
+        }
 
         void onAwake() override;
 

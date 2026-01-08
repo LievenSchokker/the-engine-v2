@@ -93,23 +93,8 @@ class RigidBody: public Behaviour, public RegistrationBase<RigidBody>
 	Vector2 linearVelocity{0.0f, 0.0f};
 	float angularVelocity{0.0f};
 
-	void serialize(WriteArchive& archive) const override
-	{
-		Component::serialize(archive);
-		archive.process(isDynamic);
-		archive.process(linearVelocity.x);
-		archive.process(linearVelocity.y);
-		archive.process(angularVelocity);
-	}
-
-	void deserialize(ReadArchive& archive) override
-	{
-		Component::deserialize(archive);
-		archive.process(isDynamic);
-		archive.process(linearVelocity.x);
-		archive.process(linearVelocity.y);
-		archive.process(angularVelocity);
-	}
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 
    protected:
 	void onStart() override;
