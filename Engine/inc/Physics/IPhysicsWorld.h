@@ -1,9 +1,9 @@
 #pragma once
 #include "Core/IEngineSystems.h"
 
+class RigidBody;
 struct b2BodyId;
 
-#include "Components/RigidBody.h"
 #include "Math/Vector2.h"
 
 
@@ -59,6 +59,19 @@ public:
 	 */
 	virtual void syncTransforms() = 0;
 
+	/**
+	 * @brief Set the linear velocity of a rigid body.
+	 *
+	 * This is intended for character and AI movement.
+	 */
+	virtual void setLinearVelocity(const RigidBody* rigidBody, Vector2 velocity) = 0;
+
+	/**
+	 * @brief Get the current linear velocity of a rigid body.
+	 */
+	virtual Vector2 getLinearVelocity(const RigidBody* rigidBody) const = 0;
+
+	virtual void applyNetworkSnapshot() = 0;
 	virtual void initialize() = 0;
 	virtual void step(float deltaTime) = 0;
 	virtual void shutdown() = 0;

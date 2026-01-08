@@ -18,8 +18,8 @@ protected:
         {
             FAIL() << "SDL_Init failed: " << SDL_GetError();
         }
-        specifications.windowOptions = {"Test Window", 800, 600};
-        specifications.renderBackend = RenderBackend::SDL;
+        specifications.renderSettings.windowOptions = {"Test Window", false, 800, 600};
+        specifications.renderSettings.renderBackend = RenderBackend::SDL;
         specifications.networkingOptions.tickRate = 60;
     	specifications.networkingOptions.port = 7777;
     	specifications.networkingOptions.serverIP = "127.0.0.1";
@@ -83,7 +83,7 @@ TEST_F(SpelMotorTest, ConstructionInitializesEngineLoop)
 TEST_F(SpelMotorTest, ThrowsOnInvalidConfiguration)
 {
     ApplicationSpecifications invalidSpecs{};
-    invalidSpecs.renderBackend = static_cast<RenderBackend>(-1);
+    invalidSpecs.renderSettings.renderBackend = static_cast<RenderBackend>(-1);
 
     auto invalidGame = std::make_unique<Game>();
     invalidGame->setApplicationSpecifications(invalidSpecs);

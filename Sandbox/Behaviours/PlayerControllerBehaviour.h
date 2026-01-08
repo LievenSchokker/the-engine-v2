@@ -24,6 +24,7 @@ class PlayerControllerBehaviour: public Behaviour
 
 	void onAwake() override;
 	void onStart() override;
+	void fixedUpdate() override;
 	void update(double deltaTime, const GameWorld& gameWorld) override;
 
 	/**

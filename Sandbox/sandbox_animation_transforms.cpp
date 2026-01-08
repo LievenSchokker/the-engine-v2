@@ -21,6 +21,8 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
+class Camera;
+
 /**
  * @brief Behavior class that handles input for the animation demo.
  *
@@ -211,11 +213,10 @@ int main(int argc, char** argv)
 	ApplicationSpecifications spec = {};
 	spec.networkingOptions.port = 8080;
 	spec.networkingOptions.serverIP = "127.0.0.1";
-	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
-	spec.renderBackend = RenderBackend::SDL;
+	spec.renderSettings.renderBackend = RenderBackend::SDL;
     spec.engineSystem = EngineSystem::Client;
-	spec.windowOptions = {"Animation Example", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.renderSettings.windowOptions = {"Animation Example", false, SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();

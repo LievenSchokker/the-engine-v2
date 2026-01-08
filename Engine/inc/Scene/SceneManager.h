@@ -28,6 +28,7 @@ public:
     ~SceneManager() override = default;
 
 	SystemStatus start(GameWorld& gameWorld) override;
+	void fixedUpdate(double deltaTime, const GameWorld& gameWorld) override;
 	void update(double deltaTime, const GameWorld& gameWorld) override;
 	void queueDestroy(GameObject* obj);
 	void shutdown(GameWorld& gameWorld) override;
@@ -37,10 +38,9 @@ public:
      * @brief Configures the SceneManager for networking.
      * Must be called before setActiveScene() for network processing to work.
      *
-     * @param mode Server or Client mode
      * @param spawnMgr Required for server to auto-spawn objects (can be nullptr for client)
      */
-    void configureNetworking(ConnectionMode mode, NetworkSpawnManager* spawnMgr = nullptr);
+    void configureNetworking(NetworkSpawnManager* spawnMgr = nullptr);
 
     /**
      * @brief Checks if network processing has been configured.
@@ -181,8 +181,7 @@ public:
      * @return Name of the first scene, or empty string if no scenes.
      */
     [[nodiscard]] std::string getFirstSceneName() const;
-	void applyNetworkSnapshot(
-		const std::vector<std::unique_ptr<GameObject>>& receivedObjects);
+	void applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>& receivedObjects);
 
 	BehaviourSystem& getBehaviourSystem();
 private:
@@ -211,6 +210,7 @@ private:
      */
     [[nodiscard]] bool hasNetworkIdentity(const GameObject& obj) const;
 
+	void addInlineChildrenRecursive(GameObject* obj);
     /// @brief Whether networking has been configured
     bool networkConfigured = false;
 

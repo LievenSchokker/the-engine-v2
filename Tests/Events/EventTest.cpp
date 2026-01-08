@@ -1,7 +1,6 @@
 #include "Events/EventDispatcher/EventDispatcher.h"
 #include "Events/Subscriptions/SubscriptionScope.h"
 #include "Events/Subscriptions/SubscriptionHandle.h"
-#include "Events/EventQueue.h"
 #include "Events/Event.h"
 
 #include <gtest/gtest.h>
@@ -302,79 +301,6 @@ TEST(SubscriptionHandleTest, ZeroIdHandleCanBeInvalidated)
     EXPECT_FALSE(handle.isValid());
 }
 
-class EventQueueTest : public ::testing::Test
-{
-protected:
-    EventDispatcher dispatcher;
-    EventQueue queue;
-};
-
-
-TEST_F(EventQueueTest, EmplaceAndProcess)
-{
-    std::string receivedMsg;
-    dispatcher.subscribe<AnotherEvent>([&](const AnotherEvent& e) {
-        receivedMsg = e.message;
-    });
-
-    queue.emplace<AnotherEvent>("hello");
-    queue.processAll(dispatcher);
-
-    EXPECT_EQ(receivedMsg, "hello");
-}
-
-TEST_F(EventQueueTest, ProcessAllClearsQueue)
-{
-    queue.push(TestEvent(1));
-    queue.push(TestEvent(2));
-
-    EXPECT_EQ(queue.size(), 2);
-    EXPECT_FALSE(queue.empty());
-
-    queue.processAll(dispatcher);
-
-    EXPECT_EQ(queue.size(), 0);
-    EXPECT_TRUE(queue.empty());
-}
-
-TEST_F(EventQueueTest, ClearWithoutProcessing)
-{
-    int callCount = 0;
-    dispatcher.subscribe<TestEvent>([&](const TestEvent&) { callCount++; });
-
-    queue.push(TestEvent(1));
-    queue.push(TestEvent(2));
-    queue.clear();
-
-    queue.processAll(dispatcher);
-    EXPECT_EQ(callCount, 0);
-}
-
-TEST_F(EventQueueTest, OrderPreserved)
-{
-    std::vector<int> received;
-    dispatcher.subscribe<TestEvent>([&](const TestEvent& e) {
-        received.push_back(e.value);
-    });
-
-    queue.push(TestEvent(1));
-    queue.push(TestEvent(2));
-    queue.push(TestEvent(3));
-
-    queue.processAll(dispatcher);
-
-    ASSERT_EQ(received.size(), 3);
-    EXPECT_EQ(received[0], 1);
-    EXPECT_EQ(received[1], 2);
-    EXPECT_EQ(received[2], 3);
-}
-
-TEST_F(EventQueueTest, ProcessEmptyQueueIsSafe)
-{
-    queue.processAll(dispatcher);
-    SUCCEED();
-}
-
 TEST(EventSystemIntegration, MultipleScopesWithSameDispatcher)
 {
     EventDispatcher dispatcher;
@@ -406,22 +332,3 @@ TEST(EventSystemIntegration, MultipleScopesWithSameDispatcher)
     EXPECT_EQ(count2, 1);
 }
 
-TEST(EventSystemIntegration, QueueWithScope)
-{
-    EventDispatcher dispatcher;
-    EventQueue queue;
-    int callCount = 0;
-
-    {
-        SubscriptionScope scope(dispatcher);
-        scope.subscribe<TestEvent>([&](const TestEvent&) { callCount++; });
-
-        queue.push(TestEvent(1));
-        queue.processAll(dispatcher);
-        EXPECT_EQ(callCount, 1);
-    }
-
-    queue.push(TestEvent(2));
-    queue.processAll(dispatcher);
-    EXPECT_EQ(callCount, 1);
-}

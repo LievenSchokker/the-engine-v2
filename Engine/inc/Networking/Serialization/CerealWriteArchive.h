@@ -88,6 +88,7 @@ public:
 	 */
 	std::vector<std::byte> getBytes() const;
 
+	void processBytes(const void* data, size_t size);
 private:
 	std::ostringstream stream; ///< Backing buffer; must outlive archive
 	cereal::BinaryOutputArchive archive;

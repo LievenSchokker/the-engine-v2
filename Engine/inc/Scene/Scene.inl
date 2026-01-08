@@ -29,3 +29,4 @@ std::vector<Component*> Scene::getAllComponentsOfType() const {
 
 	return result;
 }
+
