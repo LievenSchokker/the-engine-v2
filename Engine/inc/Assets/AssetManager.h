@@ -4,8 +4,8 @@
 #include <memory>
 #include <unordered_map>
 #include <string>
+#include "Assets/Asset.h"
 
-class Asset;
 class AssetManager
 {
 public:

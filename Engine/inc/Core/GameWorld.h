@@ -2,6 +2,7 @@
 
 #include "Events/EventDispatcher/EventDispatcher.h"
 #include "Options/ApplicationSpecifications.h"
+#include "Assets/AssetManager.h"
 
 #include <memory>
 
@@ -21,6 +22,7 @@ class GameWorld
 public:
 	GameWorld() = default;
 
+	// Non owning pointer to different systems
 	SceneManager* sceneManager = nullptr;
 	IPhysicsWorld* physics = nullptr;
 	RenderSystem* render = nullptr;
@@ -29,6 +31,8 @@ public:
 	AudioManager* audio = nullptr;
 	Client* client = nullptr;
 	Server* server = nullptr;
+
+	std::unique_ptr<AssetManager> assetManager = nullptr;
 	NetworkSpawnManager* spawnManager = nullptr;
 	ApplicationSpecifications specs = {};
 
@@ -47,6 +51,7 @@ public:
 	bool sendToClient(int clientId, const IMessage& message);
 	void setDispatcher(std::unique_ptr<EventDispatcher> dispatcher);
 	EventDispatcher* getDispatcher();
+	void setAssetManager(std::unique_ptr<AssetManager> asset_manager);
 	int localClientId = -1;
 
 private:
