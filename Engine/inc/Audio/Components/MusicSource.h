@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include "Networking/Serialization/RegistrationBase.h"
+
 class AudioManager;
 
 /**
@@ -13,12 +15,17 @@ class AudioManager;
  * MusicSource represents a single logical music player. It communicates with
  * the AudioManager to load music assets and control playback parameters.
  */
-class MusicSource: public Component
+class MusicSource: public Component, RegistrationBase<MusicSource>
 {
    public:
 	MusicSource(AudioManager* audioManagerPtr);
 	~MusicSource();
 
+    static constexpr const char* name()
+    {
+        return "MusicSource";
+    }
+    const char* getName() const override { return name(); }
 	/**
 	 * @brief Loads a music file through the AudioManager.
 	 * @param path File path to the music asset.

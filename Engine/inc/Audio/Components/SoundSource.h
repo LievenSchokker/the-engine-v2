@@ -5,6 +5,8 @@
 
 #include <string>
 
+#include "Networking/Serialization/RegistrationBase.h"
+
 /**
  * @class SoundSource
  * @brief Component responsible for loading and playing sound effects.
@@ -12,11 +14,17 @@
  * SoundSource supports one-shot playback (explosions, UI sounds) and
  * optionally looping. Each SoundSource may play multiple times (Mix channels).
  */
-class SoundSource: public Component
+class SoundSource: public Component, RegistrationBase<SoundSource>
 {
    public:
 	SoundSource(AudioManager* audioManagerPtr);
 	~SoundSource() = default;
+
+    static constexpr const char* name()
+    {
+        return "SoundSource";
+    }
+    const char* getName() const override { return name(); }
 
 	/**
 	 * @brief Loads a sound effect through the AudioManager.

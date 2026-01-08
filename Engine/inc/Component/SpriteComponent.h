@@ -20,8 +20,14 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 {
    public:
 	SpriteComponent() = default;
-	static constexpr const char* name() { return "Sprite"; }
-	const char* getName() const override { return name(); }
+	static constexpr const char* name()
+	{
+	    return "Sprite";
+	}
+	const char* getName() const override
+	{
+	    return name();
+	}
 	/**
 	 * @brief Sets the spritesheet image and grid definition.
 	 *
