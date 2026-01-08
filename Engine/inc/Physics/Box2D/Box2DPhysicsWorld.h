@@ -64,11 +64,10 @@ class Box2DPhysicsWorld: public IPhysicsWorld
 	 * @param force Force vector in world units.
 	 */
 	void applyForce(const RigidBody* rigidBody, Vector2 force) override;
-
-	void setLinearVelocity(const RigidBody* rigidBody, Vector2 velocity) override;
-
+	void setGravity(Vector2 gravity) override;
+	void setLinearVelocity(const RigidBody* rigidBody,
+						   Vector2 velocity) override;
 	Vector2 getLinearVelocity(const RigidBody* rigidBody) const override;
-
 
 	void initialize() override;
 	void step(float deltaTime) override;

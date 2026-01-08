@@ -46,5 +46,5 @@ float PathResult::getPathLength() const
 
 bool PathResult::isValid() const
 {
-    return path.size() > 0 && getPathLength() > 0;
+    return path.size() >= 2;
 }
