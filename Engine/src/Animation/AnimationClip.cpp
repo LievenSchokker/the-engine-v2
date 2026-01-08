@@ -85,7 +85,7 @@ void AnimationClip::updateLength()
 		length = std::max(length, totalDuration);
 	}
 }
-void AnimationClip::serialize(CerealWriteArchive& archive) const
+void AnimationClip::serialize(WriteArchive& archive) const
 {
     archive.process(name);
 

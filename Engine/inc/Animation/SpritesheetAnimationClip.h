@@ -51,7 +51,7 @@ struct SpritesheetAnimationClip : ISerializable
 
 
 
-    void serialize(CerealWriteArchive& archive) const
+    void serialize(WriteArchive& archive) const
     {
         archive.process(name);
 
@@ -70,7 +70,7 @@ struct SpritesheetAnimationClip : ISerializable
         archive.process(loopFlag);
     }
 
-    void deserialize(CerealReadArchive& archive)
+    void deserialize(ReadArchive& archive)
     {
         archive.process(name);
 
