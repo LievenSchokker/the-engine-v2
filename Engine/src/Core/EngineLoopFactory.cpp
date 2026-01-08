@@ -21,10 +21,13 @@
 std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     std::unique_ptr<Game> game)
 {
+    auto assets = game->getAssetManager();
+
     const auto& specs = game->getApplicationSpecifications();
     auto loop = std::make_unique<EngineLoop>(std::move(game));
 
     GameWorld* gameWorld = loop->getGameWorld();
+    gameWorld->assetManager = std::move(assets);
     Game* gamePtr = loop->getGame();
 
     std::unique_ptr<IBackendContext> backendContext{};
@@ -102,6 +105,7 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     auto sceneManager = std::make_unique<SceneManager>(*gameWorld);
     std::unique_ptr<Scene> scenePtr = gamePtr->getFirstScene();
 
+    // SCENE
     if (!scenePtr)
     {
         throw std::runtime_error("Game must have at least one scene");
@@ -134,6 +138,8 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 			std::make_unique<TransportGNS>());
 		loop->addSystem(std::move(server));
 	}
+
+
 
     return loop;
 }

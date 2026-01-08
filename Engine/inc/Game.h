@@ -6,6 +6,8 @@
 
 #include <memory>
 
+#include "Assets/AssetManager.h"
+
 class GameObject;
 
 /**
@@ -46,10 +48,19 @@ class Game
 	 */
 	void addScene(std::unique_ptr<Scene> scene);
 
+    AssetManager *getAssetManagerPointer() const {
+        return assets.get();
+    }
+
+    std::unique_ptr<AssetManager> getAssetManager() {
+        return std::move(assets);
+    }
+
     std::unique_ptr<Scene> getFirstScene();
 	std::vector<std::unique_ptr<Scene>> getAllScenes();
 private:
     ApplicationSpecifications specifications;
+    std::unique_ptr<AssetManager> assets = std::make_unique<AssetManager>();
 
     /// Owning container for all registered scenes. Using unique_ptr ensures
     /// deterministic destruction order during engine shutdown.

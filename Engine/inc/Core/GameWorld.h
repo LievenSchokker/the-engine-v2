@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "Assets/AssetManager.h"
 #include "Events/EventDispatcher/EventDispatcher.h"
 
 class ApplicationClock;
@@ -21,6 +22,7 @@ class GameWorld
 public:
 	GameWorld() = default;
 
+	// Non owning pointer to different systems
 	SceneManager* sceneManager = nullptr;
 	IPhysicsWorld* physics = nullptr;
 	RenderSystem* render = nullptr;
@@ -30,6 +32,7 @@ public:
 	Client* client = nullptr;
 	Server* server = nullptr;
 
+	std::unique_ptr<AssetManager> assetManager = nullptr;
 	NetworkSpawnManager* spawnManager = nullptr;
 
 	bool isClient() const
@@ -47,6 +50,7 @@ public:
 	bool sendToClient(int clientId, const IMessage& message);
 	void setDispatcher(std::unique_ptr<EventDispatcher> dispatcher);
 	EventDispatcher* getDispatcher();
+	void setAssetManager(std::unique_ptr<AssetManager> asset_manager);
 	int localClientId = -1;
 
 private:

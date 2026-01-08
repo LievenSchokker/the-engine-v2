@@ -208,6 +208,10 @@ void Box2DPhysicsWorld::syncTransforms()
     {
         GameObject* gameObject = rigidBody->getGameObject();
 
+		if (gameObject->getName() == "Player") {
+			continue;
+		}
+
         b2Vec2 position = b2Body_GetPosition(box2DID);
         b2Rot rotation = b2Body_GetRotation(box2DID);
         b2Vec2 linearVel = b2Body_GetLinearVelocity(box2DID);

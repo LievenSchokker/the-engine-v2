@@ -42,3 +42,8 @@ EventDispatcher* GameWorld::getDispatcher()
 {
 	return dispatcher.get();
 }
+
+void GameWorld::setAssetManager(std::unique_ptr<AssetManager> asset_manager)
+{
+    assetManager = std::move(asset_manager);
+}
