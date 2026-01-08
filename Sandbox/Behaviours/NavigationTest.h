@@ -9,27 +9,37 @@
 
 class PathRenderer;
 class Agent;
-class NavigationGrid;
 class InputManager;
-class NavigationSystem;
+class GridComponent;
 
 /// NOTE: This is a temporary class used to test Agent navigation.
 /// #TODO THIS SHOULD BE REMOVED FROM THE ENGINE BEFORE DELIVERING
 class NavigationTest : public Behaviour
 {
     public:
-        explicit NavigationTest() : input(nullptr),  target(nullptr), pathRenderer(nullptr), agent(nullptr) {};
+        explicit NavigationTest()
+            : input(nullptr),
+              pathRenderer(nullptr),
+              target(nullptr),
+              agent(nullptr),
+              gridComponent(nullptr),
+              wasAtTarget(false)
+        {
+        };
         ~NavigationTest() override = default;
 
         void onAwake() override;
         void update(double deltaTime, const GameWorld& world) override;
 
-        void setTarget(const Transform& targetTransform);
+        void setTarget(Transform& targetTransform);
         void setAgent(Agent& agent);
+        void setGridComponent(GridComponent& grid);
 
     private:
         InputManager* input;
         PathRenderer* pathRenderer;
-        const Transform* target;
+        Transform* target;
         Agent* agent;
+        GridComponent* gridComponent;
+        bool wasAtTarget;
 };

@@ -8,6 +8,7 @@
 
 class GameObject;
 class NavigationSystem;
+class INavigationSurface;
 
 class Behaviour;
 struct RenderQueue;
@@ -114,6 +115,7 @@ public:
 	void destroyAllGameObjects();
 
     NavigationSystem* getNavigationSystem();
+	void setNavigationSurface(std::unique_ptr<INavigationSurface> navSurface);
 
     template <class Component>
     std::vector<Component*> getAllComponentsOfType() const;

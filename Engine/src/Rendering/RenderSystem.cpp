@@ -1,34 +1,49 @@
 #include "Rendering/RenderSystem.h"
 
+#include "../../inc/Rendering/viewport/WorldToCameraViewSpaceAdapter.h"
 #include "Component/BaseComponentTypes/RenderComponent.h"
 #include "Component/UIElement/UIElement.h"
+#include "Events/EventImplementations/ApplicationEvents.h"
 #include "Rendering/IRenderer.h"
 #include "Rendering/SDL/SDLRenderer.h"
-#include "Rendering/ViewAdapters/WorldToCameraSpaceAdapter.h"
+#include "Rendering/viewport/CameraViewSpaceToScreenSpaceAdapter.h"
 #include "Scene/Scene.h"
 #include "Scene/SceneManager.h"
 
 #include <iostream>
 
 RenderSystem::RenderSystem(std::unique_ptr<IRenderer> renderer)
-	: renderer(std::move(renderer)),
-	clearColor(Color::black())
+	: renderer(std::move(renderer)), clearColor(Color::black())
 {
 }
 
-
-
-void RenderSystem::setupEvents(EventDispatcher& dispatcher) const
+void RenderSystem::setupEvents(EventDispatcher& dispatcher)
 {
-	if (renderer != nullptr)
+	if ( renderer != nullptr )
 	{
 		renderer->setupEvents(dispatcher);
 	}
+
+	subscriptions.push_back(dispatcher.subscribe<WindowResizeEvent>(
+		[this](const WindowResizeEvent& event)
+		{ this->onWindowResize(event); }));
+}
+
+void RenderSystem::onWindowResize(const WindowResizeEvent& event)
+{
+	windowOptions.height = event.height;
+	windowOptions.width = event.width;
+}
+
+SystemStatus RenderSystem::start(GameWorld& gameWorld)
+{
+	windowOptions = gameWorld.specs.renderSettings.windowOptions;
+	return SystemStatus::RUNNING;
 }
 
 void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 {
-	if (!renderer || !renderer->isOpen())
+	if ( !renderer || !renderer->isOpen() )
 	{
 		return;
 	}
@@ -47,22 +62,21 @@ void RenderSystem::update(double deltaTime, const GameWorld& gameWorld)
 
 void RenderSystem::processWorldCommands()
 {
-	for (auto& command : queue.world().getCommands())
+	for ( auto& command : queue.world().getCommands() )
 	{
-		if (cameras.empty())
+		if ( cameras.empty() )
 		{
 			renderer->execute(command);
 		}
 		else
 		{
-			for (const auto camera : cameras)
+			for ( const auto camera : cameras )
 			{
-				//Transform returns optional because camera culling happens here
-				if (auto transformed = WorldToCameraSpaceAdapter::Transform(
-					*camera, command); transformed.has_value())
-				{
-					renderer->execute(transformed.value());
-				}
+				auto transformed =
+					WorldToCameraViewSpaceAdapter::Transform(*camera, command);
+				renderer->execute(
+					CameraViewSpaceToScreenSpaceAdapter::Transform(
+						*camera, windowOptions, transformed));
 			}
 		}
 	}
@@ -70,26 +84,41 @@ void RenderSystem::processWorldCommands()
 
 void RenderSystem::collectCommands(Scene& scene)
 {
-	for (auto* component : scene.getAllComponentsOfType<RenderComponent>())
+	for ( auto* component : scene.getAllComponentsOfType<RenderComponent>() )
 	{
-		if (component == nullptr) continue;
+		if ( component == nullptr ) continue;
 
 		auto* gameObject = component->getGameObject();
-		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
+		if ( gameObject == nullptr || !gameObject->getIsActive() ) continue;
 
 		component->fillRenderQueue(queue);
 	}
 
-	for (auto* component :
-	     scene.getAllComponentsOfType<UserInterfaceRenderComponent>())
+	for ( auto* component :
+		  scene.getAllComponentsOfType<UserInterfaceRenderComponent>() )
 	{
-		if (component == nullptr) continue;
+		if ( component == nullptr ) continue;
 
 		auto* gameObject = component->getGameObject();
-		if (gameObject == nullptr || !gameObject->getIsActive()) continue;
+		if ( gameObject == nullptr || !gameObject->getIsActive() ) continue;
 
 		component->fillUserInterfaceRenderQueue(queue);
 	}
+}
+
+void RenderSystem::shutdown(GameWorld& gameWorld)
+{
+	if ( gameWorld.render == this )
+	{
+		gameWorld.render = nullptr;
+	}
+
+	for ( auto subscription : subscriptions )
+	{
+		gameWorld.getDispatcher()->unsubscribe(subscription);
+	}
+
+	subscriptions.clear();
 }
 
 void RenderSystem::setClearColor(const Color& color)

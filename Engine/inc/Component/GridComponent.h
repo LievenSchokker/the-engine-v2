@@ -74,6 +74,16 @@ public:
 	bool isWalkableAtWorld(Vector2 worldPos) const;
 
 	/**
+	 * @brief Convert a world position to grid coordinates using the tilemap.
+	 */
+	Vector2 worldToCell(Vector2 worldPos) const;
+
+	/**
+	 * @brief Convert grid coordinates to world position using the tilemap.
+	 */
+	Vector2 cellToWorld(Vector2 cell) const;
+
+	/**
 	 * @brief Override which tile IDs are considered walkable.
 	 * @param tileIds Collection of tile IDs that should be treated as walkable.
 	 */
@@ -140,13 +150,11 @@ public:
 	std::vector<Vector2> getWalkableNeighbors(Vector2 cell) const;
 
 	/**
-	 * @brief Get all neighboring cells including diagonals (8-directional).
+	 * @brief Get all neighboring cells.
 	 * @param cell Grid coordinates {x, y}
-	 * @param includeDiagonals If true, includes diagonal neighbors
 	 * @return Vector of walkable neighbor cells
 	 */
-	std::vector<Vector2> getNeighbors(Vector2 cell,
-	                                  bool includeDiagonals = false) const;
+	std::vector<Vector2> getNeighbors(Vector2 cell) const;
 
 	/**
 	 * @brief Calculate Manhattan distance between two cells (for pathfinding).

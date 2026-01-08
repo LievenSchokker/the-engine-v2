@@ -140,7 +140,7 @@ class SpriteComponent: public RenderComponent, RegistrationBase<SpriteComponent>
 	IImage* sprite = nullptr;
 	SpritesheetDefinition spritesheetDef{0, 0, 0, 0};
 	int currentFrame = 0;
-	Vector2 renderSize{0.0, 0.0};
+	Vector2 renderSize{1, 1};
 	bool hasCustomSize = false;
 	Color tint = Color::white();
 	Vector2 offset{0.0, 0.0};

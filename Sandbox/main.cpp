@@ -55,13 +55,13 @@ int main(int argc, char** argv)
     }
 
 
-    spec.networkingOptions.mode = mode;
     spec.networkingOptions.port = 8080;
     spec.networkingOptions.serverIP = "127.0.0.1";
     spec.networkingOptions.tickRate = 60;
-    spec.renderBackend = RenderBackend::SDL;
-    spec.windowOptions = {
+    spec.renderSettings.renderBackend = RenderBackend::SDL;
+    spec.renderSettings.windowOptions = {
         "GameEngine",
+    	false,
         700,
         700
     };
