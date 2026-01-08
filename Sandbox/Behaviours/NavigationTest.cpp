@@ -9,8 +9,10 @@
 #include <vector>
 
 #include "AI/Agent.h"
+#include "AI/Modules/FollowPathModule.h"
 #include "Component/GridComponent.h"
 #include "Component/Transform.h"
+#include "GameObject/GameObject.h"
 #include "Input/InputManager.h"
 #include "AI/Navigation/Pathfinding/PathRenderer.h"
 #include "Scene/Scene.h"
@@ -69,6 +71,14 @@ bool requestPathForAgent(Agent& agent, const Transform& target, PathRenderer* re
 
     return true;
 }
+
+bool isGameObjectInScene(GameObject* object, Scene* scene)
+{
+    if (object == nullptr || scene == nullptr)
+        return false;
+
+    return scene->getGameObject(object->getGameObjectHandle()) == object;
+}
 } // namespace
 
 void NavigationTest::onAwake()
@@ -86,6 +96,13 @@ void NavigationTest::onAwake()
 
 void NavigationTest::update(double deltaTime, const GameWorld& world)
 {
+    if (world.isClient() && !world.isServer())
+    {
+        return;
+    }
+
+    resolveReferences();
+
 	input = world.input;
     if (input == nullptr)
         return;
@@ -141,16 +158,127 @@ void NavigationTest::update(double deltaTime, const GameWorld& world)
 void NavigationTest::setTarget(Transform &targetTransform)
 {
     target = &targetTransform;
+    if (GameObject* owner = targetTransform.getGameObject())
+    {
+        targetName = owner->getName();
+    }
     wasAtTarget = false;
 }
 
 void NavigationTest::setAgent(Agent& newAgent)
 {
     agent = &newAgent;
+    if (GameObject* owner = newAgent.getGameObject())
+    {
+        agentName = owner->getName();
+    }
+    agentConfigured = false;
 }
 
 void NavigationTest::setGridComponent(GridComponent& grid)
 {
     gridComponent = &grid;
+    if (GameObject* owner = grid.getGameObject())
+    {
+        gridName = owner->getName();
+    }
 }
 
+void NavigationTest::setAgentConfig(float maxSpeed,
+                                    float turnRate,
+                                    float arrivingDistance,
+                                    float followPathWeightValue,
+                                    float followPathRadiusValue)
+{
+    agentMaxSpeed = maxSpeed;
+    agentTurnRate = turnRate;
+    agentArriveDistance = arrivingDistance;
+    followPathWeight = followPathWeightValue;
+    followPathRadius = followPathRadiusValue;
+    agentConfigured = false;
+}
+
+void NavigationTest::resolveReferences()
+{
+    if (gameObject == nullptr)
+        return;
+
+    Scene* scene = gameObject->getScene();
+    if (scene == nullptr)
+        return;
+
+    const bool agentValid =
+        agent != nullptr && isGameObjectInScene(agent->getGameObject(), scene);
+    if (!agentValid)
+    {
+        Agent* resolvedAgent = nullptr;
+        if (!agentName.empty())
+        {
+            if (GameObject* agentObj = scene->getGameObject(agentName))
+            {
+                resolvedAgent = agentObj->getComponent<Agent>();
+            }
+        }
+        if (resolvedAgent != agent)
+        {
+            agent = resolvedAgent;
+            agentConfigured = false;
+        }
+    }
+
+    const bool targetValid =
+        target != nullptr && isGameObjectInScene(target->getGameObject(), scene);
+    if (!targetValid)
+    {
+        Transform* resolvedTarget = nullptr;
+        if (!targetName.empty())
+        {
+            if (GameObject* targetObj = scene->getGameObject(targetName))
+            {
+                resolvedTarget = targetObj->getTransform();
+            }
+        }
+        target = resolvedTarget;
+        wasAtTarget = false;
+    }
+
+    const bool gridValid =
+        gridComponent != nullptr &&
+        isGameObjectInScene(gridComponent->getGameObject(), scene);
+    if (!gridValid)
+    {
+        GridComponent* resolvedGrid = nullptr;
+        if (!gridName.empty())
+        {
+            if (GameObject* gridObj = scene->getGameObject(gridName))
+            {
+                resolvedGrid = gridObj->getComponent<GridComponent>();
+            }
+        }
+        gridComponent = resolvedGrid;
+    }
+
+    configureAgentIfNeeded();
+}
+
+void NavigationTest::configureAgentIfNeeded()
+{
+    if (agentConfigured || agent == nullptr)
+        return;
+
+    agent->setMaxSpeed(agentMaxSpeed);
+    agent->setRotationTurnRate(agentTurnRate);
+    agent->setArrivingDistance(agentArriveDistance);
+
+    if (!agent->hasAgentModule<FollowPathModule>())
+    {
+        agent->addAgentModule<FollowPathModule>(followPathWeight,
+                                                followPathRadius);
+    }
+    else
+    {
+        agent->setModuleWeight<FollowPathModule>(followPathWeight);
+    }
+
+    agentConfigured = true;
+}

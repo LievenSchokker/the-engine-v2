@@ -1,5 +1,6 @@
 #include "Physics/Components/RigidBody.h"
 
+#include "Component/NetworkIdentity.h"
 #include "Core/GameWorld.h"
 #include "Physics/IPhysicsWorld.h"
 
@@ -51,6 +52,23 @@ void RigidBody::onStart()
 	GameWorld* world = getWorld();
 	if ( world != nullptr && world->physics != nullptr )
 	{
+		if (world->isClient() && !world->isServer())
+		{
+			auto* identity = getComponent<NetworkIdentity>();
+			if (identity != nullptr)
+			{
+				const int ownerId = identity->getOwnerId();
+				if (ownerId < 0 || ownerId != world->localClientId)
+				{
+					if (bodyType == BodyType::Dynamic)
+					{
+						// Avoid client simulation fighting server snapshots.
+						bodyType = BodyType::Kinematic;
+					}
+				}
+			}
+		}
+
 		world->physics->createBody(this);
 	}
 }

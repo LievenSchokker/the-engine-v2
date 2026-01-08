@@ -1,10 +1,10 @@
 #include "AI/Agent.h"
-#include "AI/Modules/FollowPathModule.h"
 #include "AI/Navigation/Pathfinding/PathRenderer.h"
 #include "Assets/AssetManager.h"
 #include "Assets/SDLImage.h"
 #include "Assets/TilemapAsset.h"
 #include "Behaviour/Behaviour.h"
+#include "Behaviours/NetworkedObjectMarker.h"
 #include "Behaviours/NavigationTest.h"
 #include "Component/Camera.h"
 #include "Component/GridComponent.h"
@@ -435,10 +435,7 @@ int main(int argc, char** argv)
 		agentCollider->setRestitution(0.0f);
 
 		agentComponent = agentObject->addComponent<Agent>();
-		agentComponent->setMaxSpeed(150.0f);
-		agentComponent->setRotationTurnRate(180.0f);
-		agentComponent->setArrivingDistance(4.0f);
-		agentComponent->addAgentModule<FollowPathModule>(150.0f, 4.0f);
+		agentObject->addComponent<NetworkedObjectMarker>();
 
 		agentObject->getTransform()->setPosition(
 			tilemapComponent->cellToWorld(agentCell));
@@ -448,6 +445,7 @@ int main(int argc, char** argv)
 		targetObject->setName("Target");
 		auto* targetRenderer = targetObject->addComponent<ShapeRenderer>();
 		targetRenderer->setCircle(6.0f).setColor(Color::yellow()).setLayer(1);
+		targetObject->addComponent<NetworkedObjectMarker>();
 		targetObject->getTransform()->setPosition(
 			tilemapComponent->cellToWorld(targetCell));
 
@@ -460,6 +458,7 @@ int main(int argc, char** argv)
 		navTest->setAgent(*agentComponent);
 		navTest->setTarget(*targetObject->getTransform());
 		navTest->setGridComponent(*gridComponent);
+		navTest->setAgentConfig(150.0f, 180.0f, 4.0f, 150.0f, 4.0f);
 	}
 
 	// Set up a camera that scales the tilemap to the window size.
@@ -540,6 +539,7 @@ int main(int argc, char** argv)
 	boxCollider->setCircle(14.0f);
 	boxCollider->setDensity(2.0f);
 	boxCollider->setRestitution(0.0f);
+	pushBoxObject->addComponent<NetworkedObjectMarker>();
 
 	// Create a GameObject for input handling
 	auto inputHandler = std::make_unique<GameObject>();
