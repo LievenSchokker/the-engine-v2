@@ -9,6 +9,7 @@
 #include "Behaviour/DebugTimeControlBehaviour.h"
 #include "Behaviours/PlayerControllerBehaviour.h"
 #include "Component/Camera.h"
+#include "Component/ShapeRenderer.h"
 #include "Component/SpriteComponent.h"
 #include "Component/Transform.h"
 #include "Core/GameWorld.h"
@@ -24,8 +25,6 @@
 #include <iostream>
 #include <memory>
 
-#include "Component/ShapeRenderer.h"
-
 /**
  * @brief Simple behavior to handle ESC key for exit.
  *
@@ -34,252 +33,225 @@
  */
 class ExitBehaviour: public Behaviour
 {
-public:
-    ExitBehaviour() : inputManager(nullptr)
-    {
-    }
+   public:
+	ExitBehaviour() : inputManager(nullptr)
+	{
+	}
 
-    ~ExitBehaviour() override = default;
+	~ExitBehaviour() override = default;
 
-    void onAwake() override
-    {
-    }
+	void onAwake() override
+	{
+	}
 
-    void update(double deltaTime, const GameWorld& world) override
-    {
-        inputManager = world.input;
+	void update(double deltaTime, const GameWorld& world) override
+	{
+		inputManager = world.input;
 
-        (void)deltaTime;
-        (void)world;
+		(void)deltaTime;
+		(void)world;
 
-        if (inputManager != nullptr &&
-            inputManager->wasKeyPressed(KeyCode::ESCAPE))
-        {
-            inputManager->signalQuit();
-        }
-    }
+		if ( inputManager != nullptr &&
+			 inputManager->wasKeyPressed(KeyCode::ESCAPE) )
+		{
+			inputManager->signalQuit();
+		}
+	}
 
-private:
-    InputManager* inputManager;
+   private:
+	InputManager* inputManager;
 };
 
 #undef main
 
 int main(int argc, char** argv)
 {
-    (void)argc;
-    (void)argv;
+	(void)argc;
+	(void)argv;
 
-    ApplicationSpecifications spec = {};
-    spec.networkingOptions.port = 8080;
-    spec.networkingOptions.serverIP = "127.0.0.1";
-    spec.networkingOptions.tickRate = 60;
-    spec.engineSystem = EngineSystem::Client;
-    spec.renderSettings.renderBackend = RenderBackend::SDL;
-    spec.renderSettings.windowOptions = {"Player Game", false, 700, 700};
-    spec.maxFrameTime = 0.1;
+	ApplicationSpecifications spec = {};
+	spec.networkingOptions.port = 8080;
+	spec.networkingOptions.serverIP = "127.0.0.1";
+	spec.networkingOptions.tickRate = 60;
+	spec.engineSystem = EngineSystem::Client;
+	spec.renderSettings.renderBackend = RenderBackend::SDL;
+	spec.renderSettings.windowOptions = {"Player Game", false, 700, 700};
+	spec.maxFrameTime = 0.1;
 
-    std::unique_ptr<Game> game = std::make_unique<Game>();
+	std::unique_ptr<Game> game = std::make_unique<Game>();
 
-    std::unique_ptr<AssetManager> assetManager =
-        std::make_unique<AssetManager>();
+	auto gameScene = std::make_unique<Scene>("GameScene");
 
-    auto gameScene = std::make_unique<Scene>("GameScene");
-
-    // Create Player GameObject
-    auto player = std::make_unique<GameObject>();
-    player->setName("Player");
+	// Create Player GameObject
+	auto player = std::make_unique<GameObject>();
+	player->setName("Player");
 	player->addComponent<Camera>(1, Vector2{0.0, 0.0}, 4, 3);
-    // Position in meters (center of world)
-    player->getTransform()->setPosition({ 2.0f,  2.0f});
+	// Position in meters (center of world)
+	player->getTransform()->setPosition({2.0f, 2.0f});
+	SpritesheetDefinition def{4, 6, 64, 64};
+	auto* playerSprite =
+		player->addComponent<SpriteComponent>("Assets/player.png", def);
+	auto* playerAnimator = player->addComponent<Animator>();
 
-    auto* playerSprite = player->addComponent<SpriteComponent>();
-    bool playerLoaded = SpritesheetLoader::loadSpritesheet(
-        assetManager.get(), playerSprite, "Assets/player.png", 4, 6, 64, 64);
+	// Idle animations
+	SpritesheetAnimationClip idleDownClip;
+	idleDownClip.name = "idleDown";
+	idleDownClip.frames = {0};
+	idleDownClip.frameDuration = 0.2f;
+	idleDownClip.loop = true;
+	playerAnimator->addSpritesheetClip("idleDown", idleDownClip);
 
-    if (playerLoaded)
-    {
-        auto* playerAnimator = player->addComponent<Animator>();
+	SpritesheetAnimationClip idleRightClip;
+	idleRightClip.name = "idleRight";
+	idleRightClip.frames = {12};
+	idleRightClip.frameDuration = 0.2f;
+	idleRightClip.loop = true;
+	playerAnimator->addSpritesheetClip("idleRight", idleRightClip);
 
-        // Idle animations
-        SpritesheetAnimationClip idleDownClip;
-        idleDownClip.name = "idleDown";
-        idleDownClip.frames = {0};
-        idleDownClip.frameDuration = 0.2f;
-        idleDownClip.loop = true;
-        playerAnimator->addSpritesheetClip("idleDown", idleDownClip);
+	SpritesheetAnimationClip idleLeftClip;
+	idleLeftClip.name = "idleLeft";
+	idleLeftClip.frames = {6};
+	idleLeftClip.frameDuration = 0.2f;
+	idleLeftClip.loop = true;
+	playerAnimator->addSpritesheetClip("idleLeft", idleLeftClip);
 
-        SpritesheetAnimationClip idleRightClip;
-        idleRightClip.name = "idleRight";
-        idleRightClip.frames = {12};
-        idleRightClip.frameDuration = 0.2f;
-        idleRightClip.loop = true;
-        playerAnimator->addSpritesheetClip("idleRight", idleRightClip);
+	SpritesheetAnimationClip idleUpClip;
+	idleUpClip.name = "idleUp";
+	idleUpClip.frames = {18};
+	idleUpClip.frameDuration = 0.2f;
+	idleUpClip.loop = true;
+	playerAnimator->addSpritesheetClip("idleUp", idleUpClip);
 
-        SpritesheetAnimationClip idleLeftClip;
-        idleLeftClip.name = "idleLeft";
-        idleLeftClip.frames = {6};
-        idleLeftClip.frameDuration = 0.2f;
-        idleLeftClip.loop = true;
-        playerAnimator->addSpritesheetClip("idleLeft", idleLeftClip);
+	// Walk animations
+	SpritesheetAnimationClip walkDownClip;
+	walkDownClip.name = "walkDown";
+	walkDownClip.frames = {0, 1, 2, 3, 4, 5};
+	walkDownClip.frameDuration = 0.1f;
+	walkDownClip.loop = true;
+	playerAnimator->addSpritesheetClip("walkDown", walkDownClip);
 
-        SpritesheetAnimationClip idleUpClip;
-        idleUpClip.name = "idleUp";
-        idleUpClip.frames = {18};
-        idleUpClip.frameDuration = 0.2f;
-        idleUpClip.loop = true;
-        playerAnimator->addSpritesheetClip("idleUp", idleUpClip);
+	SpritesheetAnimationClip walkRightClip;
+	walkRightClip.name = "walkRight";
+	walkRightClip.frames = {12, 13, 14, 15, 16, 17};
+	walkRightClip.frameDuration = 0.1f;
+	walkRightClip.loop = true;
+	playerAnimator->addSpritesheetClip("walkRight", walkRightClip);
 
-        // Walk animations
-        SpritesheetAnimationClip walkDownClip;
-        walkDownClip.name = "walkDown";
-        walkDownClip.frames = {0, 1, 2, 3, 4, 5};
-        walkDownClip.frameDuration = 0.1f;
-        walkDownClip.loop = true;
-        playerAnimator->addSpritesheetClip("walkDown", walkDownClip);
+	SpritesheetAnimationClip walkLeftClip;
+	walkLeftClip.name = "walkLeft";
+	walkLeftClip.frames = {6, 7, 8, 9, 10, 11};
+	walkLeftClip.frameDuration = 0.1f;
+	walkLeftClip.loop = true;
+	playerAnimator->addSpritesheetClip("walkLeft", walkLeftClip);
 
-        SpritesheetAnimationClip walkRightClip;
-        walkRightClip.name = "walkRight";
-        walkRightClip.frames = {12, 13, 14, 15, 16, 17};
-        walkRightClip.frameDuration = 0.1f;
-        walkRightClip.loop = true;
-        playerAnimator->addSpritesheetClip("walkRight", walkRightClip);
+	SpritesheetAnimationClip walkUpClip;
+	walkUpClip.name = "walkUp";
+	walkUpClip.frames = {18, 19, 20, 21, 22, 23};
+	walkUpClip.frameDuration = 0.1f;
+	walkUpClip.loop = true;
+	playerAnimator->addSpritesheetClip("walkUp", walkUpClip);
 
-        SpritesheetAnimationClip walkLeftClip;
-        walkLeftClip.name = "walkLeft";
-        walkLeftClip.frames = {6, 7, 8, 9, 10, 11};
-        walkLeftClip.frameDuration = 0.1f;
-        walkLeftClip.loop = true;
-        playerAnimator->addSpritesheetClip("walkLeft", walkLeftClip);
+	playerAnimator->playSpritesheet("idleDown");
 
-        SpritesheetAnimationClip walkUpClip;
-        walkUpClip.name = "walkUp";
-        walkUpClip.frames = {18, 19, 20, 21, 22, 23};
-        walkUpClip.frameDuration = 0.1f;
-        walkUpClip.loop = true;
-        playerAnimator->addSpritesheetClip("walkUp", walkUpClip);
+	auto* playerController = player->addComponent<PlayerControllerBehaviour>();
 
-        playerAnimator->playSpritesheet("idleDown");
+	// Speed in meters per second (was 200 pixels/sec = 4 meters/sec at 50 PPM)
+	playerController->setSpeed(4.0f);
 
-        auto* playerController =
-            player->addComponent<PlayerControllerBehaviour>();
+	std::cout << "Player loaded successfully\n";
 
-        // Speed in meters per second (was 200 pixels/sec = 4 meters/sec at 50 PPM)
-        playerController->setSpeed(4.0f);
+	// Create Rat GameObject
+	auto rat = std::make_unique<GameObject>();
+	rat->setName("Rat");
 
-        std::cout << "Player loaded successfully\n";
-    }
-    else
-    {
-        std::cout << "Warning: Failed to load player.png\n";
-    }
+	// Position in meters
+	rat->getTransform()->setPosition({3.0f, 2.0f});
 
-    // Create Rat GameObject
-    auto rat = std::make_unique<GameObject>();
-    rat->setName("Rat");
+	auto* ratSprite = rat->addComponent<SpriteComponent>(
+		"Assets/rat.png", SpritesheetDefinition{1, 4, 32, 32});
 
-    // Position in meters
-    rat->getTransform()->setPosition({3.0f, 2.0f});
+	ratSprite->setSize(Vector2{0.5, 0.5});
 
+	auto* ratAnimator = rat->addComponent<Animator>();
 
+	if ( ratSprite != nullptr )
+	{
+		std::cout << "Rat sprite component found, frame count: "
+				  << ratSprite->getFrameCount() << "\n";
+	}
+	else
+	{
+		std::cout << "Warning: Rat sprite component is null!\n";
+	}
 
-    auto* ratSprite = rat->addComponent<SpriteComponent>();
-    bool ratLoaded = SpritesheetLoader::loadSpritesheet(
-        assetManager.get(), ratSprite, "Assets/rat.png", 1, 4, 32, 32);
-    ratSprite->setSize(Vector2{0.5, 0.5});
-    if (ratLoaded)
-    {
-        auto* ratAnimator = rat->addComponent<Animator>();
+	auto ratMoveClip = std::make_unique<AnimationClip>("RatMove", true);
+	AnimationCurve ratCurve(EasingType::EaseInOutQuad);
 
-        if (ratSprite != nullptr)
-        {
-            std::cout << "Rat sprite component found, frame count: "
-                      << ratSprite->getFrameCount() << "\n";
-        }
-        else
-        {
-            std::cout << "Warning: Rat sprite component is null!\n";
-        }
+	// Positions in meters
+	Vector2 ratStartPos{3.0f, 2.0f};
+	Vector2 ratEndPos{1.0f, 2.0f};
 
-        auto ratMoveClip = std::make_unique<AnimationClip>("RatMove", true);
-        AnimationCurve ratCurve(EasingType::EaseInOutQuad);
+	float ratMoveDuration = 3.0f;
 
-        // Positions in meters
-        Vector2 ratStartPos{3.0f, 2.0f};
-        Vector2 ratEndPos{1.0f, 2.0f};
+	// Forward track
+	AnimationTrack ratForwardTrack(TargetType::Transform,
+								   PropertyType::Position, ratMoveDuration,
+								   false, ratStartPos, ratEndPos, ratCurve);
+	ratMoveClip->addTrack(ratForwardTrack);
 
-        float ratMoveDuration = 3.0f;
+	// Reverse track
+	AnimationTrack ratReverseTrack(TargetType::Transform,
+								   PropertyType::Position, ratMoveDuration,
+								   false, ratEndPos, ratStartPos, ratCurve);
+	ratMoveClip->addTrack(ratReverseTrack);
 
-        // Forward track
-        AnimationTrack ratForwardTrack(
-            TargetType::Transform, PropertyType::Position, ratMoveDuration,
-            false, ratStartPos, ratEndPos, ratCurve);
-        ratMoveClip->addTrack(ratForwardTrack);
+	// FlipX tracks
+	AnimationTrack ratFlipForwardTrack(TargetType::Sprite, PropertyType::FlipX,
+									   ratMoveDuration, false, 1, 1, ratCurve);
+	ratMoveClip->addTrack(ratFlipForwardTrack);
 
-        // Reverse track
-        AnimationTrack ratReverseTrack(
-            TargetType::Transform, PropertyType::Position, ratMoveDuration,
-            false, ratEndPos, ratStartPos, ratCurve);
-        ratMoveClip->addTrack(ratReverseTrack);
+	AnimationTrack ratFlipReverseTrack(TargetType::Sprite, PropertyType::FlipX,
+									   ratMoveDuration, false, 0, 0, ratCurve);
+	ratMoveClip->addTrack(ratFlipReverseTrack);
 
-        // FlipX tracks
-        AnimationTrack ratFlipForwardTrack(
-            TargetType::Sprite, PropertyType::FlipX, ratMoveDuration, false,
-            1, 1, ratCurve);
-        ratMoveClip->addTrack(ratFlipForwardTrack);
+	SpritesheetAnimationClip ratWalkClip;
+	ratWalkClip.name = "walk";
+	ratWalkClip.frames = {0, 1, 2, 3};
+	ratWalkClip.frameDuration = 0.1f;
+	ratWalkClip.loop = true;
+	AnimationClip* ratMoveClipPtr = ratAnimator->addSpritesheetTracksToClip(
+		std::move(ratMoveClip), ratWalkClip);
 
-        AnimationTrack ratFlipReverseTrack(
-            TargetType::Sprite, PropertyType::FlipX, ratMoveDuration, false,
-            0, 0, ratCurve);
-        ratMoveClip->addTrack(ratFlipReverseTrack);
+	ratAnimator->play(ratMoveClipPtr);
 
-        SpritesheetAnimationClip ratWalkClip;
-        ratWalkClip.name = "walk";
-        ratWalkClip.frames = {0, 1, 2, 3};
-        ratWalkClip.frameDuration = 0.1f;
-        ratWalkClip.loop = true;
-        AnimationClip* ratMoveClipPtr =
-            ratAnimator->addSpritesheetTracksToClip(std::move(ratMoveClip),
-                                                    ratWalkClip);
+	std::cout << "Rat loaded successfully\n";
+	std::cout << "Rat movement clip length: " << ratMoveClipPtr->getLength()
+			  << " seconds\n";
+	std::cout << "Rat start pos: (" << ratStartPos.x << ", " << ratStartPos.y
+			  << ") meters\n";
+	std::cout << "Rat end pos: (" << ratEndPos.x << ", " << ratEndPos.y
+			  << ") meters\n";
 
-        ratAnimator->play(ratMoveClipPtr);
+	std::cout << "Warning: Failed to load rat.png\n";
 
-        std::cout << "Rat loaded successfully\n";
-        std::cout << "Rat movement clip length: "
-                  << ratMoveClipPtr->getLength() << " seconds\n";
-        std::cout << "Rat start pos: (" << ratStartPos.x << ", "
-                  << ratStartPos.y << ") meters\n";
-        std::cout << "Rat end pos: (" << ratEndPos.x << ", " << ratEndPos.y
-                  << ") meters\n";
-    }
-    else
-    {
-        std::cout << "Warning: Failed to load rat.png\n";
-    }
+	// Exit handler
+	auto exitHandler = std::make_unique<GameObject>();
+	exitHandler->setName("ExitHandler");
+	exitHandler->addComponent<ExitBehaviour>();
 
-    // Exit handler
-    auto exitHandler = std::make_unique<GameObject>();
-    exitHandler->setName("ExitHandler");
-    exitHandler->addComponent<ExitBehaviour>();
+	// Debug controller
+	auto debugController = std::make_unique<GameObject>();
+	debugController->setName("DebugController");
+	debugController->addComponent<DebugTimeControlBehaviour>(
+		KeyCode::SPACE, std::nullopt, KeyCode::NUMBER_2_AND_AT,
+		KeyCode::NUMBER_3_AND_HASHMARK, KeyCode::NUMBER_4_AND_DOLLAR,
+		std::nullopt, true);
 
-    // Debug controller
-    auto debugController = std::make_unique<GameObject>();
-    debugController->setName("DebugController");
-    debugController->addComponent<DebugTimeControlBehaviour>(
-        KeyCode::SPACE,
-        std::nullopt,
-        KeyCode::NUMBER_2_AND_AT,
-        KeyCode::NUMBER_3_AND_HASHMARK,
-        KeyCode::NUMBER_4_AND_DOLLAR,
-        std::nullopt,
-        true
-    );
-
-    gameScene->addGameObject(std::move(debugController));
-    gameScene->addGameObject(std::move(player));
-    gameScene->addGameObject(std::move(rat));
-    gameScene->addGameObject(std::move(exitHandler));
-    game->addScene(std::move(gameScene));
-    game->setApplicationSpecifications(spec);
-    return SpelMotorEntry::main(std::move(game));
+	gameScene->addGameObject(std::move(debugController));
+	gameScene->addGameObject(std::move(player));
+	gameScene->addGameObject(std::move(rat));
+	gameScene->addGameObject(std::move(exitHandler));
+	game->addScene(std::move(gameScene));
+	game->setApplicationSpecifications(spec);
+	return SpelMotorEntry::main(std::move(game));
 }
