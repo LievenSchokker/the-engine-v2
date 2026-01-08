@@ -73,6 +73,7 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
             sdlRenderer->open(specs.renderSettings.windowOptions);
 
             auto system = std::make_unique<RenderSystem>(std::move(sdlRenderer));
+            system->setClearColor(specs.clearColor);
             gameWorld->render = system.get();
 
         	if (hasFlag(specs.engineSystem, EngineSystem::Events))

@@ -1,5 +1,6 @@
 #include "Component/TilemapComponent.h"
 
+#include "Assets/IImage.h"
 #include "Assets/TilemapAsset.h"
 #include "Component/Transform.h"
 #include "Math/Vector2.h"
@@ -7,7 +8,6 @@
 
 #include <cmath>
 #include <iostream>
-
 
 void TilemapComponent::setTilemapAsset(TilemapAsset* asset)
 {
@@ -42,6 +42,90 @@ Color TilemapComponent::getTileColor(int tileId) const
 				  << tileId << ", returning default white" << std::endl;
 		return Color::white();
 	}
+}
+
+void TilemapComponent::setTileset(IImage* image)
+{
+	tilesetImage = image;
+}
+
+IImage* TilemapComponent::getTileset() const
+{
+	return tilesetImage;
+}
+
+void TilemapComponent::setTilesetFrameSize(Vector2 frameSizePixels)
+{
+	tilesetFrameSize = frameSizePixels;
+}
+
+Vector2 TilemapComponent::getTilesetFrameSize() const
+{
+	return tilesetFrameSize;
+}
+
+void TilemapComponent::setTileSprite(int tileId, int frameIndex,
+									 const Color& tint)
+{
+	tileSprites[tileId] = TileSprite{frameIndex, tint};
+}
+
+void TilemapComponent::setTileSprite(int tileId, int row, int col,
+									 const Color& tint)
+{
+	if ( tilesetImage == nullptr || !tilesetImage->isLoaded() )
+	{
+		return;
+	}
+
+	const bool hasExplicitFrameSize =
+		tilesetFrameSize.x > 0.0 && tilesetFrameSize.y > 0.0;
+	const Vector2 frameSizePixels =
+		hasExplicitFrameSize ? tilesetFrameSize : tileSize;
+	const int frameWidth = static_cast<int>(std::round(frameSizePixels.x));
+	const int frameHeight = static_cast<int>(std::round(frameSizePixels.y));
+	if ( frameWidth <= 0 || frameHeight <= 0 )
+	{
+		return;
+	}
+
+	const int columns = tilesetImage->getWidth() / frameWidth;
+	const int rows = tilesetImage->getHeight() / frameHeight;
+	if ( columns <= 0 || rows <= 0 )
+	{
+		return;
+	}
+
+	if ( row < 0 || col < 0 || row >= rows || col >= columns )
+	{
+		return;
+	}
+
+	const int frameIndex = (row * columns) + col;
+	setTileSprite(tileId, frameIndex, tint);
+}
+
+void TilemapComponent::setTileSprite(int tileId, IImage* image, int frameIndex,
+									 const Color& tint)
+{
+	tilesetImage = image;
+	setTileSprite(tileId, frameIndex, tint);
+}
+
+bool TilemapComponent::hasTileSprite(int tileId) const
+{
+	return tileSprites.contains(tileId);
+}
+
+const TilemapComponent::TileSprite* TilemapComponent::getTileSprite(
+	int tileId) const
+{
+	auto it = tileSprites.find(tileId);
+	if ( it != tileSprites.end() )
+	{
+		return &it->second;
+	}
+	return nullptr;
 }
 
 void TilemapComponent::setTileCollider(int tileId, bool enabled)
@@ -86,6 +170,33 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		Vector2Utils::sanitizeScale(transform->getWorldScale());
 	const int width = tilemapAsset->getWidth();
 	const int height = tilemapAsset->getHeight();
+	const bool spritesReady =
+		tilesetImage != nullptr && tilesetImage->isLoaded();
+	int frameWidth = 0;
+	int frameHeight = 0;
+	int columns = 0;
+	int rows = 0;
+	int totalFrames = 0;
+	if ( spritesReady )
+	{
+		// Frame size is in image pixel units; by default we used tileSize for
+		// this, but that couples world scale to spritesheet slicing.
+		const bool hasExplicitFrameSize =
+			tilesetFrameSize.x > 0.0 && tilesetFrameSize.y > 0.0;
+		const Vector2 frameSizePixels =
+			hasExplicitFrameSize ? tilesetFrameSize : tileSize;
+
+		frameWidth = static_cast<int>(std::round(frameSizePixels.x));
+		frameHeight = static_cast<int>(std::round(frameSizePixels.y));
+		if ( frameWidth > 0 && frameHeight > 0 )
+		{
+			columns = tilesetImage->getWidth() / frameWidth;
+			rows = tilesetImage->getHeight() / frameHeight;
+			totalFrames = columns * rows;
+		}
+	}
+	const bool canRenderSprites =
+		spritesReady && columns > 0 && rows > 0 && totalFrames > 0;
 
 	// Build a render command for each non-empty tile
 	for ( int y = 0; y < height; ++y )
@@ -103,6 +214,36 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			Vector2 tileCenter{0.0, 0.0};
 			tileCenter.x = tileWorldPos.x + (tileSize.x / 2.0);
 			tileCenter.y = tileWorldPos.y + (tileSize.y / 2.0);
+
+			if ( canRenderSprites )
+			{
+				auto spriteIt = tileSprites.find(tileId);
+				if ( spriteIt != tileSprites.end() )
+				{
+					const TileSprite& sprite = spriteIt->second;
+					if ( sprite.frameIndex >= 0 &&
+						 sprite.frameIndex < totalFrames )
+					{
+						const int row = sprite.frameIndex / columns;
+						const int col = sprite.frameIndex % columns;
+						RenderCommand command;
+						command.type = RenderCommandType::Sprite;
+						command.sprite = tilesetImage;
+						command.srcRect =
+							Rect(col * frameWidth, row * frameHeight,
+								 frameWidth, frameHeight);
+						command.position = tileCenter;
+						command.size = tileSize;
+						command.rotationDegrees = rotation;
+						command.scale = worldScale;
+						command.tint = sprite.tint;
+						command.layer = layer;
+						command.orderInLayer = orderInLayer;
+						queue.push(command);
+						continue;
+					}
+				}
+			}
 
 			RenderCommand command;
 			command.type = RenderCommandType::Rectangle;
@@ -234,7 +375,7 @@ void TilemapComponent::serialize(WriteArchive& archive) const
 	// Tile colors
 	uint32_t colorCount = static_cast<uint32_t>(tileColors.size());
 	archive.process(colorCount);
-	for (const auto& [tileId, color] : tileColors)
+	for ( const auto& [tileId, color] : tileColors )
 	{
 		int id = tileId;
 		uint8_t r = color.r;
@@ -248,10 +389,29 @@ void TilemapComponent::serialize(WriteArchive& archive) const
 		archive.process(a);
 	}
 
+	// Tile sprites
+	uint32_t spriteCount = static_cast<uint32_t>(tileSprites.size());
+	archive.process(spriteCount);
+	for ( const auto& [tileId, sprite] : tileSprites )
+	{
+		int id = tileId;
+		int frameIndex = sprite.frameIndex;
+		uint8_t r = sprite.tint.r;
+		uint8_t g = sprite.tint.g;
+		uint8_t b = sprite.tint.b;
+		uint8_t a = sprite.tint.a;
+		archive.process(id);
+		archive.process(frameIndex);
+		archive.process(r);
+		archive.process(g);
+		archive.process(b);
+		archive.process(a);
+	}
+
 	// Collidable tile IDs
 	uint32_t colliderCount = static_cast<uint32_t>(collidableTileIds.size());
 	archive.process(colliderCount);
-	for (int tileId : collidableTileIds)
+	for ( int tileId : collidableTileIds )
 	{
 		int id = tileId;
 		archive.process(id);
@@ -274,7 +434,7 @@ void TilemapComponent::deserialize(ReadArchive& archive)
 	uint32_t colorCount;
 	archive.process(colorCount);
 	tileColors.clear();
-	for (uint32_t i = 0; i < colorCount; ++i)
+	for ( uint32_t i = 0; i < colorCount; ++i )
 	{
 		int tileId;
 		uint8_t r, g, b, a;
@@ -286,11 +446,29 @@ void TilemapComponent::deserialize(ReadArchive& archive)
 		tileColors[tileId] = Color(r, g, b, a);
 	}
 
+	// Tile sprites
+	uint32_t spriteCount = 0;
+	archive.process(spriteCount);
+	tileSprites.clear();
+	for ( uint32_t i = 0; i < spriteCount; ++i )
+	{
+		int tileId;
+		int frameIndex;
+		uint8_t r, g, b, a;
+		archive.process(tileId);
+		archive.process(frameIndex);
+		archive.process(r);
+		archive.process(g);
+		archive.process(b);
+		archive.process(a);
+		tileSprites[tileId] = TileSprite{frameIndex, Color(r, g, b, a)};
+	}
+
 	// Collidable tile IDs
 	uint32_t colliderCount = 0;
 	archive.process(colliderCount);
 	collidableTileIds.clear();
-	for (uint32_t i = 0; i < colliderCount; ++i)
+	for ( uint32_t i = 0; i < colliderCount; ++i )
 	{
 		int tileId;
 		archive.process(tileId);
@@ -303,4 +481,7 @@ void TilemapComponent::deserialize(ReadArchive& archive)
 
 	// Note: tilemapAsset is runtime reference
 	// Must be set via setTilemapAsset() after instantiation
+	// Note: tilesetImage is runtime reference
+	// Must be set via setTileset() after instantiation
+	tilesetImage = nullptr;
 }
