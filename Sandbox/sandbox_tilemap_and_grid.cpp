@@ -40,13 +40,12 @@ std::mt19937& tilemapSandboxRng()
 	return engine;
 }
 
-bool tryGetRandomWalkableCell(const GridComponent& grid,
-                              Vector2& outCell,
-                              const Vector2* avoidCell = nullptr)
+bool tryGetRandomWalkableCell(const GridComponent& grid, Vector2& outCell,
+							  const Vector2* avoidCell = nullptr)
 {
 	const int width = grid.getGridWidth();
 	const int height = grid.getGridHeight();
-	if (width <= 0 || height <= 0)
+	if ( width <= 0 || height <= 0 )
 	{
 		return false;
 	}
@@ -54,16 +53,16 @@ bool tryGetRandomWalkableCell(const GridComponent& grid,
 	std::vector<Vector2> candidates;
 	candidates.reserve(static_cast<size_t>(width * height));
 
-	for (int y = 0; y < height; ++y)
+	for ( int y = 0; y < height; ++y )
 	{
-		for (int x = 0; x < width; ++x)
+		for ( int x = 0; x < width; ++x )
 		{
 			Vector2 cell{static_cast<float>(x), static_cast<float>(y)};
-			if (!grid.isWalkable(cell))
+			if ( !grid.isWalkable(cell) )
 			{
 				continue;
 			}
-			if (avoidCell != nullptr && cell == *avoidCell)
+			if ( avoidCell != nullptr && cell == *avoidCell )
 			{
 				continue;
 			}
@@ -71,7 +70,7 @@ bool tryGetRandomWalkableCell(const GridComponent& grid,
 		}
 	}
 
-	if (candidates.empty())
+	if ( candidates.empty() )
 	{
 		return false;
 	}
@@ -80,7 +79,7 @@ bool tryGetRandomWalkableCell(const GridComponent& grid,
 	outCell = candidates[dist(tilemapSandboxRng())];
 	return true;
 }
-} // namespace
+}  // namespace
 
 /**
  * @brief Behavior class that handles input for the tilemap/grid demo.
@@ -121,7 +120,8 @@ class TilemapInputBehaviour: public Behaviour
 
 		if ( gridComponent != nullptr && pathRenderer != nullptr )
 		{
-			pathRenderer->setRenderEnabled(gridComponent->isDebugRenderEnabled());
+			pathRenderer->setRenderEnabled(
+				gridComponent->isDebugRenderEnabled());
 		}
 	}
 
@@ -141,8 +141,8 @@ class TilemapInputBehaviour: public Behaviour
 			{
 				pathRenderer->setRenderEnabled(newState);
 			}
-			std::cout << "Grid debug rendering: "
-					  << (newState ? "ON" : "OFF") << std::endl;
+			std::cout << "Grid debug rendering: " << (newState ? "ON" : "OFF")
+					  << std::endl;
 		}
 
 		// Toggle sample blocked cell with 'B' key
@@ -270,11 +270,11 @@ int main(int argc, char** argv)
 	ApplicationSpecifications spec = {};
 	spec.networkingOptions.port = 8080;
 	spec.networkingOptions.serverIP = "127.0.0.1";
-	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
-	spec.renderBackend = RenderBackend::SDL;
+	spec.renderSettings.renderBackend = RenderBackend::SDL;
+	spec.renderSettings.windowOptions = {"Tilemap Example", false, SCREEN_WIDTH,
+										 SCREEN_HEIGHT};
 	spec.engineSystem = EngineSystem::Client;
-	spec.windowOptions = {"Tilemap Example", SCREEN_WIDTH, SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 
 	std::unique_ptr<Game> game = std::make_unique<Game>();
@@ -284,7 +284,7 @@ int main(int argc, char** argv)
 
 	// Create AssetManager and load tilemap
 	AssetManager assetManager;
-	std::string tilemapPath = "build/Sandbox/Assets/level1_tilemap.csv";
+	std::string tilemapPath = "Assets/level1_tilemap.csv";
 
 	assetManager.add(tilemapPath, std::make_unique<TilemapAsset>());
 	if ( !assetManager.load(tilemapPath) )
@@ -369,24 +369,27 @@ int main(int argc, char** argv)
 			tilemapComponent->cellToWorld(blockedCell));
 
 		Vector2 agentCell = Vector2::zero();
-		if (!tryGetRandomWalkableCell(*gridComponent, agentCell))
+		if ( !tryGetRandomWalkableCell(*gridComponent, agentCell) )
 		{
-			std::cout << "[TilemapSandbox] No walkable agent cell found; using (0,0).\n";
+			std::cout << "[TilemapSandbox] No walkable agent cell found; using "
+						 "(0,0).\n";
 		}
 
 		Vector2 targetCell = agentCell;
-		if (!tryGetRandomWalkableCell(*gridComponent, targetCell, &agentCell))
+		if ( !tryGetRandomWalkableCell(*gridComponent, targetCell, &agentCell) )
 		{
-			if (!tryGetRandomWalkableCell(*gridComponent, targetCell))
+			if ( !tryGetRandomWalkableCell(*gridComponent, targetCell) )
 			{
-				std::cout << "[TilemapSandbox] No walkable target cell found; using agent cell.\n";
+				std::cout << "[TilemapSandbox] No walkable target cell found; "
+							 "using agent cell.\n";
 				targetCell = agentCell;
 			}
 		}
 
-		if (targetCell == agentCell)
+		if ( targetCell == agentCell )
 		{
-			std::cout << "[TilemapSandbox] Agent/target cells overlap; path may be empty.\n";
+			std::cout << "[TilemapSandbox] Agent/target cells overlap; path "
+						 "may be empty.\n";
 		}
 
 		// Create an agent that uses the tilemap-backed navigation surface
@@ -423,9 +426,7 @@ int main(int argc, char** argv)
 		targetObject = std::make_unique<GameObject>();
 		targetObject->setName("Target");
 		auto* targetRenderer = targetObject->addComponent<ShapeRenderer>();
-		targetRenderer->setCircle(6.0f)
-			.setColor(Color::yellow())
-			.setLayer(1);
+		targetRenderer->setCircle(6.0f).setColor(Color::yellow()).setLayer(1);
 		targetObject->getTransform()->setPosition(
 			tilemapComponent->cellToWorld(targetCell));
 

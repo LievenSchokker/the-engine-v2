@@ -18,6 +18,10 @@ public:
 
     NetworkBuilder& command(const std::string& name, Callback callback);
 
+	template<typename T, typename... Args>
+	void command(const std::string& name, void (T::*method)(Args...));
 private:
     NetworkBehaviour& target;
 };
+
+#include "NetworkBuilder.inl"

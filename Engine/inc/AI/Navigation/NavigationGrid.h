@@ -88,7 +88,7 @@ class NavigationGrid final : public INavigationSurface
         /**
          * Retrieves every neighbour cell from the provided cell
          *
-         * Can be used to get neighbours in 4 (NESW) or directions
+         * Can be used to get neighbours in 4 (NESW)
          * @param origin The position of the cell to look for neighbours from
          * @return a vector<Vector2> containing each neighbour of the origin cell
          */

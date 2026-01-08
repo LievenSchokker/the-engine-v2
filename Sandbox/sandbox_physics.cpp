@@ -158,10 +158,10 @@ int main(int argc, char** argv)
 	ApplicationSpecifications spec = {};
 	spec.networkingOptions.port = 8080;
 	spec.networkingOptions.serverIP = "127.0.0.1";
-	spec.networkingOptions.mode = EngineMode::CLIENT;
 	spec.networkingOptions.tickRate = 60;
-	spec.renderBackend = RenderBackend::SDL;
-	spec.windowOptions = {"Shape Sandbox", SCREEN_WIDTH, SCREEN_HEIGHT};
+	spec.renderSettings.renderBackend = RenderBackend::SDL;
+	spec.renderSettings.windowOptions = {"Shape Sandbox", false, SCREEN_WIDTH,
+										 SCREEN_HEIGHT};
 	spec.maxFrameTime = 0.1;  // 100ms max frame time
 	spec.engineSystem = EngineSystem::Client;
 

@@ -24,6 +24,11 @@ public:
 	};
 	virtual ~Component() = 0;
 
+	Component(const Component& other) = delete;
+	Component(Component&& other) = delete;
+	Component& operator=(const Component& other) = delete;
+	Component& operator=(Component&& other) = delete;
+
 	/**
 	* @brief Sets the GameObject that this component lives on.
 	* Also sets the @c transform field to the GameObject's Transform.

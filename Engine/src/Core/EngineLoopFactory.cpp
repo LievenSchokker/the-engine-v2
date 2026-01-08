@@ -26,12 +26,11 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
 
     GameWorld* gameWorld = loop->getGameWorld();
     Game* gamePtr = loop->getGame();
-
     std::unique_ptr<IBackendContext> backendContext{};
     IBackendContext* contextPtr = nullptr;
 
 	// BACKEND CONTEXT
-    if (specs.renderBackend == RenderBackend::SDL)
+    if (specs.renderSettings.renderBackend == RenderBackend::SDL)
     {
         backendContext = std::make_unique<SDLBackendContext>();
         contextPtr = backendContext.get();
@@ -68,11 +67,15 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
         if (contextPtr != nullptr)
         {
             auto sdlRenderer = std::make_unique<SDLRenderer>(*contextPtr);
-            sdlRenderer->open(specs.windowOptions);
+            sdlRenderer->open(specs.renderSettings.windowOptions);
 
             auto system = std::make_unique<RenderSystem>(std::move(sdlRenderer));
             gameWorld->render = system.get();
 
+        	if (hasFlag(specs.engineSystem, EngineSystem::Events))
+        	{
+        		system->setupEvents(*gameWorld->getDispatcher());
+        	}
             loop->addSystem(std::move(system));
         }
     }

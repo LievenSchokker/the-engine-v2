@@ -1,9 +1,7 @@
 #pragma once
 
-
-#include <memory>
-
 #include "Events/EventDispatcher/EventDispatcher.h"
+#include "Options/ApplicationSpecifications.h"
 
 #include <memory>
 
@@ -31,8 +29,8 @@ public:
 	AudioManager* audio = nullptr;
 	Client* client = nullptr;
 	Server* server = nullptr;
-
 	NetworkSpawnManager* spawnManager = nullptr;
+	ApplicationSpecifications specs = {};
 
 	bool isClient() const
 	{

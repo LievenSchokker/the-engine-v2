@@ -18,7 +18,8 @@
 Client::Client(std::unique_ptr<ITransport> injectedTransport)
 	: transport(std::move(injectedTransport)),
 	  currentConnection{ConnectionMode::Client, -1,
-	                    ConnectionStatus::Disconnected}
+	                    ConnectionStatus::Disconnected},
+    lastReceivedTick(0)
 {
 	messageDispatcher = nullptr;
 }
@@ -175,4 +176,14 @@ void Client::shutdown(GameWorld& world)
 const std::string Client::getName() const
 {
 	return "Client";
+}
+
+void Client::setLastReceivedTick(uint32_t lastReceivedTick_)
+{
+    lastReceivedTick = lastReceivedTick_;
+}
+
+uint32_t Client::getLastReceivedTick()
+{
+    return lastReceivedTick;
 }

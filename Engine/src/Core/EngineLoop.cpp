@@ -22,6 +22,7 @@ EngineLoop::EngineLoop(std::unique_ptr<Game> game)
 		  return 0.0;
 	  })
 {
+	gameWorld->specs = this->game->getApplicationSpecifications();
 }
 
 EngineLoop::~EngineLoop() = default;
@@ -62,11 +63,9 @@ void EngineLoop::start()
 
 void EngineLoop::initNetwork() const
 {
-	if (game->getApplicationSpecifications().networkingOptions.mode ==
-	    EngineMode::CLIENT)
+	if (hasFlag(game->getApplicationSpecifications().engineSystem , EngineSystem::NetClient))
 	{
-		sceneManagerPtr->configureNetworking(ConnectionMode::Client,
-		                                     spawnManager.get());
+		sceneManagerPtr->configureNetworking(spawnManager.get());
 
 		ServerConnectionInformation serverInfo{
 			game->getApplicationSpecifications().networkingOptions.port,
@@ -79,11 +78,9 @@ void EngineLoop::initNetwork() const
 		}
 	}
 
-	if (game->getApplicationSpecifications().networkingOptions.mode ==
-	    EngineMode::SERVER)
+	if (hasFlag(game->getApplicationSpecifications().engineSystem , EngineSystem::NetServer))
 	{
-		sceneManagerPtr->configureNetworking(ConnectionMode::Host,
-		                                     spawnManager.get());
+		sceneManagerPtr->configureNetworking(spawnManager.get());
 	}
 	if (gameWorld->server != nullptr)
 	{

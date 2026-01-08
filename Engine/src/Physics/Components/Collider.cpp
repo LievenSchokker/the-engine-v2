@@ -23,3 +23,35 @@ void Collider::onSensorEnter(Collider* other)
 			behaviour->onSensorEnter(other);
 	}
 }
+
+void Collider::serialize(WriteArchive& archive) const
+{
+	int shapeInt = static_cast<int>(shape);
+	archive.process(shapeInt);
+	archive.process(const_cast<float&>(radius));
+
+	float sizeX = size.x;
+	float sizeY = size.y;
+	archive.process(sizeX);
+	archive.process(sizeY);
+
+	archive.process(const_cast<bool&>(sensor));
+	archive.process(const_cast<float&>(density));
+}
+
+void Collider::deserialize(ReadArchive& archive)
+{
+	int shapeInt;
+	archive.process(shapeInt);
+	shape = static_cast<PhysicsShapeType>(shapeInt);
+
+	archive.process(radius);
+
+	float sizeX, sizeY;
+	archive.process(sizeX);
+	archive.process(sizeY);
+	size = Vector2(sizeX, sizeY);
+
+	archive.process(sensor);
+	archive.process(density);
+}

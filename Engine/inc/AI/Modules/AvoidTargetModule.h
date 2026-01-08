@@ -46,8 +46,8 @@ class AvoidTargetModule final : public BaseAgentModule
     private:
         /// The target to avoid, internally used.
         /// Is retrieved every frame from the scene using the @c targetGameObjectId
-        const Transform* target = nullptr;
-        int targetGameObjectId = 0;
+        const Transform* target = agentScene->getGameObject(targetGameObjectId)->getTransform();
+        ObjectHandle targetGameObjectId  = ObjectHandle::null();
         Scene* agentScene = nullptr;
 
         /// Radius in which this module 'activates' and attempts to avoid the target
