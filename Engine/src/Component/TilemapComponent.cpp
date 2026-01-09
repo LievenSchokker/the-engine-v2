@@ -128,6 +128,28 @@ const TilemapComponent::TileSprite* TilemapComponent::getTileSprite(
 	return nullptr;
 }
 
+void TilemapComponent::setTileLayer(int tileId, uint8_t layer,
+									int8_t orderInLayer)
+{
+	tileLayerOverrides[tileId] = TileLayer{layer, orderInLayer};
+}
+
+bool TilemapComponent::hasTileLayer(int tileId) const
+{
+	return tileLayerOverrides.contains(tileId);
+}
+
+const TilemapComponent::TileLayer* TilemapComponent::getTileLayer(
+	int tileId) const
+{
+	auto it = tileLayerOverrides.find(tileId);
+	if ( it != tileLayerOverrides.end() )
+	{
+		return &it->second;
+	}
+	return nullptr;
+}
+
 void TilemapComponent::setTileCollider(int tileId, bool enabled)
 {
 	if ( enabled )
@@ -204,6 +226,14 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		for ( int x = 0; x < width; ++x )
 		{
 			int tileId = tilemapAsset->getTile(x, y);
+			uint8_t tileLayer = layer;
+			int8_t tileOrder = orderInLayer;
+			auto layerOverride = tileLayerOverrides.find(tileId);
+			if ( layerOverride != tileLayerOverrides.end() )
+			{
+				tileLayer = layerOverride->second.layer;
+				tileOrder = layerOverride->second.orderInLayer;
+			}
 
 			// Calculate world position of this tile (top-left corner)
 			Vector2 tileWorldPos{0.0, 0.0};
@@ -237,8 +267,8 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 						command.rotationDegrees = rotation;
 						command.scale = worldScale;
 						command.tint = sprite.tint;
-						command.layer = layer;
-						command.orderInLayer = orderInLayer;
+						command.layer = tileLayer;
+						command.orderInLayer = tileOrder;
 						queue.push(command);
 						continue;
 					}
@@ -252,8 +282,8 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			command.rotationDegrees = rotation;
 			command.scale = worldScale;
 			command.color = getTileColor(tileId);
-			command.layer = layer;
-			command.orderInLayer = orderInLayer;
+			command.layer = tileLayer;
+			command.orderInLayer = tileOrder;
 			queue.push(command);
 		}
 	}
@@ -408,6 +438,19 @@ void TilemapComponent::serialize(WriteArchive& archive) const
 		archive.process(a);
 	}
 
+	// Tile layer overrides
+	uint32_t layerCount = static_cast<uint32_t>(tileLayerOverrides.size());
+	archive.process(layerCount);
+	for ( const auto& [tileId, layerOverride] : tileLayerOverrides )
+	{
+		int id = tileId;
+		uint8_t lay = layerOverride.layer;
+		int8_t order = layerOverride.orderInLayer;
+		archive.process(id);
+		archive.process(lay);
+		archive.process(order);
+	}
+
 	// Collidable tile IDs
 	uint32_t colliderCount = static_cast<uint32_t>(collidableTileIds.size());
 	archive.process(colliderCount);
@@ -462,6 +505,21 @@ void TilemapComponent::deserialize(ReadArchive& archive)
 		archive.process(b);
 		archive.process(a);
 		tileSprites[tileId] = TileSprite{frameIndex, Color(r, g, b, a)};
+	}
+
+	// Tile layer overrides
+	uint32_t layerCount = 0;
+	archive.process(layerCount);
+	tileLayerOverrides.clear();
+	for ( uint32_t i = 0; i < layerCount; ++i )
+	{
+		int tileId;
+		uint8_t lay;
+		int8_t order;
+		archive.process(tileId);
+		archive.process(lay);
+		archive.process(order);
+		tileLayerOverrides[tileId] = TileLayer{lay, order};
 	}
 
 	// Collidable tile IDs

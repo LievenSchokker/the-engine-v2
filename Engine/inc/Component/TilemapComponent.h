@@ -46,6 +46,12 @@ class TilemapComponent: public RenderComponent,
 		Color tint = Color::white();
 	};
 
+	struct TileLayer
+	{
+		uint8_t layer = 0;
+		int8_t orderInLayer = 0;
+	};
+
 	/**
 	 * @brief Set the tilemap asset to use.
 	 * @param asset Pointer to a loaded TilemapAsset
@@ -136,6 +142,24 @@ class TilemapComponent: public RenderComponent,
 	 */
 	void setTileSprite(int tileId, IImage* image, int frameIndex,
 					   const Color& tint = Color::white());
+
+	/**
+	 * @brief Override render layer/order for a specific tile ID.
+	 * @param tileId The tile ID to set layer for
+	 * @param layer The render layer
+	 * @param orderInLayer The order within the layer
+	 */
+	void setTileLayer(int tileId, uint8_t layer, int8_t orderInLayer = 0);
+
+	/**
+	 * @brief Check if a tile ID has a layer override.
+	 */
+	bool hasTileLayer(int tileId) const;
+
+	/**
+	 * @brief Get the layer override for a tile ID, or nullptr if missing.
+	 */
+	const TileLayer* getTileLayer(int tileId) const;
 
 	/**
 	 * @brief Check if a tile ID has a sprite mapping.
@@ -229,6 +253,7 @@ class TilemapComponent: public RenderComponent,
 	Vector2 tilesetFrameSize{0.0, 0.0};
 	std::unordered_map<int, Color> tileColors;
 	std::unordered_map<int, TileSprite> tileSprites;
+	std::unordered_map<int, TileLayer> tileLayerOverrides;
 	std::unordered_set<int> collidableTileIds;
 	uint8_t layer = 0;
 	int8_t orderInLayer = 0;
