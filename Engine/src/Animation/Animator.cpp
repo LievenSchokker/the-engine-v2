@@ -330,15 +330,8 @@ AnimationClip* Animator::addSpritesheetTracksToClip(
 
 void Animator::serialize(WriteArchive& archive) const
 {
-	uint8_t dummy = 0;
-	archive.process(dummy);
 }
 
 void Animator::deserialize(ReadArchive& archive)
 {
-	std::cout << "[Animator::deserialize] this=" << this
-		  << " hasClips=" << spritesheetClips.size()
-		  << " isPlaying=" << isPlaying << std::endl;
-	uint8_t dummy;
-	archive.process(dummy);
 }
