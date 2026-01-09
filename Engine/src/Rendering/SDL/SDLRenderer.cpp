@@ -84,6 +84,8 @@ void SDLRenderer::open(const WindowOptions& options)
 	if (userInterfaceHook != nullptr)
 	{
 		userInterfaceHook->initialize();
+		userInterfaceHook->onResize(options.width, options.height);
+
 	}
 	SDL_RenderClear(renderer);
 }
@@ -326,6 +328,14 @@ void SDLRenderer::destroySolidQuadTexture()
 	{
 		SDL_DestroyTexture(solidQuadTexture);
 		solidQuadTexture = nullptr;
+	}
+}
+
+void SDLRenderer::onResize(int width, int height)
+{
+	if (userInterfaceHook)
+	{
+		userInterfaceHook->onResize(width, height);
 	}
 }
 

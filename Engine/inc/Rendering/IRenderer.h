@@ -111,4 +111,6 @@ class IRenderer
 	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 
 	virtual void setUIRenderHook(std::unique_ptr<IUIRenderHook> hook) = 0;
+
+	virtual void onResize(int width, int height) = 0;
 };

@@ -1,10 +1,11 @@
 #pragma once
 
-#include <string>
-#include "Rendering/Color.h"
 #include "Component/UIElement/Alignment.h"
+#include "Component/UIElement/Docking.h"
+#include "Rendering/Color.h"
 
 #include <functional>
+#include <string>
 #include <vector>
 
 constexpr uint32_t NO_PARENT = 0;
@@ -105,6 +106,7 @@ struct UIRenderCommand
 	float titleHeight = 24.0f;
 	float titlePadding = 4.0f;
 	float titleLabelPadding = 4.0f;
+	UIDock dock = UIDock::None;
 
 	/**
 	 * @brief Composite key for depth sorting.

@@ -32,7 +32,12 @@ void RenderSystem::setupEvents(EventDispatcher& dispatcher)
 void RenderSystem::onWindowResize(const WindowResizeEvent& event)
 {
 	windowOptions.height = event.height;
-	windowOptions.width = event.width;
+	windowOptions.width  = event.width;
+
+	if (renderer)
+	{
+		renderer->onResize(event.width, event.height);
+	}
 }
 
 SystemStatus RenderSystem::start(GameWorld& gameWorld)

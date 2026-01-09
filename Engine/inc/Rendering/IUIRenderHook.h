@@ -55,5 +55,7 @@ public:
 	 */
 	virtual void close() = 0;
 
+	virtual void onResize(int width,int height)= 0;
+
 	virtual void setupEvents(EventDispatcher& dispatcher) = 0;
 };
