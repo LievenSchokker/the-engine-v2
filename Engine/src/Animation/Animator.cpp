@@ -328,84 +328,10 @@ AnimationClip* Animator::addSpritesheetTracksToClip(
 	return clipPtr;
 }
 
-
-void Animator::serialize(CerealWriteArchive& archive) const
+void Animator::serialize(WriteArchive& archive) const
 {
-    // Serialize clip count
-    auto clipCount = static_cast<uint32_t>(spritesheetClips.size());
-    archive.process(clipCount);
-
-    // Serialize each clip with its name
-    for (const auto& [name, clip] : spritesheetClips)
-    {
-        std::string clipName = name;
-        archive.process(clipName);
-        clip->serialize(archive);
-    }
-
-    // Current clip name
-    std::string currentClipName = getCurrentSpritesheetClipName();
-    archive.process(currentClipName);
-
-    // Playback state
-    uint8_t playing = isPlaying ? 1 : 0;
-    archive.process(playing);
-
-    float scale = timeScale;
-    archive.process(scale);
-
-    float time = currentTime;
-    archive.process(time);
 }
 
 void Animator::deserialize(ReadArchive& archive)
 {
-    stop();
-    spritesheetClips.clear();
-    clipToNameMap.clear();
-    clipsWithLoopingFrames.clear();
-    ownedClips.clear();
-
-    // Deserialize clips
-    uint32_t clipCount;
-    archive.process(clipCount);
-
-    for (uint32_t i = 0; i < clipCount; ++i)
-    {
-        std::string clipName;
-        archive.process(clipName);
-
-        auto clip = std::make_unique<AnimationClip>();
-        clip->deserialize(archive);
-
-        AnimationClip* rawPtr = clip.get();
-        clipToNameMap[rawPtr] = clipName;
-
-        if (clip->isLooping())
-        {
-            clipsWithLoopingFrames.insert(rawPtr);
-        }
-
-        spritesheetClips[clipName] = std::move(clip);
-    }
-
-    // Current clip name
-    std::string currentClipName;
-    archive.process(currentClipName);
-
-    // Playback state
-    uint8_t playing;
-    archive.process(playing);
-    archive.process(timeScale);
-    archive.process(currentTime);
-
-    // Restore playback
-    if (!currentClipName.empty() && hasSpritesheetClip(currentClipName))
-    {
-        playSpritesheet(currentClipName);
-        if (playing == 0)
-        {
-            pause();
-        }
-    }
 }
