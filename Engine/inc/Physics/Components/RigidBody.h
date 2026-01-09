@@ -104,6 +104,6 @@ class RigidBody: public Behaviour, public RegistrationBase<RigidBody>
 	BodyType bodyType = BodyType::Dynamic;
 	bool fixedRotation = false;
 	float linearDamping = 0.0f;
-	float gravityScale = 1.0f;
+	float gravityScale = 0.0f;
 	bool isBullet = false;
 };
