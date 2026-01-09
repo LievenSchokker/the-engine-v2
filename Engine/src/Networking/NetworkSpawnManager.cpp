@@ -19,7 +19,17 @@ NetworkSpawnManager::NetworkSpawnManager(GameWorld* gameWorlds) :
        identityRegistry(std::make_unique<NetworkIdentityRegistry>())
      , prefabLibrary(std::make_unique<PrefabLibrary>())
      , gameWorld(gameWorlds)
-{}
+{
+
+}
+
+NetworkSpawnManager::~NetworkSpawnManager()
+{
+	if (gameWorld != nullptr && gameWorld->server != nullptr)
+	{
+		gameWorld->server->setClientDisconnectedCallback(nullptr);
+	}
+}
 
 uint32_t NetworkSpawnManager::generateNetId()
 {
@@ -338,4 +348,13 @@ void NetworkSpawnManager::loadAssetsForGameObject(GameObject* obj)
 			);
 		}
 	}
+}
+
+void NetworkSpawnManager::configureServerCallbacks(Server* server)
+{
+	if (!server) return;
+
+	server->setClientDisconnectedCallback([this](int clientId) {
+		despawnClientObjects(clientId);
+	});
 }

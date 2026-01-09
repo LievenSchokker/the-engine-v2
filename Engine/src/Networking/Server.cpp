@@ -78,6 +78,8 @@ SystemStatus Server::start(GameWorld& gameWorld)
 		{
 			stateSyncSystem->setSceneManager(gameWorld.sceneManager);
 		}
+
+		gameWorld.spawnManager->configureServerCallbacks(this);
 	}
 	else
 	{
