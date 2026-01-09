@@ -163,6 +163,8 @@ protected:
 	{
 	}
 
+	void serialize(WriteArchive& archive) const override;
+	void deserialize(ReadArchive& archive) override;
 	uint32_t componentNetworkId = 0;
 
     SpawnOnType authorityType = SpawnOnType::ServerSpawn;
