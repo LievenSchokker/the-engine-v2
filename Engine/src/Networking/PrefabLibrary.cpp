@@ -97,18 +97,21 @@ size_t PrefabLibrary::size() const
 
 std::vector<uint32_t> PrefabLibrary::getNetworkPrefabIdsWithAuthoritativeClient() const
 {
-    std::vector<uint32_t> result;
+	std::vector<uint32_t> result;
 
-    for (const auto& [id, gameObject] : prefabsById)
-    {
-        if (const auto* networkBehaviour = gameObject->getComponent<NetworkBehaviour>())
-        {
-            if (networkBehaviour->getAuthorityType() == AuthorityType::ClientAuthority)
-            {
-                result.push_back(id);
-            }
-        }
-    }
+	for (const auto& [id, gameObject] : prefabsById)
+	{
+		auto behaviours = gameObject->getComponents<NetworkBehaviour>();
 
-    return result;
+		for (const auto* behaviour : behaviours)
+		{
+			if (behaviour->getAuthorityType() == SpawnOnType::ClientSpawn)
+			{
+				result.push_back(id);
+				break;
+			}
+		}
+	}
+
+	return result;
 }

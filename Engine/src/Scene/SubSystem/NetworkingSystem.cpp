@@ -60,11 +60,54 @@ void NetworkSystem::processForServer(Scene& scene, GameWorld& gameWorld)
 
     if (networkObjects.empty()) return;
 
-    for (const GameObject* obj : networkObjects)
+    for (GameObject* obj : networkObjects)
     {
-        auto behaviour = obj->getComponent<NetworkBehaviour>();
+        auto behaviours = obj->getComponents<NetworkBehaviour>();
 
-        if (behaviour && behaviour->getAuthorityType() == AuthorityType::ClientAuthority)
+        SpawnOnType finalAuthority = SpawnOnType::ServerSpawn;
+        bool hasClientAuthority = false;
+        bool hasServerAuthority = false;
+
+        for (auto* behaviour : behaviours)
+        {
+            if (behaviour->getAuthorityType() == SpawnOnType::ClientSpawn)
+            {
+                hasClientAuthority = true;
+            }
+            else
+            {
+                hasServerAuthority = true;
+            }
+        }
+
+        if (hasClientAuthority && hasServerAuthority)
+        {
+            std::cerr << "[NetworkSystem] ERROR: GameObject '" << obj->getName()
+                      << "' has NetworkBehaviours with mixed authority types!\n";
+
+            // Log which behaviours have which authority
+            for (auto* behaviour : behaviours)
+            {
+                std::cerr << "  - " << typeid(*behaviour).name()
+                          << ": " << (behaviour->getAuthorityType() == SpawnOnType::ClientSpawn
+                                      ? "ClientAuthority" : "ServerAuthority")
+                          << "\n";
+            }
+
+            std::cerr << "  Defaulting all to ServerAuthority." << std::endl;
+
+            for (auto* behaviour : behaviours)
+            {
+                behaviour->setAuthorityType(SpawnOnType::ServerSpawn);
+            }
+            finalAuthority = SpawnOnType::ServerSpawn;
+        }
+        else if (hasClientAuthority)
+        {
+            finalAuthority = SpawnOnType::ClientSpawn;
+        }
+
+        if (finalAuthority == SpawnOnType::ClientSpawn)
         {
             // ClientAuthority: just register as prefab
             auto extracted = scene.extractGameObject(obj->getGameObjectHandle());
@@ -410,7 +453,7 @@ bool NetworkSystem::isLocallyOwned(NetworkIdentity* identity, const GameWorld& g
         auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour);
         if (!netBehaviour) continue;
 
-        if (netBehaviour->getAuthorityType() == AuthorityType::ClientAuthority &&
+        if (netBehaviour->getAuthorityType() == SpawnOnType::ClientSpawn &&
             identity->getOwnerId() == gameWorld.localClientId)
         {
             return true;
