@@ -169,6 +169,7 @@ public:
      */
     static ServerConnectionInformation convertApplicationSettings(const ApplicationSpecifications& specifications);
 
+	int getConnectedClientCount() const;
 private:
     /**
      * @brief Deserializes and routes incoming messages
@@ -208,6 +209,7 @@ private:
      * @param clientId The newly connected client.
      */
     void handleNewClientConnected(int clientId) const;
+
     std::unique_ptr<ITransport> transport;
     ServerConnectionInformation setupInformation;
     SystemStatus status;

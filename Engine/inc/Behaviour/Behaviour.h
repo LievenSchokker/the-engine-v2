@@ -150,6 +150,7 @@ class Behaviour: virtual public Component
 	// Called when this GameObject's collider exits a sensor
 	virtual void onSensorExit(Collider* other) {}
 
+	void setGameWorld(GameWorld* world);
    private:
 	/**
 	* #brief check's if this behaviour has any subscriptions.
@@ -159,7 +160,7 @@ class Behaviour: virtual public Component
 	*/
 	bool hasSubscriptions() const;
 protected:
-    void setGameWorld(GameWorld* world);
+
     GameWorld* getWorld();
 	/**
 	 * @brief Subscribe to an event with automatic cleanup on destruction.

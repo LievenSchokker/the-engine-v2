@@ -73,6 +73,11 @@ SystemStatus Server::start(GameWorld& gameWorld)
 
 		stateSyncSystem = std::make_unique<StateSyncSystem>(
 			this, &gameWorld.spawnManager->getNetworkIdentityRegistry());
+
+		if (gameWorld.sceneManager)
+		{
+			stateSyncSystem->setSceneManager(gameWorld.sceneManager);
+		}
 	}
 	else
 	{
@@ -126,7 +131,6 @@ void Server::onConnectionChanged(const Connection& connection)
 			break;
 		}
 		case ConnectionStatus::Terminated:
-			break;
 		case ConnectionStatus::Error:
 			connectedClients.erase(clientId);
 			if (onClientDisconnected)
@@ -200,6 +204,11 @@ void Server::handleNewClientConnected(int clientId) const
 	}
 	auto message = std::make_unique<WelcomeMessage>(clientId);
 	messageDispatcher->processMessage(std::move(message));
+}
+
+int Server::getConnectedClientCount() const
+{
+	return connectedClients.size();
 }
 
 bool Server::sendMessage(const int clientId, const IMessage& message,

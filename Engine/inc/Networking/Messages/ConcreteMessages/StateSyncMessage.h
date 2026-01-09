@@ -32,5 +32,6 @@ public:
 	void clear();
 
 	uint32_t tick = 0;
+	std::string currentSceneName;
 	std::vector<std::unique_ptr<GameObject>> gameObjects;
 };
