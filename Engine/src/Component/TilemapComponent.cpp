@@ -235,6 +235,9 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 				tileOrder = layerOverride->second.orderInLayer;
 			}
 
+			auto colorIt = tileColors.find(tileId);
+			const bool hasColor = colorIt != tileColors.end();
+
 			// Calculate world position of this tile (top-left corner)
 			Vector2 tileWorldPos{0.0, 0.0};
 			tileWorldPos.x = origin.x + (x * tileSize.x);
@@ -245,46 +248,76 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			tileCenter.x = tileWorldPos.x + (tileSize.x / 2.0);
 			tileCenter.y = tileWorldPos.y + (tileSize.y / 2.0);
 
+			const TileSprite* sprite = nullptr;
+			int spriteRow = 0;
+			int spriteCol = 0;
 			if ( canRenderSprites )
 			{
 				auto spriteIt = tileSprites.find(tileId);
 				if ( spriteIt != tileSprites.end() )
 				{
-					const TileSprite& sprite = spriteIt->second;
-					if ( sprite.frameIndex >= 0 &&
-						 sprite.frameIndex < totalFrames )
+					const TileSprite& spriteRef = spriteIt->second;
+					if ( spriteRef.frameIndex >= 0 &&
+						 spriteRef.frameIndex < totalFrames )
 					{
-						const int row = sprite.frameIndex / columns;
-						const int col = sprite.frameIndex % columns;
-						RenderCommand command;
-						command.type = RenderCommandType::Sprite;
-						command.sprite = tilesetImage;
-						command.srcRect =
-							Rect(col * frameWidth, row * frameHeight,
-								 frameWidth, frameHeight);
-						command.position = tileCenter;
-						command.size = tileSize;
-						command.rotationDegrees = rotation;
-						command.scale = worldScale;
-						command.tint = sprite.tint;
-						command.layer = tileLayer;
-						command.orderInLayer = tileOrder;
-						queue.push(command);
-						continue;
+						spriteRow = spriteRef.frameIndex / columns;
+						spriteCol = spriteRef.frameIndex % columns;
+						sprite = &spriteRef;
 					}
 				}
 			}
 
-			RenderCommand command;
-			command.type = RenderCommandType::Rectangle;
-			command.position = tileCenter;
-			command.size = tileSize;
-			command.rotationDegrees = rotation;
-			command.scale = worldScale;
-			command.color = getTileColor(tileId);
-			command.layer = tileLayer;
-			command.orderInLayer = tileOrder;
-			queue.push(command);
+			if ( !hasColor && sprite == nullptr )
+			{
+				continue;
+			}
+
+			const uint8_t baseOrder = static_cast<uint8_t>(tileOrder);
+			uint8_t backgroundOrder = baseOrder;
+			uint8_t spriteOrder = baseOrder;
+			if ( hasColor && sprite != nullptr )
+			{
+				if ( baseOrder < 255 )
+				{
+					spriteOrder = static_cast<uint8_t>(baseOrder + 1);
+				}
+				else if ( baseOrder > 0 )
+				{
+					backgroundOrder = static_cast<uint8_t>(baseOrder - 1);
+				}
+			}
+
+			if ( hasColor )
+			{
+				RenderCommand command;
+				command.type = RenderCommandType::Rectangle;
+				command.position = tileCenter;
+				command.size = tileSize;
+				command.rotationDegrees = rotation;
+				command.scale = worldScale;
+				command.color = colorIt->second;
+				command.layer = tileLayer;
+				command.orderInLayer = backgroundOrder;
+				queue.push(command);
+			}
+
+			if ( sprite != nullptr )
+			{
+				RenderCommand command;
+				command.type = RenderCommandType::Sprite;
+				command.sprite = tilesetImage;
+				command.srcRect =
+					Rect(spriteCol * frameWidth, spriteRow * frameHeight,
+						 frameWidth, frameHeight);
+				command.position = tileCenter;
+				command.size = tileSize;
+				command.rotationDegrees = rotation;
+				command.scale = worldScale;
+				command.tint = sprite->tint;
+				command.layer = tileLayer;
+				command.orderInLayer = spriteOrder;
+				queue.push(command);
+			}
 		}
 	}
 }

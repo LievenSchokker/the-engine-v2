@@ -72,7 +72,7 @@ class TilemapComponent: public RenderComponent,
 	/**
 	 * @brief Set the color for a specific tile ID.
 	 * @param tileId The tile ID to set color for
-	 * @param color The color to use
+	 * @param color The color to use (rendered behind sprites when set)
 	 */
 	void setTileColor(int tileId, const Color& color);
 
