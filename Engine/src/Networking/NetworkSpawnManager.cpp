@@ -41,6 +41,8 @@ GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int o
         return nullptr;
     }
 
+	gameObject->setName(gameObject->getName() + std::to_string(ownerId));
+
     auto* identity = gameObject->getComponent<NetworkIdentity>();
     if (!identity)
     {
@@ -225,6 +227,8 @@ void NetworkSpawnManager::handleSpawnMessage(SpawnMessage& message)
 	identity->networkId = message.netId;
 	identity->ownerId = message.ownerId;
 	identity->gameWorld = gameWorld;
+
+	message.gameObject->setName(message.gameObject->getName() + std::to_string(message.ownerId));
 
 	if (identityRegistry)
 	{
