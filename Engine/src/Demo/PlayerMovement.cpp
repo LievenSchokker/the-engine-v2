@@ -13,7 +13,7 @@
 
 PlayerMovement::PlayerMovement()
 {
-	authorityType = AuthorityType::ClientAuthority;
+	authorityType = SpawnOnType::ClientSpawn;
 }
 
 void PlayerMovement::onStart()

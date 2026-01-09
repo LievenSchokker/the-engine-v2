@@ -44,7 +44,12 @@ inline void NetworkBehaviour::addCommand(const std::string& name,
 	commands[name] = std::move(callback);
 }
 
-inline AuthorityType NetworkBehaviour::getAuthorityType() const
+inline SpawnOnType NetworkBehaviour::getAuthorityType() const
 {
 	return authorityType;
+}
+
+inline void NetworkBehaviour::setAuthorityType(SpawnOnType authorityType_)
+{
+	authorityType = authorityType_;
 }

@@ -30,11 +30,13 @@ void NetworkIdentity::onNetworkInstantiate(const uint32_t nextNetworkId)
 
 	const auto& allBehaviours = getGameObject()->getAllBehaviours();
 
+
+	uint32_t componentIndex = 0;
 	for (Behaviour* behaviour : allBehaviours)
 	{
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
-			netBehaviour->setComponentNetworkId(nextNetworkId);
+			netBehaviour->setComponentNetworkId(componentIndex++);
 			networkBehaviours.push_back(netBehaviour);
 		}
 	}

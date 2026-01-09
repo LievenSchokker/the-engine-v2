@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "AuthorityType.h"
+#include "SpawnOnType.h"
 
 class NetworkBuilder;
 
@@ -127,7 +127,8 @@ public:
 
 	void addCommand(const std::string& name, ActionCallback callback);
 
-    AuthorityType getAuthorityType() const;
+    SpawnOnType getAuthorityType() const;
+	void setAuthorityType(SpawnOnType authorityType);
 protected:
 	/**
 	 * @brief Sends a command from client to server.
@@ -164,7 +165,7 @@ protected:
 
 	uint32_t componentNetworkId = 0;
 
-    AuthorityType authorityType = AuthorityType::ServerAuthority;
+    SpawnOnType authorityType = SpawnOnType::ServerSpawn;
 private:
 	/// Commands are client→server calls
 	std::unordered_map<std::string, ActionCallback> commands;
