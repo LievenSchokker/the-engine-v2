@@ -83,12 +83,12 @@ public:
     void untrackSpawnedObject(uint32_t netId);
 
 	void loadAssetsForGameObject(GameObject *obj);
-
 private:
 	SpawnMessage createSpawnMessage(const NetworkIdentity* identity,
 	                                uint32_t assetId);
 
 	uint32_t generateNetId();
+
 
 	GameWorld* gameWorld;
 	std::unique_ptr<NetworkIdentityRegistry> identityRegistry;

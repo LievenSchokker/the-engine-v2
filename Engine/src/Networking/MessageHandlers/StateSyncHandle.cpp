@@ -18,8 +18,8 @@ StateSyncMessageHandler::StateSyncMessageHandler(GameWorld& world, NetworkIdenti
 void StateSyncMessageHandler::handleMessageInternal()
 {
 	StateSyncMessage* message = getMessage();
-	if (!message) return;
-
+	if (message == nullptr) return;
+	if (message->validate() == false) return;
 
     uint32_t lastTick = gameWorld->client->getLastReceivedTick();
     // Skip check if we haven't received anything yet
@@ -29,5 +29,5 @@ void StateSyncMessageHandler::handleMessageInternal()
     }
 
     gameWorld->client->setLastReceivedTick(message->tick);
-	gameWorld->sceneManager->applyNetworkSnapshot(message->gameObjects);
+	gameWorld->sceneManager->applyNetworkSnapshot(message->currentSceneName, message->gameObjects);
 }

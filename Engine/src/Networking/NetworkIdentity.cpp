@@ -6,10 +6,7 @@
 
 NetworkIdentity::~NetworkIdentity()
 {
-	if (gameWorld && gameWorld->spawnManager)
-	{
-		gameWorld->spawnManager->getNetworkIdentityRegistry().unregisterIdentity(this);
-	}
+	networkBehaviours.clear();
 }
 
 
@@ -50,6 +47,7 @@ void NetworkIdentity::onNetworkSpawn()
 		if (auto* netBehaviour = dynamic_cast<NetworkBehaviour*>(behaviour))
 		{
 			netBehaviour->identity = this;
+			netBehaviour->setGameWorld(this->gameWorld);
 
 			if (std::ranges::find(networkBehaviours, netBehaviour) == networkBehaviours.end())
 			{

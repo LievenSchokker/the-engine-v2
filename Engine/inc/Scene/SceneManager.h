@@ -12,6 +12,7 @@
 #include "Networking/Connection/ConnectionMode.h"
 #include "SubSystems/BehaviourSystem.h"
 #include "SubSystems/DestroySystem.h"
+#include "SubSystems/NetworkSystem.h"
 
 class NetworkSpawnManager;
 
@@ -163,14 +164,7 @@ public:
      */
     [[nodiscard]] Scene* getPersistentScene() const;
 
-    /**
-     * @brief Check if a network identity is locally owned.
-     * @param identity The network identity to check.
-     * @return True if locally owned.
-     */
-    [[nodiscard]] bool isLocallyOwned(NetworkIdentity* identity) const;
-
-    /**
+	/**
      * @brief Set the game world reference.
      * @param world Pointer to the game world.
      */
@@ -181,37 +175,10 @@ public:
      * @return Name of the first scene, or empty string if no scenes.
      */
     [[nodiscard]] std::string getFirstSceneName() const;
-	void applyNetworkSnapshot(std::vector<std::unique_ptr<GameObject>>& receivedObjects);
-    void reloadAssetsForGameObject(GameObject* obj, AssetManager& assetManager);
+	void applyNetworkSnapshot(std::string currentSceneName, std::vector<std::unique_ptr<GameObject>> &receivedObjects);
 
     BehaviourSystem& getBehaviourSystem();
 private:
-    /**
-     * @brief Processes a scene for networking based on configured mode.
-     * @param scene The scene to process.
-     */
-    void processSceneForNetwork(Scene& scene);
-
-    /**
-     * @brief Server: Extract NetworkBehaviour objects as prefabs.
-     */
-    void processForServer(Scene& scene) const;
-
-    /**
-     * @brief Checks if a GameObject has any NetworkBehaviour components.
-     * @param obj The game object to check.
-     * @return True if has NetworkBehaviour.
-     */
-    [[nodiscard]] bool hasNetworkBehaviour(const GameObject& obj) const;
-
-    /**
-     * @brief Checks if a GameObject has a NetworkIdentity.
-     * @param obj The game object to check.
-     * @return True if has NetworkIdentity.
-     */
-    [[nodiscard]] bool hasNetworkIdentity(const GameObject& obj) const;
-
-	void addInlineChildrenRecursive(GameObject* obj);
     /// @brief Whether networking has been configured
     bool networkConfigured = false;
 
@@ -242,4 +209,6 @@ private:
 	std::unique_ptr<BehaviourSystem> behaviourSystem;
 
 	std::unique_ptr<DestroySystem> destroySystem;
+
+	std::unique_ptr<NetworkSystem> networkSystem;
 };

@@ -28,11 +28,12 @@ public:
 	 */
 	void setSyncInterval(uint32_t interval) { syncInterval = interval; }
 
+	void setSceneManager(SceneManager* sceneManager_) { sceneManager = sceneManager_; }
 private:
 	void broadcastState(uint32_t currentTick);
-
+	SceneManager* sceneManager;
 	Server* server;
 	NetworkIdentityRegistry* registry;
-	uint32_t syncInterval = 1;  // Sync every tick by default
+	uint32_t syncInterval = 1;
 	uint32_t tickCounter = 0;
 };
