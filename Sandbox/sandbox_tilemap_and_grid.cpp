@@ -380,11 +380,11 @@ int main(int argc, char** argv)
 
 		// blockedBoulder = std::make_unique<GameObject>();
 		// blockedBoulder->setName("BlockedBoulder");
+		// blockedBoulder->setLayer(1);
 		// auto* boulderRenderer =
 		// blockedBoulder->addComponent<ShapeRenderer>();
 		// boulderRenderer->setRectangle(tilemapComponent->getTileSize())
-		// 	.setColor(Color::gray())
-		// 	.setLayer(1);
+		// 	.setColor(Color::gray());
 		// blockedBoulder->getTransform()->setPosition(
 		// 	tilemapComponent->cellToWorld(blockedCell));
 
@@ -415,10 +415,10 @@ int main(int argc, char** argv)
 		// Create an agent that uses the tilemap-backed navigation surface
 		agentObject = std::make_unique<GameObject>();
 		agentObject->setName("TilemapAgent");
+		agentObject->setLayer(1);
 		auto* agentRenderer = agentObject->addComponent<ShapeRenderer>();
 		agentRenderer->setRectangle({20.0f, 20.0f})
-			.setColor(Color::red())
-			.setLayer(1);
+			.setColor(Color::red());
 		agentComponent = agentObject->addComponent<Agent>();
 		agentObject->addComponent<NetworkedObjectMarker>();
 
@@ -428,8 +428,9 @@ int main(int argc, char** argv)
 		// Target that the agent will path towards
 		targetObject = std::make_unique<GameObject>();
 		targetObject->setName("Target");
+		targetObject->setLayer(1);
 		auto* targetRenderer = targetObject->addComponent<ShapeRenderer>();
-		targetRenderer->setCircle(6.0f).setColor(Color::yellow()).setLayer(1);
+		targetRenderer->setCircle(6.0f).setColor(Color::yellow());
 		targetObject->addComponent<NetworkedObjectMarker>();
 		targetObject->getTransform()->setPosition(
 			tilemapComponent->cellToWorld(targetCell));
@@ -437,9 +438,10 @@ int main(int argc, char** argv)
 		// Input + path visualization
 		navInputObject = std::make_unique<GameObject>();
 		navInputObject->setName("NavigationInput");
+		navInputObject->setLayer(1);
 		auto* navTest = navInputObject->addComponent<NavigationTest>();
 		auto* pathRenderer = navInputObject->addComponent<PathRenderer>();
-		pathRenderer->setLayer(1).setRenderEnabled(false);
+		pathRenderer->setRenderEnabled(false);
 		navTest->setAgent(*agentComponent);
 		navTest->setTarget(*targetObject->getTransform());
 		navTest->setGridComponent(*gridComponent);
@@ -483,10 +485,11 @@ int main(int argc, char** argv)
 	// Create a controllable player with physics
 	playerObject = std::make_unique<GameObject>();
 	playerObject->setName("Player");
+	playerObject->setLayer(2);
 	playerObject->getTransform()->setPosition(
 		tilemapComponent->cellToWorld({1.0f, 1.0f}));
 	auto* playerRenderer = playerObject->addComponent<ShapeRenderer>();
-	playerRenderer->setCircle(8.0f).setColor(Color::blue()).setLayer(2);
+	playerRenderer->setCircle(8.0f).setColor(Color::blue());
 	playerObject->addComponent<RigidBody>();
 	auto* playerBody = playerObject->getComponent<RigidBody>();
 	if ( playerBody != nullptr )
@@ -506,10 +509,11 @@ int main(int argc, char** argv)
 	// Create a pushable box
 	pushBoxObject = std::make_unique<GameObject>();
 	pushBoxObject->setName("PushBox");
+	pushBoxObject->setLayer(2);
 	pushBoxObject->getTransform()->setPosition(
 		tilemapComponent->cellToWorld({3.0f, 1.0f}));
 	auto* boxRenderer = pushBoxObject->addComponent<ShapeRenderer>();
-	boxRenderer->setCircle(14.0f).setColor(Color::orange()).setLayer(2);
+	boxRenderer->setCircle(14.0f).setColor(Color::orange());
 	pushBoxObject->addComponent<RigidBody>();
 	auto* boxBody = pushBoxObject->getComponent<RigidBody>();
 	if ( boxBody != nullptr )

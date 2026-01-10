@@ -3,8 +3,9 @@
 
 #include "AI/Navigation/Pathfinding/PathResult.h"
 #include "AI/Agent.h"
+#include "GameObject/GameObject.h"
+#include "Rendering/RenderUtils.h"
 #include "Scene/Scene.h"
-
 
 void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 {
@@ -13,6 +14,7 @@ void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
 
     const float circleRadius = pathRenderOptions.circleRadius;
     const Color circleColor = currentPath.isValid() ? pathRenderOptions.validPathColor : pathRenderOptions.invalidPathColor;
+    const uint8_t renderLayer = clampRenderLayer(getGameObject());
 
     for (const auto& node : currentPath.getPath())
     {
@@ -22,7 +24,7 @@ void PathRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
         command.position = node;
         command.radius = circleRadius;
         command.color = circleColor;
-        command.layer = layer;
+        command.layer = renderLayer;
         command.orderInLayer = orderInLayer;
         queue.push(command);
     }

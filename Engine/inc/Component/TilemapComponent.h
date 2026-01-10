@@ -46,9 +46,8 @@ class TilemapComponent: public RenderComponent,
 		Color tint = Color::white();
 	};
 
-	struct TileLayer
+	struct TileOrderOverride
 	{
-		uint8_t layer = 0;
 		int8_t orderInLayer = 0;
 	};
 
@@ -144,22 +143,21 @@ class TilemapComponent: public RenderComponent,
 					   const Color& tint = Color::white());
 
 	/**
-	 * @brief Override render layer/order for a specific tile ID.
-	 * @param tileId The tile ID to set layer for
-	 * @param layer The render layer
+	 * @brief Override render order within the GameObject layer for a tile ID.
+	 * @param tileId The tile ID to set order for
 	 * @param orderInLayer The order within the layer
 	 */
-	void setTileLayer(int tileId, uint8_t layer, int8_t orderInLayer = 0);
+	void setTileOrderOverride(int tileId, int8_t orderInLayer = 0);
 
 	/**
-	 * @brief Check if a tile ID has a layer override.
+	 * @brief Check if a tile ID has an order override.
 	 */
-	bool hasTileLayer(int tileId) const;
+	bool hasTileOrderOverride(int tileId) const;
 
 	/**
-	 * @brief Get the layer override for a tile ID, or nullptr if missing.
+	 * @brief Get the order override for a tile ID, or nullptr if missing.
 	 */
-	const TileLayer* getTileLayer(int tileId) const;
+	const TileOrderOverride* getTileOrderOverride(int tileId) const;
 
 	/**
 	 * @brief Check if a tile ID has a sprite mapping.
@@ -241,7 +239,6 @@ class TilemapComponent: public RenderComponent,
 	 * @brief Check if the tilemap is loaded and ready.
 	 */
 	bool isReady() const;
-	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
@@ -253,8 +250,7 @@ class TilemapComponent: public RenderComponent,
 	Vector2 tilesetFrameSize{0.0, 0.0};
 	std::unordered_map<int, Color> tileColors;
 	std::unordered_map<int, TileSprite> tileSprites;
-	std::unordered_map<int, TileLayer> tileLayerOverrides;
+	std::unordered_map<int, TileOrderOverride> tileOrderOverrides;
 	std::unordered_set<int> collidableTileIds;
-	uint8_t layer = 0;
 	int8_t orderInLayer = 0;
 };

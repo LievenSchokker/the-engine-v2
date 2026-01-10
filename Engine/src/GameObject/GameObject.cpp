@@ -354,6 +354,8 @@ void GameObject::serialize(WriteArchive& archive) const
 {
 	std::string n = name;
 	archive.process(n);
+	int layerValue = layer;
+	archive.process(layerValue);
 
 	// Transform
 	Transform* t = getTransform();
@@ -437,6 +439,7 @@ void GameObject::serialize(WriteArchive& archive) const
 void GameObject::deserialize(ReadArchive& archive)
 {
 	archive.process(name);
+	archive.process(layer);
 
 	float posX, posY;
 	double rotation;

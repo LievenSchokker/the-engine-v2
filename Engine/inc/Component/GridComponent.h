@@ -238,7 +238,6 @@ public:
 	 * @brief Check if the grid is ready for queries.
 	 */
 	bool isReady() const;
-	void setLayer(uint8_t l);
 	void setOrderInLayer(int8_t order);
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
@@ -257,7 +256,6 @@ private:
 	tileWeights; // Map tile ID to movement cost
 
 	static std::pair<int, int> cellKey(Vector2 cell);
-	uint8_t layer = 0;
 	int8_t orderInLayer =
 		1;	// Default to 1 so debug overlays render above base content
 };

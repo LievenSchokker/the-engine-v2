@@ -1,9 +1,11 @@
 #include "Component/SpriteComponent.h"
 
 #include "Component/Transform.h"
+#include "GameObject/GameObject.h"
 #include "Math/Vector2Utils.h"
 #include "Rendering/RenderCommandType.h"
 #include "Rendering/RenderQueue/IRenderQueueWriter.h"
+#include "Rendering/RenderUtils.h"
 
 #include <algorithm>
 #include <numeric>
@@ -113,7 +115,7 @@ void SpriteComponent::fillRenderQueue(IRenderQueueWriter &queue) const
 	command.tint = tint;
 	command.flipX = flipX;
 	command.flipY = flipY;
-	command.layer = 0; // Can be extended later if needed
+	command.layer = clampRenderLayer(getGameObject());
 	command.orderInLayer = 0; // Can be extended later if needed
 
 	queue.push(command);
