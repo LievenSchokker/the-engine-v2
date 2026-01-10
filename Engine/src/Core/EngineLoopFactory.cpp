@@ -89,8 +89,8 @@ std::unique_ptr<IEngineLoop> EngineLoopFactory::createEngineLoop(
     {
         if (contextPtr != nullptr)
         {
-            auto audioSystem = std::make_unique<AudioSystem>(
-                std::make_unique<AudioBackendSDL>());
+            auto audioSystem = std::make_unique<AudioSystem>(std::make_unique<AudioBackendSDL>());
+            gameWorld->audio = audioSystem->getAudioManager();
             loop->addSystem(std::move(audioSystem));
         }
     }
