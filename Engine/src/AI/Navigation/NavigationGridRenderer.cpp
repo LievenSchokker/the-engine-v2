@@ -3,6 +3,8 @@
 #include "AI/Navigation/NavigationGrid.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "Component/Transform.h"
+#include "GameObject/GameObject.h"
+#include "Rendering/RenderUtils.h"
 #include "Scene/Scene.h"
 
 void NavigationGridRenderer::onAwake()
@@ -24,9 +26,12 @@ void NavigationGridRenderer::fillRenderQueue(IRenderQueueWriter &queue) const
     if (!cacheBuilt)
         return;
 
+    const uint8_t renderLayer = clampRenderLayer(getGameObject());
+
     for (const auto& cmd : cachedCommands)
     {
         RenderCommand command = cmd;
+        command.layer = renderLayer;
         queue.push(command);
     }
 }

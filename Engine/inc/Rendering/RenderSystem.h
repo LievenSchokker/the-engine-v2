@@ -52,9 +52,10 @@ public:
 	void shutdown(GameWorld& gameWorld) override;
 	void processWorldCommands();
 	void setClearColor(const Color& color);
-		void updateCameras(const Scene& scene);
+	void updateCameras(const Scene& scene);
 
 	const Color& getClearColor() const;
+	const WindowOptions& getWindowOptions() const;
 
    private:
 	const std::string getName() const override;

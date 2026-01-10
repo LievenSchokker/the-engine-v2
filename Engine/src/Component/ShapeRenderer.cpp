@@ -1,8 +1,10 @@
 #include "Component/ShapeRenderer.h"
 
 #include "Component/Transform.h"
+#include "GameObject/GameObject.h"
 #include "Math/Vector2.h"
 #include "Math/Vector2Utils.h"
+#include "Rendering/RenderUtils.h"
 
 #include <algorithm>
 
@@ -78,11 +80,10 @@ void ShapeRenderer::fillRenderQueue(IRenderQueueWriter& queue) const
 	command.rotationDegrees = rotation;
 	command.scale = scale;
 	command.color = color;
-	command.layer = layer;
+	command.layer = clampRenderLayer(getGameObject());
 	command.orderInLayer = orderInLayer;
 	queue.push(command);
 }
-
 
 void ShapeRenderer::serialize(WriteArchive& archive) const
 {
@@ -102,9 +103,7 @@ void ShapeRenderer::serialize(WriteArchive& archive) const
 	archive.process(sizeX);
 	archive.process(sizeY);
 
-	uint8_t lay = layer;
 	int8_t order = orderInLayer;
-	archive.process(lay);
 	archive.process(order);
 }
 
@@ -128,7 +127,6 @@ void ShapeRenderer::deserialize(ReadArchive& archive)
 	archive.process(size.x);
 	archive.process(size.y);
 
-	// Layer info
-	archive.process(layer);
+	// Order info
 	archive.process(orderInLayer);
 }

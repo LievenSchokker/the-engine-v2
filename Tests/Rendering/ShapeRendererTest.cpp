@@ -144,16 +144,16 @@ TEST(RenderSystemTest, ExecutesCommandsThroughRenderer)
 
     auto circle1 = std::make_unique<GameObject>();
     circle1->getTransform()->setPosition({42.0, 24.0});
+    circle1->setLayer(2);
     auto* shape1 = circle1->addComponent<ShapeRenderer>();
     shape1->setCircle(25.0).setColor(Color::blue());
-    shape1->setLayer(2);  // Layer 2
     scene->addGameObject(std::move(circle1));
 
     auto circle2 = std::make_unique<GameObject>();
     circle2->getTransform()->setPosition({10.0, 10.0});
+    circle2->setLayer(1);
     auto* shape2 = circle2->addComponent<ShapeRenderer>();
     shape2->setCircle(15.0).setColor(Color::red());
-    shape2->setLayer(1);  // Layer 1
     scene->addGameObject(std::move(circle2));
 
 	auto world = std::make_unique<GameWorld>();

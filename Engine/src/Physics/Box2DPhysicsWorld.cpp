@@ -8,6 +8,12 @@
 
 #include <iostream>
 
+namespace
+{
+constexpr float kDegToRad = 3.14159265359f / 180.0f;
+constexpr float kRadToDeg = 180.0f / 3.14159265359f;
+}
+
 Box2DPhysicsWorld::Box2DPhysicsWorld(float newTickRate)
 	: worldId{}, tickRate(newTickRate)
 {
@@ -124,7 +130,7 @@ void Box2DPhysicsWorld::createBody(const RigidBody* rigidBody)
 
 	Vector2 pos = transform->getPosition();
 	def.position = {pos.x, pos.y};
-	def.rotation = b2MakeRot(transform->getRotationAngle());
+	def.rotation = b2MakeRot(transform->getRotationAngle() * kDegToRad);
 
 	b2BodyId body = b2CreateBody(worldId, &def);
 
@@ -204,7 +210,7 @@ void Box2DPhysicsWorld::setBodyTransform(const RigidBody* rigidBody,
 	if ( it == bodies.end() ) return;
 
 	b2Vec2 b2Position = {position.x, position.y};
-	b2Rot b2Rotation = b2MakeRot(rotationAngle);
+	b2Rot b2Rotation = b2MakeRot(rotationAngle * kDegToRad);
 	b2Body_SetTransform(it->second, b2Position, b2Rotation);
 }
 
@@ -257,7 +263,8 @@ void Box2DPhysicsWorld::syncTransforms()
 
 		gameObject->getTransform()->setPosition(
 			Vector2(position.x, position.y));
-		gameObject->getTransform()->setRotationAngle(b2Rot_GetAngle(rotation));
+		gameObject->getTransform()->setRotationAngle(
+			b2Rot_GetAngle(rotation) * kRadToDeg);
 
 		auto* rb = const_cast<RigidBody*>(rigidBody);
 		rb->linearVelocity = {linearVel.x, linearVel.y};
@@ -282,8 +289,8 @@ void Box2DPhysicsWorld::applyNetworkSnapshot()
 		const Transform* transform = gameObject->getTransform();
 		if ( !transform ) continue;
 
-		const Vector2 targetPos = transform->getPosition();
-		const float targetAngle = transform->getRotationAngle();
+	const Vector2 targetPos = transform->getPosition();
+	const float targetAngle = transform->getRotationAngle() * kDegToRad;
 
 		b2Vec2 currentPos = b2Body_GetPosition(bodyId);
 		b2Rot currentRot = b2Body_GetRotation(bodyId);
@@ -312,10 +319,10 @@ void Box2DPhysicsWorld::applyNetworkSnapshot()
 			newPosition.y = currentPos.y + dy * positionLerpFactor;
 
 			float angleDiff = targetAngle - currentAngle;
-			while ( angleDiff > 3.14159265359 )
-				angleDiff -= 2.0f * 3.14159265359;
-			while ( angleDiff < -3.14159265359 )
-				angleDiff += 2.0f * 3.14159265359;
+			while ( angleDiff > 3.14159265359f )
+				angleDiff -= 2.0f * 3.14159265359f;
+			while ( angleDiff < -3.14159265359f )
+				angleDiff += 2.0f * 3.14159265359f;
 			newAngle = currentAngle + angleDiff * rotationLerpFactor;
 		}
 

@@ -2,6 +2,8 @@
 
 #include "Component/TilemapComponent.h"
 #include "Component/Transform.h"
+#include "GameObject/GameObject.h"
+#include "Rendering/RenderUtils.h"
 
 #include <algorithm>
 #include <cmath>
@@ -287,6 +289,8 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		return;
 	}
 
+	const uint8_t renderLayer = clampRenderLayer(getGameObject());
+
 	const Transform* transform = getTransform();
 	if (transform == nullptr)
 	{
@@ -388,7 +392,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 			line.rotationDegrees = angle;
 			line.scale = {1.0, 1.0};
 			line.color = debugGridLineColor;
-			line.layer = layer;
+			line.layer = renderLayer;
 			line.orderInLayer = orderInLayer;
 			queue.push(line);
 		}
@@ -405,7 +409,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		dot.rotationDegrees = 0.0;
 		dot.scale = {1.0, 1.0};
 		dot.color = debugWalkableDotColor;
-		dot.layer = layer;
+		dot.layer = renderLayer;
 		dot.orderInLayer = orderInLayer;
 		queue.push(dot);
 	}
@@ -430,7 +434,7 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		dot.rotationDegrees = 0.0;
 		dot.scale = {1.0, 1.0};
 		dot.color = debugBlockedDotColor;
-		dot.layer = layer;
+		dot.layer = renderLayer;
 		dot.orderInLayer = orderInLayer;
 		queue.push(dot);
 	}
@@ -439,11 +443,6 @@ void GridComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 bool GridComponent::isReady() const
 {
 	return tilemapComponent != nullptr && tilemapComponent->isReady();
-}
-
-void GridComponent::setLayer(uint8_t l)
-{
-	layer = l;
 }
 
 void GridComponent::setOrderInLayer(int8_t order)
@@ -507,10 +506,7 @@ void GridComponent::serialize(WriteArchive& archive) const
         archive.process(w);
     }
 
-    // Layer info
-    uint8_t lay = layer;
     int8_t order = orderInLayer;
-    archive.process(lay);
     archive.process(order);
 }
 
@@ -566,7 +562,5 @@ void GridComponent::deserialize(ReadArchive& archive)
         tileWeights[tileId] = weight;
     }
 
-    // Layer info
-    archive.process(layer);
     archive.process(orderInLayer);
 }

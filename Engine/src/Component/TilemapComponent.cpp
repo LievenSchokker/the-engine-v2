@@ -3,9 +3,12 @@
 #include "Assets/IImage.h"
 #include "Assets/TilemapAsset.h"
 #include "Component/Transform.h"
+#include "GameObject/GameObject.h"
 #include "Math/Vector2.h"
 #include "Math/Vector2Utils.h"
+#include "Rendering/RenderUtils.h"
 
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -128,22 +131,21 @@ const TilemapComponent::TileSprite* TilemapComponent::getTileSprite(
 	return nullptr;
 }
 
-void TilemapComponent::setTileLayer(int tileId, uint8_t layer,
-									int8_t orderInLayer)
+void TilemapComponent::setTileOrderOverride(int tileId, int8_t orderInLayer)
 {
-	tileLayerOverrides[tileId] = TileLayer{layer, orderInLayer};
+	tileOrderOverrides[tileId] = TileOrderOverride{orderInLayer};
 }
 
-bool TilemapComponent::hasTileLayer(int tileId) const
+bool TilemapComponent::hasTileOrderOverride(int tileId) const
 {
-	return tileLayerOverrides.contains(tileId);
+	return tileOrderOverrides.contains(tileId);
 }
 
-const TilemapComponent::TileLayer* TilemapComponent::getTileLayer(
+const TilemapComponent::TileOrderOverride* TilemapComponent::getTileOrderOverride(
 	int tileId) const
 {
-	auto it = tileLayerOverrides.find(tileId);
-	if ( it != tileLayerOverrides.end() )
+	auto it = tileOrderOverrides.find(tileId);
+	if ( it != tileOrderOverrides.end() )
 	{
 		return &it->second;
 	}
@@ -184,6 +186,8 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 	{
 		return;
 	}
+
+	const uint8_t renderLayer = clampRenderLayer(getGameObject());
 
 	// Use world transforms to respect parent-child hierarchy
 	const Vector2 origin = transform->getWorldPosition();
@@ -226,13 +230,11 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 		for ( int x = 0; x < width; ++x )
 		{
 			int tileId = tilemapAsset->getTile(x, y);
-			uint8_t tileLayer = layer;
 			int8_t tileOrder = orderInLayer;
-			auto layerOverride = tileLayerOverrides.find(tileId);
-			if ( layerOverride != tileLayerOverrides.end() )
+			auto orderOverride = tileOrderOverrides.find(tileId);
+			if ( orderOverride != tileOrderOverrides.end() )
 			{
-				tileLayer = layerOverride->second.layer;
-				tileOrder = layerOverride->second.orderInLayer;
+				tileOrder = orderOverride->second.orderInLayer;
 			}
 
 			auto colorIt = tileColors.find(tileId);
@@ -296,7 +298,7 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 				command.rotationDegrees = rotation;
 				command.scale = worldScale;
 				command.color = colorIt->second;
-				command.layer = tileLayer;
+				command.layer = renderLayer;
 				command.orderInLayer = backgroundOrder;
 				queue.push(command);
 			}
@@ -314,7 +316,7 @@ void TilemapComponent::fillRenderQueue(IRenderQueueWriter& queue) const
 				command.rotationDegrees = rotation;
 				command.scale = worldScale;
 				command.tint = sprite->tint;
-				command.layer = tileLayer;
+				command.layer = renderLayer;
 				command.orderInLayer = spriteOrder;
 				queue.push(command);
 			}
@@ -417,11 +419,6 @@ bool TilemapComponent::isReady() const
 	return tilemapAsset != nullptr && tilemapAsset->isLoaded();
 }
 
-void TilemapComponent::setLayer(uint8_t l)
-{
-	layer = l;
-}
-
 void TilemapComponent::setOrderInLayer(int8_t order)
 {
 	orderInLayer = order;
@@ -471,16 +468,14 @@ void TilemapComponent::serialize(WriteArchive& archive) const
 		archive.process(a);
 	}
 
-	// Tile layer overrides
-	uint32_t layerCount = static_cast<uint32_t>(tileLayerOverrides.size());
-	archive.process(layerCount);
-	for ( const auto& [tileId, layerOverride] : tileLayerOverrides )
+	// Tile order overrides
+	uint32_t orderCount = static_cast<uint32_t>(tileOrderOverrides.size());
+	archive.process(orderCount);
+	for ( const auto& [tileId, orderOverride] : tileOrderOverrides )
 	{
 		int id = tileId;
-		uint8_t lay = layerOverride.layer;
-		int8_t order = layerOverride.orderInLayer;
+		int8_t order = orderOverride.orderInLayer;
 		archive.process(id);
-		archive.process(lay);
 		archive.process(order);
 	}
 
@@ -493,10 +488,8 @@ void TilemapComponent::serialize(WriteArchive& archive) const
 		archive.process(id);
 	}
 
-	// Layer info
-	uint8_t lay = layer;
+	// Order info
 	int8_t order = orderInLayer;
-	archive.process(lay);
 	archive.process(order);
 }
 
@@ -540,19 +533,17 @@ void TilemapComponent::deserialize(ReadArchive& archive)
 		tileSprites[tileId] = TileSprite{frameIndex, Color(r, g, b, a)};
 	}
 
-	// Tile layer overrides
-	uint32_t layerCount = 0;
-	archive.process(layerCount);
-	tileLayerOverrides.clear();
-	for ( uint32_t i = 0; i < layerCount; ++i )
+	// Tile order overrides
+	uint32_t orderCount = 0;
+	archive.process(orderCount);
+	tileOrderOverrides.clear();
+	for ( uint32_t i = 0; i < orderCount; ++i )
 	{
 		int tileId;
-		uint8_t lay;
 		int8_t order;
 		archive.process(tileId);
-		archive.process(lay);
 		archive.process(order);
-		tileLayerOverrides[tileId] = TileLayer{lay, order};
+		tileOrderOverrides[tileId] = TileOrderOverride{order};
 	}
 
 	// Collidable tile IDs
@@ -566,8 +557,6 @@ void TilemapComponent::deserialize(ReadArchive& archive)
 		collidableTileIds.insert(tileId);
 	}
 
-	// Layer info
-	archive.process(layer);
 	archive.process(orderInLayer);
 
 	// Note: tilemapAsset is runtime reference
