@@ -136,6 +136,11 @@ const Color& RenderSystem::getClearColor() const
 	return clearColor;
 }
 
+const WindowOptions& RenderSystem::getWindowOptions() const
+{
+	return windowOptions;
+}
+
 void RenderSystem::updateCameras(const Scene& scene)
 {
 	cameras = scene.getAllComponentsOfType<Camera>();
