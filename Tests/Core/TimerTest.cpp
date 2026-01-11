@@ -148,27 +148,27 @@ TEST_F(TimerTest, TimeScaleAffectsDeltaTime)
 
 	// Act & Assert - Default time scale should be 1.0
 	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 1.0);
-	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime);
+	EXPECT_DOUBLE_EQ(timer->getFixedDeltaTime(), fixedDeltaTime);
 
 	// Act & Assert - Slow motion (0.5x)
 	timer->setTimeScale(0.5);
 	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 0.5);
-	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime * 0.5);
+	EXPECT_DOUBLE_EQ(timer->getFixedDeltaTime(), fixedDeltaTime * 0.5);
 
 	// Act & Assert - Fast motion (2.0x)
 	timer->setTimeScale(2.0);
 	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 2.0);
-	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime * 2.0);
+	EXPECT_DOUBLE_EQ(timer->getFixedDeltaTime(), fixedDeltaTime * 2.0);
 
 	// Act & Assert - Very slow (0.10x)
 	timer->setTimeScale(0.10);
 	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 0.10);
-	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime * 0.10);
+	EXPECT_DOUBLE_EQ(timer->getFixedDeltaTime(), fixedDeltaTime * 0.10);
 
 	// Act & Assert - Reset to normal
 	timer->setTimeScale(1.0);
 	EXPECT_DOUBLE_EQ(timer->getTimeScale(), 1.0);
-	EXPECT_DOUBLE_EQ(timer->getDeltaTime(), fixedDeltaTime);
+	EXPECT_DOUBLE_EQ(timer->getFixedDeltaTime(), fixedDeltaTime);
 }
 
 // Test 4: Verify pause prevents fixed updates
@@ -309,6 +309,6 @@ TEST_F(TimerTest, TimeScaleAffectsSimulationSpeed)
 	EXPECT_GT(normalTicks, slowTicks);
 
 	// Check that delta times match expected scaling
-	EXPECT_DOUBLE_EQ(timerNormal->getDeltaTime(), (1.0 / targetTickRate) * 1.0);
-	EXPECT_DOUBLE_EQ(timerSlow->getDeltaTime(), (1.0 / targetTickRate) * 0.5);
+	EXPECT_DOUBLE_EQ(timerNormal->getFixedDeltaTime(), (1.0 / targetTickRate) * 1.0);
+	EXPECT_DOUBLE_EQ(timerSlow->getFixedDeltaTime(), (1.0 / targetTickRate) * 0.5);
 }

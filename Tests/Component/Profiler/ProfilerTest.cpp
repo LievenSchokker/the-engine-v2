@@ -274,21 +274,6 @@ TEST_F(ProfilerTest, RenderMinMaxLabelUsesLabelColor)
     EXPECT_EQ(minMax.color, Color::white());
 }
 
-TEST_F(ProfilerTest, RenderEntityLabelReturnsTextCommand)
-{
-    UIRenderCommand entity = profiler->renderEntityLabel();
-
-    EXPECT_EQ(entity.type, UICommandType::Text);
-    EXPECT_NE(entity.text.find("Entities:"), std::string::npos);
-}
-
-TEST_F(ProfilerTest, RenderSceneLabelReturnsTextCommand)
-{
-    UIRenderCommand scene = profiler->renderSceneLabel();
-
-    EXPECT_EQ(scene.type, UICommandType::Text);
-    EXPECT_NE(scene.text.find("Active Scenes:"), std::string::npos);
-}
 
 TEST_F(ProfilerTest, SetShowFPSFalseHidesFPS)
 {
@@ -306,18 +291,8 @@ TEST_F(ProfilerTest, SetShowFPSTrueShowsFPS)
     EXPECT_TRUE(hasTextContaining("FPS:"));
 }
 
-TEST_F(ProfilerTest, SetShowFrameTimeFalseHidesFrameTime)
-{
-    profiler->setShowFrameTime(false);
-    profiler->fillUserInterfaceRenderQueue(*mockQueue);
-
-    EXPECT_FALSE(hasTextContaining("Frame:"));
-    EXPECT_FALSE(hasTextContaining("Min/Max:"));
-}
-
 TEST_F(ProfilerTest, SetShowFrameTimeTrueShowsFrameTime)
 {
-    profiler->setShowFrameTime(true);
     profiler->fillUserInterfaceRenderQueue(*mockQueue);
 
     EXPECT_TRUE(hasTextContaining("Frame:"));
@@ -326,22 +301,11 @@ TEST_F(ProfilerTest, SetShowFrameTimeTrueShowsFrameTime)
 
 TEST_F(ProfilerTest, SetShowEntityCountFalseHidesEntityInfo)
 {
-    profiler->setShowEntityCount(false);
     profiler->fillUserInterfaceRenderQueue(*mockQueue);
 
     EXPECT_FALSE(hasTextContaining("Entities:"));
     EXPECT_FALSE(hasTextContaining("Active Scenes:"));
 }
-
-TEST_F(ProfilerTest, SetShowEntityCountTrueShowsEntityInfo)
-{
-    profiler->setShowEntityCount(true);
-    profiler->fillUserInterfaceRenderQueue(*mockQueue);
-
-    EXPECT_TRUE(hasTextContaining("Entities:"));
-    EXPECT_TRUE(hasTextContaining("Active Scenes:"));
-}
-
 
 TEST_F(ProfilerTest, RenderQueueNotFilledWhenInvisible)
 {
@@ -386,29 +350,6 @@ TEST_F(ProfilerTest, RenderQueueAllCommandsUseSamePanelId)
         EXPECT_EQ(cmd.panelId, 9999);
     }
 }
-
-TEST_F(ProfilerTest, RenderQueueWithAllOptionsEnabled)
-{
-    profiler->setShowFPS(true);
-    profiler->setShowFrameTime(true);
-    profiler->setShowEntityCount(true);
-    profiler->fillUserInterfaceRenderQueue(*mockQueue);
-
-    // Should have: Panel, FPS, FrameTime, MinMax, Separator, Entities, Scenes
-    EXPECT_GE(mockQueue->commands.size(), 7u);
-}
-
-TEST_F(ProfilerTest, RenderQueueWithAllOptionsDisabled)
-{
-    profiler->setShowFPS(false);
-    profiler->setShowFrameTime(false);
-    profiler->setShowEntityCount(false);
-    profiler->fillUserInterfaceRenderQueue(*mockQueue);
-
-    // Should only have: Panel, Separator
-    EXPECT_EQ(mockQueue->commands.size(), 2u);
-}
-
 
 TEST_F(ProfilerTest, FPSCalculationWithConstantFrameTime)
 {

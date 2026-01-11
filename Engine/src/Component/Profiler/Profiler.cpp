@@ -20,8 +20,6 @@ Profiler::Profiler(float x, float y, float width, float height)
 	  averageFrameTime(0.0f),
 	  minFrameTime(0.0f),
 	  maxFrameTime(0.0f),
-	  entityCount(0),
-	  activeSceneCount(0),
 	  showFPS(true),
 	  showFrameTime(true),
 	  showFrameGraph(true),
@@ -42,7 +40,6 @@ void Profiler::update(double deltaTime, const GameWorld& gameWorld)
 	timeSinceLastUpdate += deltaTime;
 	if ( timeSinceLastUpdate >= updateInterval )
 	{
-		updateStats(gameWorld);
 		timeSinceLastUpdate = 0.0f;
 	}
 }
@@ -64,15 +61,6 @@ void Profiler::calculateFPS(float deltaTime)
 
 		minFrameTime = *std::min_element(frameTimes.begin(), frameTimes.end());
 		maxFrameTime = *std::max_element(frameTimes.begin(), frameTimes.end());
-	}
-}
-
-void Profiler::updateStats(const GameWorld& world)
-{
-	if (world.sceneManager != nullptr )
-	{
-		entityCount = 0;
-		activeSceneCount = 1;
 	}
 }
 
@@ -101,12 +89,7 @@ void Profiler::fillUserInterfaceRenderQueue(
 	sep1.type = UICommandType::Separator;
 	sep1.panelId = panelId;
 	queue.push(sep1);
-
-	if ( showEntityCount )
-	{
-		queue.push(renderEntityLabel());
-		queue.push(renderSceneLabel());
-	}
+	
 }
 
 UIRenderCommand Profiler::renderPanel() const
@@ -164,27 +147,7 @@ UIRenderCommand Profiler::renderMinMaxLabel() const
 	return minMaxLabel;
 }
 
-UIRenderCommand Profiler::renderEntityLabel() const
-{
-	UIRenderCommand entityLabel;
-	entityLabel.type = UICommandType::Text;
-	entityLabel.panelId = panelId;
-	entityLabel.text = "Entities: " + std::to_string(entityCount);
-	entityLabel.color = labelColor;
-	entityLabel.alignment = Alignment::Left;
-	return entityLabel;
-}
 
-UIRenderCommand Profiler::renderSceneLabel() const
-{
-	UIRenderCommand sceneLabel;
-	sceneLabel.type = UICommandType::Text;
-	sceneLabel.panelId = panelId;
-	sceneLabel.text = "Active Scenes: " + std::to_string(activeSceneCount);
-	sceneLabel.color = labelColor;
-	sceneLabel.alignment = Alignment::Left;
-	return sceneLabel;
-}
 
 void Profiler::toggle()
 {
@@ -199,16 +162,6 @@ void Profiler::setUpdateInterval(float seconds)
 void Profiler::setShowFPS(bool show)
 {
 	showFPS = show;
-}
-
-void Profiler::setShowFrameTime(bool show)
-{
-	showFrameTime = show;
-}
-
-void Profiler::setShowEntityCount(bool show)
-{
-	showEntityCount = show;
 }
 
 Color Profiler::getFPSColor() const

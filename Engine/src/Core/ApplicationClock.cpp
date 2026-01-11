@@ -35,6 +35,7 @@ void ApplicationClock::tick()
 {
 	double newTime = getClock();
 	double frameTime = newTime - currentTime;
+	deltaTime = frameTime;
 
 	double oldAccum = accumulatedTime;
 
@@ -49,7 +50,7 @@ void ApplicationClock::tick()
 	// When paused, we want to freeze the simulation exactly where it is
 	if ( !paused )
 	{
-		accumulatedTime += frameTime;
+		accumulatedTime += frameTime * timeScale;
 	}
 }
 
@@ -77,8 +78,13 @@ double ApplicationClock::getTime() const
 
 double ApplicationClock::getDeltaTime() const
 {
-	return fixedDeltaTime * timeScale;
+	return deltaTime * timeScale;
 }
+double ApplicationClock::getFixedDeltaTime()
+{
+	return fixedDeltaTime;
+}
+
 
 double ApplicationClock::getAccumulatedTime() const
 {
@@ -119,3 +125,5 @@ bool ApplicationClock::isPaused() const
 {
 	return paused;
 }
+
+

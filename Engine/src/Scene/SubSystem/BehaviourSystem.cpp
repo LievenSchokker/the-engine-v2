@@ -55,7 +55,7 @@ void BehaviourSystem::update(Scene& scene, double deltaTime, const GameWorld& wo
                 continue;
 			if (fixed)
 			{
-				behaviour->fixedUpdate();
+				behaviour->fixedUpdate(deltaTime);
 			}
         	else
         	{

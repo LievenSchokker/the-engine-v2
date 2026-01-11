@@ -88,6 +88,8 @@ public:
 	 */
 	[[nodiscard]] double getDeltaTime() const;
 
+	double getFixedDeltaTime();
+
 	/**
 	 * @brief Gets remaining time in accumulator after fixed updates.
 	 * @return Leftover frame time not yet simulated (always < fixedDeltaTime)
@@ -145,6 +147,7 @@ private:
 	/** @brief A functions that retusn, the time the applicationhas beenrunning in second */
 	ClockFunction getClock;
 	double fixedDeltaTime;
+	double deltaTime = 0.0;
 	double currentTime;
 	double accumulatedTime;
 	double simulationTime;

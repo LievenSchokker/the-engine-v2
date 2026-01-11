@@ -45,8 +45,6 @@ public:
 	UIRenderCommand renderFps() const;
 	UIRenderCommand renderFrameTime() const;
 	UIRenderCommand renderMinMaxLabel() const;
-	UIRenderCommand renderEntityLabel() const;
-	UIRenderCommand renderSceneLabel() const;
 	/// @}
 
 
@@ -55,9 +53,6 @@ public:
 
 	void setUpdateInterval(float seconds);
 	void setShowFPS(bool show);
-	void setShowFrameTime(bool show);
-	void setShowEntityCount(bool show);
-
 private:
 	/// Rolling window size for frame time averaging. 60 samples smooths
 	/// out single-frame spikes while still responding to sustained changes.
@@ -77,9 +72,6 @@ private:
 	float maxFrameTime;
 	/// @}
 
-	int entityCount;
-	int activeSceneCount;
-
 	bool showFPS;
 	bool showFrameTime;
 	bool showFrameGraph;
@@ -97,7 +89,6 @@ private:
 	Color badColor;
 	/// @}
 
-	void updateStats(const GameWorld& world);
 	void calculateFPS(float deltaTime);
 	Color getFPSColor() const;
 	Color getFrameTimeColor() const;
