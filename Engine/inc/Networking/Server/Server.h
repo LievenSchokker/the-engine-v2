@@ -67,6 +67,14 @@ public:
      * @param deltaTime Time since last update.
      * @param gameWorld Reference to the game world.
      */
+    void update(double deltaTime, const GameWorld& gameWorld) override;
+
+    /**
+     * @brief Advances the server tick loop for state sync.
+     *
+     * @param deltaTime Time since last fixed update.
+     * @param gameWorld Reference to the game world.
+     */
     void fixedUpdate(double deltaTime, const GameWorld& gameWorld) override;
 
     /**

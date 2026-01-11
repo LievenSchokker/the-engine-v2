@@ -33,9 +33,10 @@ void Box2DPhysicsWorld::initialize()
 
 void Box2DPhysicsWorld::step(float deltaTime)
 {
+	const float timeStep = (deltaTime > 0.0f) ? deltaTime : (1.0f / tickRate);
 	const int subStepCount = 4;
 
-	b2World_Step(worldId, deltaTime, subStepCount);
+	b2World_Step(worldId, timeStep, subStepCount);
 	handleEvents();
 	syncTransforms();
 }
