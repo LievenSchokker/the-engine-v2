@@ -118,8 +118,8 @@ void createCircle(std::unique_ptr<GameObject>& circle, float x, float y,
 	circle->getTransform()->setPosition({x, y});
 	circle->getTransform()->setScale({1.0, 1.0});
 	circle->addComponent<ShapeRenderer>()->setCircle(radius).setColor(color);
-
-	circle->addComponent<RigidBody>();
+	auto rigid = circle->addComponent<RigidBody>();
+	rigid->setGravityScale(1);
 	auto* collider = circle->addComponent<Collider>();
 	collider->setCircle(radius);
 	collider->setDensity(density);
