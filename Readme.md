@@ -40,6 +40,8 @@ After successfully installing vcpkg run the following command to install all dep
 vcpkg install
 ```
 
+**Note:** For documentation generation, you'll also need Doxygen. Download it from [doxygen.org](https://www.doxygen.nl/download.html) or try installing via vcpkg (availability may vary by platform).
+
 The following command is to make sure CMake can find each package.
 A variable will be shown, copy that variable and place it inside the CMAKE build config.
 
@@ -66,6 +68,9 @@ brew install gamenetworkingsockets
 ```
 ```bash
 brew install googletest
+```
+```bash
+brew install doxygen
 ```
 
 ### Linux Setup
@@ -96,6 +101,11 @@ $ cmake -G Ninja ..
 $ ninja
 
 # cmake --install .
+```
+
+For documentation generation, install Doxygen:
+```bash
+# apt install doxygen
 ```
 
 ## Dependencies
@@ -153,3 +163,50 @@ executeRenderQueue(renderer, queue); // Draws both shapes using the object's tra
 
 Shapes automatically follow the owning object's position, rotation, and scale every frame. Build a
 `RenderQueue` from the active scene when you're ready and let the renderer consume it on its own timing.
+
+## Generating Documentation
+
+The engine includes Doxygen comments in all public headers. To generate HTML documentation:
+
+### Prerequisites
+
+**Windows:**
+- Download and install Doxygen from [doxygen.org](https://www.doxygen.nl/download.html)
+- Or use vcpkg: `vcpkg install doxygen` (if available for your platform)
+
+**macOS:**
+```bash
+brew install doxygen
+```
+
+**Linux:**
+```bash
+# Debian/Ubuntu
+sudo apt install doxygen
+
+# Fedora
+sudo dnf install doxygen
+
+# Arch Linux
+sudo pacman -S doxygen
+```
+
+### Building Documentation
+
+After installing Doxygen and configuring CMake, generate the documentation:
+
+**Using CMake:**
+```bash
+cd build
+cmake --build . --target docs
+```
+
+**Using Make (if using Unix Makefiles generator):**
+```bash
+cd build
+make docs
+```
+
+The documentation will be generated in `build/docs/html/index.html`. Open this file in your web browser to view the API documentation.
+
+To regenerate documentation after making changes to Doxygen comments, simply run the build command again.

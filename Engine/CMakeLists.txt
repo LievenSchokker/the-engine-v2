@@ -41,3 +41,31 @@ target_link_libraries(engine PUBLIC
 )
 
 add_library(Engine::Core ALIAS engine)
+
+# Doxygen documentation
+find_package(Doxygen QUIET)
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/docs)
+    set(DOXYGEN_PROJECT_NAME "Engine Documentation")
+    set(DOXYGEN_PROJECT_BRIEF "A modern C++20 game engine")
+    set(DOXYGEN_INPUT_DIRECTORIES ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+    set(DOXYGEN_MAINPAGE ${CMAKE_CURRENT_SOURCE_DIR}/../Readme.md)
+    set(DOXYGEN_USE_MDFILE_AS_MAINPAGE ${CMAKE_CURRENT_SOURCE_DIR}/../Readme.md)
+    
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    
+    add_custom_target(docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM
+    )
+    message(STATUS "Doxygen found - documentation target 'docs' available")
+else()
+    message(STATUS "Doxygen not found - documentation target will not be available")
+    if(WIN32)
+        message(STATUS "Install Doxygen: vcpkg install doxygen (or download from doxygen.org)")
+    else()
+        message(STATUS "Install Doxygen: brew install doxygen (macOS) or apt install doxygen (Linux)")
+    endif()
+endif()
