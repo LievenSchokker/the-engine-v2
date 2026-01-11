@@ -35,8 +35,6 @@ class RenderSystem: public IEngineSystems
 	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
 	void setupEvents(EventDispatcher& dispatcher);
 
-	// #TODO Mag weg?
-	void setupEvents(EventDispatcher& dispatcher) const;
 	void onWindowResize(const WindowResizeEvent& event);
 
 	SystemStatus start(GameWorld& gameWorld) override;
