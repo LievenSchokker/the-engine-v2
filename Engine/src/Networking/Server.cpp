@@ -94,8 +94,20 @@ SystemStatus Server::start(GameWorld& gameWorld)
 
 void Server::fixedUpdate(double deltaTime, const GameWorld& gameWorld)
 {
-	transport->poll();
 	stateSyncSystem->tick(gameWorld.clock->getTotalTicks());
+}
+
+void Server::update(double deltaTime, const GameWorld& gameWorld)
+{
+	(void)deltaTime;
+	(void)gameWorld;
+
+	if (status != SystemStatus::RUNNING)
+	{
+		return;
+	}
+
+	transport->poll();
 }
 
 void Server::shutdown(GameWorld& gameWorld)
