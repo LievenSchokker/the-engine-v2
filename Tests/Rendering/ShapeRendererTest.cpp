@@ -56,6 +56,8 @@ struct FakeRenderer : public IRenderer
     }
 	void setupEvents(EventDispatcher&) override {}
 
+	void onResize(int width, int height) override {};
+
 	bool isWindowOpen = true;
     int beginCalls = 0;
     int endCalls = 0;

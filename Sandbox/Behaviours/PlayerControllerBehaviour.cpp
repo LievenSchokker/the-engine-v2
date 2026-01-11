@@ -30,7 +30,7 @@ void PlayerControllerBehaviour::onStart()
 	}
 }
 
-void PlayerControllerBehaviour::fixedUpdate()
+void PlayerControllerBehaviour::fixedUpdate(double deltaTime)
 {
 }
 
