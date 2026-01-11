@@ -1,16 +1,13 @@
 #include "Rendering/Nuklear/NuklearSDLRenderHook.h"
 
-#include <algorithm>
-
 #include "nuklear.h"
 #include "nuklear_sdl_renderer.h"
-#include "../../../inc/Events/EventImplementations/ApplicationEvents.h"
-#include "../../../inc/Events/EventImplementations/UserInterfaceEvent.h"
+#include "Events/EventImplementations/ApplicationEvents.h"
+#include "Events/EventImplementations/UserInterfaceEvent.h"
 #include "Input/InputManager.h"
-#include "Input/KeyCode.h"
 #include "Input/MouseButton.h"
+#include "Rendering/PanelState.h"
 
-#include <algorithm>
 #include <iostream>
 #include <algorithm>
 
@@ -403,15 +400,20 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
 
     const auto& panel = commandQueue[panelIterator->second];
 
-    PanelState& state = panelStateCache[panelId];
-    if (!state.initialized) {
-        state.x = panel.x;
-        state.y = panel.y;
-        state.width = panel.width;
-        state.height = panel.height;
-        state.isClosed = false;
-        state.initialized = true;
-    }
+	PanelState& state = panelStateCache[panelId];
+
+	if (!state.initialized)
+	{
+		state.width = panel.width;
+		state.height = panel.height;
+		state.initialized = true;
+	}
+
+	if (panel.dock != UIDock::None)
+	{
+		applyDocking(state, panel);
+		state.appliedDock = panel.dock;
+	}
 
     if (state.isClosed) {
         return;
@@ -424,7 +426,8 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
     if (panel.resizable) flags |= NK_WINDOW_SCALABLE;
     if (panel.minimizable) flags |= NK_WINDOW_MINIMIZABLE;
     if (panel.closable) flags |= NK_WINDOW_CLOSABLE;
-    if (panel.movable) flags |= NK_WINDOW_MOVABLE;
+	if (panel.movable && panel.dock == UIDock::None)
+		flags |= NK_WINDOW_MOVABLE;
 
     char windowId[32];
     snprintf(windowId, sizeof(windowId), "##%u", panelId);
@@ -467,28 +470,18 @@ void NuklearSDLRenderHook::renderPanel(uint32_t panelId)
     nuklearContext->style.window.header.label_padding =
         nk_vec2(panel.titleLabelPadding, panel.titleLabelPadding);
 
-    if (win == nullptr) {
-        if (nk_begin(nuklearContext, name,
-                     nk_rect(state.x, state.y, state.width, state.height), flags))
-        {
-            nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
-            renderPanelContents(panelId);
-        }
-    } else {
-        if (nk_begin(nuklearContext, name,
-                     nk_rect(win->bounds.x, win->bounds.y,
-                             win->bounds.w, win->bounds.h), flags))
-        {
-            nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
-            renderPanelContents(panelId);
-        }
-    }
+	struct nk_rect desiredBounds = nk_rect(
+	    state.x,
+	    state.y,
+	    state.width,
+	    state.height
+	);
 
-    struct nk_rect bounds = nk_window_get_bounds(nuklearContext);
-    state.x = bounds.x;
-    state.y = bounds.y;
-    state.width = bounds.w;
-    state.height = bounds.h;
+	if (nk_begin(nuklearContext, name, desiredBounds, flags))
+	{
+	    nk_layout_row_dynamic(nuklearContext, panel.rowHeight, panel.columns);
+	    renderPanelContents(panelId);
+	}
 
     if (panel.closable && nk_window_is_hidden(nuklearContext, name)) {
         state.isClosed = true;
@@ -561,5 +554,40 @@ void NuklearSDLRenderHook::close()
 		nk_sdl_shutdown();
 		nk_free(nuklearContext);
 		nuklearContext = nullptr;
+	}
+}
+
+void NuklearSDLRenderHook::onResize(int width, int height)
+{
+	windowWidth  = width;
+	windowHeight = height;
+}
+
+void NuklearSDLRenderHook::applyDocking(PanelState& state, const UIRenderCommand& panel)
+{
+	switch (panel.dock)
+	{
+		case UIDock::TopLeft:
+			state.x = 0;
+			state.y = 0;
+			break;
+
+		case UIDock::TopRight:
+			state.x = windowWidth - state.width;
+			state.y = 0;
+			break;
+
+		case UIDock::BottomLeft:
+			state.x = 0;
+			state.y = windowHeight - state.height;
+			break;
+
+		case UIDock::BottomRight:
+			state.x = windowWidth - state.width;
+			state.y = windowHeight - state.height;
+			break;
+
+		default:
+			break;
 	}
 }

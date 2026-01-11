@@ -56,6 +56,7 @@ void UIPanelElement::fillUserInterfaceRenderQueue(IUserInterfaceRenderQueueWrite
 	command.resizable = resizable;
 	command.minimizable = minimizable;
 	command.closable = closable;
+	command.dock = dock;
 
 	queue.push(command);
 }
@@ -110,3 +111,6 @@ float UIPanelElement::getTitleLabelPadding() const { return titleLabelPadding; }
 void UIPanelElement::setTitleHeight(float height) { titleHeight = height; }
 void UIPanelElement::setTitlePadding(float pad) { titlePadding = pad; }
 void UIPanelElement::setTitleLabelPadding(float pad) { titleLabelPadding = pad; }
+
+void UIPanelElement::setDock(UIDock d){dock = d;}
+UIDock UIPanelElement::getDock() const {return dock;}

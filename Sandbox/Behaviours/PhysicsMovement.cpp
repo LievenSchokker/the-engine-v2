@@ -18,7 +18,7 @@
 
 PhysicsMovement::PhysicsMovement()
 {
-    authorityType = AuthorityType::ClientAuthority;
+    authorityType = SpawnOnType::ClientSpawn;
 }
 
 void PhysicsMovement::onStart()

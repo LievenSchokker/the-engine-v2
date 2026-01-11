@@ -149,6 +149,7 @@ class SDLRenderer: public IRenderer
 	void clearTextureCache();
 	bool ensureSolidQuadTexture();
 	void destroySolidQuadTexture();
+	void onResize(int width, int height) override;
 	SDL_Window* window =
 		nullptr;  ///< Null indicates closed state; must outlive renderer
 	SDL_Renderer* renderer =

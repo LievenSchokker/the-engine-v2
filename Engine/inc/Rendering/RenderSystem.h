@@ -23,7 +23,7 @@ class IRenderer;
  */
 class RenderSystem: public IEngineSystems
 {
-public:
+   public:
 	/**
 	 * @brief Takes ownership of a renderer implementation.
 	 * @param renderer The backend-specific renderer to delegate drawing to.
@@ -33,9 +33,8 @@ public:
 	 *
 	 */
 	explicit RenderSystem(std::unique_ptr<IRenderer> renderer);
- void setupEvents(EventDispatcher& dispatcher);
+	void setupEvents(EventDispatcher& dispatcher);
 
- void setupEvents(EventDispatcher& dispatcher) const;
 	void onWindowResize(const WindowResizeEvent& event);
 
 	SystemStatus start(GameWorld& gameWorld) override;

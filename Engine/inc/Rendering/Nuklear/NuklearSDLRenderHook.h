@@ -9,6 +9,8 @@
 #include <queue>
 #include <unordered_map>
 
+struct PanelState;
+
 /**
  * @brief SDL-specific implementation of Nuklear UI rendering.
  *
@@ -87,8 +89,11 @@ public:
 	*
 	*/
 	void process(const std::vector<UIRenderCommand>& commands, InputManager& inputManager) override;
-
+	void onResize(int width, int height) override;
 private:
+	int windowWidth = 0;
+	int windowHeight = 0;
+
 	void flushCommands();
 	void createDefaultPanel(uint32_t panelId);
 	void renderPanel(uint32_t panelId);
@@ -101,6 +106,7 @@ private:
 	void renderImage(const UIRenderCommand& command);
 	void renderSpacer(const UIRenderCommand& command);
 	void renderText(const UIRenderCommand& command);
+	void applyDocking(PanelState& state, const UIRenderCommand& panel);
 
 	InputManager* inputManager;
 	SDL_Window* sdlWindow;
@@ -115,12 +121,6 @@ private:
 	int mouseX;
 	int mouseY;
 
-	struct PanelState {
-		float x, y, width, height;
-		bool initialized = false;
-		bool isMinimized = false;
-		bool isClosed = false;
-	};
 
 	std::unordered_map<uint32_t, PanelState> panelStateCache;
 

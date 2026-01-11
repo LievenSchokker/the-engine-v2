@@ -13,7 +13,7 @@ std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
     auto scene = std::make_unique<Scene>("UIStressTest");
 
     auto menu1 = std::make_unique<GameObject>();
-    auto panel1 = menu1->addComponent<UIPanelElement>(20, 20, 280, 500, "THICC BOI");
+    auto panel1 = menu1->addComponent<UIPanelElement>(20, 20, 280, 200, "THICC BOI");
     panel1->setPanelId(1);
     panel1->setBorder(true);
     panel1->setMinimizable(true);
@@ -28,6 +28,7 @@ std::unique_ptr<Scene> UserInterfaceZandbak::getScene()
     panel1->setTitlePadding(10.0f);
     panel1->setRowHeight(40.0f);
     panel1->setColumns(1);
+	panel1->setDock(UIDock::BottomRight);
 
 	auto label1 = menu1->addComponent<UITextElement>(0, 0, 200, 30, "MAXIMUM THICCNESS");
     label1->setPanelId(1);

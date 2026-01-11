@@ -1,8 +1,8 @@
 #pragma once
 
-
 #include "Behaviour/Behaviour.h"
 #include "Component/UIElement/UIElement.h"
+#include "Docking.h"
 #include "Math/Vector2.h"
 
 #include <string>
@@ -78,7 +78,11 @@ public:
 	void setTitleHeight(float height);
 	void setTitlePadding(float pad);
 	void setTitleLabelPadding(float pad);
+
+	void setDock(UIDock dock);
+	UIDock getDock() const;
 private:
+	UIDock dock = UIDock::None;
 	std::string title;
 
 	float borderThickness = 1.0f;
