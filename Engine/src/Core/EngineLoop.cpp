@@ -71,11 +71,6 @@ void EngineLoop::initNetwork() const
 			game->getApplicationSpecifications().networkingOptions.port,
 			game->getApplicationSpecifications().networkingOptions.serverIP
 		};
-
-		if (gameWorld->getDispatcher() != nullptr)
-		{
-			gameWorld->client->connectToServer(serverInfo);
-		}
 	}
 
 	if (hasFlag(game->getApplicationSpecifications().engineSystem , EngineSystem::NetServer))
