@@ -213,6 +213,11 @@ int Server::getConnectedClientCount() const
 	return connectedClients.size();
 }
 
+const std::unordered_set<int>& Server::getConnectedClientIds() const
+{
+	return connectedClients;
+}
+
 bool Server::sendMessage(const int clientId, const IMessage& message,
                          const SendMode& mode) const
 {
@@ -302,6 +307,8 @@ void Server::setClientDisconnectedCallback(ClientDisconnectedCallback callback)
 {
 	onClientDisconnected = std::move(callback);
 }
+
+
 
 ServerConnectionInformation Server::convertApplicationSettings(
 	const ApplicationSpecifications& specifications)

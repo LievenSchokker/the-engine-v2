@@ -54,6 +54,7 @@ public:
 	 */
 	[[nodiscard]] size_t size() const;
     std::vector<uint32_t> getNetworkPrefabIdsWithAuthoritativeClient() const;
+	void clear();
 
 private:
 	uint32_t nextAssetId = 1;
