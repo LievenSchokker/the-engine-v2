@@ -34,3 +34,15 @@ void NetworkBehaviour::setComponentNetworkId(uint32_t id)
 {
 	componentNetworkId = id;
 }
+
+void NetworkBehaviour::serialize(WriteArchive &archive) const
+{
+	archive.process(componentNetworkId);
+	archive.process(authorityType);
+}
+
+void NetworkBehaviour::deserialize(ReadArchive &archive)
+{
+	archive.process(componentNetworkId);
+	archive.process(authorityType);
+}
