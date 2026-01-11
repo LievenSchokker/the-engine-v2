@@ -92,7 +92,7 @@ class Behaviour: virtual public Component
 	 * on the frame rate of the simulation, to ensure consistent and
 	 * deterministic physics calculations, regardless of rendering speed.
 	 */
-	virtual void fixedUpdate() {};
+	virtual void fixedUpdate(double fixedDeltaTime) {};
 
 	/**
 	* @brief Called when this component is disabled:

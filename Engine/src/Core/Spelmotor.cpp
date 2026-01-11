@@ -104,7 +104,7 @@ void SpelMotor::tick()
 	coreClock->tick();
 	while (coreClock->shouldFixedUpdate())
 	{
-		coreSystemLoop->fixedUpdate(coreClock->getDeltaTime());
+		coreSystemLoop->fixedUpdate(coreClock->getFixedDeltaTime());
 		coreClock->consumeFixedUpdate();
 
 		if (coreSystemLoop->isShutdownRequested())

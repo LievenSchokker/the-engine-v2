@@ -35,6 +35,7 @@ void ApplicationClock::tick()
 {
 	double newTime = getClock();
 	double frameTime = newTime - currentTime;
+	deltaTime = frameTime;
 
 	double oldAccum = accumulatedTime;
 
@@ -77,8 +78,13 @@ double ApplicationClock::getTime() const
 
 double ApplicationClock::getDeltaTime() const
 {
+	return deltaTime * timeScale;
+}
+double ApplicationClock::getFixedDeltaTime()
+{
 	return fixedDeltaTime * timeScale;
 }
+
 
 double ApplicationClock::getAccumulatedTime() const
 {
@@ -119,3 +125,5 @@ bool ApplicationClock::isPaused() const
 {
 	return paused;
 }
+
+
