@@ -35,6 +35,8 @@ public:
 	 */
 	NetworkSpawnManager(GameWorld* gameWorlds);
 
+	~NetworkSpawnManager();
+
 	/**
 	 * @brief Spawns a networked object (server-side).
 	 *
@@ -83,6 +85,9 @@ public:
     void untrackSpawnedObject(uint32_t netId);
 
 	void loadAssetsForGameObject(GameObject *obj);
+
+	void configureServerCallbacks(Server *server);
+
 private:
 	SpawnMessage createSpawnMessage(const NetworkIdentity* identity,
 	                                uint32_t assetId);
