@@ -1,0 +1,21 @@
+# Doxyfile configuration for Engine Documentation
+
+PROJECT_NAME           = "@DOXYGEN_PROJECT_NAME@"
+PROJECT_BRIEF          = "@DOXYGEN_PROJECT_BRIEF@"
+OUTPUT_DIRECTORY       = "@DOXYGEN_OUTPUT_DIRECTORY@"
+INPUT                  = @DOXYGEN_INPUT_DIRECTORIES@ \
+                         @DOXYGEN_MAINPAGE@
+FILE_PATTERNS          = *.h *.hpp *.cpp
+RECURSIVE              = YES
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+USE_MDFILE_AS_MAINPAGE = @DOXYGEN_USE_MDFILE_AS_MAINPAGE@
+MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+GENERATE_TREEVIEW      = YES
+DISABLE_INDEX          = NO
+FULL_SIDEBAR           = YES
