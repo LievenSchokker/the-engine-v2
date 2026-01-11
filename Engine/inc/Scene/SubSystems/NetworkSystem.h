@@ -135,6 +135,8 @@ private:
      */
     void processForServer(Scene& scene, GameWorld& gameWorld);
 
+    void spawnClientObjectsForConnectedClients(GameWorld &gameWorld);
+
     /**
      * @brief Client-side scene processing.
      *

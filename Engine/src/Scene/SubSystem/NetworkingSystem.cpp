@@ -14,6 +14,8 @@
 
 #include <iostream>
 
+#include "Networking/Server/Server.h"
+
 void NetworkSystem::configure(NetworkSpawnManager *spawnMgr, BehaviourSystem *behSys)
 {
 	spawnManager = spawnMgr;
@@ -32,6 +34,10 @@ void NetworkSystem::processSceneForNetwork(Scene &scene, GameWorld &gameWorld)
 
 void NetworkSystem::processForServer(Scene &scene, GameWorld &gameWorld)
 {
+	if (spawnManager)
+	{
+		spawnManager->clearPrefabLibrary();
+	}
 	std::vector<GameObject *> networkObjects;
 
 	scene.forEachGameObject([&](GameObject &obj)
@@ -102,6 +108,28 @@ void NetworkSystem::processForServer(Scene &scene, GameWorld &gameWorld)
 
 		uint32_t assetId = spawnManager->addToPrefabLibrary(std::move(extracted));
 		spawnManager->spawnObject(assetId, -1);
+	}
+
+	spawnClientObjectsForConnectedClients(gameWorld);
+}
+
+void NetworkSystem::spawnClientObjectsForConnectedClients(GameWorld& gameWorld)
+{
+	if (!spawnManager || !gameWorld.server)
+	{
+		return;
+	}
+
+	const auto& connectedClients = gameWorld.server->getConnectedClientIds();
+
+	if (connectedClients.empty())
+	{
+		return;
+	}
+
+	for (const int clientId : connectedClients)
+	{
+		spawnManager->CheckNewClientSpawnObject(clientId);
 	}
 }
 

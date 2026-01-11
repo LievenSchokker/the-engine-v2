@@ -36,6 +36,14 @@ uint32_t NetworkSpawnManager::generateNetId()
 	return nextNetworkId++;
 }
 
+void NetworkSpawnManager::clearPrefabLibrary()
+{
+	if (prefabLibrary)
+	{
+		prefabLibrary->clear();
+	}
+}
+
 GameObject* NetworkSpawnManager::spawnObject(const uint32_t assetId, const int ownerId)
 {
     if (!prefabLibrary)

@@ -88,11 +88,13 @@ public:
 
 	void configureServerCallbacks(Server *server);
 
+	void clearPrefabLibrary();
 private:
 	SpawnMessage createSpawnMessage(const NetworkIdentity* identity,
 	                                uint32_t assetId);
 
 	uint32_t generateNetId();
+
 
 
 	GameWorld* gameWorld;

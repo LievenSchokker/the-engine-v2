@@ -170,6 +170,7 @@ public:
     static ServerConnectionInformation convertApplicationSettings(const ApplicationSpecifications& specifications);
 
 	int getConnectedClientCount() const;
+	const std::unordered_set<int>& getConnectedClientIds() const;
 private:
     /**
      * @brief Deserializes and routes incoming messages

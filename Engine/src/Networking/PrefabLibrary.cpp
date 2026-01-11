@@ -115,3 +115,9 @@ std::vector<uint32_t> PrefabLibrary::getNetworkPrefabIdsWithAuthoritativeClient(
 
 	return result;
 }
+
+void PrefabLibrary::clear()
+{
+	prefabsById.clear();
+	networkPrefabIds.clear();
+}
