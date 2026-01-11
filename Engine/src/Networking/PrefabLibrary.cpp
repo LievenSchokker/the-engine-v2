@@ -120,6 +120,4 @@ void PrefabLibrary::clear()
 {
 	prefabsById.clear();
 	networkPrefabIds.clear();
-	// Don't reset nextAssetId to avoid ID collisions across scene switches
-	std::cout << "[PrefabLibrary] Cleared all prefabs" << std::endl;
 }

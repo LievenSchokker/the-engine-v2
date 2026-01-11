@@ -41,7 +41,6 @@ void NetworkSpawnManager::clearPrefabLibrary()
 	if (prefabLibrary)
 	{
 		prefabLibrary->clear();
-		std::cout << "[NetworkSpawnManager] Prefab library cleared" << std::endl;
 	}
 }
 
