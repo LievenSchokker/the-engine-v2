@@ -350,7 +350,7 @@ void NetworkSystem::cleanupNetworkObjectsInScene(Scene &scene)
 
 bool NetworkSystem::isLocallyOwned(NetworkIdentity *identity, const GameWorld &gameWorld) const
 {
-	if (!identity) return false;
+	if (identity) return false;
 
 	GameObject *go = identity->getGameObject();
 	if (!go) return false;
