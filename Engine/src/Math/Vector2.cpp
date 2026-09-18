@@ -59,7 +59,7 @@ Vector2 Vector2::left()
 }
 
 
-float Vector2::distance(const Vector2& from, const Vector2& to)
+float Vector2::distance(Vector2 from, Vector2 to)
 {
 	float deltaX = to.x - from.x;
 	float deltaY = to.y - from.y;
@@ -68,13 +68,13 @@ float Vector2::distance(const Vector2& from, const Vector2& to)
 }
 
 
-float Vector2::dot(const Vector2& a, const Vector2& b)
+float Vector2::dot(Vector2 a, Vector2 b)
 {
 	return a.x * b.x + a.y * b.y;
 }
 
 
-float Vector2::angle(const Vector2& from, const Vector2& to)
+float Vector2::angle(Vector2 from, Vector2 to)
 {
 	float fromMagnitude = from.magnitude();
 	float toMagnitude = to.magnitude();
@@ -93,7 +93,7 @@ float Vector2::angle(const Vector2& from, const Vector2& to)
 }
 
 
-Vector2 Vector2::lerp(const Vector2& from, const Vector2& to, float t)
+Vector2 Vector2::lerp(Vector2 from, Vector2 to, float t)
 {
 	t = std::clamp(t, 0.0f, 1.0f);
 	return from + (to - from) * t;
@@ -129,25 +129,25 @@ float Vector2::magnitude() const
 }
 
 
-Vector2 Vector2::operator+(const Vector2& other) const
+Vector2 Vector2::operator+(Vector2 other) const
 {
 	return {x + other.x, y + other.y};
 }
 
 
-Vector2 Vector2::operator-(const Vector2& other) const
+Vector2 Vector2::operator-(Vector2 other) const
 {
 	return {x - other.x, y - other.y};
 }
 
 
-Vector2 Vector2::operator*(const Vector2& other) const
+Vector2 Vector2::operator*(Vector2 other) const
 {
 	return {x * other.x, y * other.y};
 }
 
 
-Vector2 Vector2::operator/(const Vector2& other) const
+Vector2 Vector2::operator/(Vector2 other) const
 {
 	return {x / other.x, y / other.y};
 }
@@ -165,7 +165,7 @@ Vector2 Vector2::operator/(float scalar) const
 }
 
 
-Vector2& Vector2::operator+=(const Vector2& other)
+Vector2& Vector2::operator+=(Vector2 other)
 {
 	x += other.x;
 	y += other.y;
@@ -173,7 +173,7 @@ Vector2& Vector2::operator+=(const Vector2& other)
 }
 
 
-Vector2& Vector2::operator-=(const Vector2& other)
+Vector2& Vector2::operator-=(Vector2 other)
 {
 	x -= other.x;
 	y -= other.y;
@@ -181,7 +181,7 @@ Vector2& Vector2::operator-=(const Vector2& other)
 }
 
 
-Vector2& Vector2::operator*=(const Vector2& other)
+Vector2& Vector2::operator*=(Vector2 other)
 {
 	x *= other.x;
 	y *= other.y;
@@ -189,7 +189,7 @@ Vector2& Vector2::operator*=(const Vector2& other)
 }
 
 
-Vector2& Vector2::operator/=(const Vector2& other)
+Vector2& Vector2::operator/=(Vector2 other)
 {
 	x /= other.x;
 	y /= other.y;
@@ -218,14 +218,14 @@ Vector2 Vector2::operator-() const
 }
 
 
-bool Vector2::operator==(const Vector2& other) const
+bool Vector2::operator==(Vector2 other) const
 {
 	return std::fabs(x - other.x) < EPSILON && std::fabs(y - other.y) <
 	       EPSILON;
 }
 
 
-bool Vector2::operator!=(const Vector2& other) const
+bool Vector2::operator!=(Vector2 other) const
 {
 	return !(*this == other);
 }

@@ -31,17 +31,17 @@ struct Vector2
     static Vector2 left();
 
     /// Returns the distance between two vectors.
-    [[nodiscard]] static float distance(const Vector2 &from, const Vector2 &to);
+    [[nodiscard]] static float distance(Vector2 from, Vector2 to);
 
     /// Returns the dot product between this and the other vector
     /// (1 point in the same direction; -1 complete opposite directions; 0 if perpendicular)
-    [[nodiscard]] static float dot(const Vector2 &a, const Vector2 &b);
+    [[nodiscard]] static float dot(Vector2 a, Vector2 b);
 
     /// Returns the angle between two vectors (in radians)
-    [[nodiscard]] static float angle(const Vector2 &from, const Vector2 &to);
+    [[nodiscard]] static float angle(Vector2 from, Vector2 to);
 
     /// Linearly interpolates between @c from and @c to by @c t (t will be normalised between 0 and 1).
-    static Vector2 lerp(const Vector2& from, const Vector2& to, float t);
+    static Vector2 lerp(Vector2 from, Vector2 to, float t);
 
     /// Sets the value of this vector's x component
     void setX(float value);
@@ -61,16 +61,16 @@ struct Vector2
     [[nodiscard]] float magnitude() const;
 
     /// Adds each element of the other Vector to this Vector's respective element (v1.x + v2.x, v1.y + v2.y)
-    Vector2 operator+(const Vector2 &other) const;
+    Vector2 operator+(Vector2 other) const;
 
     /// Subtracts each element of the other Vector to this Vector's respective element (v1.x - v2.x, v1.y - v2.y)
-    Vector2 operator-(const Vector2 &other) const;
+    Vector2 operator-(Vector2 other) const;
 
     /// Multiplies each element of the other Vector to this Vector's respective element (v1.x * v2.x, v1.y * v2.y)
-    Vector2 operator*(const Vector2 &other) const;
+    Vector2 operator*(Vector2 other) const;
 
     /// Divides each element of the other Vector to this Vector's respective element (v1.x / v2.x, v1.y / v2.y)
-    Vector2 operator/(const Vector2 &other) const;
+    Vector2 operator/(Vector2 other) const;
 
     /// Multiplies this vector's component by a scalar value (v1.x * scalar, v1.y * scalar)
     Vector2 operator*(float scalar) const;
@@ -79,16 +79,16 @@ struct Vector2
     Vector2 operator/(float scalar) const;
 
     /// Adds each element of the other Vector to this Vector's respective element (v1.x + v2.x, v1.y + v2.y)
-    Vector2 &operator+=(const Vector2 &other);
+    Vector2 &operator+=(Vector2 other);
 
     /// Subtracts each element of the other Vector to this Vector's respective element (v1.x - v2.x, v1.y - v2.y)
-    Vector2 &operator-=(const Vector2 &other);
+    Vector2 &operator-=(Vector2 other);
 
     /// Multiplies this vector's component by a scalar value (v1.x * scalar, v1.y * scalar)
-    Vector2 &operator*=(const Vector2 &other);
+    Vector2 &operator*=(Vector2 other);
 
     /// Divides this vector's component by a scalar value (v1.x / scalar, v1.y / scalar)
-    Vector2 &operator/=(const Vector2 &other);
+    Vector2 &operator/=(Vector2 other);
 
     /// Multiplies this vector's component by a scalar value (v1.x * scalar, v1.y * scalar)
     Vector2 &operator*=(float scalar);
@@ -100,10 +100,10 @@ struct Vector2
     Vector2 operator-() const;
 
     /// Returns wheter this and the other are equal (using float epsilon)
-    bool operator==(const Vector2& other) const;
+    bool operator==(Vector2 other) const;
 
     /// Returns whether this and the other vector are not equal
-    bool operator!=(const Vector2& other) const;
+    bool operator!=(Vector2 other) const;
 
     float x = 0;
     float y = 0;
@@ -112,7 +112,7 @@ struct Vector2
 
 struct Vector2Hash
 {
-    std::size_t operator()(const Vector2& v) const
+    std::size_t operator()(Vector2 v) const
     {
         return std::hash<float>()(v.x) ^ (std::hash<float>()(v.y) << 1);
     }
