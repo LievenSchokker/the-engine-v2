@@ -123,8 +123,6 @@ const std::vector<Behaviour*>& GameObject::getEnabledBehaviours()
 void GameObject::destroy()
 {
 	if (isDestroyed) return;
-
-	isDestroyed = true;
 	setActive(false);
 
 	disableAllBehaviours();
