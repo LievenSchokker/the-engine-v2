@@ -9,18 +9,12 @@ void DestroySystem::queueDestroy(GameObject* obj)
 	if (obj == nullptr)
 		return;
 
-	if (isQueued(obj))
+	if(obj->getIsDestroyed()){
 		return;
+	}
 
 	destroyQueue.push_back(obj);
-}
-
-void DestroySystem::queueDestroy(const std::vector<GameObject*>& objects)
-{
-	for (GameObject* obj : objects)
-	{
-		queueDestroy(obj);
-	}
+	obj->isDestroyed = true;
 }
 
 void DestroySystem::processQueue(Scene& scene)
@@ -28,12 +22,10 @@ void DestroySystem::processQueue(Scene& scene)
 	if (destroyQueue.empty())
 		return;
 
-	// We iterate by index because the queue could grow
-	// if onSceneDestroy() queues more objects
-    // DON'T MAKE THIS A NESTED LOOP
-	for (size_t i = 0; i < destroyQueue.size(); ++i)
+	while(!destroyQueue.empty())
 	{
-		GameObject* obj = destroyQueue[i];
+		GameObject* obj = destroyQueue.back();
+		destroyQueue.pop_back();
 
 		if (obj == nullptr)
 			continue;
@@ -44,17 +36,6 @@ void DestroySystem::processQueue(Scene& scene)
 
 		scene.removeGameObject(obj->getGameObjectHandle());
 	}
-
-	destroyQueue.clear();
-}
-
-bool DestroySystem::isQueued(const GameObject* obj) const
-{
-	if (obj == nullptr)
-		return false;
-
-	return std::ranges::find(destroyQueue, obj)
-		   != destroyQueue.end();
 }
 
 size_t DestroySystem::queueSize() const

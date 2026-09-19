@@ -53,7 +53,9 @@ public:
     	
         if (gameWorld.input->wasKeyPressed(KeyCode::L))
         {
-            spawnNewObject(gameWorld);
+			for(int i = 0; i < 10000; i++){
+				spawnNewObject(gameWorld);
+			}
         }
 
         if (gameWorld.input->wasKeyPressed(KeyCode::K))
@@ -68,11 +70,8 @@ private:
         spawnCount++;
         std::string objectName = "SpawnedObject_" + std::to_string(spawnCount);
 
-        std::cout << "\n>>> SPAWNING: " << objectName << " <<<" << std::endl;
-
         auto newObject = std::make_unique<GameObject>();
         newObject->setName(objectName);
-        newObject->setTag("Spawned");
 
         static std::random_device rd;
         static std::mt19937 gen(rd());
@@ -91,63 +90,44 @@ private:
             Color::darkPurple(),
             Color(255, 128, 0)
         };
+
         renderer->setColor(colors[spawnCount % 6]);
-        newObject->addComponent<TestLifecycleBehaviour>(objectName);
-        spawnedNames.push_back(objectName);
+
         Scene* scene = gameWorld.sceneManager->getActiveScene();
         if (scene)
         {
-            scene->addGameObject(std::move(newObject));
-            std::cout << ">>> SPAWN COMPLETE: " << objectName
-                      << " (Total spawned: " << spawnedNames.size() << ") <<<\n" << std::endl;
+			spawnedObjectHandles.push_back(scene->addGameObject(std::move(newObject)));
         }
         else
         {
-            std::cerr << "[SpawnDestroyInput] ERROR: No active scene!" << std::endl;
-            spawnedNames.pop_back();
+			spawnedObjectHandles.pop_back();
         }
     }
 
     void destroyAllSpawned(const GameWorld& gameWorld)
     {
-        if (spawnedNames.empty())
+        if ( spawnedObjectHandles.empty())
         {
-            std::cout << "\n>>> No spawned objects to destroy <<<\n" << std::endl;
             return;
         }
-
-        std::cout << "\n>>> DESTROYING ALL " << spawnedNames.size() << " SPAWNED OBJECTS <<<" << std::endl;
 
         Scene* scene = gameWorld.sceneManager->getActiveScene();
         if (!scene)
         {
-            std::cerr << "[SpawnDestroyInput] ERROR: No active scene!" << std::endl;
             return;
         }
 
         int destroyedCount = 0;
-        for (const std::string& name : spawnedNames)
+        for (const ObjectHandle& handle : spawnedObjectHandles )
         {
-            GameObject* obj = scene->getGameObject(name);
-            if (obj)
-            {
-                std::cout << "  Destroying: " << name << std::endl;
-                obj->destroy();
-                destroyedCount++;
-            }
-            else
-            {
-                std::cout << "  [Already destroyed]: " << name << std::endl;
-            }
+			scene->removeGameObject(handle);
         }
 
-        spawnedNames.clear();
-
-        std::cout << ">>> DESTROY COMPLETE: " << destroyedCount << " objects destroyed <<<\n" << std::endl;
+		spawnedObjectHandles.clear();
     }
 
     int spawnCount;
-    std::vector<std::string> spawnedNames;
+    std::vector<ObjectHandle> spawnedObjectHandles;
 };
 
 std::unique_ptr<Scene> SpawnDestroyZandbak::getScene()

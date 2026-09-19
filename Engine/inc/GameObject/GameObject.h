@@ -377,6 +377,8 @@ class GameObject: public ISerializable
 	 */
 	void storeInlineChild(std::unique_ptr<GameObject> child);
 
+
+
 private:
 	void fixupPointersAfterClone();
 
@@ -425,6 +427,8 @@ private:
 	uint32_t pendingParentNetId = 0;
 	bool hasPendingParent = false;
 	std::vector<std::unique_ptr<GameObject>> deserializedInlineChildren;
+
+	friend class DestroySystem;
 };
 
 #include "GameObjectImplementation.inl"

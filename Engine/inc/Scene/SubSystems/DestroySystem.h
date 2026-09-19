@@ -1,8 +1,8 @@
 #pragma once
 
 
-#include <vector>
 #include <functional>
+#include <deque>
 
 class GameObject;
 class Scene;
@@ -75,6 +75,6 @@ public:
     void setPreDestroyCallback(std::function<void(GameObject*)> callback);
 
 private:
-    std::vector<GameObject*> destroyQueue;
+    std::deque<GameObject* > destroyQueue;
     std::function<void(GameObject*)> preDestroyCallback;
 };
