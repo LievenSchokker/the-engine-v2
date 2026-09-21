@@ -74,6 +74,8 @@ void Scene::onStop()
 
 ObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 {
+	invalidateComponentCache();
+
 	if ( gameObject == nullptr )
 	{
 		return ObjectHandle::null();
@@ -124,6 +126,7 @@ ObjectHandle Scene::addGameObject(std::unique_ptr<GameObject> gameObject)
 
 bool Scene::removeGameObject(const std::string& name)
 {
+	invalidateComponentCache();
 	ObjectHandle handle = findHandleByName(name);
 	if ( handle.isNull() ) return false;
 	return removeGameObject(handle);
@@ -131,6 +134,7 @@ bool Scene::removeGameObject(const std::string& name)
 
 bool Scene::removeGameObject(ObjectHandle handle)
 {
+	invalidateComponentCache();
 	if ( !gameObjects.isValid(handle) ) return false;
 
 	GameObject* obj = gameObjects.resolve(handle);
@@ -189,6 +193,7 @@ std::unique_ptr<GameObject> Scene::extractGameObject(const std::string& name)
 
 std::unique_ptr<GameObject> Scene::extractGameObject(ObjectHandle handle)
 {
+	invalidateComponentCache();
 	if ( !gameObjects.isValid(handle) ) return nullptr;
 
 	GameObject* obj = gameObjects.resolve(handle);
@@ -220,6 +225,7 @@ std::unique_ptr<GameObject> Scene::extractGameObject(ObjectHandle handle)
 
 void Scene::destroyAllGameObjects()
 {
+	invalidateComponentCache();
 	forEachGameObject([](GameObject& obj) { obj.onSceneDestroy(); });
 	gameObjects.clear();
 }
@@ -358,6 +364,10 @@ void Scene::serialize(WriteArchive& archive) const
 			archive.process(parentIndex);
 		}
 	}
+}
+
+void Scene::invalidateComponentCache() {
+	componentCaches.clear();
 }
 
 void Scene::deserialize(ReadArchive& archive)

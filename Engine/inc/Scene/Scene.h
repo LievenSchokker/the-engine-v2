@@ -1,6 +1,7 @@
 #pragma once
 
-
+#include <map>
+#include <any>
 #include "Core/GameWorld.h"
 #include "AI/Navigation/NavigationGridOptions.h"
 #include "Networking/Serialization/ISerializable.h"
@@ -128,7 +129,7 @@ public:
 
 	void serialize(WriteArchive& archive) const override;
 	void deserialize(ReadArchive& archive) override;
-
+	void invalidateComponentCache();
 
 
 private:
@@ -144,6 +145,8 @@ private:
     [[nodiscard]] ObjectHandle findHandleByName(const std::string& name) const;
     [[nodiscard]] bool isValid(ObjectHandle handle) const;
     void initialiseNavigationSystem(NavigationGridOptions options);
+
+	mutable std::unordered_map<std::type_index, std::any> componentCaches;
 };
 
 #include "Scene.inl"

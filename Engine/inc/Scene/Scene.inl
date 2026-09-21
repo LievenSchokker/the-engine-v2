@@ -16,17 +16,21 @@ void Scene::forEachGameObject(Func&& func) const {
 }
 
 template<typename Component>
-std::vector<Component*> Scene::getAllComponentsOfType() const {
+std::vector<Component*> Scene::getAllComponentsOfType() const{
+
+	auto it = componentCaches.find(std::type_index(typeid(Component)));
+	if (it != componentCaches.end()) {
+		return std::any_cast<std::vector<Component*>>(it->second);
+	}
+
 	std::vector<Component*> result;
-
 	forEachGameObject([&](const GameObject& obj) {
-		if (!obj.getIsActive()) return;
-
 		for (Component* component : obj.getComponents<Component>()) {
 			result.push_back(component);
 		}
 	});
 
+	componentCaches[std::type_index(typeid(Component))] = result;
 	return result;
 }
 
