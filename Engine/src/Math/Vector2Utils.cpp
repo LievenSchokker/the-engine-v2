@@ -14,7 +14,7 @@ Vector2 Vector2Utils::sanitizeScale(Vector2 scale)
 	}
 
 	if ( std::abs(scale.y) < kEpsilon ) {
-		scale.setY(1.0);;
+		scale.setY(1.0);
 	}
 
 	return scale;

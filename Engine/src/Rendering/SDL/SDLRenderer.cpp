@@ -201,11 +201,6 @@ bool SDLRenderer::isOpen()
 void SDLRenderer::drawCircle(const Vector2& center, double radius,
                              const Color& color, const Vector2& scale)
 {
-	if (renderer == nullptr)
-	{
-		return;
-	}
-
 	const Vector2 finalScale = Vector2Utils::sanitizeScale(scale);
 	const double scaledRadiusX = std::abs(radius * finalScale.x);
 	const double scaledRadiusY = std::abs(radius * finalScale.y);
@@ -224,15 +219,12 @@ void SDLRenderer::drawCircle(const Vector2& center, double radius,
 
 	for (int y = -ry; y <= ry; ++y)
 	{
-		const double normalizedY =
-			static_cast<double>(y) / static_cast<double>(ry);
-		const double span =
-			static_cast<double>(rx) *
-			std::sqrt(std::max(0.0, 1.0 - normalizedY * normalizedY));
-		const int startX = static_cast<int>(std::floor(-span));
-		const int endX = static_cast<int>(std::ceil(span));
-		SDL_RenderDrawLine(renderer, centerX + startX, centerY + y,
-		                   centerX + endX, centerY + y);
+		const double normalizedY = double(y) / ry;
+		const double span = rx * std::sqrt(std::max(0.0, 1.0 - normalizedY * normalizedY));
+		const int halfSpan = static_cast<int>(std::ceil(span));
+
+		SDL_RenderDrawLine(renderer, centerX - halfSpan, centerY + y,
+						   centerX + halfSpan, centerY + y);
 	}
 }
 
@@ -283,11 +275,6 @@ bool SDLRenderer::ensureSolidQuadTexture()
 	if (solidQuadTexture != nullptr)
 	{
 		return true;
-	}
-
-	if (renderer == nullptr)
-	{
-		return false;
 	}
 
 	solidQuadTexture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
