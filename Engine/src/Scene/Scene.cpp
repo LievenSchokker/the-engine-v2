@@ -154,7 +154,6 @@ bool Scene::removeGameObject(ObjectHandle handle)
 		obj->onSceneDestroy();
 	}
 
-	gameObjects.destroy(handle);
 	return true;
 }
 
